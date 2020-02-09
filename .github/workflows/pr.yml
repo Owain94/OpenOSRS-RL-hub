@@ -47,35 +47,35 @@ jobs:
 
       - name: Make gradlew executable (client)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Assembling client
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Building client
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Upload client artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Make gradlew executable (plugins)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Assembling plugins
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Building plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -118,35 +118,35 @@ jobs:
 
       - name: Make gradlew executable (client)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Assembling client
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Building client
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Upload client artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Make gradlew executable (plugins)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Assembling plugins
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Building plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -188,35 +188,35 @@ jobs:
 
       - name: Make gradlew executable (client)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Assembling client
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Building client
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Upload client artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/plugins/runelite
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
 
       - name: Make gradlew executable (plugins)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Assembling plugins
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Building plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/plugins/plugins
+        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
