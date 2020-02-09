@@ -305,7 +305,7 @@ jobs:
         run: ./gradlew bootstrapPlugins --stacktrace --console=plain
 
       - name: Copy bootstrap
-        run: cp -af /home/runner/work/OpenOSRS-RL-hub/plugins/build/bootstrap/. /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub-hosting/
+        run: cp -af /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub/build/bootstrap/. /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub-hosting/
 
       - name: Commit bootstrap
         run: |
