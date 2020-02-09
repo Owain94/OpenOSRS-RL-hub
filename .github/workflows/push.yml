@@ -1,4 +1,4 @@
-name: OpenOSRS - CI (Push)
+name: Owain94 - CI (Push)
 
 on:
   push:
@@ -321,4 +321,4 @@ jobs:
         with:
           github_token: ${{ secrets.Owain }}
           directory: /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub-hosting
-          repository: open-osrs/OpenOSRS-RL-hub-hosting
+          repository: Owain94/OpenOSRS-RL-hub-hosting

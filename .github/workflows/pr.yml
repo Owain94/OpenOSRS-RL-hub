@@ -1,4 +1,4 @@
-name: OpenOSRS - CI (PR)
+name: Owain94 - CI (PR)
 
 on:
   pull_request:
