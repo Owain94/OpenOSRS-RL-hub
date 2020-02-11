@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2020, Adrian Lee Elder <https://github.com/AdrianLeeElder>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,22 +22,52 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.bankhistory;
 
-rootProject.name = "OpenOSRS Plugins"
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":inventorysetups")
-include(":stonedloottracker")
+@ConfigGroup("bankhistory")
+public interface BankHistoryConfig extends Config
+{
+	@ConfigItem(
+		keyName = "defaultAccount",
+		name = "Default account",
+		description = "The account to show data for by default"
+	)
+	default String getDefaultAccount()
+	{
+		return "";
+	}
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+	@ConfigItem(
+		keyName = "defaultBankTab",
+		name = "Default bank tab",
+		description = "The bank tab to select by default"
+	)
+	default int getDefaultBankTab()
+	{
+		return 0;
+	}
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+	@ConfigItem(
+		keyName = "defaultDatasetEntry",
+		name = "Default dataset entry",
+		description = "The amount of time in hours that should elapse before adding a new data entry"
+	)
+	default int getDefaultDatasetEntry()
+	{
+		return 1;
+	}
+
+	@ConfigItem(
+		keyName = "onlyManualEntries",
+		name = "Only manual entries",
+		description = "Only add entries manually, rather than each time the bank is opened."
+	)
+	default boolean getOnlyManualEntries()
+	{
+		return false;
+	}
 }

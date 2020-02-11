@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2018, TheStonedTurtle <https://github.com/TheStonedTurtle>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,22 +22,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.lootlogger.localstorage;
 
-rootProject.name = "OpenOSRS Plugins"
+import java.util.Collection;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import net.runelite.http.api.loottracker.LootRecordType;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":inventorysetups")
-include(":stonedloottracker")
+@Data
+@AllArgsConstructor
+public class LTRecord
+{
+	private final String name;
+	private final int level;
+	private final int killCount;
+	private LootRecordType type;
+	final Collection<LTItemEntry> drops;
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
-
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+	public void addDropEntry(LTItemEntry itemEntry)
+	{
+		drops.add(itemEntry);
+	}
 }
