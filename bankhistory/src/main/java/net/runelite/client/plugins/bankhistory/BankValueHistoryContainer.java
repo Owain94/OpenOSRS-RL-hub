@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2020, Adrian Lee Elder <https://github.com/AdrianLeeElder>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,22 +22,30 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.bankhistory;
 
-rootProject.name = "OpenOSRS Plugins"
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":inventorysetups")
-include(":stonedloottracker")
+/**
+ * Wraps a collection of prices mapped to the time recorded.
+ */
+@Data
+@RequiredArgsConstructor
+public class BankValueHistoryContainer
+{
+	private final Map<LocalDateTime, BankValue> pricesMap;
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+	public BankValueHistoryContainer()
+	{
+		this(new HashMap<>());
+	}
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+	public void addPrice(BankValue bankValue)
+	{
+		pricesMap.put(LocalDateTime.now(), bankValue);
+	}
 }
