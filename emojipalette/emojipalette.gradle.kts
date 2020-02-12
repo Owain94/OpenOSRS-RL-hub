@@ -27,21 +27,18 @@ import ProjectVersions.rlVersion
 
 version = "0.0.1"
 
-project.extra["PluginName"] = "Stoned Tracker"
-project.extra["PluginDescription"] = "Local data persistence and unique UI for the Loot Tracker"
+project.extra["PluginName"] = "Emoji palette"
+project.extra["PluginDescription"] = "Shows a panel with all the emoji"
 
 dependencies {
     annotationProcessor(Libraries.lombok)
     annotationProcessor(Libraries.pf4j)
 
-    compileOnly("com.openosrs:http-api:$rlVersion")
     compileOnly("com.openosrs:runelite-api:$rlVersion")
     compileOnly("com.openosrs:runelite-client:$rlVersion")
 
-    compileOnly("com.openosrs.externals:loottracker:0.0.5")
+    compileOnly("com.openosrs.externals:emojis:0.0.3")
 
-    compileOnly(Libraries.apacheCommonsText)
-    compileOnly(Libraries.guava)
     compileOnly(Libraries.guice)
     compileOnly(Libraries.gson)
     compileOnly(Libraries.javax)
@@ -56,7 +53,7 @@ tasks {
                     "Plugin-Version" to project.version,
                     "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Dependencies" to nameToId("loottracker"),
+                    "Plugin-Dependencies" to nameToId("emojis"),
                     "Plugin-Description" to project.extra["PluginDescription"],
                     "Plugin-License" to project.extra["PluginLicense"]
             ))
