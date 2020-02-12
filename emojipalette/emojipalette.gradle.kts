@@ -1,5 +1,7 @@
+import ProjectVersions.rlVersion
+
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,22 +25,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-rootProject.name = "OpenOSRS Plugins"
+version = "0.0.1"
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":emojipalette")
-include(":inventorysetups")
-include(":stonedloottracker")
+project.extra["PluginName"] = "Emoji palette"
+project.extra["PluginDescription"] = "Shows a panel with all the emoji"
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+dependencies {
+    annotationProcessor(Libraries.lombok)
+    annotationProcessor(Libraries.pf4j)
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
+    compileOnly("com.openosrs:runelite-api:$rlVersion")
+    compileOnly("com.openosrs:runelite-client:$rlVersion")
+
+    compileOnly("com.openosrs.externals:emojis:0.0.3")
+
+    compileOnly(Libraries.guice)
+    compileOnly(Libraries.gson)
+    compileOnly(Libraries.javax)
+    compileOnly(Libraries.lombok)
+    compileOnly(Libraries.pf4j)
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes(mapOf(
+                    "Plugin-Version" to project.version,
+                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
+                    "Plugin-Provider" to project.extra["PluginProvider"],
+                    "Plugin-Dependencies" to nameToId("emojis"),
+                    "Plugin-Description" to project.extra["PluginDescription"],
+                    "Plugin-License" to project.extra["PluginLicense"]
+            ))
+        }
     }
 }
