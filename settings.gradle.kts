@@ -29,6 +29,7 @@ include(":bankedexperience")
 include(":bankheatmap")
 include(":bankhistory")
 include(":chatboxopacity")
+include(":emojipalette")
 include(":inventorysetups")
 include(":stonedloottracker")
 
