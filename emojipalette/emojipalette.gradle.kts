@@ -37,7 +37,7 @@ dependencies {
     compileOnly("com.openosrs:runelite-api:$rlVersion")
     compileOnly("com.openosrs:runelite-client:$rlVersion")
 
-    compileOnly("com.openosrs.externals:emojis:0.0.3")
+    compileOnly("com.openosrs.externals:emojis:0.0.+")
 
     compileOnly(Libraries.guice)
     compileOnly(Libraries.gson)
