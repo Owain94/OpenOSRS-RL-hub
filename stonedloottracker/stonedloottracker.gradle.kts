@@ -38,7 +38,7 @@ dependencies {
     compileOnly("com.openosrs:runelite-api:$rlVersion")
     compileOnly("com.openosrs:runelite-client:$rlVersion")
 
-    compileOnly("com.openosrs.externals:loottracker:0.0.5")
+    compileOnly("com.openosrs.externals:loottracker:0.0.+")
 
     compileOnly(Libraries.apacheCommonsText)
     compileOnly(Libraries.guava)
