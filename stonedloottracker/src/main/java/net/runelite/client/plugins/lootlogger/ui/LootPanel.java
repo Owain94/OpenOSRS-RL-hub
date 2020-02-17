@@ -115,20 +115,57 @@ class LootPanel extends JPanel
 		}
 
 		// Attach Kill Count Panel(s)
-		if (lootLog.getRecords().size() > 0)
+		final int amount = lootLog.getRecords().size();
+		String currentText;
+		String loggedText;
+
+		switch (lootLog.getName())
 		{
-			final int amount = lootLog.getRecords().size();
+			case "Wintertodt":
+				currentText = "Current Killcount:";
+				loggedText = "Crates logged:";
+				break;
+			case "Herbiboar":
+				currentText = "Herbiboars looted:";
+				loggedText = "Loots logged:";
+				break;
+			case "Brimstone Chest":
+			case "Crystal Chest":
+			case "Larran's big chest":
+			case "Larran's small chest":
+			case "Elven Crystal Chest":
+				currentText = "Chests opened:";
+				loggedText = "Chests logged:";
+				break;
+			case  "Clue Scroll (Beginner)":
+			case  "Clue Scroll (Easy)":
+			case  "Clue Scroll (Medium)":
+			case  "Clue Scroll (Hard)":
+			case  "Clue Scroll (Elite)":
+			case  "Clue Scroll (Master)":
+				currentText = "Clues completed:";
+				loggedText = "Clues logged:";
+				break;
+			default:
+				currentText = "Current loot count:";
+				loggedText = "Loots logged:";
+				break;
+		}
+
+		if (amount > 0)
+		{
 			final LTRecord entry = lootLog.getRecords().get(amount - 1);
 			if (entry.getKillCount() != -1)
 			{
-				final TextPanel p = new TextPanel("Current Killcount:", entry.getKillCount());
+				final TextPanel p = new TextPanel(currentText, entry.getKillCount());
 				this.add(p, c);
 				c.gridy++;
 			}
-			final TextPanel p2 = new TextPanel("Kills Logged:", amount);
-			this.add(p2, c);
-			c.gridy++;
 		}
+
+		final TextPanel p2 = new TextPanel(loggedText, amount);
+		this.add(p2, c);
+		c.gridy++;
 
 		// Only add the total value element if it has something useful to display
 		final long totalValue = lootLog.getConsolidated().values().stream().mapToLong(e -> e.getPrice() * e.getQuantity()).sum();

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2019 Hydrox6 <ikada@protonmail.ch>
+ * Copyright (c) 2019 Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,29 +23,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.esspouch;
 
-rootProject.name = "OpenOSRS Plugins"
+import lombok.AllArgsConstructor;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":emojipalette")
-include(":esspouch")
-include(":friendsexporter")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":stonedloottracker")
-include(":tobhealthbars")
+@AllArgsConstructor
+class ClickOperation
+{
+	Pouch pouch;
+	int tick; // timeout for operation
+	int delta;
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
-
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+	ClickOperation(Pouch pouch, int tick)
+	{
+		this(pouch, tick, 0);
+	}
 }

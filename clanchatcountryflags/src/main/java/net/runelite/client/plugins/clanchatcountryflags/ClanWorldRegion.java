@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2020, melky <https://github.com/melkypie>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,29 +22,48 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.clanchatcountryflags;
 
-rootProject.name = "OpenOSRS Plugins"
+import com.google.common.collect.ImmutableMap;
+import java.awt.image.BufferedImage;
+import java.util.Map;
+import net.runelite.client.util.ImageUtil;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":emojipalette")
-include(":esspouch")
-include(":friendsexporter")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":stonedloottracker")
-include(":tobhealthbars")
+enum ClanWorldRegion
+{
+	// Follow ISO 3166-1 alpha-2 for country codes
+	FLAG_US(0),
+	FLAG_GB(1),
+	FLAG_AU(3),
+	FLAG_DE(7);
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+	private static final Map<Integer, ClanWorldRegion> worldRegionMap;
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+	private final int regionId;
+
+	static
+	{
+		ImmutableMap.Builder<Integer, ClanWorldRegion> builder = new ImmutableMap.Builder<>();
+
+		for (final ClanWorldRegion worldRegion : values())
+		{
+			builder.put(worldRegion.regionId, worldRegion);
+		}
+		worldRegionMap = builder.build();
+	}
+
+	ClanWorldRegion(int regionId)
+	{
+		this.regionId = regionId;
+	}
+
+	BufferedImage loadImage()
+	{
+		return ImageUtil.getResourceStreamFromClass(ClanChatCountryFlagsPlugin.class, this.name().toLowerCase() + ".png");
+	}
+
+	static ClanWorldRegion getByRegionId(int regionId)
+	{
+		return worldRegionMap.get(regionId);
+	}
 }
