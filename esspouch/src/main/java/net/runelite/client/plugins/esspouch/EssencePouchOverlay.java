@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2019 Hydrox6 <ikada@protonmail.ch>
+ * Copyright (c) 2019 Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,29 +23,46 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.esspouch;
 
-rootProject.name = "OpenOSRS Plugins"
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import javax.inject.Inject;
+import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import net.runelite.client.ui.overlay.components.TextComponent;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":emojipalette")
-include(":esspouch")
-include(":friendsexporter")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":stonedloottracker")
-include(":tobhealthbars")
+class EssencePouchOverlay extends WidgetItemOverlay
+{
+	@Inject
+	EssencePouchOverlay()
+	{
+		showOnInventory();
+	}
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+	@Override
+	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem itemWidget)
+	{
+		final Pouch pouch = Pouch.forItem(itemId);
+		if (pouch == null)
+		{
+			return;
+		}
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+		final Rectangle bounds = itemWidget.getCanvasBounds();
+		final TextComponent textComponent = new TextComponent();
+		textComponent.setPosition(new Point(bounds.x - 1, bounds.y + 8));
+		textComponent.setColor(Color.CYAN);
+		if (pouch.isUnknown())
+		{
+			textComponent.setText("?");
+		}
+		else
+		{
+			textComponent.setText(Integer.toString(pouch.getHolding()));
+		}
+		textComponent.render(graphics);
+	}
 }
