@@ -37,8 +37,8 @@ dependencies {
     compileOnly("com.openosrs:runelite-api:$rlVersion")
     compileOnly("com.openosrs:runelite-client:$rlVersion")
 
-    compileOnly("com.openosrs.externals:banktags:0.0.2")
-    compileOnly("com.openosrs.externals:runepouch:0.0.2")
+    compileOnly("com.openosrs.externals:banktags:0.0.+")
+    compileOnly("com.openosrs.externals:runepouch:0.0.+")
 
     compileOnly(Libraries.apacheCommonsLang)
     compileOnly(Libraries.guice)
