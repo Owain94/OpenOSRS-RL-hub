@@ -27,8 +27,8 @@ import ProjectVersions.rlVersion
 
 version = "0.0.1"
 
-project.extra["PluginName"] = "Tob Health Bars"
-project.extra["PluginDescription"] = "Replaces the tob orbs with health bars"
+project.extra["PluginName"] = "Fullscreen"
+project.extra["PluginDescription"] = "Fullscreen OpenOSRS"
 
 dependencies {
     annotationProcessor(Libraries.lombok)
