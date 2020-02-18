@@ -41,10 +41,21 @@ public interface ClanChatWarningsConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "cooldown",
+		name = "Cooldown",
+		description = "Cooldown, in seconds, before you will be notified of a player joining again.",
+		position = 3
+	)
+	default int cooldown()
+	{
+		return 30;
+	}
+
+	@ConfigItem(
 		keyName = "warnedAndAlerted",
 		name = "Alert On Warning",
 		description = "Ping if player procs a warning.",
-		position = 3
+		position = 4
 	)
 	default boolean warnedAttention()
 	{
@@ -55,7 +66,7 @@ public interface ClanChatWarningsConfig extends Config
 		keyName = "Check on self join",
 		name = "Check on Joining",
 		description = "Runs the check when you join Clan Chat.",
-		position = 4
+		position = 5
 	)
 	default boolean selfCheck()
 	{
@@ -66,7 +77,7 @@ public interface ClanChatWarningsConfig extends Config
 		keyName = "Ping on self join",
 		name = "Ping on Joining",
 		description = "If \"Check on Joining\" is enabled, will ping if players on the list are in cc when you join Clan Chat.",
-		position = 5
+		position = 6
 	)
 	default boolean selfPing()
 	{
@@ -77,9 +88,64 @@ public interface ClanChatWarningsConfig extends Config
 		keyName = "Kicks",
 		name = "Kick from Warning",
 		description = "Changes message to support kicking players from warning.",
-		position = 6
+		position = 7
 	)
 	default boolean kickable()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "Tracker",
+		name = "Track mentioned players",
+		description = "Tracks, and notifies via chat message, when player leaves Clan Chat after saying \"Tracker Keyword\".",
+		position = 8
+	)
+	default boolean track()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "Tracker Keyword",
+		name = "Tracker Keyword",
+		description = "Keyword to trigger tracking of a player.",
+		position = 9
+	)
+	default String trackerTrigger()
+	{
+		return "Hi";
+	}
+
+	@ConfigItem(
+		keyName = "Tracker Dismisser",
+		name = "Stop Tracking Keyword",
+		description = "Keyword to trigger stop tracking of a player.",
+		position = 10
+	)
+	default String trackerDismiss()
+	{
+		return "Bye";
+	}
+
+	@ConfigItem(
+		keyName = "Tracker Length",
+		name = "Tracker Length",
+		description = "How long to track a Player, in seconds.",
+		position = 11
+	)
+	default int trackerLength()
+	{
+		return 30;
+	}
+
+	@ConfigItem(
+		keyName = "Tracker Ping",
+		name = "Ping on Tracked Leave",
+		description = "Sends a ping if a tracked player leaves.",
+		position = 12
+	)
+	default boolean trackerPing()
 	{
 		return false;
 	}

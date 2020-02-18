@@ -16,50 +16,60 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.ClanMember;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.ClanChanged;
 import net.runelite.api.events.ClanMemberJoined;
+import net.runelite.api.events.ClanMemberLeft;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.util.Text;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.ClanManager;
+import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
-import org.pf4j.Extension;
 
-@Extension
-@PluginDescriptor(
-	name = "Clan Chat Warnings",
-	description = "Notifies you when players join clan chat. Supports adding notes to signal why you put them on the watchlist",
-	type = PluginType.MISCELLANEOUS
-)
 @Slf4j
+@PluginDescriptor(
+	name = "Clan Chat Warnings"
+)
 public class ClanChatWarningsPlugin extends Plugin
 {
 	private static final Splitter NEWLINE_SPLITTER = Splitter.on("\n").omitEmptyStrings().trimResults();
 	private final List<Pattern> warnings;
 	private final List<Pattern> warnPlayers;
 	private final List<Pattern> exemptPlayers;
-
-	@Inject
-	private Client client;
-
-	@Inject
-	private Notifier ping;
-
-	@Inject
-	private ClanChatWarningsConfig config;
-
+	private final List<Integer> coolTimer;
+	private final List<String> coolName;
+	private final List<Integer> trackTimer;
+	private final List<String> trackName;
+	private final List<String> clansName;
 	private boolean hopping;
 	private int clanJoinedTick;
+	@Inject
+	private Client client;
+	@Inject
+	private Notifier ping;
+	@Inject
+	private MenuManager menuManager;
+	@Inject
+	private ClanChatWarningsConfig config;
+	@Inject
+	private ClanManager clanManager;
 
 	public ClanChatWarningsPlugin()
 	{
 		this.warnings = new ArrayList();
 		this.exemptPlayers = new ArrayList();
 		this.warnPlayers = new ArrayList();
+		this.coolTimer = new ArrayList();
+		this.coolName = new ArrayList();
+		this.trackTimer = new ArrayList();
+		this.trackName = new ArrayList();
+		this.clansName = new ArrayList();
 	}
 
 	@Override
@@ -74,6 +84,11 @@ public class ClanChatWarningsPlugin extends Plugin
 		this.warnings.clear();
 		this.exemptPlayers.clear();
 		this.warnPlayers.clear();
+		this.coolTimer.clear();
+		this.coolName.clear();
+		this.trackTimer.clear();
+		this.trackName.clear();
+		this.clansName.clear();
 	}
 
 	void updateSets()
@@ -82,7 +97,7 @@ public class ClanChatWarningsPlugin extends Plugin
 		this.exemptPlayers.clear();
 		this.warnPlayers.clear();
 
-		Stream var10000 = Text.fromCSV(this.config.warnPlayers()).stream().map((s) -> Pattern.compile(Pattern.quote(s), Pattern.CASE_INSENSITIVE));
+		Stream var10000 = Text.fromCSV(this.config.warnPlayers()).stream().map((s) -> Pattern.compile(Pattern.quote(s), 2));
 		List var10001 = this.warnPlayers;
 		var10000.forEach(var10001::add);
 		Stream var10002 = NEWLINE_SPLITTER.splitToList(this.config.warnings()).stream().map((s) -> {
@@ -105,36 +120,106 @@ public class ClanChatWarningsPlugin extends Plugin
 	}
 
 
-	private void sendNotification(String player, String Comment)
+	private void sendNotification(String player, String Comment, int type)
 	{
-		String notification = "has joined Clan Chat. " + Comment;
-		if (this.config.kickable())
+		StringBuilder stringBuilder = new StringBuilder();
+		if (type == 1)
 		{
-			this.client.addChatMessage(ChatMessageType.FRIENDSCHAT, player, notification, "Warning");
-		}
-		else
-		{
-			this.client.addChatMessage(ChatMessageType.FRIENDSCHATNOTIFICATION, "", player + " " + notification, "");
-		}
-		if (this.config.warnedAttention())
-		{
-			if (this.clanJoinedTick != this.client.getTickCount() || this.config.selfPing())
+			stringBuilder.append("has joined Clan Chat. ").append(Comment);
+			String notification = stringBuilder.toString();
+			if (this.config.kickable())
 			{
-				this.ping.notify(notification);
+				this.client.addChatMessage(ChatMessageType.FRIENDSCHAT, player, notification, "Warning");
+			}
+			else
+			{
+				this.client.addChatMessage(ChatMessageType.FRIENDSCHATNOTIFICATION, "", player + " " + notification, "");
+			}
+			if (this.config.warnedAttention())
+			{
+				if (this.clanJoinedTick != this.client.getTickCount() || this.config.selfPing())
+				{
+					this.ping.notify(player + " " + notification);
+				}
+			}
+		}
+		else if (type == 2)
+		{
+			stringBuilder.append(" has left Clan Chat.");
+			String notification = stringBuilder.toString();
+			this.client.addChatMessage(ChatMessageType.FRIENDSCHATNOTIFICATION, "", player + " " + notification, "");
+			if (this.config.trackerPing())
+			{
+				this.ping.notify(player + " " + notification);
 			}
 		}
 	}
 
 	@Subscribe
+	public void onChatMessage(ChatMessage chatMessage)
+	{
+		if (chatMessage.getType() == ChatMessageType.FRIENDSCHAT && this.config.track())
+		{
+			if (chatMessage.getName().equals(this.client.getLocalPlayer().getName()))
+			{
+				if (chatMessage.getMessage().contains(this.config.trackerTrigger()))
+				{
+					for (String name : clansName)
+					{
+						if (chatMessage.getMessage().toLowerCase().contains(name.toLowerCase()))
+						{
+							if (trackName.contains(name.toLowerCase()))
+							{
+								trackTimer.set(trackName.indexOf(name.toLowerCase()), (int) (this.config.trackerLength() / .6));
+							}
+							else
+							{
+								trackName.add(name.toLowerCase());
+								trackTimer.add((int) (this.config.trackerLength() / .6));
+							}
+						}
+					}
+				}
+				else if (chatMessage.getMessage().contains(this.config.trackerDismiss()))
+				{
+					for (int i = 0; i < trackName.size(); i++)
+					{
+						if (chatMessage.getMessage().toLowerCase().contains(trackName.get(i).toLowerCase()))
+						{
+							trackName.remove(i);
+							trackTimer.remove(i);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@Subscribe
+	public void onClanMemberLeft(ClanMemberLeft event)
+	{
+		String name = event.getMember().getUsername();
+		if (trackName.contains(name.toLowerCase()))
+		{
+			sendNotification(Text.toJagexName(name), "", 2);
+			trackTimer.remove(trackName.indexOf(name.toLowerCase()));
+			trackName.remove(name.toLowerCase());
+		}
+		clansName.remove(name);
+	}
+
+	@Subscribe
 	public void onClanMemberJoined(ClanMemberJoined event)
 	{
+		if (this.config.track())
+		{
+			clansName.add(event.getMember().getUsername());
+		}
 		if (this.clanJoinedTick != this.client.getTickCount())
 		{
 			hopping = false;
 		}
-
 		//God have mercy on your soul if you're about to check how I did this.
-
 		if ((this.clanJoinedTick != this.client.getTickCount() || this.config.selfCheck()) && !hopping)
 		{
 			ClanMember member = event.getMember();
@@ -148,7 +233,11 @@ public class ClanChatWarningsPlugin extends Plugin
 			{
 				return;
 			}
-			for (Iterator<Pattern> var2 = this.exemptPlayers.iterator(); var2.hasNext(); memberNameX = sx.toString())
+			if (coolName.contains(member.getUsername()))
+			{
+				return;
+			}
+			for (Iterator var2 = this.exemptPlayers.iterator(); var2.hasNext(); memberNameX = sx.toString())
 			{ //For exempting people from being pinged
 				Pattern pattern = (Pattern) var2.next();
 				Matcher n = pattern.matcher(memberNameX.toLowerCase());
@@ -162,7 +251,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				}
 				n.appendTail(sx);
 			}
-			for (Iterator<Pattern> var4 = this.warnPlayers.iterator(); var4.hasNext(); memberNameP = sp.toString())
+			for (Iterator var4 = this.warnPlayers.iterator(); var4.hasNext(); memberNameP = sp.toString())
 			{ //For checking specific players
 				Pattern pattern = (Pattern) var4.next();
 				Pattern patternDiv = Pattern.compile("~");
@@ -170,7 +259,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				String slash = "\\\\";
 				String[] sections = patternDiv.split(pattern.toString());
 				StringBuilder note = new StringBuilder();
-				String nameP = "";
+				String nameP;
 				if (sections.length > 1)
 				{
 					for (int x = 0; x < sections.length; x++)
@@ -180,7 +269,7 @@ public class ClanChatWarningsPlugin extends Plugin
 							String[] notes = sections[x].split(slash);
 							if (x > 1)
 							{
-								note.append("-");
+								note.append("~");
 							}
 							note.append(notes[0]);
 						}
@@ -188,7 +277,7 @@ public class ClanChatWarningsPlugin extends Plugin
 						{
 							if (x > 1)
 							{
-								note.append("-");
+								note.append("~");
 							}
 							note.append(sections[x]);
 						}
@@ -210,13 +299,18 @@ public class ClanChatWarningsPlugin extends Plugin
 				{
 					if (nameP.toLowerCase().equals(memberNameP.toLowerCase()))
 					{
-						sendNotification(Text.toJagexName(member.getUsername()), note.toString());
+						sendNotification(Text.toJagexName(member.getUsername()), note.toString(), 1);
+						if (this.config.cooldown() > 0)
+						{
+							coolName.add(Text.toJagexName(member.getUsername()));
+							coolTimer.add((int) (this.config.cooldown() / .6));
+						}
 						break;
 					}
 				}
 				l.appendTail(sp);
 			}
-			for (Iterator<Pattern> var3 = this.warnings.iterator(); var3.hasNext(); memberNameR = sr.toString())
+			for (Iterator var3 = this.warnings.iterator(); var3.hasNext(); memberNameR = sr.toString())
 			{ //For checking the regex
 				Pattern pattern = (Pattern) var3.next();
 				Pattern patternDiv = Pattern.compile("~");
@@ -233,7 +327,7 @@ public class ClanChatWarningsPlugin extends Plugin
 							String[] notes = sections[x].split(slash);
 							if (x > 1)
 							{
-								note.append("-");
+								note.append("~");
 							}
 							note.append(notes[0]);
 							pattern = Pattern.compile(sections[0].trim().toLowerCase());
@@ -242,7 +336,7 @@ public class ClanChatWarningsPlugin extends Plugin
 						{
 							if (x > 1)
 							{
-								note.append("-");
+								note.append("~");
 							}
 							note.append(sections[x]);
 						}
@@ -250,12 +344,52 @@ public class ClanChatWarningsPlugin extends Plugin
 				}
 				Matcher m = pattern.matcher(memberNameR.toLowerCase());
 				sr = new StringBuffer();
-				if (m.find())
+				while (m.find())
 				{
-					sendNotification(Text.toJagexName(member.getUsername()), note.toString());
+					sendNotification(Text.toJagexName(member.getUsername()), note.toString(), 1);
+					if (this.config.cooldown() > 0)
+					{
+						coolName.add(Text.toJagexName(member.getUsername()));
+						coolTimer.add((int) (this.config.cooldown() / .6));
+					}
 					break;
 				}
 				m.appendTail(sr);
+			}
+		}
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		if (this.config.cooldown() > 0)
+		{
+			for (int i = 0; i < coolTimer.size(); i++)
+			{
+				if (coolTimer.get(i) > 0)
+				{
+					coolTimer.set(i, coolTimer.get(i) - 1);
+				}
+				else
+				{
+					coolTimer.remove(i);
+					coolName.remove(i);
+				}
+			}
+		}
+		if (!trackName.isEmpty())
+		{
+			for (int i = 0; i < trackTimer.size(); i++)
+			{
+				if (trackTimer.get(i) > 0)
+				{
+					trackTimer.set(i, trackTimer.get(i) - 1);
+				}
+				else
+				{
+					trackTimer.remove(i);
+					trackName.remove(i);
+				}
 			}
 		}
 	}
