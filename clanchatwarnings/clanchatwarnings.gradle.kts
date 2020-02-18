@@ -25,7 +25,7 @@ import ProjectVersions.rlVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2"
 
 project.extra["PluginName"] = "Clan Chat Warnings"
 project.extra["PluginDescription"] = "Notifies you when players join clan chat. Supports adding notes to signal why you put them on the watchlist"

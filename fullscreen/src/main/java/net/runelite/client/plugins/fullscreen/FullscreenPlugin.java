@@ -35,6 +35,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientUI;
+import net.runelite.client.ui.ContainableFrame;
 import net.runelite.client.util.SwingUtil;
 import org.pf4j.Extension;
 
@@ -84,9 +85,14 @@ public class FullscreenPlugin extends Plugin
 
 		//Dirty hack
 		Frame[] frames = Frame.getFrames();
-		if (frames.length > 1)
+		for (Frame frame : frames)
 		{
 			gd.setFullScreenWindow(frames[1]);
+			if (frame instanceof ContainableFrame)
+			{
+				gd.setFullScreenWindow(frame);
+				return;
+			}
 		}
 	}
 
