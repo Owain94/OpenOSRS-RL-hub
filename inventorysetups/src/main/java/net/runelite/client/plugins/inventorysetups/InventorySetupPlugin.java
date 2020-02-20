@@ -48,12 +48,16 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.ItemDefinition;
 import net.runelite.api.ItemID;
+import net.runelite.api.MenuOpcode;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.api.events.VarClientIntChanged;
 import net.runelite.api.vars.InputType;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.account.AccountSession;
 import net.runelite.client.account.SessionManager;
 import net.runelite.client.callback.ClientThread;
@@ -94,6 +98,7 @@ public class InventorySetupPlugin extends Plugin
 	public static final String CONFIG_GROUP = "inventorysetups";
 	public static final String CONFIG_KEY = "setups";
 	public static final String INV_SEARCH = "inv:";
+	public static final String LABEL_SEARCH = "Inv. Setup";
 	private static final int NUM_INVENTORY_ITEMS = 28;
 	private static final int NUM_EQUIPMENT_ITEMS = 14;
 	private static final Varbits[] RUNE_POUCH_AMOUNT_VARBITS =
@@ -162,7 +167,7 @@ public class InventorySetupPlugin extends Plugin
 					return false;
 				}
 
-				doBankSearch();
+				doBankSearch(false);
 				return true;
 			});
 		}
@@ -260,11 +265,11 @@ public class InventorySetupPlugin extends Plugin
 			.collect(Collectors.toList());
 	}
 
-	public void doBankSearch()
+	public void doBankSearch(boolean ignoreFilter)
 	{
 		final InventorySetup currentSelectedSetup = panel.getCurrentSelectedSetup();
 
-		if (currentSelectedSetup != null && currentSelectedSetup.isFilterBank())
+		if (currentSelectedSetup != null && (ignoreFilter || currentSelectedSetup.isFilterBank()))
 		{
 			client.setVarbit(Varbits.CURRENT_BANK_TAB, 0);
 			bankSearch.search(InputType.SEARCH, INV_SEARCH + currentSelectedSetup.getName(), true);
@@ -286,7 +291,7 @@ public class InventorySetupPlugin extends Plugin
 			int value = client.getVarcIntValue(386);
 			if (value == 0)
 			{
-				doBankSearch();
+				doBankSearch(false);
 			}
 		});
 	}
@@ -591,6 +596,26 @@ public class InventorySetupPlugin extends Plugin
 	{
 		panel.highlightInventory();
 		panel.highlightEquipment();
+	}
+
+	@Subscribe
+	public void onMenuEntryAdded(MenuEntryAdded event)
+	{
+		if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
+			&& event.getOption().equals("Search"))
+		{
+			insertMenuEntry(event, LABEL_SEARCH, event.getTarget());
+		}
+	}
+
+	@Subscribe
+	public void onMenuOptionClicked(MenuOptionClicked event)
+	{
+		if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
+			&& event.getOption().equals(LABEL_SEARCH))
+		{
+			doBankSearch(true);
+		}
 	}
 
 	public ArrayList<InventorySetupItem> getNormalizedContainer(final InventorySetupSlotID id)
@@ -899,5 +924,18 @@ public class InventorySetupPlugin extends Plugin
 		}
 
 		return true;
+	}
+
+	private void insertMenuEntry(MenuEntryAdded event, String option, String target)
+	{
+		client.insertMenuItem(
+			option,
+			target,
+			MenuOpcode.RUNELITE.getId(),
+			event.getIdentifier(),
+			event.getParam0(),
+			event.getParam1(),
+			false
+		);
 	}
 }
