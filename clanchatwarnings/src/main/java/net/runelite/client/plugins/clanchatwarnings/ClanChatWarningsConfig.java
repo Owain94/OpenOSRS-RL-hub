@@ -97,8 +97,8 @@ public interface ClanChatWarningsConfig extends Config
 
 	@ConfigItem(
 		keyName = "Tracker",
-		name = "Track mentioned players",
-		description = "Tracks, and notifies via chat message, when player leaves Clan Chat after saying \"Tracker Keyword\".",
+		name = "Enable Tracker",
+		description = "Adds a right click option that will track, and notify via chat message, when a player leaves Clan Chat after saying \"Tracker Keyword\".",
 		position = 8
 	)
 	default boolean track()
@@ -107,32 +107,10 @@ public interface ClanChatWarningsConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "Tracker Keyword",
-		name = "Tracker Keyword",
-		description = "Keyword to trigger tracking of a player.",
-		position = 9
-	)
-	default String trackerTrigger()
-	{
-		return "Hi";
-	}
-
-	@ConfigItem(
-		keyName = "Tracker Dismisser",
-		name = "Stop Tracking Keyword",
-		description = "Keyword to trigger stop tracking of a player.",
-		position = 10
-	)
-	default String trackerDismiss()
-	{
-		return "Bye";
-	}
-
-	@ConfigItem(
 		keyName = "Tracker Length",
 		name = "Tracker Length",
 		description = "How long to track a Player, in seconds.",
-		position = 11
+		position = 9
 	)
 	default int trackerLength()
 	{
@@ -143,7 +121,7 @@ public interface ClanChatWarningsConfig extends Config
 		keyName = "Tracker Ping",
 		name = "Ping on Tracked Leave",
 		description = "Sends a ping if a tracked player leaves.",
-		position = 12
+		position = 10
 	)
 	default boolean trackerPing()
 	{

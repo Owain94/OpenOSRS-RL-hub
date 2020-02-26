@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.clanchatwarnings;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ObjectArrays;
 import com.google.inject.Provides;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,13 +18,17 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.ClanMember;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.events.ChatMessage;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.MenuOpcode;
 import net.runelite.api.events.ClanChanged;
 import net.runelite.api.events.ClanMemberJoined;
 import net.runelite.api.events.ClanMemberLeft;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.PlayerMenuOptionClicked;
 import net.runelite.api.util.Text;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -31,14 +37,18 @@ import net.runelite.client.game.ClanManager;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import org.apache.commons.lang3.ArrayUtils;
+import org.pf4j.Extension;
 
-@Slf4j
+@Extension
 @PluginDescriptor(
 	name = "Clan Chat Warnings"
 )
+@Slf4j
 public class ClanChatWarningsPlugin extends Plugin
 {
 	private static final Splitter NEWLINE_SPLITTER = Splitter.on("\n").omitEmptyStrings().trimResults();
+	private static final ImmutableList<String> AFTER_OPTIONS = ImmutableList.of("Message", "Add ignore", "Remove friend", "Kick");
 	private final List<Pattern> warnings;
 	private final List<Pattern> warnPlayers;
 	private final List<Pattern> exemptPlayers;
@@ -91,13 +101,72 @@ public class ClanChatWarningsPlugin extends Plugin
 		this.clansName.clear();
 	}
 
+	@Subscribe
+	public void onMenuEntryAdded(MenuEntryAdded event)
+	{
+		//If you or someone you love is able to figure out how to only have this enabled for clan and private chat, hit a Turtle up.
+		if (true && this.config.track())
+		{
+			int groupId = WidgetInfo.TO_GROUP(event.getParam1());
+			String option = event.getOption();
+			if (groupId == WidgetInfo.CHATBOX.getGroupId() && !"Kick".equals(option) || groupId == WidgetInfo.PRIVATE_CHAT_MESSAGE.getGroupId())
+			{
+				if (!AFTER_OPTIONS.contains(option))
+				{
+					return;
+				}
+				MenuEntry track = new MenuEntry();
+				track.setOption("Track Player");
+				track.setTarget(event.getTarget());
+				track.setOpcode(MenuOpcode.RUNELITE.getId());
+				track.setParam0(event.getParam0());
+				track.setParam1(event.getParam1());
+				track.setIdentifier(event.getIdentifier());
+				this.insertMenuEntry(track, this.client.getMenuEntries());
+			}
+		}
+	}
+
+	private void insertMenuEntry(MenuEntry newEntry, MenuEntry[] entries)
+	{
+		MenuEntry[] newMenu = ObjectArrays.concat(entries, newEntry);
+		int menuEntryCount = newMenu.length;
+		ArrayUtils.swap(newMenu, menuEntryCount - 1, menuEntryCount - 2);
+		this.client.setMenuEntries(newMenu);
+	}
+
+	@Subscribe
+	public void onPlayerMenuOptionClicked(PlayerMenuOptionClicked event)
+	{
+		if (event.getMenuOption().equals("Track Player"))
+		{
+			for (String name : clansName)
+			{
+				if (event.getMenuTarget().toLowerCase().contains(name.toLowerCase()))
+				{
+					if (trackName.contains(name.toLowerCase()))
+					{
+						trackTimer.set(trackName.indexOf(name.toLowerCase()), (int) (this.config.trackerLength() / .6));
+					}
+					else
+					{
+						trackName.add(name.toLowerCase());
+						trackTimer.add((int) (this.config.trackerLength() / .6));
+					}
+				}
+			}
+		}
+	}
+
 	void updateSets()
 	{
 		this.warnings.clear();
 		this.exemptPlayers.clear();
 		this.warnPlayers.clear();
 
-		Stream var10000 = Text.fromCSV(this.config.warnPlayers()).stream().map((s) -> Pattern.compile(Pattern.quote(s), 2));
+		Stream var10000 = Text.fromCSV(this.config.warnPlayers()).stream().map((s) -> {
+			return Pattern.compile(Pattern.quote(s), 2);
+		});
 		List var10001 = this.warnPlayers;
 		var10000.forEach(var10001::add);
 		Stream var10002 = NEWLINE_SPLITTER.splitToList(this.config.warnings()).stream().map((s) -> {
@@ -156,46 +225,6 @@ public class ClanChatWarningsPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onChatMessage(ChatMessage chatMessage)
-	{
-		if (chatMessage.getType() == ChatMessageType.FRIENDSCHAT && this.config.track())
-		{
-			if (chatMessage.getName().equals(this.client.getLocalPlayer().getName()))
-			{
-				if (chatMessage.getMessage().contains(this.config.trackerTrigger()))
-				{
-					for (String name : clansName)
-					{
-						if (chatMessage.getMessage().toLowerCase().contains(name.toLowerCase()))
-						{
-							if (trackName.contains(name.toLowerCase()))
-							{
-								trackTimer.set(trackName.indexOf(name.toLowerCase()), (int) (this.config.trackerLength() / .6));
-							}
-							else
-							{
-								trackName.add(name.toLowerCase());
-								trackTimer.add((int) (this.config.trackerLength() / .6));
-							}
-						}
-					}
-				}
-				else if (chatMessage.getMessage().contains(this.config.trackerDismiss()))
-				{
-					for (int i = 0; i < trackName.size(); i++)
-					{
-						if (chatMessage.getMessage().toLowerCase().contains(trackName.get(i).toLowerCase()))
-						{
-							trackName.remove(i);
-							trackTimer.remove(i);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	@Subscribe
 	public void onClanMemberLeft(ClanMemberLeft event)
 	{
 		String name = event.getMember().getUsername();
@@ -205,7 +234,10 @@ public class ClanChatWarningsPlugin extends Plugin
 			trackTimer.remove(trackName.indexOf(name.toLowerCase()));
 			trackName.remove(name.toLowerCase());
 		}
-		clansName.remove(name);
+		if (clansName.contains(name))
+		{
+			clansName.remove(name);
+		}
 	}
 
 	@Subscribe
@@ -257,29 +289,29 @@ public class ClanChatWarningsPlugin extends Plugin
 				Pattern patternDiv = Pattern.compile("~");
 				//Yes Im aware this String is dumb, frankly I spent 20 mins trying to fix it and this is what worked so it stays.
 				String slash = "\\\\";
-				String[] sections = patternDiv.split(pattern.toString());
-				StringBuilder note = new StringBuilder();
-				String nameP;
+				String sections[] = patternDiv.split(pattern.toString());
+				String note = "";
+				String nameP = "";
 				if (sections.length > 1)
 				{
-					for (int x = 0; x < sections.length; x++)
+					for (Integer x = 0; x < sections.length; x++)
 					{
 						if (x == sections.length - 1)
 						{
-							String[] notes = sections[x].split(slash);
+							String notes[] = sections[x].split(slash);
 							if (x > 1)
 							{
-								note.append("~");
+								note += "~";
 							}
-							note.append(notes[0]);
+							note += notes[0];
 						}
 						else if (x != 0)
 						{
 							if (x > 1)
 							{
-								note.append("~");
+								note += "~";
 							}
-							note.append(sections[x]);
+							note += sections[x];
 						}
 					}
 				}
@@ -299,7 +331,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				{
 					if (nameP.toLowerCase().equals(memberNameP.toLowerCase()))
 					{
-						sendNotification(Text.toJagexName(member.getUsername()), note.toString(), 1);
+						sendNotification(Text.toJagexName(member.getUsername()), note, 1);
 						if (this.config.cooldown() > 0)
 						{
 							coolName.add(Text.toJagexName(member.getUsername()));
@@ -316,29 +348,29 @@ public class ClanChatWarningsPlugin extends Plugin
 				Pattern patternDiv = Pattern.compile("~");
 				//Yes Im aware this String is dumb, frankly I spent 20 mins trying to fix it and this is what worked so it stays.
 				String slash = "\\\\";
-				String[] sections = patternDiv.split(pattern.toString());
-				StringBuilder note = new StringBuilder();
+				String sections[] = patternDiv.split(pattern.toString());
+				String note = "";
 				if (sections.length > 1)
 				{
-					for (int x = 0; x < sections.length; x++)
+					for (Integer x = 0; x < sections.length; x++)
 					{
 						if (x == sections.length - 1)
 						{
-							String[] notes = sections[x].split(slash);
+							String notes[] = sections[x].split(slash);
 							if (x > 1)
 							{
-								note.append("~");
+								note += "~";
 							}
-							note.append(notes[0]);
+							note += notes[0];
 							pattern = Pattern.compile(sections[0].trim().toLowerCase());
 						}
 						else if (x != 0)
 						{
 							if (x > 1)
 							{
-								note.append("~");
+								note += "~";
 							}
-							note.append(sections[x]);
+							note += sections[x];
 						}
 					}
 				}
@@ -346,7 +378,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				sr = new StringBuffer();
 				while (m.find())
 				{
-					sendNotification(Text.toJagexName(member.getUsername()), note.toString(), 1);
+					sendNotification(Text.toJagexName(member.getUsername()), note, 1);
 					if (this.config.cooldown() > 0)
 					{
 						coolName.add(Text.toJagexName(member.getUsername()));

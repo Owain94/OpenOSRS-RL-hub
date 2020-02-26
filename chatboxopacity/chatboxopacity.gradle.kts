@@ -38,8 +38,6 @@ dependencies {
     compileOnly("com.openosrs:runelite-client:$rlVersion")
 
     compileOnly(Libraries.guice)
-    compileOnly(Libraries.gson)
-    compileOnly(Libraries.jopt)
     compileOnly(Libraries.lombok)
     compileOnly(Libraries.pf4j)
 }
