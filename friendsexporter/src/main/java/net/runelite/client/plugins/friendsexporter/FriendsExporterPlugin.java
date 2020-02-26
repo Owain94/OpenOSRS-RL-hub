@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.Friend;
 import net.runelite.api.Ignore;
@@ -72,7 +73,10 @@ public class FriendsExporterPlugin extends Plugin
 	@Subscribe
 	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event) throws Exception
 	{
-		if (event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.FIXED_VIEWPORT_CLAN_CHAT_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_CLAN_CHAT_TAB)
+		if (event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB ||
+			event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB ||
+			event.getWidget() == WidgetInfo.FIXED_VIEWPORT_CLAN_CHAT_TAB ||
+			event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_CLAN_CHAT_TAB)
 		{
 			if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Friends List"))
 			{
@@ -88,6 +92,11 @@ public class FriendsExporterPlugin extends Plugin
 			}
 			refreshShiftClickCustomizationMenus();
 		}
+	}
+
+	private void sendNotification(String type, File filename)
+	{
+		this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Exported " + type + " to " + filename.getPath(), "");
 	}
 
 	private void refreshShiftClickCustomizationMenus()
@@ -120,7 +129,7 @@ public class FriendsExporterPlugin extends Plugin
 
 	private void exportFriendsList() throws Exception
 	{
-		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Friends " + LocalDate.now() + ".txt";
+		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Friends " + LocalDate.now() + ".txt");
 		purgeList(fileName);
 		Friend[] array = this.client.getFriends();
 		FileWriter writer = new FileWriter(fileName, true);
@@ -143,11 +152,12 @@ public class FriendsExporterPlugin extends Plugin
 			}
 		}
 		writer.close();
+		sendNotification("friends list", fileName);
 	}
 
 	private void exportRankList() throws Exception
 	{
-		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Ranks " + LocalDate.now() + ".txt";
+		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ranks " + LocalDate.now() + ".txt");
 		purgeList(fileName);
 		Friend[] array = this.client.getFriends();
 		Widget temp;
@@ -193,11 +203,12 @@ public class FriendsExporterPlugin extends Plugin
 			}
 		}
 		writer.close();
+		sendNotification("rank list list", fileName);
 	}
 
 	private void exportIgnoreList() throws Exception
 	{
-		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Ignore " + LocalDate.now() + ".txt";
+		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ignore " + LocalDate.now() + ".txt");
 		purgeList(fileName);
 		Ignore[] array = this.client.getIgnores();
 		FileWriter writer = new FileWriter(fileName, true);
@@ -220,12 +231,12 @@ public class FriendsExporterPlugin extends Plugin
 			}
 		}
 		writer.close();
+		sendNotification("ignore list", fileName);
 	}
 
-	private void purgeList(String fileName)
+	private void purgeList(File fileName)
 	{
-		File purge = new File(fileName);
-		purge.delete();
+		fileName.delete();
 	}
 
 	private String toWrite(Integer Num, String firstName, String lastName, String rank)
