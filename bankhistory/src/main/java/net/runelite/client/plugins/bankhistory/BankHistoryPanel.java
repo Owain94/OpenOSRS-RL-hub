@@ -58,9 +58,7 @@ import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.QuantityFormatter;
@@ -262,13 +260,11 @@ public class BankHistoryPanel extends PluginPanel
 		{
 			setDatasetButton(false);
 			tracker.addEntry(true, (s) ->
-			{
 				SwingUtilities.invokeLater(() ->
 				{
 					updateDataset((String) accountSelectionCombo.getSelectedItem());
 					setDatasetButton(true);
-				});
-			});
+				}));
 		});
 
 		addDatasetPanel.add(addDatasetButton, BorderLayout.CENTER);
@@ -280,9 +276,7 @@ public class BankHistoryPanel extends PluginPanel
 		JButton refreshButton = new JButton("Refresh");
 		refreshButton.setFocusPainted(false);
 		refreshButton.addActionListener((event) ->
-		{
-			updateDataset((String) accountSelectionCombo.getSelectedItem());
-		});
+			updateDataset((String) accountSelectionCombo.getSelectedItem()));
 
 		refreshPanel.add(refreshButton, BorderLayout.CENTER);
 
@@ -464,15 +458,6 @@ public class BankHistoryPanel extends PluginPanel
 		collection.addSeries(timeSeries);
 
 		return collection;
-	}
-
-	@Subscribe
-	public void onScriptCallbackEvent(ScriptCallbackEvent event)
-	{
-		if ("setBankTitle".equals(event.getEventName()))
-		{
-			addDatasetButton.setEnabled(true);
-		}
 	}
 
 	private boolean onOrBefore(LocalDateTime first, LocalDateTime second)

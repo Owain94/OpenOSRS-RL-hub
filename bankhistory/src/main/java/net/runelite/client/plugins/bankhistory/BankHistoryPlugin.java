@@ -30,7 +30,6 @@ import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.api.events.WidgetHiddenChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
@@ -40,6 +39,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.PluginPanel;
@@ -50,7 +50,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Bank Value Tracking",
 	description = "Track the value of your bank over time",
-	tags = {"bank", "value", "history", "tracking"}
+	tags = {"bank", "value", "history", "tracking"},
+	type = PluginType.UTILITY
 )
 @Slf4j
 public class BankHistoryPlugin extends Plugin
@@ -128,15 +129,6 @@ public class BankHistoryPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onScriptCallbackEvent(ScriptCallbackEvent event)
-	{
-		if ("setBankTitle".equals(event.getEventName()))
-		{
-			tracker.addEntry();
-		}
-	}
-
-	@Subscribe
 	public void onWidgetLoaded(final WidgetLoaded event)
 	{
 		if (event.getGroupId() == WidgetID.BANK_GROUP_ID)
@@ -154,6 +146,7 @@ public class BankHistoryPlugin extends Plugin
 			if (bankHistoryPanel != null)
 			{
 				bankHistoryPanel.setDatasetButton(true);
+				tracker.addEntry();
 			}
 		}
 	}

@@ -245,7 +245,7 @@ public class BankValueHistoryTracker
 				return;
 			}
 
-			if (force || lastEntry == null || LocalDateTime.now().isAfter(nextUpdateTime))
+			if (force || lastEntry == null || LocalDateTime.now().isAfter(lastEntry.plusHours(config.getDefaultDatasetEntry())))
 			{
 				BankValueHistoryTracker.this.add(client.getUsername(),
 					BankValue
@@ -254,6 +254,7 @@ public class BankValueHistoryTracker
 						.bankValue(bankCalculation.calculate(getBankTabItems()))
 						.build());
 
+				log.info("New entry added!");
 				if (callback != null)
 				{
 					callback.accept("New entry added!");
@@ -261,6 +262,7 @@ public class BankValueHistoryTracker
 			}
 			else
 			{
+				log.info("No entry added.");
 				if (callback != null)
 				{
 					callback.accept("No entry added.");
