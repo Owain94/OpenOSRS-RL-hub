@@ -126,25 +126,7 @@ enum RSEmoji
 
 	BufferedImage loadImage()
 	{
-		try
-		{
-			return ImageUtil.getResourceStreamFromClass(getClass(), "/skills/" + this.name().toLowerCase() + ".png");
-		}
-		catch (Exception ex)
-		{
-			log.debug("Emoji icon not in /Skills/");
-		}
-
-		try
-		{
-			return ImageUtil.getResourceStreamFromClass(getClass(), "/prayers/" + this.name().toLowerCase() + ".png");
-		}
-		catch (Exception ex)
-		{
-			log.debug("Emoji icon not in /Prayers/");
-		}
-
-		return ImageUtil.getResourceStreamFromClass(getClass(), "/misc/" + this.name().toLowerCase() + ".png");
+		return ImageUtil.getResourceStreamFromClass(EmojiScapePlugin.class, this.name().toLowerCase() + ".png");
 	}
 
 	public static RSEmoji getRSEmoji(String longTrigger)
