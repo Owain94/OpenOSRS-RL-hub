@@ -33,6 +33,7 @@ import org.pf4j.Extension;
 @Extension
 @PluginDescriptor(
 	name = "Banked Experience",
+	description = "Shows banked experience",
 	type = PluginType.UTILITY
 )
 @Slf4j
