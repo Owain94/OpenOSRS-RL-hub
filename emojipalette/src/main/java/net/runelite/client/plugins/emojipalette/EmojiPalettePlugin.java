@@ -38,6 +38,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.NavigationButton;
@@ -48,7 +49,8 @@ import org.pf4j.Extension;
 @Extension
 @PluginDescriptor(
 	name = "Emoji palette",
-	description = "Shows a panel with all the emoji"
+	description = "Shows a panel with all the emoji",
+	type = PluginType.UTILITY
 )
 public class EmojiPalettePlugin extends Plugin
 {

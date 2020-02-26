@@ -37,12 +37,15 @@ import net.runelite.client.game.ClanManager;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-	name = "Clan Chat Warnings"
+	name = "Clan Chat Warnings",
+	description = "Notifies you when players join clan chat. Supports adding notes to signal why you put them on the watchlist",
+	type = PluginType.MISCELLANEOUS
 )
 @Slf4j
 public class ClanChatWarningsPlugin extends Plugin
