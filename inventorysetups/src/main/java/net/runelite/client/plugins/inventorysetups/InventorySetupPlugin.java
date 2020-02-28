@@ -32,6 +32,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +64,7 @@ import net.runelite.client.account.SessionManager;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.SessionClose;
 import net.runelite.client.events.SessionOpen;
 import net.runelite.client.game.ItemManager;
@@ -97,6 +99,7 @@ public class InventorySetupPlugin extends Plugin
 
 	public static final String CONFIG_GROUP = "inventorysetups";
 	public static final String CONFIG_KEY = "setups";
+	public static final String CONFIG_KEY_COMPACT_MODE = "compactMode";
 	public static final String INV_SEARCH = "inv:";
 	public static final String LABEL_SEARCH = "Inv. Setup";
 	private static final int NUM_INVENTORY_ITEMS = 28;
@@ -111,33 +114,49 @@ public class InventorySetupPlugin extends Plugin
 		};
 	@Inject
 	private Client client;
+
 	@Inject
 	private SessionManager sessionManager;
+
 	@Inject
 	private ItemManager itemManager;
+
 	@Inject
 	private ClientToolbar clientToolbar;
+
 	@Inject
 	private ClientThread clientThread;
+
 	@Inject
 	private ConfigManager configManager;
+
 	@Inject
+	@Getter
 	private InventorySetupConfig config;
+
 	@Inject
 	@Getter
 	private ColorPickerManager colorPickerManager;
+
 	private InventorySetupPluginPanel panel;
+
 	@Getter
 	private ArrayList<InventorySetup> inventorySetups;
+
 	private NavigationButton navButton;
+
 	@Inject
 	private BankSearch bankSearch;
+
 	@Inject
 	private KeyManager keyManager;
+
 	@Inject
 	private ChatboxItemSearch itemSearch;
+
 	@Inject
 	private ChatboxPanelManager chatboxPanelManager;
+
 	private ChatboxTextInput searchInput;
 
 	private final HotkeyListener returnToSetupsHotkeyListener = new HotkeyListener(() -> config.returnToSetupsHotkey())
@@ -179,6 +198,23 @@ public class InventorySetupPlugin extends Plugin
 		return configManager.getConfig(InventorySetupConfig.class);
 	}
 
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (event.getGroup().equals(CONFIG_GROUP))
+		{
+			if (event.getKey().equals(CONFIG_KEY_COMPACT_MODE))
+			{
+				panel.rebuild();
+			}
+		}
+	}
+
+	public void switchViews(boolean compactMode)
+	{
+		configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY_COMPACT_MODE, compactMode);
+	}
+
 	@Override
 	public void startUp()
 	{
@@ -188,7 +224,7 @@ public class InventorySetupPlugin extends Plugin
 		navButton = NavigationButton.builder()
 			.tooltip("Inventory Setups")
 			.icon(icon)
-			.priority(9)
+			.priority(6)
 			.panel(panel)
 			.build();
 
@@ -255,6 +291,38 @@ public class InventorySetupPlugin extends Plugin
 				config.highlightUnorderedDifference());
 			addInventorySetupClientThread(invSetup);
 		});
+	}
+
+	public void moveSetupDown(final InventorySetup setup)
+	{
+		int invIndex = inventorySetups.indexOf(setup);
+		assert invIndex >= 0 && invIndex < inventorySetups.size();
+
+		// return if this is setup is at the bottom. It cant be moved further
+		if (invIndex == inventorySetups.size() - 1)
+		{
+			return;
+		}
+
+		Collections.swap(inventorySetups, invIndex, invIndex + 1);
+		panel.rebuild();
+		updateJsonConfig();
+	}
+
+	public void moveSetupUp(final InventorySetup setup)
+	{
+		int invIndex = inventorySetups.indexOf(setup);
+		assert invIndex >= 0 && invIndex < inventorySetups.size();
+
+		// return if this is setup is at the top. It cant be moved further
+		if (invIndex == 0)
+		{
+			return;
+		}
+
+		Collections.swap(inventorySetups, invIndex, invIndex - 1);
+		panel.rebuild();
+		updateJsonConfig();
 	}
 
 	public List<InventorySetup> filterSetups(String textToFilter)
@@ -844,7 +912,7 @@ public class InventorySetupPlugin extends Plugin
 		}
 
 		return checkIfContainerContainsItem(itemID, setup.getInventory(), setup.isVariationDifference()) ||
-			checkIfContainerContainsItem(itemID, setup.getEquipment(), setup.isVariationDifference());
+			checkIfContainerContainsItem(ItemVariationMapping.map(itemID), setup.getEquipment(), false);
 	}
 
 	private boolean checkIfContainerContainsItem(int itemID, final ArrayList<InventorySetupItem> container, boolean isVariationDifference)

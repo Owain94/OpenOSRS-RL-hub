@@ -129,8 +129,14 @@ public enum Activity
 	// Cadantine
 	CADANTINE_POTION_UNF(ItemID.CADANTINE_POTION_UNF, "Unfinished potion", 66, 0,
 		ExperienceItem.CADANTINE, Secondaries.UNFINISHED_POTION, new ItemStack(ItemID.CADANTINE_POTION_UNF, 1)),
+	CADANTINE_BLOOD_POTION_UNF(ItemID.CADANTINE_BLOOD_POTION_UNF, "Unfinished blood potion", 80, 0,
+		ExperienceItem.CADANTINE, Secondaries.VIAL_OF_BLOOD, new ItemStack(ItemID.CADANTINE_BLOOD_POTION_UNF, 1)),
 	SUPER_DEFENCE_POTION(ItemID.SUPER_DEFENCE3, "Super defence", 66, 150,
 		ExperienceItem.CADANTINE_POTION_UNF, Secondaries.SUPER_DEFENCE_POTION, new ItemStack(ItemID.SUPER_DEFENCE3, 1)),
+	BASTION_POTION(ItemID.BASTION_POTION3, "Bastion potion", 80, 155,
+		ExperienceItem.CADANTINE_BLOOD_POTION_UNF, Secondaries.RANGING_POTION, new ItemStack(ItemID.BASTION_POTION3, 1)),
+	BATTLEMAGE_POTION(ItemID.BATTLEMAGE_POTION3, "Battlemage potion", 80, 155,
+		ExperienceItem.CADANTINE_BLOOD_POTION_UNF, Secondaries.MAGIC_POTION, new ItemStack(ItemID.BATTLEMAGE_POTION3, 1)),
 	// Lantadyme
 	LANTADYME_POTION_UNF(ItemID.LANTADYME_POTION_UNF, "Unfinished potion", 69, 0,
 		ExperienceItem.LANTADYME, Secondaries.UNFINISHED_POTION, new ItemStack(ItemID.LANTADYME_POTION_UNF, 1)),
@@ -181,6 +187,15 @@ public enum Activity
 		ExperienceItem.GRIMY_DWARF_WEED, null, new ItemStack(ItemID.DWARF_WEED, 1)),
 	CLEAN_TORSTOL(ItemID.TORSTOL, "Clean torstol", 75, 15,
 		ExperienceItem.GRIMY_TORSTOL, null, new ItemStack(ItemID.TORSTOL, 1)),
+	// Other
+	AMYLASE_CRYSTAL(ItemID.AMYLASE_CRYSTAL, "Convert to crystals", 0, 0,
+		ExperienceItem.MARK_OF_GRACE, null , new ItemStack(ItemID.AMYLASE_CRYSTAL, 10)),
+	STAMINA_POTION(ItemID.STAMINA_POTION1, "Stamina potion", 77, 25.5,
+		ExperienceItem.AMYLASE_CRYSTAL, Secondaries.STAMINA_POTION , new ItemStack(ItemID.STAMINA_POTION1, 1)),
+	EXTENDED_ANTIFIRE(ItemID.EXTENDED_ANTIFIRE1, "Extended antifire", 77, 25.5,
+		ExperienceItem.LAVA_SCALE_SHARD, Secondaries.EXTENDED_ANTIFIRE , new ItemStack(ItemID.EXTENDED_ANTIFIRE1, 1)),
+	EXTENDED_SUPER_ANTIFIRE(ItemID.EXTENDED_SUPER_ANTIFIRE1, "Extended super antifire", 77, 25.5,
+		ExperienceItem.LAVA_SCALE_SHARD, Secondaries.EXTENDED_SUPER_ANTIFIRE , new ItemStack(ItemID.EXTENDED_SUPER_ANTIFIRE1, 1)),
 	/**
 	 * Construction
 	 */
@@ -619,43 +634,46 @@ public enum Activity
 	/**
 	 * Fletching
 	 */
+	// General
+	F_HEADLESS_ARROWS(ItemID.HEADLESS_ARROW, "Headless arrow", 1, 1,
+		ExperienceItem.F_ARROW_SHAFT, Secondaries.FEATHER, new ItemStack(ItemID.HEADLESS_ARROW, 1)),
 	// Logs
-	F_HEADLESS_ARROWS(ItemID.ARROW_SHAFT, "Arrow shaft", 1, 5,
+	F_ARROW_SHAFT(ItemID.ARROW_SHAFT, "Arrow shaft", 1, 5,
 		ExperienceItem.F_LOGS, null, new ItemStack(ItemID.ARROW_SHAFT, 15)),
 	F_SHORTBOW_U(ItemID.SHORTBOW_U, "Shortbow (u)", 5, 5,
 		ExperienceItem.F_LOGS, null, new ItemStack(ItemID.SHORTBOW_U, 1)),
 	F_LONGBOW_U(ItemID.LONGBOW_U, "Longbow (u)", 10, 10,
 		ExperienceItem.F_LOGS, null, new ItemStack(ItemID.LONGBOW_U, 1)),
 	// Oak Logs
-	F_OAK_HEADLESS_ARROWS(ItemID.ARROW_SHAFT, "Arrow shaft", 15, 10,
+	F_OAK_ARROW_SHAFT(ItemID.ARROW_SHAFT, "Arrow shaft", 15, 10,
 		ExperienceItem.F_OAK_LOGS, null, new ItemStack(ItemID.ARROW_SHAFT, 30)),
 	F_OAK_SHORTBOW_U(ItemID.OAK_SHORTBOW_U, "Oak shortbow (u)", 25, 16.5,
 		ExperienceItem.F_OAK_LOGS, null, new ItemStack(ItemID.OAK_SHORTBOW_U, 1)),
 	F_OAK_LONGBOW_U(ItemID.OAK_LONGBOW_U, "Oak longbow (u)", 25, 25,
 		ExperienceItem.F_OAK_LOGS, null, new ItemStack(ItemID.OAK_LONGBOW_U, 1)),
 	// Willow Logs
-	F_WILLOW_HEADLESS_ARROWS(ItemID.ARROW_SHAFT, "Arrow shaft", 30, 15,
+	F_WILLOW_ARROW_SHAFT(ItemID.ARROW_SHAFT, "Arrow shaft", 30, 15,
 		ExperienceItem.F_WILLOW_LOGS, null, new ItemStack(ItemID.ARROW_SHAFT, 45)),
 	F_WILLOW_SHORTBOW_U(ItemID.WILLOW_SHORTBOW_U, "Willow shortbow (u)", 35, 33.3,
 		ExperienceItem.F_WILLOW_LOGS, null, new ItemStack(ItemID.WILLOW_SHORTBOW_U, 1)),
 	F_WILLOW_LONGBOW_U(ItemID.WILLOW_LONGBOW_U, "Willow longbow (u)", 40, 41.5,
 		ExperienceItem.F_WILLOW_LOGS, null, new ItemStack(ItemID.WILLOW_LONGBOW_U, 1)),
 	// Maple Logs
-	F_MAPLE_HEADLESS_ARROWS(ItemID.ARROW_SHAFT, "Arrow shaft", 45, 20,
+	F_MAPLE_ARROW_SHAFT(ItemID.ARROW_SHAFT, "Arrow shaft", 45, 20,
 		ExperienceItem.F_MAPLE_LOGS, null, new ItemStack(ItemID.ARROW_SHAFT, 60)),
 	F_MAPLE_SHORTBOW_U(ItemID.MAPLE_SHORTBOW_U, "Maple shortbow (u)", 50, 50,
 		ExperienceItem.F_MAPLE_LOGS, null, new ItemStack(ItemID.MAPLE_SHORTBOW_U, 1)),
 	F_MAPLE_LONGBOW_U(ItemID.MAPLE_LONGBOW_U, "Maple longbow (u)", 55, 58.3,
 		ExperienceItem.F_MAPLE_LOGS, null, new ItemStack(ItemID.MAPLE_LONGBOW_U, 1)),
 	// Yew Logs
-	F_YEW_HEADLESS_ARROWS(ItemID.ARROW_SHAFT, "Arrow shaft", 60, 25,
+	F_YEW_ARROW_SHAFT(ItemID.ARROW_SHAFT, "Arrow shaft", 60, 25,
 		ExperienceItem.F_YEW_LOGS, null, new ItemStack(ItemID.ARROW_SHAFT, 75)),
 	F_YEW_SHORTBOW_U(ItemID.YEW_SHORTBOW_U, "Yew shortbow (u)", 65, 67.5,
 		ExperienceItem.F_YEW_LOGS, null, new ItemStack(ItemID.YEW_SHORTBOW_U, 1)),
 	F_YEW_LONGBOW_U(ItemID.YEW_LONGBOW_U, "Yew longbow (u)", 70, 75,
 		ExperienceItem.F_YEW_LOGS, null, new ItemStack(ItemID.YEW_LONGBOW_U, 1)),
 	// Magic Logs
-	F_MAGIC_HEADLESS_ARROWS(ItemID.ARROW_SHAFT, "Arrow shaft", 75, 30,
+	F_MAGIC_ARROW_SHAFT(ItemID.ARROW_SHAFT, "Arrow shaft", 75, 30,
 		ExperienceItem.F_MAGIC_LOGS, null, new ItemStack(ItemID.ARROW_SHAFT, 90)),
 	F_MAGIC_SHORTBOW_U(ItemID.MAGIC_SHORTBOW_U, "Magic shortbow (u)", 80, 83.3,
 		ExperienceItem.F_MAGIC_LOGS, null, new ItemStack(ItemID.MAGIC_SHORTBOW_U, 1)),
@@ -728,7 +746,8 @@ public enum Activity
 	private final double xp;
 	private final ExperienceItem experienceItem;
 	private final Skill skill;
-	private final ItemStack[] secondaries;
+	@Nullable
+	private final Secondaries secondaries;
 	@Nullable
 	private final ItemStack output;
 	private ItemInfo outputItemInfo = null;
@@ -765,7 +784,7 @@ public enum Activity
 		this.level = level;
 		this.xp = xp;
 		this.experienceItem = experienceItem;
-		this.secondaries = secondaries == null ? new ItemStack[0] : secondaries.getItems();
+		this.secondaries = secondaries;
 		this.output = output;
 		this.linkedItem = output == null ? null : ExperienceItem.getByItemId(output.getId());
 	}

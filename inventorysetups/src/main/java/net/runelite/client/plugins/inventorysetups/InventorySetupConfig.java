@@ -30,6 +30,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Keybind;
+import static net.runelite.client.plugins.inventorysetups.InventorySetupPlugin.CONFIG_KEY_COMPACT_MODE;
 
 @ConfigGroup(InventorySetupPlugin.CONFIG_GROUP)
 public interface InventorySetupConfig extends Config
@@ -121,5 +122,16 @@ public interface InventorySetupConfig extends Config
 	default Keybind filterBankHotkey()
 	{
 		return Keybind.NOT_SET;
+	}
+
+	@ConfigItem(
+		keyName = CONFIG_KEY_COMPACT_MODE,
+		name = "Compact Mode",
+		description = "Configures the setup panels to be compact",
+		position = 8
+	)
+	default boolean compactMode()
+	{
+		return false;
 	}
 }
