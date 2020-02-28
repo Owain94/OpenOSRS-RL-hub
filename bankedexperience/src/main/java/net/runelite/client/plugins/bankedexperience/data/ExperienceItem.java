@@ -101,9 +101,14 @@ public enum ExperienceItem
 	KWUARM_POTION_UNF(ItemID.KWUARM_POTION_UNF, Skill.HERBLORE, "Unfinished Potions"),
 	SNAPDRAGON_POTION_UNF(ItemID.SNAPDRAGON_POTION_UNF, Skill.HERBLORE, "Unfinished Potions"),
 	CADANTINE_POTION_UNF(ItemID.CADANTINE_POTION_UNF, Skill.HERBLORE, "Unfinished Potions"),
+	CADANTINE_BLOOD_POTION_UNF(ItemID.CADANTINE_BLOOD_POTION_UNF, Skill.HERBLORE, "Unfinished Potions"),
 	LANTADYME_POTION_UNF(ItemID.LANTADYME_POTION_UNF, Skill.HERBLORE, "Unfinished Potions"),
 	DWARF_WEED_POTION_UNF(ItemID.DWARF_WEED_POTION_UNF, Skill.HERBLORE, "Unfinished Potions"),
 	TORSTOL_POTION_UNF(ItemID.TORSTOL_POTION_UNF, Skill.HERBLORE, "Unfinished Potions"),
+	// Other
+	MARK_OF_GRACE(ItemID.MARK_OF_GRACE, Skill.HERBLORE, "Other"),
+	AMYLASE_CRYSTAL(ItemID.AMYLASE_CRYSTAL, Skill.HERBLORE, "Other"),
+	LAVA_SCALE_SHARD(ItemID.LAVA_SCALE_SHARD, Skill.HERBLORE, "Other"),
 	/**
 	 * Prayer
 	 */
@@ -283,6 +288,8 @@ public enum ExperienceItem
 	/**
 	 * Fletching
 	 */
+	// General
+	F_ARROW_SHAFT(ItemID.ARROW_SHAFT, Skill.FLETCHING, "Headless arrow"),
 	// Logs
 	F_LOGS(ItemID.LOGS, Skill.FLETCHING, "Logs"),
 	F_OAK_LOGS(ItemID.OAK_LOGS, Skill.FLETCHING, "Logs"),

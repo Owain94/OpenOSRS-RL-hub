@@ -43,6 +43,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import net.runelite.api.InventoryID;
@@ -58,7 +59,10 @@ import net.runelite.client.util.ImageUtil;
 
 public class InventorySetupPluginPanel extends PluginPanel
 {
-
+	private static ImageIcon COMPACT_VIEW_ICON;
+	private static ImageIcon COMPACT_VIEW_HOVER_ICON;
+	private static ImageIcon NO_COMPACT_VIEW_ICON;
+	private static ImageIcon NO_COMPACT_VIEW_HOVER_ICON;
 	private static ImageIcon ADD_ICON;
 	private static ImageIcon ADD_HOVER_ICON;
 	private static ImageIcon BACK_ICON;
@@ -72,6 +76,14 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 	static
 	{
+		final BufferedImage compactIcon = ImageUtil.getResourceStreamFromClass(InventorySetupPlugin.class, "compact_mode_icon.png");
+		final BufferedImage compactIconHover = ImageUtil.luminanceOffset(compactIcon, -150);
+		COMPACT_VIEW_ICON = new ImageIcon(compactIcon);
+		COMPACT_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(compactIcon, 0.53f));
+
+		NO_COMPACT_VIEW_ICON = new ImageIcon(compactIconHover);
+		NO_COMPACT_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(compactIconHover, -100));
+
 		final BufferedImage addIcon = ImageUtil.getResourceStreamFromClass(InventorySetupPlugin.class, "add_icon.png");
 		ADD_ICON = new ImageIcon(addIcon);
 		ADD_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(addIcon, 0.53f));
@@ -98,6 +110,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 	private final JPanel overviewTopRightButtonsPanel;
 	private final JPanel setupTopRightButtonsPanel;
 	private final JLabel title;
+	private final JLabel compactViewMarker;
 	private final JLabel addMarker;
 	private final JLabel addImportMarker;
 	private final JLabel updateMarker;
@@ -127,6 +140,33 @@ public class InventorySetupPluginPanel extends PluginPanel
 		title.setText(MAIN_TITLE);
 		title.setForeground(Color.WHITE);
 
+		this.compactViewMarker = new JLabel(COMPACT_VIEW_ICON);
+		compactViewMarker.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mousePressed(MouseEvent e)
+			{
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					plugin.switchViews(!plugin.getConfig().compactMode());
+					updateCompactViewMarker();
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e)
+			{
+				compactViewMarker.setIcon(plugin.getConfig().compactMode() ? COMPACT_VIEW_HOVER_ICON : NO_COMPACT_VIEW_HOVER_ICON);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e)
+			{
+				compactViewMarker.setIcon(plugin.getConfig().compactMode() ? COMPACT_VIEW_ICON : NO_COMPACT_VIEW_ICON);
+			}
+		});
+
+
 		this.addImportMarker = new JLabel(IMPORT_ICON);
 		addImportMarker.setToolTipText ("Import a new inventory setup");
 		addImportMarker.addMouseListener(new MouseAdapter()
@@ -134,7 +174,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
-				plugin.importSetup();
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					plugin.importSetup();
+				}
 			}
 
 			@Override
@@ -158,7 +201,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
-				plugin.addInventorySetup();
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					plugin.addInventorySetup();
+				}
 			}
 
 			@Override
@@ -181,7 +227,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
-				plugin.updateCurrentSetup(currentSelectedSetup);
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					plugin.updateCurrentSetup(currentSelectedSetup);
+				}
 			}
 
 			@Override
@@ -204,7 +253,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
-				returnToOverviewPanel();
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					returnToOverviewPanel();
+				}
 			}
 
 			@Override
@@ -221,8 +273,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 		});
 
 		this.overviewTopRightButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		overviewTopRightButtonsPanel.add(compactViewMarker);
 		overviewTopRightButtonsPanel.add(addImportMarker);
 		overviewTopRightButtonsPanel.add(addMarker);
+		addImportMarker.setBorder(new EmptyBorder(0, 8, 0, 0));
 		addMarker.setBorder(new EmptyBorder(0, 8, 0, 0));
 
 		this.setupTopRightButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -316,12 +370,15 @@ public class InventorySetupPluginPanel extends PluginPanel
 		// make sure the invEq panel isn't visible upon startup
 		invEqPanel.setVisible(false);
 
+		updateCompactViewMarker();
 	}
 
 	public void init(List<InventorySetup> setups)
 	{
 		overviewPanel.setLayout(new GridBagLayout());
 		overviewPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
+
+		updateCompactViewMarker();
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -331,7 +388,15 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 		for (final InventorySetup setup : setups)
 		{
-			InventorySetupPanel newPanel = new InventorySetupPanel(plugin, this, setup);
+			InventorySetupPanel newPanel = null;
+			if (plugin.getConfig().compactMode())
+			{
+				newPanel = new InventorySetupCompactPanel(plugin, this, setup);
+			}
+			else
+			{
+				newPanel = new InventorySetupStandardPanel(plugin, this, setup);
+			}
 			overviewPanel.add(newPanel, constraints);
 			constraints.gridy++;
 
@@ -451,5 +516,11 @@ public class InventorySetupPluginPanel extends PluginPanel
 		currentSelectedSetup = null;
 		searchBar.setVisible(true);
 		plugin.resetBankSearch();
+	}
+
+	private void updateCompactViewMarker()
+	{
+		compactViewMarker.setIcon(plugin.getConfig().compactMode() ? COMPACT_VIEW_ICON : NO_COMPACT_VIEW_ICON);
+		compactViewMarker.setToolTipText("Switch to " + (plugin.getConfig().compactMode() ? "standard mode" : "compact mode"));
 	}
 }

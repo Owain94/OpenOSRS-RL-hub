@@ -54,6 +54,7 @@ import net.runelite.client.plugins.bankedexperience.components.combobox.ComboBox
 import net.runelite.client.plugins.bankedexperience.components.combobox.ComboBoxIconListRenderer;
 import net.runelite.client.plugins.bankedexperience.data.Activity;
 import net.runelite.client.plugins.bankedexperience.data.BankedItem;
+import net.runelite.client.plugins.bankedexperience.data.Secondaries;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
@@ -157,22 +158,9 @@ public class ModifyPanel extends JPanel
 		}
 
 		this.bankedItem = bankedItem;
-		;
-		if (this.calc.getConfig().cascadeBankedXp())
-		{
-			this.linkedMap = this.calc.createLinksMap(bankedItem);
+		this.amount = this.calc.getItemQty(bankedItem);
 
-			this.amount = bankedItem.getQty();
-			for (int i : linkedMap.values())
-			{
-				this.amount += i;
-			}
-		}
-		else
-		{
-			this.linkedMap = new HashMap<>();
-			this.amount = this.calc.getItemQty(bankedItem);
-		}
+		this.linkedMap = this.calc.getConfig().cascadeBankedXp() ? this.calc.createLinksMap(bankedItem) : new HashMap<>();
 
 		updateImageTooltip();
 		updateLabelContainer();
@@ -187,6 +175,11 @@ public class ModifyPanel extends JPanel
 		for (final Map.Entry<ExperienceItem, Integer> e : this.linkedMap.entrySet())
 		{
 			b.append("<br/>").append(e.getValue()).append(" x ").append(e.getKey().getItemInfo().getName());
+			final ItemStack output = e.getKey().getSelectedActivity().getOutput();
+			if (output != null && output.getQty() > 1)
+			{
+				b.append(" x ").append(output.getQty());
+			}
 		}
 
 		b.append("</html>");
@@ -257,7 +250,9 @@ public class ModifyPanel extends JPanel
 		{
 			final Activity a = activities.get(0);
 
-			final AsyncBufferedImage img = itemManager.getImage(a.getIcon());
+			final int qty =  a.getOutput() == null ? 1 : a.getOutput().getQty();
+			final boolean stackable = a.getOutputItemInfo() == null ? qty > 1 : a.getOutputItemInfo().isStackable();
+			final AsyncBufferedImage img = itemManager.getImage(a.getIcon(), qty, stackable);
 			final ImageIcon icon = new ImageIcon(img);
 			final double xp = a.getXpRate(xpFactor);
 			final JPanel container = createShadowedLabel(icon, a.getName(), FORMAT_COMMA.format(xp) + "xp");
@@ -335,8 +330,8 @@ public class ModifyPanel extends JPanel
 			return;
 		}
 
-		final ItemStack[] secondaries = a.getSecondaries();
-		if (secondaries.length > 0 && this.calc.getConfig().showSecondaries())
+		final Secondaries secondaries = a.getSecondaries();
+		if (secondaries != null && this.calc.getConfig().showSecondaries())
 		{
 			final JLabel secondaryLabel = new JLabel("Secondaries:");
 			secondaryLabel.setVerticalAlignment(JLabel.CENTER);
@@ -349,36 +344,54 @@ public class ModifyPanel extends JPanel
 			container.setLayout(new GridLayout(1, 6, 1, 1));
 			container.setBackground(BACKGROUND_COLOR);
 
-			for (final ItemStack s : secondaries)
+			for (final ItemStack s : secondaries.getItems())
 			{
-				final JLabel l = new JLabel();
 				final int required = s.getQty() * amount;
-
-				final AsyncBufferedImage img = itemManager.getImage(s.getId(), required, required > 1);
-				final ImageIcon icon = new ImageIcon(img);
-				img.onLoaded(() ->
-				{
-					icon.setImage(img);
-					l.repaint();
-				});
-
-				l.setIcon(icon);
-				l.setHorizontalAlignment(JLabel.CENTER);
-
 				final int available = this.calc.getItemQtyFromBank(s.getId());
-				final int result = (available - required);
-
-				final String toolTip = "<html>" +
-					"Banked: " + FORMAT_COMMA.format(available) +
-					"<br/>Needed: " + FORMAT_COMMA.format(required) +
-					"<br/>Result: " + (result > 0 ? "+" : "") + FORMAT_COMMA.format(result) +
-					"</html>";
-				l.setToolTipText(toolTip);
-				container.add(l);
+				container.add(createSecondaryItemLabel(s.getId(), available, required));
 			}
+
+			if (secondaries.getCustomHandler() instanceof Secondaries.ByDose)
+			{
+				final Secondaries.ByDose byDose = ((Secondaries.ByDose) secondaries.getCustomHandler());
+				final int required = amount;
+				int available = 0;
+				for (int i = 0; i < byDose.getItems().length; i++)
+				{
+					final int id = byDose.getItems()[i];
+					available += (this.calc.getItemQtyFromBank(id) * (i + 1));
+				}
+				container.add(createSecondaryItemLabel(byDose.getItems()[0], available, required));
+			}
+
 			adjustContainer.add(container, c);
 			c.gridy++;
 		}
+	}
+
+	private JLabel createSecondaryItemLabel(int itemID, int available, int required)
+	{
+		final JLabel l = new JLabel();
+		final AsyncBufferedImage img = itemManager.getImage(itemID, required, required > 1);
+		final ImageIcon icon = new ImageIcon(img);
+		img.onLoaded(() ->
+		{
+			icon.setImage(img);
+			l.repaint();
+		});
+
+		l.setIcon(icon);
+		l.setHorizontalAlignment(JLabel.CENTER);
+
+		final int result = (available - required);
+		final String tooltip = "<html>" +
+			"Banked: " + FORMAT_COMMA.format(available) +
+			"<br/>Needed: " + FORMAT_COMMA.format(required) +
+			"<br/>Result: " + (result > 0 ? "+" : "") + FORMAT_COMMA.format(result) +
+			"</html>";
+		l.setToolTipText(tooltip);
+
+		return l;
 	}
 
 	private JPanel createShadowedLabel(final ImageIcon icon, final String name, final String value)

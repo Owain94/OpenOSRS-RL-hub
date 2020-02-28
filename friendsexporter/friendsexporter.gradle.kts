@@ -25,7 +25,7 @@ import ProjectVersions.rlVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Friends Exporter"
 project.extra["PluginDescription"] = "Adds a right click option to the friends tab that allows exporting of either friends or ignore list"
@@ -34,8 +34,8 @@ dependencies {
     annotationProcessor(Libraries.lombok)
     annotationProcessor(Libraries.pf4j)
 
-    compileOnly("com.openosrs:runelite-api:$rlVersion")
-    compileOnly("com.openosrs:runelite-client:$rlVersion")
+    compileOnly("com.openosrs:runelite-api:$rlVersion+")
+    compileOnly("com.openosrs:runelite-client:$rlVersion+")
 
     compileOnly(Libraries.apacheCommonsLang)
     compileOnly(Libraries.guice)

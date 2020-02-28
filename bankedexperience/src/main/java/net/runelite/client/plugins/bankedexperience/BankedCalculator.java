@@ -55,6 +55,7 @@ import net.runelite.client.plugins.bankedexperience.components.textinput.UICalcu
 import net.runelite.client.plugins.bankedexperience.data.Activity;
 import net.runelite.client.plugins.bankedexperience.data.BankedItem;
 import net.runelite.client.plugins.bankedexperience.data.ExperienceItem;
+import net.runelite.client.plugins.bankedexperience.data.ItemStack;
 import net.runelite.client.plugins.bankedexperience.data.XpModifiers;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.DynamicGridLayout;
@@ -297,7 +298,12 @@ public class BankedCalculator extends JPanel
 		}
 
 		final Map<ExperienceItem, Integer> linked = createLinksMap(item);
-		final int linkedQty = linked.values().stream().mapToInt(Integer::intValue).sum();
+		final int linkedQty = linked.entrySet().stream().mapToInt((entry) ->
+		{
+			// Account for activities that output multiple of a specific item per action
+			final ItemStack output = entry.getKey().getSelectedActivity().getOutput();
+			return entry.getValue() * (output != null ? output.getQty() : 1);
+		}).sum();
 
 		return qty + linkedQty;
 	}

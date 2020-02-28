@@ -4,7 +4,9 @@ import com.google.inject.Provides;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -45,6 +47,7 @@ public class FriendsExporterPlugin extends Plugin
 	private static final WidgetMenuOption Bottom_Ignore_List;
 	private static final WidgetMenuOption Fixed_Clan_List;
 	private static final WidgetMenuOption Resizable_Clan_List;
+	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
 	@Inject
 	private Client client;
@@ -70,6 +73,14 @@ public class FriendsExporterPlugin extends Plugin
 		removeShiftClickCustomizationMenus();
 	}
 
+	static String format(Date date)
+	{
+		synchronized (TIME_FORMAT)
+		{
+			return TIME_FORMAT.format(date);
+		}
+	}
+
 	@Subscribe
 	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event) throws Exception
 	{
@@ -88,7 +99,14 @@ public class FriendsExporterPlugin extends Plugin
 			}
 			else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Rank List"))
 			{
-				exportRankList();
+				if (clan)
+				{
+					exportRankList();
+				}
+				else
+				{
+					this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Clan Chat tab to export this list.", "");
+				}
 			}
 			refreshShiftClickCustomizationMenus();
 		}
@@ -108,11 +126,8 @@ public class FriendsExporterPlugin extends Plugin
 		this.menuManager.addManagedCustomMenu(FIXED_Ignore_List);
 		this.menuManager.addManagedCustomMenu(Resizable_Ignore_List);
 		this.menuManager.addManagedCustomMenu(Bottom_Ignore_List);
-		if (clan)
-		{
-			this.menuManager.addManagedCustomMenu(Fixed_Clan_List);
-			this.menuManager.addManagedCustomMenu(Resizable_Clan_List);
-		}
+		this.menuManager.addManagedCustomMenu(Fixed_Clan_List);
+		this.menuManager.addManagedCustomMenu(Resizable_Clan_List);
 	}
 
 	private void removeShiftClickCustomizationMenus()
@@ -129,7 +144,7 @@ public class FriendsExporterPlugin extends Plugin
 
 	private void exportFriendsList() throws Exception
 	{
-		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Friends " + LocalDate.now() + ".txt");
+		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Friends " + format(new Date()) + ".txt");
 		purgeList(fileName);
 		Friend[] array = this.client.getFriends();
 		FileWriter writer = new FileWriter(fileName, true);
@@ -157,7 +172,7 @@ public class FriendsExporterPlugin extends Plugin
 
 	private void exportRankList() throws Exception
 	{
-		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ranks " + LocalDate.now() + ".txt");
+		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ranks " + format(new Date()) + ".txt");
 		purgeList(fileName);
 		Friend[] array = this.client.getFriends();
 		Widget temp;
@@ -208,7 +223,7 @@ public class FriendsExporterPlugin extends Plugin
 
 	private void exportIgnoreList() throws Exception
 	{
-		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ignore " + LocalDate.now() + ".txt");
+		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ignore " + format(new Date()) + ".txt");
 		purgeList(fileName);
 		Ignore[] array = this.client.getIgnores();
 		FileWriter writer = new FileWriter(fileName, true);

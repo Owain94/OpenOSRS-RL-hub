@@ -25,7 +25,7 @@ import ProjectVersions.rlVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.0.6"
 
 project.extra["PluginName"] = "Inventory Setups"
 project.extra["PluginDescription"] = "Save inventory setups"
@@ -34,8 +34,8 @@ dependencies {
     annotationProcessor(Libraries.lombok)
     annotationProcessor(Libraries.pf4j)
 
-    compileOnly("com.openosrs:runelite-api:$rlVersion")
-    compileOnly("com.openosrs:runelite-client:$rlVersion")
+    compileOnly("com.openosrs:runelite-api:$rlVersion+")
+    compileOnly("com.openosrs:runelite-client:$rlVersion+")
 
     compileOnly("com.openosrs.externals:banktags:0.0.+")
     compileOnly("com.openosrs.externals:runepouch:0.0.+")

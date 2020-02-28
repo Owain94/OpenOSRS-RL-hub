@@ -37,9 +37,9 @@ dependencies {
     implementation(Libraries.jfreechart)
     implementation(Libraries.jdatepicker)
 
-    compileOnly("com.openosrs:http-api:$rlVersion")
-    compileOnly("com.openosrs:runelite-api:$rlVersion")
-    compileOnly("com.openosrs:runelite-client:$rlVersion")
+    compileOnly("com.openosrs:http-api:$rlVersion+")
+    compileOnly("com.openosrs:runelite-api:$rlVersion+")
+    compileOnly("com.openosrs:runelite-client:$rlVersion+")
 
     compileOnly(Libraries.apacheCommonsLang)
     compileOnly(Libraries.guice)
