@@ -34,9 +34,9 @@ dependencies {
     annotationProcessor(Libraries.lombok)
     annotationProcessor(Libraries.pf4j)
 
-    compileOnly("com.openosrs:http-api:$rlVersion")
-    compileOnly("com.openosrs:runelite-api:$rlVersion")
-    compileOnly("com.openosrs:runelite-client:$rlVersion")
+    compileOnly("com.openosrs:http-api:$rlVersion+")
+    compileOnly("com.openosrs:runelite-api:$rlVersion+")
+    compileOnly("com.openosrs:runelite-client:$rlVersion+")
 
     compileOnly("com.openosrs.externals:loottracker:0.0.+")
 
