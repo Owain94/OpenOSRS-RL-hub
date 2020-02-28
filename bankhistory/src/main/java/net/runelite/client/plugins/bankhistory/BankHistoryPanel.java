@@ -67,8 +67,6 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -90,7 +88,7 @@ public class BankHistoryPanel extends PluginPanel
 	private DatePickerPanel startDatePickerPanel;
 	private JFreeChart chart;
 	private ChartPanel graphPanel = null;
-	private SimpleTimeSelection timeSelection = SimpleTimeSelection.ALL;
+	private SimpleTimeSelection timeSelection = SimpleTimeSelection.TWENTY_FOUR_HOURS;
 	private Map<LocalDateTime, Long> currentDataRange;
 	private JLabel changeLabel;
 	private TimeSeriesCollection dataset;
@@ -138,6 +136,8 @@ public class BankHistoryPanel extends PluginPanel
 						.values())
 						.map(SimpleTimeSelection::getFormattedName)
 						.collect(Collectors.toList())));
+
+		simpleComboBox.setSelectedIndex(6);
 
 		simpleComboBox
 			.addItemListener(event ->
@@ -231,7 +231,7 @@ public class BankHistoryPanel extends PluginPanel
 
 		//bank tab selection
 		JPanel tabPanel = new JPanel();
-		JComboBox<String> tabSelectionCombo  = new JComboBox<>(DatePickerPanel.getArrayOfIntegers(0, 8, false));
+		JComboBox<String> tabSelectionCombo = new JComboBox<>(DatePickerPanel.getArrayOfIntegers(0, 8, false));
 		tabSelectionCombo.addItemListener((event) ->
 		{
 			currentBankTab = Integer.parseInt((String) event.getItem());
@@ -383,21 +383,14 @@ public class BankHistoryPanel extends PluginPanel
 		ChartFactory.setChartTheme(StandardChartTheme.createDarknessTheme());
 		chart = ChartFactory.createTimeSeriesChart(
 			null,
-			"Date/time",
-			"Bank Value (mil)",
+			null,
+			null,
 			dataset,
 			false,
 			true,
 			false);
 
 		XYPlot plot = chart.getXYPlot();
-		XYItemRenderer r = plot.getRenderer();
-		if (r instanceof XYLineAndShapeRenderer)
-		{
-			XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) r;
-			renderer.setBaseShapesVisible(true);
-			renderer.setBaseShapesFilled(true);
-		}
 		plot.setBackgroundPaint(ColorScheme.DARKER_GRAY_HOVER_COLOR);
 		chart.setBackgroundPaint(ColorScheme.DARK_GRAY_HOVER_COLOR);
 		if (graphPanel != null)
@@ -408,6 +401,10 @@ public class BankHistoryPanel extends PluginPanel
 		graphPanel = new ChartPanel(chart);
 		graphPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
 		graphPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		graphPanel.setMinimumDrawHeight(250);
+		graphPanel.setMinimumDrawWidth(250);
+		graphPanel.setMaximumDrawHeight(1080);
+		graphPanel.setMaximumDrawWidth(1920);
 
 		add(graphPanel, BorderLayout.SOUTH);
 		revalidate();

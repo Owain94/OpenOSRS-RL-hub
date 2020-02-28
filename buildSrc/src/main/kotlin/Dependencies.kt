@@ -37,9 +37,10 @@ object Libraries {
         const val guice = "4.2.2"
         const val javax = "1.3.2"
         const val jdatepicker = "1.3.2"
-        const val jfreechart = "1.0.13"
+        const val jfreechart = "1.5.0"
         const val jopt = "5.0.4"
         const val lombok = "1.18.10"
+        const val okhttp3 = "4.3.0"
         const val pf4j = "3.2.0"
     }
 
@@ -50,9 +51,10 @@ object Libraries {
     const val guice = "com.google.inject:guice:${Versions.guice}:no_aop"
     const val javax = "javax.annotation:javax.annotation-api:${Versions.javax}"
     const val jdatepicker = "net.sourceforge.jdatepicker:jdatepicker:${Versions.jdatepicker}"
-    const val jfreechart = "jfree:jfreechart:${Versions.jfreechart}"
+    const val jfreechart = "org.jfree:jfreechart:${Versions.jfreechart}"
     const val jopt = "net.sf.jopt-simple:jopt-simple:${Versions.jopt}"
     const val lombok = "org.projectlombok:lombok:${Versions.lombok}"
+    const val okhttp3 = "com.squareup.okhttp3:okhttp:${Versions.okhttp3}"
     const val pf4j = "org.pf4j:pf4j:${Versions.pf4j}"
 
 }
