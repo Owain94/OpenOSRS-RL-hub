@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.ItemID;
+import net.runelite.api.NullItemID;
 
 @Getter
 @AllArgsConstructor
@@ -87,6 +88,7 @@ public enum BossTab
 	// Skilling
 	WINTERTODT("Wintertodt", ItemID.PHOENIX, "Skilling"),
 	HERBIBOAR("Herbiboar", ItemID.HERBI, "Skilling"),
+	HESPORI("Hespori", NullItemID.NULL_23044, "Skilling"),
 
 	// Chests
 	BRIMSTONE_CHEST("Brimstone Chest", ItemID.BRIMSTONE_KEY, "Chests"),
