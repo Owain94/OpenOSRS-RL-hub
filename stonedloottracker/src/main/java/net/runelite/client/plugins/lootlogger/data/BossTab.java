@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.ItemID;
+import net.runelite.api.NullItemID;
 
 @Getter
 @AllArgsConstructor
@@ -81,12 +82,13 @@ public enum BossTab
 	CORPOREAL_BEAST("Corporeal Beast", ItemID.PET_CORPOREAL_CRITTER, "Other"),
 	SARACHNIS("Sarachnis", ItemID.SRARACHA, "Other"),
 	THE_GAUNTLET("The Gauntlet", ItemID.YOUNGLLEF, "Other"),
-	ZALCANO("Zalcano", ItemID.SMOLCANO, "Other"),
 	NIGHTMARE("Nightmare", ItemID.LITTLE_NIGHTMARE, "Other"),
 
 	// Skilling
+	ZALCANO("Zalcano", ItemID.SMOLCANO, "Skilling"),
 	WINTERTODT("Wintertodt", ItemID.PHOENIX, "Skilling"),
 	HERBIBOAR("Herbiboar", ItemID.HERBI, "Skilling"),
+	HESPORI("Hespori", NullItemID.NULL_23044, "Skilling"),
 
 	// Chests
 	BRIMSTONE_CHEST("Brimstone Chest", ItemID.BRIMSTONE_KEY, "Chests"),
