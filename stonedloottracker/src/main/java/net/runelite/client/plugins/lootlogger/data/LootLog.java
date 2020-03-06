@@ -30,8 +30,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import net.runelite.api.ItemID;
 import net.runelite.client.plugins.lootlogger.localstorage.LTItemEntry;
 import net.runelite.client.plugins.lootlogger.localstorage.LTRecord;
 import net.runelite.http.api.loottracker.LootRecordType;
@@ -95,7 +98,7 @@ public class LootLog
 		CASKET
 	}
 
-	private void addItemEntryToMap(final LTItemEntry item)
+	private void addItemEntryToMap(LTItemEntry item)
 	{
 		final String itemNameLowercased = item.getName().toLowerCase();
 
@@ -104,7 +107,7 @@ public class LootLog
 		{
 			type = ClueType.SCROLL;
 		}
-		else if(itemNameLowercased.startsWith("casket "))
+		else if (itemNameLowercased.startsWith("casket "))
 		{
 			type = ClueType.CASKET;
 		}
