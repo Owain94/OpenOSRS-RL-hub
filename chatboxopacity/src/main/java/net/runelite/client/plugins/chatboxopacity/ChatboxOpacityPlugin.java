@@ -20,8 +20,8 @@ import org.pf4j.Extension;
 @Extension
 @PluginDescriptor(
 	name = "Chatbox Opacity",
-	description = "Change the opacity on your transparent chatboxes",
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	description = "Change the opacity on your transparent chatboxes"
 )
 public class ChatboxOpacityPlugin extends Plugin
 {
@@ -77,6 +77,7 @@ public class ChatboxOpacityPlugin extends Plugin
 	private void writeChatboxOpacity(int opacity)
 	{
 		if (client.getGameState() != GameState.LOGGED_IN
+			|| !client.isResized()
 			|| client.getVar(Varbits.TRANSPARENT_CHATBOX) == 0)
 		{
 			return;

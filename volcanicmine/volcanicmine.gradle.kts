@@ -25,10 +25,10 @@ import ProjectVersions.rlVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Chatbox Opacity"
-project.extra["PluginDescription"] = "Change the opacity on your transparent chatboxes"
+project.extra["PluginName"] = "Volcanic Mine"
+project.extra["PluginDescription"] = "Useful timers for when to start moving in Volcanic Mine"
 
 dependencies {
     annotationProcessor(Libraries.lombok)
