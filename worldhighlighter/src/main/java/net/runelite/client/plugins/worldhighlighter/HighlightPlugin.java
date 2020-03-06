@@ -42,11 +42,10 @@ import org.pf4j.Extension;
 public class HighlightPlugin extends Plugin
 {
 	private static final ImmutableList<String> AFTER_OPTIONS = ImmutableList.of("Message", "Add ignore", "Remove friend", "Kick");
-	private final net.runelite.client.ui.overlay.components.TextComponent textComponent = new TextComponent();
+	private static final TextComponent textComponent = new TextComponent();
 	private static final Color HIGHLIGHT_BORDER_COLOR;
 	private static final Color HIGHLIGHT_HOVER_BORDER_COLOR;
 	private static final Color HIGHLIGHT_FILL_COLOR;
-	private int world;
 
 	@Inject
 	private Client client;
@@ -59,6 +58,9 @@ public class HighlightPlugin extends Plugin
 
 	@Inject
 	private HighlightConfig config;
+	private int world;
+	private String player;
+	private boolean clan;
 
 	@Override
 	protected void startUp()
@@ -85,7 +87,6 @@ public class HighlightPlugin extends Plugin
 			{
 				return;
 			}
-
 			MenuEntry high = new MenuEntry();
 			high.setOption("Highlight World");
 			high.setTarget(event.getTarget());
@@ -93,7 +94,6 @@ public class HighlightPlugin extends Plugin
 			high.setParam0(event.getParam0());
 			high.setParam1(event.getParam1());
 			high.setIdentifier(event.getIdentifier());
-
 			this.insertMenuEntry(high, this.client.getMenuEntries());
 		}
 	}
@@ -108,13 +108,23 @@ public class HighlightPlugin extends Plugin
 
 	private void highlight(String playerName)
 	{
-		boolean clan = false;
-		for (int c = 0; c != this.client.getClanMembers().length; c++)
+		clan = false;
+		for (int c = 0; c != this.client.getClanChatCount(); c++)
 		{
 			if (this.client.getClanMembers()[c].getUsername().equals(playerName))
 			{
 				clan = true;
+				player = Text.toJagexName(this.client.getClanMembers()[c].getUsername());
 				world = this.client.getClanMembers()[c].getWorld();
+				if (world == this.client.getWorld())
+				{
+					sendNotification(2);
+					this.resetWorld();
+				}
+				else
+				{
+					sendNotification(4);
+				}
 				break;
 			}
 		}
@@ -125,21 +135,21 @@ public class HighlightPlugin extends Plugin
 				if (this.client.getFriends()[f].getName().equals(playerName))
 				{
 					world = this.client.getFriends()[f].getWorld();
+					if (world == this.client.getWorld())
+					{
+						sendNotification(2);
+						this.resetWorld();
+					}
+					else
+					{
+						sendNotification(1);
+					}
 				}
 			}
 		}
-		if (world == this.client.getWorld())
-		{
-			sendNotification(2);
-			this.resetWorld();
-		}
-		else if (world == 0)
+		if (world == 0)
 		{
 			sendNotification(3);
-		}
-		else
-		{
-			sendNotification(1);
 		}
 	}
 
@@ -154,7 +164,7 @@ public class HighlightPlugin extends Plugin
 
 	void highlightWidget(Graphics2D graphics, Widget toHighlight, Widget container, Rectangle padding, String text)
 	{
-		padding = MoreObjects.firstNonNull(padding, new Rectangle());
+		padding = (Rectangle) MoreObjects.firstNonNull(padding, new Rectangle());
 		Point canvasLocation = toHighlight.getCanvasLocation();
 		if (canvasLocation != null && container != null)
 		{
@@ -176,10 +186,14 @@ public class HighlightPlugin extends Plugin
 
 	void scrollToWidget(Widget list, Widget scrollbar, Widget... toHighlight)
 	{
+		Widget parent = list;
 		int averageCentralY = 0;
 		int nonnullCount = 0;
-		for (Widget widget : toHighlight)
+		Widget[] var7 = toHighlight;
+		int var8 = toHighlight.length;
+		for (int var9 = 0; var9 < var8; ++var9)
 		{
+			Widget widget = var7[var9];
 			if (widget != null)
 			{
 				averageCentralY += widget.getRelativeY() + widget.getHeight() / 2;
@@ -189,15 +203,15 @@ public class HighlightPlugin extends Plugin
 		if (nonnullCount != 0)
 		{
 			averageCentralY /= nonnullCount;
-			int newScroll = Math.max(0, Math.min(list.getScrollHeight(), averageCentralY - list.getHeight() / 2));
-			this.client.runScript(72, scrollbar.getId(), list.getId(), newScroll);
+			int newScroll = Math.max(0, Math.min(parent.getScrollHeight(), averageCentralY - parent.getHeight() / 2));
+			this.client.runScript(new Object[]{72, scrollbar.getId(), parent.getId(), newScroll});
 		}
 	}
 
 	private void sendNotification(int type)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		if (!this.config.message())
+		if (this.config.message() == false)
 		{
 			return;
 		}
@@ -213,9 +227,15 @@ public class HighlightPlugin extends Plugin
 			String notification = stringBuilder.toString();
 			this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", notification, "");
 		}
-		else
+		else if (type == 3)
 		{
 			stringBuilder.append("Unable to find world, player is neither in clan chat nor on friends list.");
+			String notification = stringBuilder.toString();
+			this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", notification, "");
+		}
+		else
+		{
+			stringBuilder.append("Highlighting " + player + " in clan chat.");
 			String notification = stringBuilder.toString();
 			this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", notification, "");
 		}
@@ -235,6 +255,26 @@ public class HighlightPlugin extends Plugin
 	public void resetWorld()
 	{
 		this.world = 0;
+	}
+
+	public String getPlayer()
+	{
+		return this.player;
+	}
+
+	public void resetPlayer()
+	{
+		this.player = "";
+	}
+
+	public boolean getClan()
+	{
+		return this.clan;
+	}
+
+	public void resetClan()
+	{
+		this.clan = false;
 	}
 
 	static

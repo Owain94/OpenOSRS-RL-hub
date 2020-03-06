@@ -25,10 +25,10 @@ import ProjectVersions.rlVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Chatbox Opacity"
-project.extra["PluginDescription"] = "Change the opacity on your transparent chatboxes"
+project.extra["PluginName"] = "Crab Stun Timers"
+project.extra["PluginDescription"] = "Show crab stun timers in CoX"
 
 dependencies {
     annotationProcessor(Libraries.lombok)
