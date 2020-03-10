@@ -62,7 +62,8 @@ public interface CrabStunConfig extends Config
 		description = "Configures the diameter of the timer",
 		position = 3
 	)
-	default int timerDiameter() {
+	default int timerDiameter()
+	{
 		return 25;
 	}
 
