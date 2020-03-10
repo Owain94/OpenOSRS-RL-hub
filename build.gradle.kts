@@ -64,6 +64,8 @@ subprojects {
 
         withType<Checkstyle> {
             group = "verification"
+
+            exclude("**/Emoji.java")
         }
     }
 }
