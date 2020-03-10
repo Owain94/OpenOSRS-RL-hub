@@ -1,4 +1,4 @@
-import ProjectVersions.rlVersion
+import ProjectVersions.openosrsVersion
 
 /*
  * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
@@ -37,9 +37,9 @@ dependencies {
     implementation(Libraries.jfreechart)
     implementation(Libraries.jdatepicker)
 
-    compileOnly("com.openosrs:http-api:$rlVersion+")
-    compileOnly("com.openosrs:runelite-api:$rlVersion+")
-    compileOnly("com.openosrs:runelite-client:$rlVersion+")
+    compileOnly("com.openosrs:http-api:$openosrsVersion+")
+    compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
+    compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
 
     compileOnly(Libraries.apacheCommonsLang)
     compileOnly(Libraries.guice)
