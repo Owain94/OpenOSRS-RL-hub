@@ -40,7 +40,7 @@ dependencies {
     compileOnly("com.openosrs.externals:banktags:0.0.+")
     compileOnly("com.openosrs.externals:runepouch:0.0.+")
 
-    compileOnly(Libraries.apacheCommonsLang)
+    compileOnly(Libraries.apacheCommonsText)
     compileOnly(Libraries.guice)
     compileOnly(Libraries.gson)
     compileOnly(Libraries.jopt)

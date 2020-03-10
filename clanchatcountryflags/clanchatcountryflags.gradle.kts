@@ -38,7 +38,7 @@ dependencies {
     compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
     compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
 
-    compileOnly(Libraries.apacheCommonsLang)
+    compileOnly(Libraries.apacheCommonsText)
     compileOnly(Libraries.guice)
     compileOnly(Libraries.lombok)
     compileOnly(Libraries.pf4j)

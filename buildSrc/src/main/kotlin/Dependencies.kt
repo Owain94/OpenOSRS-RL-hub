@@ -30,7 +30,6 @@ object ProjectVersions {
 
 object Libraries {
     private object Versions {
-        const val apacheCommonsLang = "3.9"
         const val apacheCommonsText = "1.8"
         const val gson = "2.8.6"
         const val guava = "28.2-jre"
@@ -39,12 +38,10 @@ object Libraries {
         const val jdatepicker = "1.3.2"
         const val jfreechart = "1.5.0"
         const val jopt = "5.0.4"
-        const val lombok = "1.18.10"
-        const val okhttp3 = "4.3.0"
+        const val lombok = "1.18.12"
         const val pf4j = "3.2.0"
     }
 
-    const val apacheCommonsLang = "org.apache.commons:commons-lang3:${Versions.apacheCommonsLang}"
     const val apacheCommonsText = "org.apache.commons:commons-text:${Versions.apacheCommonsText}"
     const val gson = "com.google.code.gson:gson:${Versions.gson}"
     const val guava = "com.google.guava:guava:${Versions.guava}"
@@ -54,7 +51,6 @@ object Libraries {
     const val jfreechart = "org.jfree:jfreechart:${Versions.jfreechart}"
     const val jopt = "net.sf.jopt-simple:jopt-simple:${Versions.jopt}"
     const val lombok = "org.projectlombok:lombok:${Versions.lombok}"
-    const val okhttp3 = "com.squareup.okhttp3:okhttp:${Versions.okhttp3}"
     const val pf4j = "org.pf4j:pf4j:${Versions.pf4j}"
 
 }
