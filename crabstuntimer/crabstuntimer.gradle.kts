@@ -25,10 +25,10 @@ import ProjectVersions.rlVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2"
 
 project.extra["PluginName"] = "Crab Stun Timers"
-project.extra["PluginDescription"] = "Show crab stun timers in CoX"
+project.extra["PluginDescription"] = "Timers for when crabs in CoX get unstunned."
 
 dependencies {
     annotationProcessor(Libraries.lombok)
