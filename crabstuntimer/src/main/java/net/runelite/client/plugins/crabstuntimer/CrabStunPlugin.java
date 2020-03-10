@@ -52,7 +52,7 @@ import org.pf4j.Extension;
 @Extension
 @PluginDescriptor(
 	name = "Crab Stun Timers",
-	description = "Show crab stun timers",
+	description = "Timers for when crabs in CoX get unstunned.",
 	tags = {"overlay", "raid", "pvm", "timers"},
 	type = PluginType.MINIGAME
 )

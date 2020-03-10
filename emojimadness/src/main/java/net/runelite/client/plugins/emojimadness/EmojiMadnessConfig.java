@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2020, dekvall <https://github.com/dekvall>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,40 +22,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.emojimadness;
 
-rootProject.name = "OpenOSRS Plugins"
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":crabstuntimer")
-include(":emojipalette")
-include(":emojimadness")
-include(":emojiscape")
-include(":esspouch")
-include(":essencerunning")
-include(":friendsexporter")
-include(":fullscreen")
-include(":greenscreen")
-include(":hamstoreroom")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":polybarintegration")
-include(":stonedloottracker")
-include(":tobhealthbars")
-include(":toweroflife")
-include(":volcanicmine")
-include(":worldhighlighter")
-
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
-
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+@ConfigGroup("emojimadness")
+public interface EmojiMadnessConfig extends Config
+{
+	@ConfigItem(
+		keyName = "appendMode",
+		name = "Append Mode",
+		description = "Append the icon to the trigger instead of replacing it"
+	)
+	default boolean appendMode()
+	{
+		return true;
+	}
 }
