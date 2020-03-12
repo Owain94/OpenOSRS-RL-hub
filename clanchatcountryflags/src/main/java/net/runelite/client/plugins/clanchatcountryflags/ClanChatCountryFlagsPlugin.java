@@ -31,8 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.IndexedSprite;
+import net.runelite.api.ScriptID;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
@@ -91,9 +92,9 @@ public class ClanChatCountryFlagsPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onScriptCallbackEvent(ScriptCallbackEvent scriptCallbackEvent)
+	public void onScriptPostFired(ScriptPostFired event)
 	{
-		if (!scriptCallbackEvent.getEventName().equals("clanChatChannelRebuild"))
+		if (event.getScriptId() != ScriptID.CLAN_CHAT_CHANNEL_BUILD)
 		{
 			return;
 		}
