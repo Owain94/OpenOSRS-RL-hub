@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2020, TheStonedTurtle <https://github.com/TheStonedTurtle>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,48 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.partypanel.data;
 
-rootProject.name = "OpenOSRS Plugins"
+import java.util.HashMap;
+import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import net.runelite.api.Client;
+import net.runelite.api.Experience;
+import net.runelite.api.Skill;
+import net.runelite.api.VarPlayer;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":crabstuntimer")
-include(":emojipalette")
-include(":emojimadness")
-include(":emojiscape")
-include(":esspouch")
-include(":essencerunning")
-include(":friendsexporter")
-include(":fullscreen")
-include(":greenscreen")
-include(":hamstoreroom")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":partypanel")
-include(":polybarintegration")
-include(":stonedloottracker")
-include(":tobhealthbars")
-include(":toweroflife")
-include(":volcanicmine")
-include(":worldhighlighter")
+@Getter
+@Setter
+public class Stats
+{
+	private final Map<Skill, Integer> baseLevels = new HashMap<>();
+	private final Map<Skill, Integer> boostedLevels = new HashMap<>();
+	private int specialPercent;
+	private int combatLevel;
+	private int totalLevel;
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+	public Stats(final Client client)
+	{
+		final int[] bases = client.getRealSkillLevels();
+		final int[] boosts = client.getBoostedSkillLevels();
+		for (final Skill s : Skill.values())
+		{
+			baseLevels.put(s, bases[s.ordinal()]);
+			boostedLevels.put(s, boosts[s.ordinal()]);
+		}
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+		combatLevel = Experience.getCombatLevel(
+			baseLevels.get(Skill.ATTACK),
+			baseLevels.get(Skill.STRENGTH),
+			baseLevels.get(Skill.DEFENCE),
+			baseLevels.get(Skill.HITPOINTS),
+			baseLevels.get(Skill.MAGIC),
+			baseLevels.get(Skill.RANGED),
+			baseLevels.get(Skill.PRAYER)
+		);
+
+		specialPercent = client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) / 10;
+		totalLevel = client.getTotalLevel();
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2020, TheStonedTurtle <https://github.com/TheStonedTurtle>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,57 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.partypanel.data;
 
-rootProject.name = "OpenOSRS Plugins"
+import lombok.AllArgsConstructor;
+import lombok.Value;
+import net.runelite.api.Item;
+import net.runelite.api.ItemDefinition;
+import net.runelite.client.game.ItemManager;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":crabstuntimer")
-include(":emojipalette")
-include(":emojimadness")
-include(":emojiscape")
-include(":esspouch")
-include(":essencerunning")
-include(":friendsexporter")
-include(":fullscreen")
-include(":greenscreen")
-include(":hamstoreroom")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":partypanel")
-include(":polybarintegration")
-include(":stonedloottracker")
-include(":tobhealthbars")
-include(":toweroflife")
-include(":volcanicmine")
-include(":worldhighlighter")
+@Value
+@AllArgsConstructor
+public class GameItem
+{
+	final int id;
+	final int qty;
+	final String name;
+	final boolean stackable;
+	final int price;
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+	public GameItem(final Item item, final ItemManager itemManager)
+	{
+		this(item.getId(), item.getQuantity(), itemManager);
+	}
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+	public GameItem(final int id, final int qty, final ItemManager itemManager)
+	{
+		this.id = id;
+		this.qty = qty;
+
+		final ItemDefinition c = itemManager.getItemDefinition(id);
+
+		this.name = c.getName();
+		this.stackable = c.isStackable();
+		this.price = itemManager.getItemPrice(c.getNote() != -1 ? c.getLinkedNoteId() : id);
+	}
+
+	public static GameItem[] convertItemsToGameItems(final Item[] items, final ItemManager itemManager)
+	{
+		final GameItem[] output = new GameItem[items.length];
+		for (int i = 0; i < items.length; i++)
+		{
+			final Item item = items[i];
+			if (item == null || item.getId() == -1)
+			{
+				output[i] = null;
+			}
+			else
+			{
+				output[i] = new GameItem(item, itemManager);
+			}
+		}
+
+		return output;
+	}
 }
