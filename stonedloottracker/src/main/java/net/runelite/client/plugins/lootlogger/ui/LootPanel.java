@@ -26,6 +26,7 @@ package net.runelite.client.plugins.lootlogger.ui;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -34,7 +35,9 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +50,8 @@ import net.runelite.client.plugins.lootlogger.data.UniqueItem;
 import net.runelite.client.plugins.lootlogger.localstorage.LTItemEntry;
 import net.runelite.client.plugins.lootlogger.localstorage.LTRecord;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.FontManager;
+import net.runelite.client.ui.components.shadowlabel.JShadowedLabel;
 
 @Slf4j
 class LootPanel extends JPanel
@@ -86,34 +91,6 @@ class LootPanel extends JPanel
 		final Multimap<Integer, UniqueItem> positionMap = ArrayListMultimap.create();
 		final Set<Integer> uniqueIds = new HashSet<>();
 
-		if (!config.uniquesPlacement().equals(UniqueItemPlacement.ITEM_BREAKDOWN))
-		{
-			// Loop over all UniqueItems and check how many the player has received as a drop for each
-			// Also add all Item IDs for uniques to a Set for easy hiding later on.
-			for (final UniqueItem item : lootLog.getUniques())
-			{
-				final int id = item.getItemID();
-				final int linkedId = item.getLinkedID();
-				uniqueIds.add(id);
-				uniqueIds.add(linkedId);
-
-				final LTItemEntry entry = lootLog.getConsolidated().get(id);
-				final LTItemEntry notedEntry = lootLog.getConsolidated().get(linkedId);
-				final int qty = (entry == null ? 0 : entry.getQuantity()) + (notedEntry == null ? 0 : notedEntry.getQuantity());
-				item.setQty(qty);
-				positionMap.put(item.getPosition(), item);
-			}
-
-			for (final int position : positionMap.keySet())
-			{
-				final Collection<UniqueItem> uniques = positionMap.get(position);
-
-				final UniqueItemPanel p = new UniqueItemPanel(uniques, this.itemManager, this.config.itemMissingAlpha());
-				this.add(p, c);
-				c.gridy++;
-			}
-		}
-
 		// Attach Kill Count Panel(s)
 		final int amount = lootLog.getRecords().size();
 		String currentText;
@@ -123,19 +100,19 @@ class LootPanel extends JPanel
 		{
 			case "Wintertodt":
 				currentText = "Current Killcount:";
-				loggedText = "Crates logged:";
+				loggedText = "Crates Logged:";
 				break;
 			case "Herbiboar":
-				currentText = "Herbiboars looted:";
-				loggedText = "Loots logged:";
+				currentText = "Herbiboars Looted:";
+				loggedText = "Loots Logged:";
 				break;
 			case "Brimstone Chest":
 			case "Crystal Chest":
 			case "Larran's big chest":
 			case "Larran's small chest":
 			case "Elven Crystal Chest":
-				currentText = "Chests opened:";
-				loggedText = "Chests logged:";
+				currentText = "Chests Opened:";
+				loggedText = "Chests Logged:";
 				break;
 			case  "Clue Scroll (Beginner)":
 			case  "Clue Scroll (Easy)":
@@ -143,14 +120,17 @@ class LootPanel extends JPanel
 			case  "Clue Scroll (Hard)":
 			case  "Clue Scroll (Elite)":
 			case  "Clue Scroll (Master)":
-				currentText = "Clues completed:";
-				loggedText = "Clues logged:";
+				currentText = "Clues Completed:";
+				loggedText = "Clues Logged:";
 				break;
 			default:
-				currentText = "Current loot count:";
-				loggedText = "Loots logged:";
+				currentText = "Current Loot Count:";
+				loggedText = "Loots Logged:";
 				break;
 		}
+
+		this.add(titleLabel("Statistics"), c);
+		c.gridy++;
 
 		if (amount > 0)
 		{
@@ -176,6 +156,47 @@ class LootPanel extends JPanel
 			c.gridy++;
 		}
 
+		if (amount > 0 && totalValue > 0)
+		{
+			final TextPanel totalPanel = new TextPanel("Average Value:", totalValue / amount);
+			this.add(totalPanel, c);
+			c.gridy++;
+		}
+
+		if (!config.uniquesPlacement().equals(UniqueItemPlacement.ITEM_BREAKDOWN))
+		{
+			// Loop over all UniqueItems and check how many the player has received as a drop for each
+			// Also add all Item IDs for uniques to a Set for easy hiding later on.
+			for (final UniqueItem item : lootLog.getUniques())
+			{
+				final int id = item.getItemID();
+				final int linkedId = item.getLinkedID();
+				uniqueIds.add(id);
+				uniqueIds.add(linkedId);
+
+				final LTItemEntry entry = lootLog.getConsolidated().get(id);
+				final LTItemEntry notedEntry = lootLog.getConsolidated().get(linkedId);
+				final int qty = (entry == null ? 0 : entry.getQuantity()) + (notedEntry == null ? 0 : notedEntry.getQuantity());
+				item.setQty(qty);
+				positionMap.put(item.getPosition(), item);
+			}
+
+			if (!positionMap.isEmpty())
+			{
+				this.add(titleLabel("Uniques"), c);
+				c.gridy++;
+			}
+
+			for (final int position : positionMap.keySet())
+			{
+				final Collection<UniqueItem> uniques = positionMap.get(position);
+
+				final UniqueItemPanel p = new UniqueItemPanel(uniques, this.itemManager, this.config.itemMissingAlpha());
+				this.add(p, c);
+				c.gridy++;
+			}
+		}
+
 		final boolean hideUniques = config.uniquesPlacement().equals(UniqueItemPlacement.UNIQUES_PANEL);
 		final Comparator<LTItemEntry> sorter = createLTItemEntryComparator(config.itemSortType());
 		final Collection<LTItemEntry> itemsToDisplay = lootLog.getConsolidated().values().stream()
@@ -185,6 +206,9 @@ class LootPanel extends JPanel
 
 		if (itemsToDisplay.size() > 0)
 		{
+			this.add(titleLabel("Drops"), c);
+			c.gridy++;
+
 			if (config.itemBreakdown())
 			{
 				for (final LTItemEntry e : itemsToDisplay)
@@ -302,5 +326,18 @@ class LootPanel extends JPanel
 			// Default to alphabetical
 			return o1.getName().compareTo(o2.getName());
 		};
+	}
+
+	private static JLabel titleLabel(String text)
+	{
+		JLabel title = new JShadowedLabel();
+
+		title.setFont(FontManager.getRunescapeSmallFont());
+		title.setForeground(Color.WHITE);
+		title.setHorizontalAlignment(SwingConstants.CENTER);
+		title.setText("<html><body style = 'text-align:center'>" + text + "</body></html>");
+		title.setBorder(new EmptyBorder(10, 0, 0, 0));
+
+		return title;
 	}
 }
