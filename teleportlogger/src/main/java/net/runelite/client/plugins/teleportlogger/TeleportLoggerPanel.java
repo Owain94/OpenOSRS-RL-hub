@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2018 Charlie Waters
+ * Copyright (c) 2018, Psikoi <https://github.com/psikoi>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,44 +23,50 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.teleportlogger;
 
-rootProject.name = "OpenOSRS Plugins"
+import java.awt.BorderLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.PluginPanel;
 
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":crabstuntimer")
-include(":crowdsourcing")
-include(":emojipalette")
-include(":emojimadness")
-include(":emojiscape")
-include(":esspouch")
-include(":essencerunning")
-include(":friendsexporter")
-include(":fullscreen")
-include(":greenscreen")
-include(":hamstoreroom")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":partypanel")
-include(":polybarintegration")
-include(":pvpperformancetracker")
-include(":stonedloottracker")
-include(":teleportlogger")
-include(":tobhealthbars")
-include(":toweroflife")
-include(":volcanicmine")
-include(":worldhighlighter")
+@Slf4j
+class TeleportLoggerPanel extends PluginPanel
+{
+	private final JTextArea notesEditor = new JTextArea();
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+	void init()
+	{
+		getParent().setLayout(new BorderLayout());
+		getParent().add(this, BorderLayout.CENTER);
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
-    }
+		setLayout(new BorderLayout());
+		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		setBackground(ColorScheme.DARK_GRAY_COLOR);
+
+		notesEditor.setTabSize(2);
+		notesEditor.setLineWrap(true);
+		notesEditor.setWrapStyleWord(true);
+
+		JPanel notesContainer = new JPanel();
+		notesContainer.setLayout(new BorderLayout());
+		notesContainer.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+
+		notesEditor.setOpaque(false);
+
+
+		notesContainer.add(notesEditor, BorderLayout.CENTER);
+		notesContainer.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		add(notesContainer, BorderLayout.CENTER);
+	}
+
+	void appendText(String data)
+	{
+		notesEditor.append(data + "\n");
+	}
 }

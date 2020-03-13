@@ -1,3 +1,5 @@
+import ProjectVersions.openosrsVersion
+
 /*
  * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
  * All rights reserved.
@@ -23,35 +25,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-object ProjectVersions {
-    const val openosrsVersion = "3.1.0"
-    const val apiVersion = "0.0.1"
+version = "0.0.1"
+
+project.extra["PluginName"] = "OSRS Wiki Crowdsourcing"
+project.extra["PluginDescription"] = "Help figure out skilling success rates, burn rates, more. See osrs.wiki/RS:CROWD"
+
+dependencies {
+    annotationProcessor(Libraries.lombok)
+    annotationProcessor(Libraries.pf4j)
+
+    compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
+    compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
+
+    compileOnly(Libraries.gson)
+    compileOnly(Libraries.guice)
+    compileOnly(Libraries.lombok)
+    compileOnly(Libraries.okhttp3)
+    compileOnly(Libraries.pf4j)
+    compileOnly(Libraries.rxjava)
 }
 
-object Libraries {
-    private object Versions {
-        const val apacheCommonsText = "1.8"
-        const val gson = "2.8.6"
-        const val guava = "28.2-jre"
-        const val guice = "4.2.2"
-        const val jdatepicker = "1.3.2"
-        const val jfreechart = "1.5.0"
-        const val jopt = "5.0.4"
-        const val lombok = "1.18.12"
-        const val okhttp3 = "4.4.0"
-        const val pf4j = "3.2.0"
-        const val rxjava = "3.0.0"
+tasks {
+    jar {
+        manifest {
+            attributes(mapOf(
+                    "Plugin-Version" to project.version,
+                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
+                    "Plugin-Provider" to project.extra["PluginProvider"],
+                    "Plugin-Description" to project.extra["PluginDescription"],
+                    "Plugin-License" to project.extra["PluginLicense"]
+            ))
+        }
     }
-
-    const val apacheCommonsText = "org.apache.commons:commons-text:${Versions.apacheCommonsText}"
-    const val gson = "com.google.code.gson:gson:${Versions.gson}"
-    const val guava = "com.google.guava:guava:${Versions.guava}"
-    const val guice = "com.google.inject:guice:${Versions.guice}:no_aop"
-    const val jdatepicker = "net.sourceforge.jdatepicker:jdatepicker:${Versions.jdatepicker}"
-    const val jfreechart = "org.jfree:jfreechart:${Versions.jfreechart}"
-    const val jopt = "net.sf.jopt-simple:jopt-simple:${Versions.jopt}"
-    const val lombok = "org.projectlombok:lombok:${Versions.lombok}"
-    const val okhttp3 = "com.squareup.okhttp3:okhttp:${Versions.okhttp3}"
-    const val pf4j = "org.pf4j:pf4j:${Versions.pf4j}"
-    const val rxjava = "io.reactivex.rxjava3:rxjava:${Versions.rxjava}"
 }
