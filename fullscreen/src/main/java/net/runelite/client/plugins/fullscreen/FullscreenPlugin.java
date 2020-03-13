@@ -28,6 +28,7 @@ import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.RuneLiteConfig;
@@ -36,13 +37,13 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.ContainableFrame;
-import net.runelite.client.util.SwingUtil;
 import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
 	name = "Fullscreen",
 	description = "Requires custom chrome being off.",
+	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
 @Slf4j
@@ -61,25 +62,25 @@ public class FullscreenPlugin extends Plugin
 	{
 		log.info("Fullscreen started!");
 		gd = clientUI.getGraphicsConfiguration().getDevice();
+		Frame tempParent = Frame.getFrames()[0];
 
 		if (configManager.getConfig(RuneLiteConfig.class).enableCustomChrome())
 		{
 			log.info("You must disable custom chrome to enable fullscreen");
-			SwingUtil.syncExec(() ->
-				JOptionPane.showMessageDialog(null,
-					"You must disable custom chrome to enable fullscreen",
-					"Fullscreen plugin",
-					JOptionPane.ERROR_MESSAGE));
+			SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(tempParent,
+				"You must disable custom chrome to enable fullscreen",
+				"Could not enter fullscreen mode",
+				JOptionPane.ERROR_MESSAGE));
 			return;
 		}
 
 		if (!gd.isFullScreenSupported())
 		{
-			SwingUtil.syncExec(() ->
-				JOptionPane.showMessageDialog(null,
-					"Fullscreen is not supported on your device, sorry :(",
-					"Fullscreen plugin",
-					JOptionPane.ERROR_MESSAGE));
+			log.info("Fullscreen is not supported on your device, sorry :(");
+			SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(tempParent,
+				"Fullscreen is not supported on your device, sorry :(",
+				"Could not enter fullscreen mode",
+				JOptionPane.ERROR_MESSAGE));
 			return;
 		}
 
@@ -87,7 +88,6 @@ public class FullscreenPlugin extends Plugin
 		Frame[] frames = Frame.getFrames();
 		for (Frame frame : frames)
 		{
-			gd.setFullScreenWindow(frames[1]);
 			if (frame instanceof ContainableFrame)
 			{
 				gd.setFullScreenWindow(frame);
