@@ -30,6 +30,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -114,12 +115,12 @@ class LootPanel extends JPanel
 				currentText = "Chests Opened:";
 				loggedText = "Chests Logged:";
 				break;
-			case  "Clue Scroll (Beginner)":
-			case  "Clue Scroll (Easy)":
-			case  "Clue Scroll (Medium)":
-			case  "Clue Scroll (Hard)":
-			case  "Clue Scroll (Elite)":
-			case  "Clue Scroll (Master)":
+			case "Clue Scroll (Beginner)":
+			case "Clue Scroll (Easy)":
+			case "Clue Scroll (Medium)":
+			case "Clue Scroll (Hard)":
+			case "Clue Scroll (Elite)":
+			case "Clue Scroll (Master)":
 				currentText = "Clues Completed:";
 				loggedText = "Clues Logged:";
 				break;
@@ -158,8 +159,17 @@ class LootPanel extends JPanel
 
 		if (amount > 0 && totalValue > 0)
 		{
-			final TextPanel totalPanel = new TextPanel("Average Value:", totalValue / amount);
-			this.add(totalPanel, c);
+			final TextPanel meanPanel = new TextPanel("Mean Value:", totalValue / amount);
+			this.add(meanPanel, c);
+			c.gridy++;
+
+			long[] values = lootLog.getConsolidated().values().stream()
+				.mapToLong(e -> e.getPrice() * e.getQuantity())
+				.sorted()
+				.toArray();
+
+			final TextPanel medianPanel = new TextPanel("Median Value:", (values.length % 2 != 0) ? values[values.length / 2] : (values[values.length / 2] + values[(values.length / 2) - 1]) / 2);
+			this.add(medianPanel, c);
 			c.gridy++;
 		}
 
@@ -292,6 +302,7 @@ class LootPanel extends JPanel
 
 	/**
 	 * Sorts the collection of LTItemEntry based on the selected {@link ItemSortTypes}
+	 *
 	 * @param sortType The {@link ItemSortTypes} describing how these entries should be sorted
 	 * @return returns the sorted list
 	 */
