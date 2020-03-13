@@ -248,11 +248,6 @@ jobs:
           repository: open-osrs/plugins
           ref: master
 
-      - uses: actions/checkout@v1
-        with:
-          repository: Owain94/OpenOSRS-RL-hub-hosting
-          ref: master
-
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
@@ -303,6 +298,11 @@ jobs:
 
       - name: Bootstrapping plugins
         run: ./gradlew bootstrapPlugins --stacktrace --console=plain
+
+      - uses: actions/checkout@v1
+        with:
+          repository: Owain94/OpenOSRS-RL-hub-hosting
+          ref: master
 
       - name: Copy bootstrap
         run: cp -af /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub/build/bootstrap/. /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub-hosting/
