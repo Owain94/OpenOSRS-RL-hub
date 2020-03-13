@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import static net.runelite.api.AnimationID.*;
@@ -18,7 +20,11 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginInstantiationException;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.PluginType;
+import net.runelite.client.ui.ClientUI;
+import net.runelite.client.util.OSType;
 import org.pf4j.Extension;
 
 @Extension
@@ -42,9 +48,35 @@ public class PolybarIntegrationPlugin extends Plugin
 	@Inject
 	private ScheduledExecutorService executorService;
 
+	@Inject
+	private PluginManager pluginManager;
+
 	@Override
 	protected void startUp()
 	{
+		if (OSType.getOSType() == OSType.MacOS || OSType.getOSType() == OSType.Windows)
+		{
+			SwingUtilities.invokeLater(() ->
+				{
+					JOptionPane.showMessageDialog(ClientUI.getFrame(),
+						"Polybar is not compatible with your system!",
+						"Error!",
+						JOptionPane.ERROR_MESSAGE);
+
+					try
+					{
+						pluginManager.setPluginEnabled(this, false);
+						pluginManager.stopPlugin(this);
+					}
+					catch (PluginInstantiationException ex)
+					{
+						log.error("error stopping plugin", ex);
+					}
+				});
+
+			return;
+		}
+
 		writeState(State.IDLE);
 		notifyPolybar();
 	}
@@ -52,8 +84,11 @@ public class PolybarIntegrationPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		writeState(State.IDLE);
-		notifyPolybar();
+		if (OSType.getOSType() != OSType.MacOS && OSType.getOSType() != OSType.Windows)
+		{
+			writeState(State.IDLE);
+			notifyPolybar();
+		}
 	}
 
 	@Subscribe
