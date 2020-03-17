@@ -25,10 +25,10 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Inventory Setups"
-project.extra["PluginDescription"] = "Save inventory setups"
+project.extra["PluginName"] = "World Hider"
+project.extra["PluginDescription"] = "Hides your world so you can stream in peace"
 
 dependencies {
     annotationProcessor(Libraries.lombok)
@@ -37,13 +37,7 @@ dependencies {
     compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
     compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
 
-    compileOnly("com.openosrs.externals:banktags:0.0.+")
-    compileOnly("com.openosrs.externals:runepouch:0.0.+")
-
-    compileOnly(Libraries.apacheCommonsText)
     compileOnly(Libraries.guice)
-    compileOnly(Libraries.gson)
-    compileOnly(Libraries.jopt)
     compileOnly(Libraries.lombok)
     compileOnly(Libraries.pf4j)
 }
@@ -55,11 +49,6 @@ tasks {
                     "Plugin-Version" to project.version,
                     "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Dependencies" to
-                            arrayOf(
-                                    nameToId("banktags"),
-                                    nameToId("runepouch")
-                            ).joinToString(),
                     "Plugin-Description" to project.extra["PluginDescription"],
                     "Plugin-License" to project.extra["PluginLicense"]
             ))

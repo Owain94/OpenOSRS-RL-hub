@@ -53,6 +53,7 @@ include(":teleportlogger")
 include(":tobhealthbars")
 include(":toweroflife")
 include(":volcanicmine")
+include(":worldhider")
 include(":worldhighlighter")
 
 for (project in rootProject.children) {
