@@ -1,3 +1,5 @@
+import ProjectVersions.openosrsVersion
+
 buildscript {
     repositories {
         gradlePluginPortal()
@@ -6,19 +8,20 @@ buildscript {
 
 plugins {
     checkstyle
+    java
 }
 
 apply<BootstrapPlugin>()
 apply<VersionPlugin>()
 
-subprojects {
-    group = "com.owain.externals"
-
-    project.extra["PluginProvider"] = "Owain94"
-    project.extra["ProjectUrl"] = "https://discord.gg/HVjnT6R"
-    project.extra["PluginLicense"] = "3-Clause BSD License"
-
+allprojects {
     repositories {
+        mavenCentral {
+            content {
+                excludeGroupByRegex("com\\.openosrs.*")
+            }
+        }
+
         jcenter {
             content {
                 excludeGroupByRegex("com\\.openosrs.*")
@@ -34,9 +37,36 @@ subprojects {
             }
         }
     }
+}
+
+subprojects {
+    group = "com.owain.externals"
+
+    project.extra["PluginProvider"] = "Owain94"
+    project.extra["ProjectUrl"] = "https://discord.gg/HVjnT6R"
+    project.extra["PluginLicense"] = "3-Clause BSD License"
 
     apply<JavaPlugin>()
     apply(plugin = "checkstyle")
+
+    dependencies {
+        annotationProcessor(Libraries.lombok)
+        annotationProcessor(Libraries.pf4j)
+
+        compileOnly("com.openosrs:http-api:$openosrsVersion+")
+        compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
+        compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
+
+        compileOnly(Libraries.apacheCommonsText)
+        compileOnly(Libraries.guava)
+        compileOnly(Libraries.guice)
+        compileOnly(Libraries.gson)
+        compileOnly(Libraries.jopt)
+        compileOnly(Libraries.lombok)
+        compileOnly(Libraries.okhttp3)
+        compileOnly(Libraries.pf4j)
+        compileOnly(Libraries.rxjava)
+    }
 
     checkstyle {
         maxWarnings = 0

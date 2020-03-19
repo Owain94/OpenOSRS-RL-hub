@@ -1,5 +1,3 @@
-import ProjectVersions.openosrsVersion
-
 /*
  * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
  * All rights reserved.
@@ -31,21 +29,8 @@ project.extra["PluginName"] = "Inventory Setups"
 project.extra["PluginDescription"] = "Save inventory setups"
 
 dependencies {
-    annotationProcessor(Libraries.lombok)
-    annotationProcessor(Libraries.pf4j)
-
-    compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
-    compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
-
     compileOnly("com.openosrs.externals:banktags:0.0.+")
     compileOnly("com.openosrs.externals:runepouch:0.0.+")
-
-    compileOnly(Libraries.apacheCommonsText)
-    compileOnly(Libraries.guice)
-    compileOnly(Libraries.gson)
-    compileOnly(Libraries.jopt)
-    compileOnly(Libraries.lombok)
-    compileOnly(Libraries.pf4j)
 }
 
 tasks {

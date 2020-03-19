@@ -31,18 +31,7 @@ project.extra["PluginName"] = "Emoji palette"
 project.extra["PluginDescription"] = "Shows a panel with all the emoji"
 
 dependencies {
-    annotationProcessor(Libraries.lombok)
-    annotationProcessor(Libraries.pf4j)
-
-    compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
-    compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
-
     compileOnly("com.openosrs.externals:emojis:0.0.+")
-
-    compileOnly(Libraries.guice)
-    compileOnly(Libraries.gson)
-    compileOnly(Libraries.lombok)
-    compileOnly(Libraries.pf4j)
 }
 
 tasks {
