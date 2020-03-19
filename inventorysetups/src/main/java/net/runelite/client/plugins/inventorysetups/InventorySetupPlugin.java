@@ -366,6 +366,12 @@ public class InventorySetupPlugin extends Plugin
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
+		if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
+			&& event.getOption().equals(LABEL_SEARCH))
+		{
+			doBankSearch(true);
+		}
+
 		if (panel.getCurrentSelectedSetup() != null
 			&& event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
 			&& client.getWidget(WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND).getSpriteId() != SpriteID.EQUIPMENT_SLOT_SELECTED)
