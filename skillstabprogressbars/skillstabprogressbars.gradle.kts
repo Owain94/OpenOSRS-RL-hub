@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,48 +23,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-rootProject.name = "OpenOSRS Plugins"
+version = "0.0.1"
 
-include(":advancednotifications")
-include(":bankedexperience")
-include(":bankheatmap")
-include(":bankhistory")
-include(":bankvalue")
-include(":chatboxopacity")
-include(":clanchatcountryflags")
-include(":clanchatwarnings")
-include(":crabstuntimer")
-include(":crowdsourcing")
-include(":emojipalette")
-include(":emojimadness")
-include(":emojiscape")
-include(":esspouch")
-include(":flippingutilities")
-include(":essencerunning")
-include(":friendsexporter")
-include(":fullscreen")
-include(":greenscreen")
-include(":hamstoreroom")
-include(":inventorysetups")
-include(":masterfarmer")
-include(":partypanel")
-include(":polybarintegration")
-include(":pvpperformancetracker")
-include(":stonedloottracker")
-include(":skillstabprogressbars")
-include(":teleportlogger")
-include(":tobhealthbars")
-include(":toweroflife")
-include(":volcanicmine")
-include(":worldhider")
-include(":worldhighlighter")
+project.extra["PluginName"] = "Skills Progress Bars"
+project.extra["PluginDescription"] = "Adds progress bars to the skills tab to show how close the next level ups are"
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
-
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
+tasks {
+    jar {
+        manifest {
+            attributes(mapOf(
+                    "Plugin-Version" to project.version,
+                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
+                    "Plugin-Provider" to project.extra["PluginProvider"],
+                    "Plugin-Description" to project.extra["PluginDescription"],
+                    "Plugin-License" to project.extra["PluginLicense"]
+            ))
+        }
     }
 }
