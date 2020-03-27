@@ -19,7 +19,7 @@ public class EssenceRunningSession
 	public void updateRunnerStatistic(final String rsn, final int pureEssenceTraded, final int bindingNecklaceTraded)
 	{
 		final Optional<EssenceRunner> optional = runners.stream().filter(i -> i.getRsn().equals(rsn)).findFirst();
-		final EssenceRunner runner = optional.isPresent() ? optional.get() : new EssenceRunner(rsn);
+		final EssenceRunner runner = optional.orElseGet(() -> new EssenceRunner(rsn));
 
 		this.runners.remove(runner);
 		runner.increasePureEssenceTraded(pureEssenceTraded);

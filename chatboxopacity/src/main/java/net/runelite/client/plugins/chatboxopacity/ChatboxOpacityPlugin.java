@@ -43,13 +43,13 @@ public class ChatboxOpacityPlugin extends Plugin
 	}
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		clientThread.invoke(() -> writeChatboxOpacity(config.opacity()));
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		clientThread.invoke(() -> client.runScript(BUILD_CHATBOX_SCRIPT));
 	}

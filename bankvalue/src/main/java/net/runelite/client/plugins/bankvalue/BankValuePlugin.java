@@ -43,9 +43,9 @@ public class BankValuePlugin extends Plugin
 	private NavigationButton navButton;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
-		panel = new BankValuePanel(this);
+		panel = new BankValuePanel();
 
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(BankValuePlugin.class, "panel_icon.png");
 
@@ -60,7 +60,7 @@ public class BankValuePlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		clientToolbar.removeNavigation(navButton);
 	}

@@ -36,6 +36,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -92,14 +93,11 @@ public class FlippingPanel extends PluginPanel
 
 	@Getter
 	public final JPanel centerPanel = new JPanel(cardLayout);
-	//So we can keep track what items are shown on the panel.
-	private ArrayList<FlippingItemPanel> activePanels = new ArrayList<>();
 
-	//Used to store previous panels for use of highlighting.
+	//So we can keep track what items are shown on the panel.
+	private final List<FlippingItemPanel> activePanels = new ArrayList<>();
 	@Getter
-	@Setter
-	private ArrayList<FlippingItem> itemsToBeAddedList;
-	private ArrayList<FlippingItem> preHighlightList = new ArrayList<>();
+	private List<FlippingItemPanel> preHighlightList = new ArrayList<>();
 
 
 	@Inject
@@ -200,7 +198,7 @@ public class FlippingPanel extends PluginPanel
 		add(container, BorderLayout.CENTER);
 	}
 
-	private void initializeFlippingPanel(ArrayList<FlippingItem> flippingItems)
+	private void initializeFlippingPanel(List<FlippingItem> flippingItems)
 	{
 		if (flippingItems == null)
 		{
@@ -219,58 +217,61 @@ public class FlippingPanel extends PluginPanel
 			cardLayout.show(centerPanel, ITEMS_PANEL);
 		}
 
+
 		SwingUtilities.invokeLater(() ->
 		{
 			int index = 0;
 			for (FlippingItem item : flippingItems)
 			{
-
-				FlippingItemPanel newPanel = new FlippingItemPanel(plugin, itemManager, item);
-
-				clientThread.invokeLater(() -> {
-					activePanels.add(newPanel);
-					newPanel.buildPanelValues();
-					newPanel.checkOutdatedPriceTimes();
-					newPanel.setActiveTimer(true);
-				});
-
-				//Collapse when clicking the top panel of an item.
-				newPanel.topPanel.addMouseListener(new MouseAdapter()
 				{
-					@Override
-					public void mousePressed(MouseEvent e)
+					FlippingItemPanel newPanel = new FlippingItemPanel(plugin, itemManager, item);
+					clientThread.invokeLater(() ->
 					{
-						if (e.getButton() == MouseEvent.BUTTON1)
+						activePanels.add(newPanel);
+						newPanel.buildPanelValues();
+						newPanel.updateGELimits();
+						newPanel.checkOutdatedPriceTimes();
+						newPanel.setActiveTimer(true);
+					});
+
+					//Collapse when clicking the top panel of an item.
+					newPanel.topPanel.addMouseListener(new MouseAdapter()
+					{
+						@Override
+						public void mousePressed(MouseEvent e)
 						{
-							if (newPanel.isCollapsed())
+							if (e.getButton() == MouseEvent.BUTTON1)
 							{
-								newPanel.expand();
-							}
-							else
-							{
-								newPanel.collapse();
+								if (newPanel.isCollapsed())
+								{
+									newPanel.expand();
+								}
+								else
+								{
+									newPanel.collapse();
+								}
 							}
 						}
+					});
+					if (index++ > 0)
+					{
+						JPanel marginWrapper = new JPanel(new BorderLayout());
+						marginWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
+						marginWrapper.setBorder(new EmptyBorder(4, 0, 0, 0));
+						marginWrapper.add(newPanel, BorderLayout.NORTH);
+						flippingItemsPanel.add(marginWrapper, constraints);
 					}
-				});
-				if (index++ > 0)
-				{
-					JPanel marginWrapper = new JPanel(new BorderLayout());
-					marginWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
-					marginWrapper.setBorder(new EmptyBorder(4, 0, 0, 0));
-					marginWrapper.add(newPanel, BorderLayout.NORTH);
-					flippingItemsPanel.add(marginWrapper, constraints);
+					else
+					{
+						flippingItemsPanel.add(newPanel, constraints);
+					}
+					constraints.gridy++;
 				}
-				else
-				{
-					flippingItemsPanel.add(newPanel, constraints);
-				}
-				constraints.gridy++;
 			}
 		});
 	}
 
-	public void rebuildFlippingPanel(ArrayList<FlippingItem> flippingItems)
+	public void rebuildFlippingPanel(List<FlippingItem> flippingItems)
 	{
 		flippingItemsPanel.removeAll();
 		if (flippingItems == null)
@@ -280,7 +281,6 @@ public class FlippingPanel extends PluginPanel
 		else
 		{
 			initializeFlippingPanel(flippingItems);
-			itemsToBeAddedList = flippingItems;
 		}
 
 		revalidate();
@@ -292,33 +292,52 @@ public class FlippingPanel extends PluginPanel
 	private boolean itemHighlighted = false;
 
 	//Clears all other items, if the item in the offer setup slot is presently available on the panel
-	public void highlightItem(int itemID)
+	public void highlightItem(int itemId)
 	{
-		//Check if item is contained in the panel item list.
-		itemsToBeAddedList.stream()
-			.filter(e -> e.getItemId() == itemID)
-			.findFirst()
-			.ifPresent(item -> {
-				ArrayList<FlippingItem> itemToHighlight = new ArrayList<>();
-				itemToHighlight.add(item);
-				preHighlightList = itemsToBeAddedList;
-				rebuildFlippingPanel(itemToHighlight);
-				itemHighlighted = true;
-			});
+		if (itemHighlighted)
+		{
+			return;
+		}
+		List<FlippingItem> itemToHighlight = new ArrayList<>(findItemPanelFromItemId(itemId));
+		if (!itemToHighlight.isEmpty())
+		{
+			preHighlightList.addAll(activePanels);
+			rebuildFlippingPanel(itemToHighlight);
+			itemHighlighted = true;
+		}
 	}
 
 	//This is run whenever the PlayerVar containing the GE offer slot changes to its empty value (-1)
-	// or if GE is closed.
+	// or if the GE is closed.
 	public void dehighlightItem()
 	{
 		if (!itemHighlighted)
 		{
 			return;
 		}
-		itemsToBeAddedList = preHighlightList;
-		rebuildFlippingPanel(itemsToBeAddedList);
+
+		List<FlippingItem> itemsToAdd = new ArrayList<>();
+		for (FlippingItemPanel itemPanel : preHighlightList)
+		{
+			itemsToAdd.add(itemPanel.getFlippingItem());
+		}
+
+		rebuildFlippingPanel(itemsToAdd);
 		itemHighlighted = false;
+		preHighlightList.clear();
 		plugin.setPrevHighlight(0);
+	}
+
+	public List<FlippingItem> findItemPanelFromItemId(int itemId)
+	{
+		List<FlippingItem> result = new ArrayList<>();
+
+		activePanels.stream()
+			.filter(t -> t.getFlippingItem().getItemId() == itemId)
+			.findFirst()
+			.ifPresent(t -> result.add(t.getFlippingItem()));
+
+		return result;
 	}
 
 	//Updates tooltips on prices to show how long ago the latest margin check was.
@@ -331,11 +350,22 @@ public class FlippingPanel extends PluginPanel
 	}
 
 	//Not sure if this is necessary, but just in case it hinders performance.
-	private void stopTimerUpdates(ArrayList<FlippingItemPanel> activePanels)
+	private void stopTimerUpdates(List<FlippingItemPanel> activePanels)
 	{
 		for (FlippingItemPanel panel : activePanels)
 		{
 			panel.setActiveTimer(false);
 		}
+	}
+
+	public void updateGELimit()
+	{
+		SwingUtilities.invokeLater(() ->
+		{
+			for (FlippingItemPanel activePanel : activePanels)
+			{
+				activePanel.updateGELimits();
+			}
+		});
 	}
 }

@@ -38,7 +38,7 @@ public class EssenceRunningStatisticsOverlay extends Overlay
 
 			panelComponent.getChildren().add(LineComponent.builder().left("Runner").right("Ess/Neck").build());
 
-			session.getRunners().stream().forEach(runner -> panelComponent.getChildren().add(
+			session.getRunners().forEach(runner -> panelComponent.getChildren().add(
 				LineComponent.builder()
 					.left(runner.getRsn())
 					.right(runner.getPureEssenceTraded() + "/" + runner.getBindingNecklaceTraded())

@@ -54,10 +54,32 @@ public interface PvpPerformanceTrackerConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "showFightHistoryPanel",
+		name = "Show Fight History Panel",
+		description = "Enables the side-panel which displays previous fight statistics.",
+		position = 2
+	)
+	default boolean showFightHistoryPanel()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "useSimpleOverlay",
+		name = "Use Simple Overlay",
+		description = "The overlay will only display percentage as stats rather than fraction, percentage & deserved dps.",
+		position = 3
+	)
+	default boolean useSimpleOverlay()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		keyName = "showOverlayTitle",
 		name = "Show Overlay Title",
-		description = "The overlay will have a title to say it's the PvP Performance Tracker.",
-		position = 2
+		description = "The overlay will have a title to display that it is PvP Performance.",
+		position = 4
 	)
 	default boolean showOverlayTitle()
 	{
@@ -65,24 +87,69 @@ public interface PvpPerformanceTrackerConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "useSimpleOverlay",
-		name = "Use Simple Overlay",
-		description = "The overlay will only display percentage as stats rather than fraction & percentage.",
-		position = 3
+		keyName = "fightHistoryLimit",
+		name = "Fight History Limit",
+		description = "Maximum number of previous fights to save. 0 means unlimited. They are lightweight, but will cause significant ram usage at ridiculously high numbers.",
+		position = 5
 	)
-	default boolean useSimpleOverlay()
+	default int fightHistoryLimit()
+	{
+		return 1000;
+	}
+
+	@ConfigItem(
+		keyName = "boltChoice",
+		name = "RCB Ammo",
+		description = "Bolts used for rune crossbow's deserved damage estimate. LMS uses diamond (e). Dragonfire protection not accounted for.",
+		position = 6
+	)
+	default RangeAmmoData.BoltAmmo boltChoice()
+	{
+		return RangeAmmoData.BoltAmmo.DIAMOND_BOLTS_E;
+	}
+
+	@ConfigItem(
+		keyName = "strongBoltChoice",
+		name = "ACB/DCB/DHCB Ammo",
+		description = "Bolts used for ACB/DCB/DHCB's deserved damage estimate. LMS uses regular diamond (e). Dragonfire protection not accounted for.",
+		position = 7
+	)
+	default RangeAmmoData.StrongBoltAmmo strongBoltChoice()
+	{
+		return RangeAmmoData.StrongBoltAmmo.DIAMOND_BOLTS_E;
+	}
+
+	@ConfigItem(
+		keyName = "bpDartChoice",
+		name = "Blowpipe Ammo",
+		description = "Darts used for blowpipe deserved damage estimate.",
+		position = 8
+	)
+	default RangeAmmoData.DartAmmo bpDartChoice()
+	{
+		return RangeAmmoData.DartAmmo.DRAGON_DARTS;
+	}
+
+	@ConfigItem(
+		keyName = "assumeZerkRing",
+		name = "Assume B Ring",
+		description = "Assume both players are using an unimbued Berserker Ring, the starting LMS ring. Can't dynamically determine the ring.",
+		position = 9
+	)
+	default boolean assumeZerkRing()
 	{
 		return true;
 	}
 
 	@ConfigItem(
-		keyName = "saveFightHistory",
-		name = "Save Fight History",
-		description = "Enables the side-panel which displays previous fight statistics.",
-		position = 4
+		hidden = true,
+		keyName = "fightHistoryData",
+		name = "Fight History Data",
+		description = "You shouldn't be seeing this without looking at the code. Fight history data is saved here. Do not edit.",
+		position = 999
 	)
-	default boolean saveFightHistory()
+	default String fightHistoryData()
 	{
-		return true;
+		return "[]";
 	}
 }

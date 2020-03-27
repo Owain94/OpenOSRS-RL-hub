@@ -16,7 +16,6 @@ public class EnabledButton extends JLabel
 	private static final ImageIcon DISABLED_ICON;
 	private static final ImageIcon DISABLED_HOVER_ICON;
 
-	private final AdvancedNotificationsPlugin plugin;
 	private final Notification notification;
 
 	static
@@ -34,7 +33,6 @@ public class EnabledButton extends JLabel
 
 	public EnabledButton(AdvancedNotificationsPlugin plugin, Notification notification)
 	{
-		this.plugin = plugin;
 		this.notification = notification;
 
 		setIcon(notification.isEnabled() ? ENABLED_ICON : DISABLED_ICON);

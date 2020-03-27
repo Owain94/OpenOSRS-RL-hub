@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
@@ -142,7 +143,7 @@ public enum BossTab
 		return CATEGORY_MAP.get(name);
 	}
 
-	public static TreeSet<String> getCategories()
+	public static Set<String> getCategories()
 	{
 		return new TreeSet<>(CATEGORY_MAP.keySet());
 	}

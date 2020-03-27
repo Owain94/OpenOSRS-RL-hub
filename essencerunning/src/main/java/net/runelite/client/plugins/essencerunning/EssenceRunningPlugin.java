@@ -109,7 +109,7 @@ public class EssenceRunningPlugin extends Plugin
 	private boolean craftedFireRunes = false;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		keyManager.registerKeyListener(inputListener);
 		mouseManager.registerMouseListener(inputListener);
@@ -121,7 +121,7 @@ public class EssenceRunningPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		keyManager.unregisterKeyListener(inputListener);
 		mouseManager.unregisterMouseListener(inputListener);

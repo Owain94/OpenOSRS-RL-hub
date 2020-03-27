@@ -74,14 +74,14 @@ public class TobHealthBarsPlugin extends Plugin
 	private boolean inTob;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		overlayManager.add(overlay);
 		clientThread.invoke(() -> setHidden(true));
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		overlayManager.remove(overlay);
 		clientThread.invoke(() -> setHidden(false));

@@ -27,6 +27,8 @@ package net.runelite.client.plugins.inventorysetups.ui;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JPanel;
 import net.runelite.api.ItemID;
 import net.runelite.client.game.ItemManager;
@@ -44,7 +46,7 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 	private static final int ITEMS_PER_ROW = 4;
 	private static final int NUM_INVENTORY_ITEMS = 28;
 
-	private ArrayList<InventorySetupSlot> inventorySlots;
+	private List<InventorySetupSlot> inventorySlots;
 	private InventorySetupRunePouchPanel rpPanel;
 
 	InventorySetupInventoryPanel(final ItemManager itemManager, final InventorySetupPlugin plugin, final InventorySetupRunePouchPanel rpPanel)
@@ -72,9 +74,9 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 	}
 
 	@Override
-	public void highlightSlotDifferences(final ArrayList<InventorySetupItem> currInventory, final InventorySetup inventorySetup)
+	public void highlightSlotDifferences(final List<InventorySetupItem> currInventory, final InventorySetup inventorySetup)
 	{
-		final ArrayList<InventorySetupItem> inventoryToCheck = inventorySetup.getInventory();
+		final List<InventorySetupItem> inventoryToCheck = inventorySetup.getInventory();
 
 		assert currInventory.size() == inventoryToCheck.size() : "size mismatch";
 
@@ -132,9 +134,9 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 		isHighlighted = false;
 	}
 
-	private void doUnorderedHighlighting(final ArrayList<InventorySetupItem> currInventory, final InventorySetup inventorySetup)
+	private void doUnorderedHighlighting(final List<InventorySetupItem> currInventory, final InventorySetup inventorySetup)
 	{
-		HashMap<ImmutablePair<Integer, Integer>, Integer> currInvMap = new HashMap<>();
+		Map<ImmutablePair<Integer, Integer>, Integer> currInvMap = new HashMap<>();
 
 		boolean currInvHasRunePouch = false;
 		for (final InventorySetupItem item : currInventory)
@@ -153,7 +155,7 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 			currInvMap.put(key, count + 1);
 		}
 
-		final ArrayList<InventorySetupItem> setupInv = inventorySetup.getInventory();
+		final List<InventorySetupItem> setupInv = inventorySetup.getInventory();
 		for (int i = 0; i < setupInv.size(); i++)
 		{
 			final InventorySetupItem item = setupInv.get(i);
@@ -207,7 +209,7 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 			// attempt to highlight if rune pouch is available
 			if (currInvHasRunePouch)
 			{
-				ArrayList<InventorySetupItem> runePouchToCheck = plugin.getRunePouchData();
+				List<InventorySetupItem> runePouchToCheck = plugin.getRunePouchData();
 				rpPanel.highlightSlotDifferences(runePouchToCheck, inventorySetup);
 			}
 			else // if the current inventory doesn't have a rune pouch but the setup does, highlight the RP pouch

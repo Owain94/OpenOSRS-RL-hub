@@ -54,7 +54,10 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 		}
 		in.endObject();
 
-		notification.setEnabled(enabled);
+		if (notification != null)
+		{
+			notification.setEnabled(enabled);
+		}
 		return notification;
 	}
 
@@ -79,7 +82,7 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 		}
 		else if (o instanceof EmptyNotification)
 		{
-			emptyNotificationAdapter.write(plugin, out, (EmptyNotification) o);
+			emptyNotificationAdapter.write(out, (EmptyNotification) o);
 		}
 	}
 

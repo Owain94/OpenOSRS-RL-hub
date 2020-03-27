@@ -40,7 +40,7 @@ public class CrowdsourcingPlugin extends Plugin
 	private CrowdsourcingCooking cooking;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		manager.storeEvent("hello!");
 		eventBus.subscribe(ChatMessage.class, this, cooking::onChatMessage);
@@ -48,7 +48,7 @@ public class CrowdsourcingPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		eventBus.unregister(this);
 	}

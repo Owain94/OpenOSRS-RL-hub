@@ -58,7 +58,7 @@ public class FullscreenPlugin extends Plugin
 	private GraphicsDevice gd;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		log.info("Fullscreen started!");
 		gd = clientUI.getGraphicsConfiguration().getDevice();
@@ -97,7 +97,7 @@ public class FullscreenPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		gd.setFullScreenWindow(null);
 		log.info("Fullscreen stopped!");

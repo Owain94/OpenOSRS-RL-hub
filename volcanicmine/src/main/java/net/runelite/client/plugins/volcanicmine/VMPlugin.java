@@ -195,7 +195,7 @@ public class VMPlugin extends Plugin
 	public void onGameObjectSpawned(GameObjectSpawned event)
 	{
 		// Skip calculation if not in VM
-		if (!isInVM())
+		if (client.getLocalPlayer() == null || !isInVM())
 		{
 			return;
 		}

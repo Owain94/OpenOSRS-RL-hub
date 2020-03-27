@@ -65,13 +65,13 @@ public class WorldHiderPlugin extends Plugin
 	private int randomWorld = getRandomWorld();
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		log.info("World Hider started!");
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		log.info("World Hider stopped!");
 	}
@@ -132,8 +132,6 @@ public class WorldHiderPlugin extends Plugin
 				clientThread.invokeLater(this::killWorldHopper);
 			case BUILD_CC:
 				clientThread.invokeLater(this::hideClanWorlds);
-			default:
-				return;
 		}
 	}
 
@@ -191,7 +189,7 @@ public class WorldHiderPlugin extends Plugin
 		int world = client.getWorld();
 		Widget clan = client.getWidget(WidgetInfo.CLAN_CHAT_LIST);
 
-		if (clan == null)
+		if (clan == null || client.getLocalPlayer() == null)
 		{
 			return;
 		}

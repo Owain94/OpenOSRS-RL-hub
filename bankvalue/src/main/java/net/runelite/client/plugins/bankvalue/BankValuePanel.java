@@ -53,13 +53,10 @@ class BankValuePanel extends PluginPanel
 	private SortOrder orderIndex = SortOrder.VALUE;
 	private boolean ascendingOrder = false;
 
-	private ArrayList<BankValueTableRow> rows = new ArrayList<>();
-	private BankValuePlugin plugin;
+	private List<BankValueTableRow> rows = new ArrayList<>();
 
-	BankValuePanel(BankValuePlugin plugin)
+	BankValuePanel()
 	{
-		this.plugin = plugin;
-
 		setBorder(null);
 		setLayout(new DynamicGridLayout(0, 1));
 

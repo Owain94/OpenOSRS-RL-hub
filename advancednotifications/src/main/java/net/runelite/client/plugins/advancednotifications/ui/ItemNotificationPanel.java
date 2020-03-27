@@ -13,8 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -38,7 +36,6 @@ public class ItemNotificationPanel extends NotificationPanel
 
 	private ItemNotification notification;
 
-	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 	private final JSpinner countSpinner = new JSpinner();
 
 	static
@@ -132,7 +129,7 @@ public class ItemNotificationPanel extends NotificationPanel
 		comparatorBox.setPreferredSize(new Dimension(50, 20));
 		comparatorBox.setMaximumRowCount(9);
 		comparatorBox.addItemListener(e -> {
-			notification.setComparator((InventoryComparator)comparatorBox.getSelectedItem());
+			notification.setComparator((InventoryComparator) comparatorBox.getSelectedItem());
 			notification.getPlugin().updateConfig();
 			countSpinner.setVisible(notification.getComparator().takesParam());
 		});
@@ -141,7 +138,7 @@ public class ItemNotificationPanel extends NotificationPanel
 		countSpinner.setPreferredSize(new Dimension(64, 20));
 		countSpinner.setVisible(notification.getComparator().takesParam());
 		countSpinner.addChangeListener(e -> {
-			notification.setComparatorParam((Integer)countSpinner.getValue());
+			notification.setComparatorParam((Integer) countSpinner.getValue());
 			notification.getPlugin().updateConfig();
 		});
 

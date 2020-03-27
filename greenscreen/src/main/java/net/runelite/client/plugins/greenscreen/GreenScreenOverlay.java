@@ -35,6 +35,11 @@ public class GreenScreenOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		if (client.getLocalPlayer() == null)
+		{
+			return null;
+		}
+
 
 		BufferedImage image = new BufferedImage(client.getCanvasWidth(), client.getCanvasHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics g = image.getGraphics();
@@ -87,7 +92,7 @@ public class GreenScreenOverlay extends Overlay
 
 		int count = model.getVerticesCount();
 
-		List<Vertex> vertices = new ArrayList(count);
+		List<Vertex> vertices = new ArrayList<>(count);
 
 		for (int i = 0; i < count; ++i)
 		{

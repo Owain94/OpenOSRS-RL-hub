@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class EmptyNotificationAdapter
 {
-	public void write(AdvancedNotificationsPlugin plugin, JsonWriter out, EmptyNotification o) throws IOException
+	public void write(JsonWriter out, EmptyNotification o) throws IOException
 	{
 		out.beginObject();
 		out.name("comparator").value(Arrays.asList(InventoryComparator.COMPARATORS).indexOf(o.getComparator()));
