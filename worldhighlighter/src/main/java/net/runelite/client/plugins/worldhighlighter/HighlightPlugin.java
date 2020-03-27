@@ -164,7 +164,7 @@ public class HighlightPlugin extends Plugin
 
 	void highlightWidget(Graphics2D graphics, Widget toHighlight, Widget container, Rectangle padding, String text)
 	{
-		padding = (Rectangle) MoreObjects.firstNonNull(padding, new Rectangle());
+		padding = MoreObjects.firstNonNull(padding, new Rectangle());
 		Point canvasLocation = toHighlight.getCanvasLocation();
 		if (canvasLocation != null && container != null)
 		{
@@ -176,9 +176,9 @@ public class HighlightPlugin extends Plugin
 				if (text != null)
 				{
 					FontMetrics fontMetrics = graphics.getFontMetrics();
-					this.textComponent.setPosition(new java.awt.Point(canvasLocation.getX() + toHighlight.getWidth() / 2 - fontMetrics.stringWidth(text) / 2, canvasLocation.getY() + fontMetrics.getHeight()));
-					this.textComponent.setText(text);
-					this.textComponent.render(graphics);
+					textComponent.setPosition(new java.awt.Point(canvasLocation.getX() + toHighlight.getWidth() / 2 - fontMetrics.stringWidth(text) / 2, canvasLocation.getY() + fontMetrics.getHeight()));
+					textComponent.setText(text);
+					textComponent.render(graphics);
 				}
 			}
 		}
@@ -186,14 +186,10 @@ public class HighlightPlugin extends Plugin
 
 	void scrollToWidget(Widget list, Widget scrollbar, Widget... toHighlight)
 	{
-		Widget parent = list;
 		int averageCentralY = 0;
 		int nonnullCount = 0;
-		Widget[] var7 = toHighlight;
-		int var8 = toHighlight.length;
-		for (int var9 = 0; var9 < var8; ++var9)
+		for (Widget widget : toHighlight)
 		{
-			Widget widget = var7[var9];
 			if (widget != null)
 			{
 				averageCentralY += widget.getRelativeY() + widget.getHeight() / 2;
@@ -203,15 +199,15 @@ public class HighlightPlugin extends Plugin
 		if (nonnullCount != 0)
 		{
 			averageCentralY /= nonnullCount;
-			int newScroll = Math.max(0, Math.min(parent.getScrollHeight(), averageCentralY - parent.getHeight() / 2));
-			this.client.runScript(new Object[]{72, scrollbar.getId(), parent.getId(), newScroll});
+			int newScroll = Math.max(0, Math.min(list.getScrollHeight(), averageCentralY - list.getHeight() / 2));
+			this.client.runScript(72, scrollbar.getId(), list.getId(), newScroll);
 		}
 	}
 
 	private void sendNotification(int type)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		if (this.config.message() == false)
+		if (!this.config.message())
 		{
 			return;
 		}
@@ -235,7 +231,7 @@ public class HighlightPlugin extends Plugin
 		}
 		else
 		{
-			stringBuilder.append("Highlighting " + player + " in clan chat.");
+			stringBuilder.append("Highlighting ").append(player).append(" in clan chat.");
 			String notification = stringBuilder.toString();
 			this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", notification, "");
 		}

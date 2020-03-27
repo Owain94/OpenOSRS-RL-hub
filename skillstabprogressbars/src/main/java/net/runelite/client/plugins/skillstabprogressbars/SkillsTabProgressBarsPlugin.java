@@ -4,11 +4,17 @@ import com.google.inject.Provides;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Experience;
 import net.runelite.api.Skill;
 import net.runelite.api.events.StatChanged;
+import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.JavaScriptCallback;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -31,7 +37,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin
 {
 
 	static final int MINIMUM_BAR_HEIGHT = 1;
-	static final int MAXIMUM_BAR_HEIGHT = 15;
+	static final int MAXIMUM_BAR_HEIGHT = 32;
 	static final int MINIMUM_BAR_WIDTH_TO_BE_SEEN_WELL = 2;
 
 	@Inject
@@ -45,6 +51,9 @@ public class SkillsTabProgressBarsPlugin extends Plugin
 
 	@Inject
 	private ClientThread clientThread;
+
+	@Getter(AccessLevel.PACKAGE)
+	private static Skill hoveredSkill = null;
 
 	@Override
 	protected void startUp()
@@ -84,6 +93,35 @@ public class SkillsTabProgressBarsPlugin extends Plugin
 			}
 			progressNormalised.put(skill, progressToLevelNormalised);
 		});
+	}
+
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded widget)
+	{
+		if (widget.getGroupId() == WidgetInfo.SKILLS_CONTAINER.getGroupId())
+		{
+			attachHoverListeners();
+		}
+	}
+
+	private void attachHoverListeners()
+	{
+		Widget skillsContainer = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
+		if (skillsContainer == null)
+		{
+			log.warn("skills container widget not found - not attaching hovered skill listeners");
+			return;
+		}
+
+		for (Widget skillWidget : skillsContainer.getStaticChildren())
+		{
+			final Skill skill = skillFromWidgetID(skillWidget.getId());
+			if (skill != null)
+			{ /* skip invalid skill widgets (such as the side stone) */
+				skillWidget.setOnMouseOverListener((JavaScriptCallback) event -> hoveredSkill = skill);
+			}
+		}
+		skillsContainer.setOnMouseLeaveListener((JavaScriptCallback) event -> hoveredSkill = null);
 	}
 
 	Skill skillFromWidgetID(int widgetID)
@@ -137,6 +175,8 @@ public class SkillsTabProgressBarsPlugin extends Plugin
 				return Skill.WOODCUTTING;
 			case 20971543:
 				return Skill.FARMING;
+			case 20971544:
+				return Skill.OVERALL;
 			default:
 				return null;
 		}

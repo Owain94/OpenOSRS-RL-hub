@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
@@ -145,7 +146,7 @@ public class InventorySetupPlugin extends Plugin
 	private InventorySetupPluginPanel panel;
 
 	@Getter
-	private ArrayList<InventorySetup> inventorySetups;
+	private List<InventorySetup> inventorySetups;
 
 	private NavigationButton navButton;
 
@@ -280,10 +281,10 @@ public class InventorySetupPlugin extends Plugin
 
 		clientThread.invokeLater(() ->
 		{
-			ArrayList<InventorySetupItem> inv = getNormalizedContainer(InventoryID.INVENTORY);
-			ArrayList<InventorySetupItem> eqp = getNormalizedContainer(InventoryID.EQUIPMENT);
+			List<InventorySetupItem> inv = getNormalizedContainer(InventoryID.INVENTORY);
+			List<InventorySetupItem> eqp = getNormalizedContainer(InventoryID.EQUIPMENT);
 
-			ArrayList<InventorySetupItem> runePouchData = null;
+			List<InventorySetupItem> runePouchData = null;
 			if (checkIfContainerContainsItem(ItemID.RUNE_POUCH, inv, false, true))
 			{
 				runePouchData = getRunePouchData();
@@ -413,9 +414,9 @@ public class InventorySetupPlugin extends Plugin
 		bankSearch.reset(true);
 	}
 
-	public ArrayList<InventorySetupItem> getRunePouchData()
+	public List<InventorySetupItem> getRunePouchData()
 	{
-		ArrayList<InventorySetupItem> runePouchData = new ArrayList<>();
+		List<InventorySetupItem> runePouchData = new ArrayList<>();
 		for (int i = 0; i < RUNE_POUCH_RUNE_VARBITS.length; i++)
 		{
 			int runeId = client.getVar(RUNE_POUCH_RUNE_VARBITS[i]);
@@ -500,10 +501,10 @@ public class InventorySetupPlugin extends Plugin
 		// must be on client thread to get names
 		clientThread.invokeLater(() ->
 		{
-			ArrayList<InventorySetupItem> inv = getNormalizedContainer(InventoryID.INVENTORY);
-			ArrayList<InventorySetupItem> eqp = getNormalizedContainer(InventoryID.EQUIPMENT);
+			List<InventorySetupItem> inv = getNormalizedContainer(InventoryID.INVENTORY);
+			List<InventorySetupItem> eqp = getNormalizedContainer(InventoryID.EQUIPMENT);
 
-			ArrayList<InventorySetupItem> runePouchData = null;
+			List<InventorySetupItem> runePouchData = null;
 			if (checkIfContainerContainsItem(ItemID.RUNE_POUCH, inv, false, true))
 			{
 				runePouchData = getRunePouchData();
@@ -528,12 +529,12 @@ public class InventorySetupPlugin extends Plugin
 			return;
 		}
 
-		final ArrayList<InventorySetupItem> container = getContainerFromSlot(slot);
+		final List<InventorySetupItem> container = getContainerFromSlot(slot);
 
 		// must be invoked on client thread to get the name
 		clientThread.invokeLater(() ->
 		{
-			final ArrayList<InventorySetupItem> playerContainer = getNormalizedContainer(slot.getSlotID());
+			final List<InventorySetupItem> playerContainer = getNormalizedContainer(slot.getSlotID());
 			final InventorySetupItem newItem = playerContainer.get(slot.getIndexInSlot());
 
 			// update the rune pouch data
@@ -561,12 +562,11 @@ public class InventorySetupPlugin extends Plugin
 			return;
 		}
 
-		final ArrayList<InventorySetupItem> container = getContainerFromSlot(slot);
+		final List<InventorySetupItem> container = getContainerFromSlot(slot);
 
 		itemSearch
 			.tooltipText("Set slot to")
 			.onItemSelected((itemId) ->
-			{
 				clientThread.invokeLater(() ->
 				{
 					int finalId = itemManager.canonicalize(itemId);
@@ -594,7 +594,6 @@ public class InventorySetupPlugin extends Plugin
 						searchInput = chatboxPanelManager.openTextInput("Enter amount")
 							.addCharValidator(arg -> arg >= 48 && arg <= 57) // only allow numbers (ASCII)
 							.onDone((input) ->
-							{
 								clientThread.invokeLater(() ->
 								{
 									String inputParsed = input;
@@ -621,8 +620,7 @@ public class InventorySetupPlugin extends Plugin
 									updateJsonConfig();
 									panel.refreshCurrentSetup();
 
-								});
-							}).build();
+								})).build();
 					}
 					else
 					{
@@ -640,8 +638,7 @@ public class InventorySetupPlugin extends Plugin
 						panel.refreshCurrentSetup();
 					}
 
-				});
-			})
+				}))
 			.build();
 	}
 
@@ -679,9 +676,7 @@ public class InventorySetupPlugin extends Plugin
 			{
 				loadConfig();
 				SwingUtilities.invokeLater(() ->
-				{
-					panel.rebuild();
-				});
+					panel.rebuild());
 
 				return true;
 			});
@@ -696,9 +691,7 @@ public class InventorySetupPlugin extends Plugin
 		{
 			loadConfig();
 			SwingUtilities.invokeLater(() ->
-			{
-				panel.rebuild();
-			});
+				panel.rebuild());
 
 			return true;
 		});
@@ -739,7 +732,7 @@ public class InventorySetupPlugin extends Plugin
 		}
 	}
 
-	public ArrayList<InventorySetupItem> getNormalizedContainer(final InventorySetupSlotID id)
+	public List<InventorySetupItem> getNormalizedContainer(final InventorySetupSlotID id)
 	{
 		switch (id)
 		{
@@ -753,13 +746,13 @@ public class InventorySetupPlugin extends Plugin
 		}
 	}
 
-	public ArrayList<InventorySetupItem> getNormalizedContainer(final InventoryID id)
+	public List<InventorySetupItem> getNormalizedContainer(final InventoryID id)
 	{
 		assert id == InventoryID.INVENTORY || id == InventoryID.EQUIPMENT : "invalid inventory ID";
 
 		final ItemContainer container = client.getItemContainer(id);
 
-		ArrayList<InventorySetupItem> newContainer = new ArrayList<>();
+		List<InventorySetupItem> newContainer = new ArrayList<>();
 
 		Item[] items = null;
 		if (container != null)
@@ -849,9 +842,9 @@ public class InventorySetupPlugin extends Plugin
 		return client.getGameState() == GameState.LOGGED_IN;
 	}
 
-	private ArrayList<InventorySetupItem> getContainerFromSlot(final InventorySetupSlot slot)
+	private List<InventorySetupItem> getContainerFromSlot(final InventorySetupSlot slot)
 	{
-		ArrayList<InventorySetupItem> container = slot.getParentSetup().getInventory();
+		List<InventorySetupItem> container = slot.getParentSetup().getInventory();
 
 		if (slot.getSlotID() == InventorySetupSlotID.EQUIPMENT)
 		{
@@ -877,7 +870,7 @@ public class InventorySetupPlugin extends Plugin
 			try
 			{
 				final Gson gson = new Gson();
-				Type type = new TypeToken<ArrayList<InventorySetup>>()
+				Type type = new TypeToken<List<InventorySetup>>()
 				{
 
 				}.getType();
@@ -900,8 +893,7 @@ public class InventorySetupPlugin extends Plugin
 				{
 				}.getType();
 
-				HashMap<String, InventorySetupOld> oldSetups = new HashMap<>();
-				oldSetups.putAll(gson.fromJson(json, type));
+				Map<String, InventorySetupOld> oldSetups = new HashMap<>(gson.fromJson(json, type));
 
 				for (String name : oldSetups.keySet())
 				{
@@ -922,9 +914,8 @@ public class InventorySetupPlugin extends Plugin
 
 			}
 
-			inventorySetups = new ArrayList<>(inventorySetups.stream()
-				.sorted(Comparator.comparing(InventorySetup::getName, String::compareToIgnoreCase))
-				.collect(Collectors.toList()));
+			inventorySetups = inventorySetups.stream()
+				.sorted(Comparator.comparing(InventorySetup::getName, String::compareToIgnoreCase)).collect(Collectors.toCollection(ArrayList::new));
 		}
 	}
 
@@ -933,9 +924,8 @@ public class InventorySetupPlugin extends Plugin
 		SwingUtilities.invokeLater(() ->
 		{
 			inventorySetups.add(newSetup);
-			inventorySetups = new ArrayList<>(inventorySetups.stream()
-				.sorted(Comparator.comparing(InventorySetup::getName, String::compareToIgnoreCase))
-				.collect(Collectors.toList()));
+			inventorySetups = inventorySetups.stream()
+				.sorted(Comparator.comparing(InventorySetup::getName, String::compareToIgnoreCase)).collect(Collectors.toCollection(ArrayList::new));
 
 			panel.rebuild();
 
@@ -969,7 +959,7 @@ public class InventorySetupPlugin extends Plugin
 			checkIfContainerContainsItem(itemID, setup.getEquipment(), setup.isVariationDifference(), true);
 	}
 
-	private boolean checkIfContainerContainsItem(int itemID, final ArrayList<InventorySetupItem> container, boolean isVariationDifference, boolean canonicalize)
+	private boolean checkIfContainerContainsItem(int itemID, final List<InventorySetupItem> container, boolean isVariationDifference, boolean canonicalize)
 	{
 		for (final InventorySetupItem item : container)
 		{

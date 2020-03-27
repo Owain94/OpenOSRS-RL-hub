@@ -26,10 +26,13 @@ package net.runelite.client.plugins.pvpperformancetracker;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.HeadIcon;
 import static net.runelite.client.plugins.pvpperformancetracker.AnimationID.*;
 
+// These are AnimationID groupings to represent the three main attack styles,
+// simply Melee/Mage/Ranged.
 public enum AnimationAttackStyle
 {
 	// Melee attack animations
@@ -112,8 +115,9 @@ public enum AnimationAttackStyle
 	// create a static map of all the animation IDs to retrieve a style given an id more efficiently.
 	private static final Map<Integer, AnimationAttackStyle> STYLES;
 
-	@Getter
+	@Getter(AccessLevel.PACKAGE)
 	private final HeadIcon protection;
+
 	private final int[] animationIds;
 
 	static

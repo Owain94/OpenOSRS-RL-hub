@@ -51,7 +51,7 @@ class HamOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (client.getLocalPlayer().getWorldLocation().getRegionID() != 10321)
+		if (client.getLocalPlayer() == null || client.getLocalPlayer().getWorldLocation().getRegionID() != 10321)
 		{
 			return null;
 		}

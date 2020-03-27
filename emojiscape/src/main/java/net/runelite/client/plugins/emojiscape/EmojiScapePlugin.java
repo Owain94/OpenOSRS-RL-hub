@@ -69,9 +69,6 @@ public class EmojiScapePlugin extends Plugin
 	private Client client;
 
 	@Inject
-	private ConfigManager configManager;
-
-	@Inject
 	private EmojiScapeConfig config;
 
 	@Inject

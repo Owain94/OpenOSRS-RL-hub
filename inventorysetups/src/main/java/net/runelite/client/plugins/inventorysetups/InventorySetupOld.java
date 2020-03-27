@@ -8,8 +8,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class InventorySetupOld
 {
-@Getter(AccessLevel.PUBLIC)
-private List<InventorySetupItem> inventory;
-@Getter(AccessLevel.PUBLIC)
-private List<InventorySetupItem> equipment;
+	@Getter(AccessLevel.PUBLIC)
+	private List<InventorySetupItem> inventory;
+	@Getter(AccessLevel.PUBLIC)
+	private List<InventorySetupItem> equipment;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2020, Matsyir <https://github.com/Matsyir>
+ * Copyright (c) 2020, Matsyir <https://github.com/matsyir>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

@@ -35,7 +35,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -168,7 +167,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 
 		this.addImportMarker = new JLabel(IMPORT_ICON);
-		addImportMarker.setToolTipText ("Import a new inventory setup");
+		addImportMarker.setToolTipText("Import a new inventory setup");
 		addImportMarker.addMouseListener(new MouseAdapter()
 		{
 			@Override
@@ -388,7 +387,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 		for (final InventorySetup setup : setups)
 		{
-			InventorySetupPanel newPanel = null;
+			InventorySetupPanel newPanel;
 			if (plugin.getConfig().compactMode())
 			{
 				newPanel = new InventorySetupCompactPanel(plugin, this, setup);
@@ -414,7 +413,6 @@ public class InventorySetupPluginPanel extends PluginPanel
 	public void rebuild()
 	{
 		overviewPanel.removeAll();
-		final String text = searchBar.getText();
 		List<InventorySetup> setupsToAdd = searchBar.getText().isEmpty() ? plugin.getInventorySetups() : plugin.filterSetups(searchBar.getText());
 		init(setupsToAdd);
 		revalidate();
@@ -481,7 +479,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 			return;
 		}
 
-		final ArrayList<InventorySetupItem> inv = plugin.getNormalizedContainer(InventoryID.INVENTORY);
+		final List<InventorySetupItem> inv = plugin.getNormalizedContainer(InventoryID.INVENTORY);
 		invPanel.highlightSlotDifferences(inv, currentSelectedSetup);
 	}
 
@@ -501,10 +499,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 			return;
 		}
 
-		final ArrayList<InventorySetupItem> eqp = plugin.getNormalizedContainer(InventoryID.EQUIPMENT);
+		final List<InventorySetupItem> eqp = plugin.getNormalizedContainer(InventoryID.EQUIPMENT);
 		eqpPanel.highlightSlotDifferences(eqp, currentSelectedSetup);
 	}
-	
+
 	public void returnToOverviewPanel()
 	{
 		noSetupsPanel.setVisible(false);

@@ -34,7 +34,7 @@ import net.runelite.client.util.ImageUtil;
 
 public class EquipmentPanelSlot extends JLabel
 {
-	private final int IMAGE_SIZE = 48; // Background is squared at 32x32, we want 50% bigger so 48x48
+	private final static int IMAGE_SIZE = 48; // Background is squared at 32x32, we want 50% bigger so 48x48
 	private final BufferedImage background;
 	private final BufferedImage placeholder;
 	@Getter

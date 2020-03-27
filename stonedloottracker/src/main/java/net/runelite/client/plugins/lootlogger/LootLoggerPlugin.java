@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -95,7 +96,7 @@ public class LootLoggerPlugin extends Plugin
 	private NavigationButton navButton;
 
 	@Getter
-	private TreeSet<String> lootNames = new TreeSet<>();
+	private Set<String> lootNames = new TreeSet<>();
 
 	private boolean prepared = false;
 	private boolean unsiredReclaiming = false;
@@ -111,7 +112,7 @@ public class LootLoggerPlugin extends Plugin
 	}
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		panel = new LootLoggerPanel(itemManager, this);
 
@@ -397,7 +398,7 @@ public class LootLoggerPlugin extends Plugin
 					return;
 			}
 
-			final int killCount = Integer.valueOf(m.group(1));
+			final int killCount = Integer.parseInt(m.group(1));
 			killCountMap.put(eventType.toUpperCase(), killCount);
 			return;
 		}
@@ -440,7 +441,7 @@ public class LootLoggerPlugin extends Plugin
 		if (boss.find())
 		{
 			final String bossName = boss.group(1);
-			final int killCount = Integer.valueOf(boss.group(2));
+			final int killCount = Integer.parseInt(boss.group(2));
 			killCountMap.put(bossName.toUpperCase(), killCount);
 		}
 	}
@@ -450,6 +451,12 @@ public class LootLoggerPlugin extends Plugin
 	 */
 	private boolean isInNightmareZone()
 	{
-		return ArrayUtils.contains(client.getMapRegions(), NMZ_MAP_REGION);
+		if (client.getLocalPlayer() == null)
+		{
+			return false;
+		}
+
+		// It seems that KBD shares the map region with NMZ but NMZ is never in plane 0.
+		return ArrayUtils.contains(client.getMapRegions(), NMZ_MAP_REGION) && client.getLocalPlayer().getWorldLocation().getPlane() > 0;
 	}
 }

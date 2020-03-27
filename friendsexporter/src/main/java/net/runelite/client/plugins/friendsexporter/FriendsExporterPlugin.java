@@ -105,7 +105,7 @@ public class FriendsExporterPlugin extends Plugin
 				}
 				else
 				{
-					this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Clan Chat tab to export this list.", "");
+					client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Clan Chat tab to export this list.", "");
 				}
 			}
 			refreshShiftClickCustomizationMenus();
@@ -114,41 +114,46 @@ public class FriendsExporterPlugin extends Plugin
 
 	private void sendNotification(String type, File filename)
 	{
-		this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Exported " + type + " to " + filename.getPath(), "");
+		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Exported " + type + " to " + filename.getPath(), "");
 	}
 
 	private void refreshShiftClickCustomizationMenus()
 	{
-		this.removeShiftClickCustomizationMenus();
-		this.menuManager.addManagedCustomMenu(FIXED_Friends_List);
-		this.menuManager.addManagedCustomMenu(Resizable_Friends_List);
-		this.menuManager.addManagedCustomMenu(Bottom_Friends_List);
-		this.menuManager.addManagedCustomMenu(FIXED_Ignore_List);
-		this.menuManager.addManagedCustomMenu(Resizable_Ignore_List);
-		this.menuManager.addManagedCustomMenu(Bottom_Ignore_List);
-		this.menuManager.addManagedCustomMenu(Fixed_Clan_List);
-		this.menuManager.addManagedCustomMenu(Resizable_Clan_List);
+		removeShiftClickCustomizationMenus();
+		menuManager.addManagedCustomMenu(FIXED_Friends_List);
+		menuManager.addManagedCustomMenu(Resizable_Friends_List);
+		menuManager.addManagedCustomMenu(Bottom_Friends_List);
+		menuManager.addManagedCustomMenu(FIXED_Ignore_List);
+		menuManager.addManagedCustomMenu(Resizable_Ignore_List);
+		menuManager.addManagedCustomMenu(Bottom_Ignore_List);
+		menuManager.addManagedCustomMenu(Fixed_Clan_List);
+		menuManager.addManagedCustomMenu(Resizable_Clan_List);
 	}
 
 	private void removeShiftClickCustomizationMenus()
 	{
-		this.menuManager.removeManagedCustomMenu(FIXED_Friends_List);
-		this.menuManager.removeManagedCustomMenu(Resizable_Friends_List);
-		this.menuManager.removeManagedCustomMenu(Bottom_Friends_List);
-		this.menuManager.removeManagedCustomMenu(FIXED_Ignore_List);
-		this.menuManager.removeManagedCustomMenu(Resizable_Ignore_List);
-		this.menuManager.removeManagedCustomMenu(Bottom_Ignore_List);
-		this.menuManager.removeManagedCustomMenu(Fixed_Clan_List);
-		this.menuManager.removeManagedCustomMenu(Resizable_Clan_List);
+		menuManager.removeManagedCustomMenu(FIXED_Friends_List);
+		menuManager.removeManagedCustomMenu(Resizable_Friends_List);
+		menuManager.removeManagedCustomMenu(Bottom_Friends_List);
+		menuManager.removeManagedCustomMenu(FIXED_Ignore_List);
+		menuManager.removeManagedCustomMenu(Resizable_Ignore_List);
+		menuManager.removeManagedCustomMenu(Bottom_Ignore_List);
+		menuManager.removeManagedCustomMenu(Fixed_Clan_List);
+		menuManager.removeManagedCustomMenu(Resizable_Clan_List);
 	}
 
 	private void exportFriendsList() throws Exception
 	{
-		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Friends " + format(new Date()) + ".txt");
+		if (client.getLocalPlayer() == null)
+		{
+			return;
+		}
+
+		File fileName = new File(RuneLite.RUNELITE_DIR, client.getLocalPlayer().getName() + " Friends " + format(new Date()) + ".txt");
 		purgeList(fileName);
-		Friend[] array = this.client.getFriends();
+		Friend[] array = client.getFriends();
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x != this.client.getFriendsCount(); x++)
+		for (int x = 0; x != client.getFriendsCount(); x++)
 		{
 			String friendName = Text.toJagexName(array[x].getName());
 			String prevName = "";
@@ -172,21 +177,26 @@ public class FriendsExporterPlugin extends Plugin
 
 	private void exportRankList() throws Exception
 	{
-		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ranks " + format(new Date()) + ".txt");
+		if (client.getLocalPlayer() == null)
+		{
+			return;
+		}
+
+		File fileName = new File(RuneLite.RUNELITE_DIR, client.getLocalPlayer().getName() + " Ranks " + format(new Date()) + ".txt");
 		purgeList(fileName);
-		Friend[] array = this.client.getFriends();
+		Friend[] array = client.getFriends();
 		Widget temp;
 		Widget[] temp2;
-		temp = this.client.getWidget(94, 28);
+		temp = client.getWidget(94, 28);
 		temp2 = temp.getChildren();
 		FileWriter writer = new FileWriter(fileName, true);
 		for (int x = 0; x < temp2.length / 4; x++)
 		{
 			String rank = temp2[(x * 4) + 1].getText();
-			if (!rank.equals("Not in clan") || this.config.showUnranked())
+			if (!rank.equals("Not in clan") || config.showUnranked())
 			{
 				String prevName = "";
-				for (int y = 0; y != this.client.getFriendsCount(); y++)
+				for (int y = 0; y != client.getFriendsCount(); y++)
 				{
 					String friendName = Text.toJagexName(array[y].getName());
 					if (friendName.equals(temp2[(x * 4) + 2].getText()))
@@ -223,11 +233,16 @@ public class FriendsExporterPlugin extends Plugin
 
 	private void exportIgnoreList() throws Exception
 	{
-		File fileName = new File(RuneLite.RUNELITE_DIR, this.client.getLocalPlayer().getName() + " Ignore " + format(new Date()) + ".txt");
+		if (client.getLocalPlayer() == null)
+		{
+			return;
+		}
+
+		File fileName = new File(RuneLite.RUNELITE_DIR, client.getLocalPlayer().getName() + " Ignore " + format(new Date()) + ".txt");
 		purgeList(fileName);
-		Ignore[] array = this.client.getIgnores();
+		Ignore[] array = client.getIgnores();
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x != this.client.getIgnoreCount(); x++)
+		for (int x = 0; x != client.getIgnoreCount(); x++)
 		{
 			String friendName = Text.toJagexName(array[x].getName());
 			String prevName = "";
@@ -259,15 +274,15 @@ public class FriendsExporterPlugin extends Plugin
 		String export = "";
 		String Separator;
 		String Role = "";
-		if (this.config.Separator().equals(""))
+		if (config.Separator().equals(""))
 		{
 			Separator = "-";
 		}
 		else
 		{
-			Separator = this.config.Separator();
+			Separator = config.Separator();
 		}
-		if (this.config.newLine())
+		if (config.newLine())
 		{
 			Separator = "\n" + Separator;
 		}
@@ -275,7 +290,7 @@ public class FriendsExporterPlugin extends Plugin
 		{
 			Role = rank + Separator;
 		}
-		switch (this.config.Lineleads())
+		switch (config.Lineleads())
 		{
 			case None:
 				if (!StringUtils.isEmpty(lastName))
@@ -351,7 +366,7 @@ public class FriendsExporterPlugin extends Plugin
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded widget)
 	{
-		if (widget.getGroupId() == 94 && !this.client.isInInstancedRegion())
+		if (widget.getGroupId() == 94 && !client.isInInstancedRegion())
 		{
 			wid = true;
 			clan = true;
@@ -361,7 +376,7 @@ public class FriendsExporterPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		if (this.client.getWidget(94, 28) == null)
+		if (client.getWidget(94, 28) == null)
 		{
 			clan = false;
 			refreshShiftClickCustomizationMenus();

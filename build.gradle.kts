@@ -66,6 +66,7 @@ subprojects {
         compileOnly(Libraries.okhttp3)
         compileOnly(Libraries.pf4j)
         compileOnly(Libraries.rxjava)
+        compileOnly(Libraries.substance)
     }
 
     checkstyle {

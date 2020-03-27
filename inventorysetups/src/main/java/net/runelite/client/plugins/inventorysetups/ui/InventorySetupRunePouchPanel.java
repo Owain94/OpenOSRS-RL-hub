@@ -2,6 +2,7 @@ package net.runelite.client.plugins.inventorysetups.ui;
 
 import java.awt.GridLayout;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -15,7 +16,7 @@ import net.runelite.client.ui.ColorScheme;
 
 public class InventorySetupRunePouchPanel extends InventorySetupContainerPanel
 {
-	private ArrayList<InventorySetupSlot> runeSlots;
+	private List<InventorySetupSlot> runeSlots;
 
 	InventorySetupRunePouchPanel(ItemManager itemManager, InventorySetupPlugin plugin)
 	{
@@ -41,7 +42,7 @@ public class InventorySetupRunePouchPanel extends InventorySetupContainerPanel
 	}
 
 	@Override
-	public void highlightSlotDifferences(ArrayList<InventorySetupItem> currContainer, InventorySetup inventorySetup)
+	public void highlightSlotDifferences(List<InventorySetupItem> currContainer, InventorySetup inventorySetup)
 	{
 		assert inventorySetup.getRune_pouch() != null : "Rune Pouch container is null.";
 
@@ -51,7 +52,7 @@ public class InventorySetupRunePouchPanel extends InventorySetupContainerPanel
 
 		// Note, we don't care about order or stack size
 
-		final ArrayList<InventorySetupItem> setupRunePouch = inventorySetup.getRune_pouch();
+		final List<InventorySetupItem> setupRunePouch = inventorySetup.getRune_pouch();
 
 		Map<Integer, Long> currInvMap = currContainer.stream()
 			.map(InventorySetupItem::getId)

@@ -33,8 +33,6 @@ import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.game.ClanManager;
-import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
@@ -67,11 +65,7 @@ public class ClanChatWarningsPlugin extends Plugin
 	@Inject
 	private Notifier ping;
 	@Inject
-	private MenuManager menuManager;
-	@Inject
 	private ClanChatWarningsConfig config;
-	@Inject
-	private ClanManager clanManager;
 
 	public ClanChatWarningsPlugin()
 	{
@@ -237,10 +231,7 @@ public class ClanChatWarningsPlugin extends Plugin
 			trackTimer.remove(trackName.indexOf(name.toLowerCase()));
 			trackName.remove(name.toLowerCase());
 		}
-		if (clansName.contains(name))
-		{
-			clansName.remove(name);
-		}
+		clansName.remove(name);
 	}
 
 	@Subscribe
@@ -279,7 +270,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				sx = new StringBuffer();
 				while (n.matches())
 				{
-					if (pattern.toString().substring(2, pattern.toString().length() - 2).toLowerCase().equals(memberNameX.toLowerCase()))
+					if (pattern.toString().substring(2, pattern.toString().length() - 2).equalsIgnoreCase(memberNameX.toLowerCase()))
 					{
 						return;
 					}
@@ -292,7 +283,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				Pattern patternDiv = Pattern.compile("~");
 				//Yes Im aware this String is dumb, frankly I spent 20 mins trying to fix it and this is what worked so it stays.
 				String slash = "\\\\";
-				String sections[] = patternDiv.split(pattern.toString());
+				String[] sections = patternDiv.split(pattern.toString());
 				String note = "";
 				String nameP = "";
 				if (sections.length > 1)
@@ -301,7 +292,7 @@ public class ClanChatWarningsPlugin extends Plugin
 					{
 						if (x == sections.length - 1)
 						{
-							String notes[] = sections[x].split(slash);
+							String[] notes = sections[x].split(slash);
 							if (x > 1)
 							{
 								note += "~";
@@ -332,7 +323,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				sp = new StringBuffer();
 				while (l.matches())
 				{
-					if (nameP.toLowerCase().equals(memberNameP.toLowerCase()))
+					if (nameP.equalsIgnoreCase(memberNameP))
 					{
 						sendNotification(Text.toJagexName(member.getUsername()), note, 1);
 						if (this.config.cooldown() > 0)
@@ -351,7 +342,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				Pattern patternDiv = Pattern.compile("~");
 				//Yes Im aware this String is dumb, frankly I spent 20 mins trying to fix it and this is what worked so it stays.
 				String slash = "\\\\";
-				String sections[] = patternDiv.split(pattern.toString());
+				String[] sections = patternDiv.split(pattern.toString());
 				String note = "";
 				if (sections.length > 1)
 				{
@@ -359,7 +350,7 @@ public class ClanChatWarningsPlugin extends Plugin
 					{
 						if (x == sections.length - 1)
 						{
-							String notes[] = sections[x].split(slash);
+							String[] notes = sections[x].split(slash);
 							if (x > 1)
 							{
 								note += "~";

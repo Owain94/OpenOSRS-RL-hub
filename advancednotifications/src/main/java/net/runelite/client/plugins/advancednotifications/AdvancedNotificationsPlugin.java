@@ -72,7 +72,7 @@ public class AdvancedNotificationsPlugin extends Plugin
 	private List<Notification> notifications;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		notifications = new ArrayList<>();
 		previousItems = null;
@@ -95,7 +95,7 @@ public class AdvancedNotificationsPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		clientToolbar.removeNavigation(navigationButton);
 

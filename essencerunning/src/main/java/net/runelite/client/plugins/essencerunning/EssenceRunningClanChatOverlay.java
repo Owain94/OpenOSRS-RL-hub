@@ -41,7 +41,7 @@ public class EssenceRunningClanChatOverlay extends Overlay
 		if (config.clanChatOverlay() && chatbox != null && !chatbox.isHidden())
 		{
 			panelComponent.setPreferredSize(new Dimension(chatbox.getWidth(), 0));
-			plugin.getClanMessages().values().stream().forEach(message -> panelComponent.getChildren().add(LineComponent.builder().left(message).build()));
+			plugin.getClanMessages().values().forEach(message -> panelComponent.getChildren().add(LineComponent.builder().left(message).build()));
 		}
 
 		return panelComponent.render(graphics);

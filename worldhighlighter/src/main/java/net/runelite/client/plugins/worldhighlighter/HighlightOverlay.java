@@ -48,8 +48,7 @@ class HighlightOverlay extends Overlay
 					if (clanContainer != null && !clanContainer.isHidden())
 					{
 						Widget found = null;
-						Widget[] var8 = clanContainer.getDynamicChildren();
-						for (Widget clany : var8)
+						for (Widget clany : clanContainer.getDynamicChildren())
 						{
 							if (clany.getText().contains(player))
 							{
@@ -57,11 +56,7 @@ class HighlightOverlay extends Overlay
 								break;
 							}
 						}
-						if (found == null)
-						{
-							return null;
-						}
-						else
+						if (found != null)
 						{
 							if (this.hasScrolled != found.getRelativeY())
 							{
@@ -69,8 +64,8 @@ class HighlightOverlay extends Overlay
 								this.plugin.scrollToWidget(this.client.getWidget(WidgetInfo.CLAN_CHAT_LIST), this.client.getWidget(7, 17), found);
 							}
 							this.plugin.highlightWidget(graphics, found, this.client.getWidget(WidgetInfo.CLAN_CHAT_LIST), PADDING, null);
-							return null;
 						}
+						return null;
 					}
 					else if (hasScrolled != 0)
 					{
@@ -98,8 +93,7 @@ class HighlightOverlay extends Overlay
 					if (worldContainer != null && !worldContainer.isHidden())
 					{
 						Widget found = null;
-						Widget[] var8 = worldContainer.getDynamicChildren();
-						for (Widget track : var8)
+						for (Widget track : worldContainer.getDynamicChildren())
 						{
 							if (track.getName().contains("" + world))
 							{
@@ -107,11 +101,7 @@ class HighlightOverlay extends Overlay
 								break;
 							}
 						}
-						if (found == null)
-						{
-							return null;
-						}
-						else
+						if (found != null)
 						{
 							if (this.hasScrolled != world)
 							{
@@ -119,8 +109,8 @@ class HighlightOverlay extends Overlay
 								this.plugin.scrollToWidget(this.client.getWidget(69, 15), this.client.getWidget(69, 18), found);
 							}
 							this.plugin.highlightWidget(graphics, found, this.client.getWidget(69, 15), PADDING, null);
-							return null;
 						}
+						return null;
 					}
 					else if (hasScrolled != 0)
 					{
@@ -156,8 +146,7 @@ class HighlightOverlay extends Overlay
 					}
 					else
 					{
-						Widget[] var8 = worldList.getDynamicChildren();
-						for (Widget track : var8)
+						for (Widget track : worldList.getDynamicChildren())
 						{
 							if (track.getName().contains("" + world))
 							{
@@ -166,11 +155,7 @@ class HighlightOverlay extends Overlay
 							}
 						}
 
-						if (found == null)
-						{
-							return null;
-						}
-						else
+						if (found != null)
 						{
 							if (this.hasScrolled != world)
 							{
@@ -178,8 +163,8 @@ class HighlightOverlay extends Overlay
 								this.plugin.scrollToWidget(this.client.getWidget(69, 15), this.client.getWidget(69, 18), found);
 							}
 							this.plugin.highlightWidget(graphics, found, this.client.getWidget(69, 15), PADDING, null);
-							return null;
 						}
+						return null;
 					}
 				}
 				else if (hasScrolled != 0)

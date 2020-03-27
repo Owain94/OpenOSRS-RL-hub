@@ -25,7 +25,7 @@
 package net.runelite.client.plugins.inventorysetups.ui;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -103,14 +103,10 @@ public abstract class InventorySetupContainerPanel extends JPanel
 		popupMenu.add(updateFromSearch);
 
 		updateFromContainer.addActionListener(e ->
-		{
-			plugin.updateSlotFromContainer(slot);
-		});
+			plugin.updateSlotFromContainer(slot));
 
 		updateFromSearch.addActionListener(e ->
-		{
-			plugin.updateSlotFromSearch(slot);
-		});
+			plugin.updateSlotFromSearch(slot));
 
 		// both the panel and image label need adapters
 		// because the image will cover the entire panel
@@ -121,7 +117,7 @@ public abstract class InventorySetupContainerPanel extends JPanel
 
 	protected void setContainerSlot(int index, final InventorySetupSlot containerSlot, final InventorySetup setup)
 	{
-		ArrayList<InventorySetupItem> items = null;
+		List<InventorySetupItem> items = null;
 		switch (containerSlot.getSlotID())
 		{
 			case INVENTORY:
@@ -195,7 +191,7 @@ public abstract class InventorySetupContainerPanel extends JPanel
 
 	abstract public void setupContainerPanel(final JPanel containerSlotsPanel);
 
-	abstract public void highlightSlotDifferences(final ArrayList<InventorySetupItem> currContainer, final InventorySetup inventorySetup);
+	abstract public void highlightSlotDifferences(final List<InventorySetupItem> currContainer, final InventorySetup inventorySetup);
 
 	abstract public void setSlots(final InventorySetup setup);
 

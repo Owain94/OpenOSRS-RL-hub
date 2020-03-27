@@ -38,20 +38,8 @@ import net.runelite.client.util.QuantityFormatter;
 
 class BankValueTableRow extends JPanel
 {
-	static final int ITEM_NAME_COLUMN_WIDTH = 60;
 	static final int ITEM_COUNT_COLUMN_WIDTH = 45;
 	static final int ITEM_VALUE_COLUMN_WIDTH = 45;
-
-	private static final Color CURRENT_WORLD = new Color(66, 227, 17);
-	private static final Color UNAVAILABLE_WORLD = Color.GRAY.darker().darker();
-	private static final Color DANGEROUS_WORLD = new Color(251, 62, 62);
-	private static final Color TOURNAMENT_WORLD = new Color(79, 145, 255);
-	private static final Color MEMBERS_WORLD = new Color(210, 193, 53);
-	private static final Color FREE_WORLD = new Color(200, 200, 200);
-
-	private JLabel itemName;
-	private JLabel itemCount;
-	private JLabel value;
 
 	@Getter
 	private final CachedItem item;
@@ -153,7 +141,7 @@ class BankValueTableRow extends JPanel
 		JPanel column = new JPanel(new BorderLayout());
 		column.setBorder(new EmptyBorder(0, 5, 0, 5));
 
-		itemCount = new JLabel(QuantityFormatter.quantityToStackSize(getItemCount()));
+		JLabel itemCount = new JLabel(QuantityFormatter.quantityToStackSize(getItemCount()));
 		itemCount.setFont(FontManager.getRunescapeSmallFont());
 
 		column.add(itemCount, BorderLayout.WEST);
@@ -171,7 +159,7 @@ class BankValueTableRow extends JPanel
 		JPanel column = new JPanel(new BorderLayout());
 		column.setBorder(new EmptyBorder(0, 5, 0, 5));
 
-		value = new JLabel(QuantityFormatter.quantityToStackSize(getPrice()));
+		JLabel value = new JLabel(QuantityFormatter.quantityToStackSize(getPrice()));
 		value.setFont(FontManager.getRunescapeSmallFont());
 
 		column.add(value, BorderLayout.EAST);
@@ -192,7 +180,7 @@ class BankValueTableRow extends JPanel
 		JPanel column = new JPanel(new BorderLayout());
 		column.setBorder(new EmptyBorder(0, 5, 0, 5));
 
-		itemName = new JLabel(getItemName());
+		JLabel itemName = new JLabel(getItemName());
 		itemName.setFont(FontManager.getRunescapeSmallFont());
 
 		column.add(itemName, BorderLayout.WEST);

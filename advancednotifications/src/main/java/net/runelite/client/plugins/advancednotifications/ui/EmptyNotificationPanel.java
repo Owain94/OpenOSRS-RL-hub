@@ -12,8 +12,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -33,9 +31,6 @@ public class EmptyNotificationPanel extends NotificationPanel
 		new MatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
 		new EmptyBorder(8, 8, 8, 8));
 
-	private EmptyNotification notification;
-
-	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 	private final JSpinner countSpinner = new JSpinner();
 
 	static
@@ -48,7 +43,6 @@ public class EmptyNotificationPanel extends NotificationPanel
 
 	public EmptyNotificationPanel(EmptyNotification notification)
 	{
-		this.notification = notification;
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
 

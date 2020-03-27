@@ -25,8 +25,9 @@
 package net.runelite.client.plugins.inventorysetups.ui;
 
 import java.awt.GridLayout;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JPanel;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.client.game.ItemManager;
@@ -38,7 +39,7 @@ import net.runelite.client.ui.ColorScheme;
 
 public class InventorySetupEquipmentPanel extends InventorySetupContainerPanel
 {
-	private HashMap<EquipmentInventorySlot, InventorySetupSlot> equipmentSlots;
+	private Map<EquipmentInventorySlot, InventorySetupSlot> equipmentSlots;
 
 	InventorySetupEquipmentPanel(final ItemManager itemManager, final InventorySetupPlugin plugin)
 	{
@@ -79,9 +80,9 @@ public class InventorySetupEquipmentPanel extends InventorySetupContainerPanel
 	}
 
 	@Override
-	public void highlightSlotDifferences(final ArrayList<InventorySetupItem> currEquipment, final InventorySetup inventorySetup)
+	public void highlightSlotDifferences(final List<InventorySetupItem> currEquipment, final InventorySetup inventorySetup)
 	{
-		final ArrayList<InventorySetupItem> equipToCheck = inventorySetup.getEquipment();
+		final List<InventorySetupItem> equipToCheck = inventorySetup.getEquipment();
 
 		assert currEquipment.size() == equipToCheck.size() : "size mismatch";
 

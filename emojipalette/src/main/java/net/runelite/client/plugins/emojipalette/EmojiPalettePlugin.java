@@ -67,10 +67,9 @@ public class EmojiPalettePlugin extends Plugin
 	private ClientToolbar clientToolbar;
 
 	private NavigationButton navButton;
-	private String text = "";
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		EmojiPanel emojiPanel = injector.getInstance(EmojiPanel.class);
 		emojiPanel.init(this);

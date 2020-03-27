@@ -36,6 +36,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
@@ -63,7 +64,7 @@ class SelectionPanel extends JPanel
 	private final static Color BUTTON_HOVER_COLOR = ColorScheme.DARKER_GRAY_HOVER_COLOR;
 	private static final JaroWinklerDistance DISTANCE = new JaroWinklerDistance();
 
-	private final TreeSet<String> names;
+	private final Set<String> names;
 	private final LootLoggerPanel parent;
 	private final ItemManager itemManager;
 
@@ -75,7 +76,7 @@ class SelectionPanel extends JPanel
 
 	SelectionPanel(
 		final boolean configToggle,
-		final TreeSet<String> names,
+		final Set<String> names,
 		final LootLoggerPanel parent,
 		final ItemManager itemManager)
 	{

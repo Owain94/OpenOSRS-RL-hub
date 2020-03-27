@@ -3,6 +3,7 @@ package net.runelite.client.plugins.polybarintegration;
 import com.google.inject.Provides;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -326,7 +327,7 @@ public class PolybarIntegrationPlugin extends Plugin
 	{
 		try
 		{
-			PrintWriter writer = new PrintWriter("/tmp/rl_state", "UTF-8");
+			PrintWriter writer = new PrintWriter("/tmp/rl_state", StandardCharsets.UTF_8);
 			writer.println(state.getMessage());
 			writer.close();
 		}

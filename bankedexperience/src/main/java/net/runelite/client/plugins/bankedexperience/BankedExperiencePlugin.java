@@ -76,7 +76,7 @@ public class BankedExperiencePlugin extends Plugin
 	private int lastCheckTick = -1;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		panel = new BankedCalculatorPanel(client, config, skillIconManager, itemManager);
 		navButton = NavigationButton.builder()
@@ -113,7 +113,7 @@ public class BankedExperiencePlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		clientToolbar.removeNavigation(navButton);
 	}

@@ -122,9 +122,7 @@ public class BankHistoryPanel extends PluginPanel
 		JComboBox<String> accountSelectionCombo = new JComboBox<>(new Vector<>(accounts));
 
 		accountSelectionCombo.addItemListener((change) ->
-		{
-			updateDataset(change.getItem().toString());
-		});
+			updateDataset(change.getItem().toString()));
 
 		String account = config.getDefaultAccount();
 
@@ -157,9 +155,7 @@ public class BankHistoryPanel extends PluginPanel
 		LocalDate today = LocalDate.now();
 		LocalDateTime startOfDay = today.atStartOfDay();
 		Consumer<Void> callback = (t) ->
-		{
 			updateDataset((String) accountSelectionCombo.getSelectedItem());
-		};
 
 		startDatePickerPanel = new DatePickerPanel(startOfDay, "Start Date", callback);
 		toDatePickerPanel = new DatePickerPanel(startOfDay.plusDays(1), "End Date", callback);

@@ -33,7 +33,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import java.time.Instant;
-import javax.inject.Inject;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -43,9 +44,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
@@ -83,50 +84,38 @@ public class FlippingItemPanel extends JPanel
 	private int profitEach;
 	private int profitTotal;
 	private float ROI;
-	private final int GELimit;
+	@Getter
 	private final FlippingItem flippingItem;
 	private FlippingPlugin plugin;
-	private int latestBuyTimeAgo;
-	private int latestSellTimeAgo;
 
 	@Setter
 	private boolean activeTimer;
 
-	@Inject
-	private FlippingConfig config;
-	@Inject
-	private ClientThread clientThread;
-
 	/* Labels */
-	JLabel buyPriceVal = new JLabel();
-	JLabel sellPriceVal = new JLabel();
-	JLabel profitEachVal = new JLabel();
-	JLabel profitTotalVal = new JLabel();
-	JLabel ROILabel = new JLabel();
-	JLabel arrowIcon = new JLabel(OPEN_ICON);
+	final JLabel buyPriceVal = new JLabel();
+	final JLabel sellPriceVal = new JLabel();
+	final JLabel profitEachVal = new JLabel();
+	final JLabel profitTotalVal = new JLabel();
+	final JLabel limitLabel = new JLabel();
+	final JLabel ROILabel = new JLabel();
+	final JLabel arrowIcon = new JLabel(OPEN_ICON);
 
 	/* Panels */
-	JPanel topPanel = new JPanel(new BorderLayout());
-	JPanel itemInfo = new JPanel(new BorderLayout());
-	JPanel leftInfoTextPanel = new JPanel(new GridLayout(7, 1));
-	JPanel rightValuesPanel = new JPanel(new GridLayout(7, 1));
+	final JPanel topPanel = new JPanel(new BorderLayout());
+	final JPanel itemInfo = new JPanel(new BorderLayout());
+	final JPanel leftInfoTextPanel = new JPanel(new GridLayout(7, 1));
+	final JPanel rightValuesPanel = new JPanel(new GridLayout(7, 1));
 
 	FlippingItemPanel(final FlippingPlugin plugin, final ItemManager itemManager, final FlippingItem flippingItem)
 	{
 		this.flippingItem = flippingItem;
 		this.buyPrice = this.flippingItem.getLatestBuyPrice();
 		this.sellPrice = this.flippingItem.getLatestSellPrice();
-		this.profitEach = sellPrice - buyPrice;
-		this.ROI = calculateROI();
 		this.plugin = plugin;
 
 		final int itemID = flippingItem.getItemId();
-		GELimit = flippingItem.getTotalGELimit();
 
-		/* Assume one less traded item than limit as one was spent in margin checking the item.
-		If the user wants, we calculate the total profit while taking into account
-		the margin check loss. */
-		this.profitTotal = (GELimit == 0) ? 0 : (GELimit - 1) * profitEach - (plugin.getConfig().marginCheckLoss() ? profitEach : 0);
+		updateProfits();
 
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
@@ -151,17 +140,13 @@ public class FlippingItemPanel extends JPanel
 
 		itemName.setForeground(Color.WHITE);
 		itemName.setFont(FontManager.getRunescapeBoldFont());
+		itemName.setPreferredSize(new Dimension(0, 0)); //Make sure the item name fits
 
 		topPanel.setBackground(background.darker());
 		topPanel.add(itemIcon, BorderLayout.WEST);
 		topPanel.add(itemName, BorderLayout.CENTER);
-		//Pad east to make name line up with horizontal center of the whole panel.
-		//Will probably replace this with an arrow to indicate collapsibility.
 		topPanel.add(arrowIcon, BorderLayout.EAST);
 		topPanel.setBorder(new EmptyBorder(2, 0, 2, 0));
-
-		/* GE limit */
-		JLabel limitLabel = new JLabel();
 
 		/* Prices and profits info */
 		leftInfoTextPanel.setBackground(background);
@@ -172,7 +157,6 @@ public class FlippingItemPanel extends JPanel
 		JLabel sellPriceText = new JLabel("Sell price each: ");
 		JLabel profitEachText = new JLabel("Profit each: ");
 		JLabel profitTotalText = new JLabel("Total profit: ");
-		limitLabel.setText("GE limit: " + String.format(NUM_FORMAT, GELimit));
 
 		/* Right labels */
 		buyPriceVal.setHorizontalAlignment(JLabel.RIGHT);
@@ -188,13 +172,12 @@ public class FlippingItemPanel extends JPanel
 		profitTotalText.setForeground(ColorScheme.GRAND_EXCHANGE_PRICE);
 		limitLabel.setForeground(ColorScheme.GRAND_EXCHANGE_LIMIT);
 
-
 		/* Tooltips */
 		buyPriceText.setToolTipText("The buy price according to your latest margin check");
 		sellPriceText.setToolTipText("The sell price according to your latest margin check");
 		profitEachText.setToolTipText("The profit margin according to your latest margin check");
 		profitTotalText.setToolTipText("The total profit according to your latest margin check and GE 4-hour limit");
-		ROILabel.setToolTipText("Return on investment: Percentage of profit relative to gp invested");
+		ROILabel.setToolTipText("<html>Return on investment:<br>Percentage of profit relative to gp invested</html>");
 		limitLabel.setToolTipText("The amount you can buy of this item every 4 hours.");
 
 		profitEachVal.setToolTipText(profitEachText.getToolTipText());
@@ -306,7 +289,12 @@ public class FlippingItemPanel extends JPanel
 	public void updateProfits()
 	{
 		this.profitEach = sellPrice - buyPrice;
-		this.profitTotal = GELimit != 0 ? GELimit * profitEach : 0;
+
+		/*
+		If the user wants, we calculate the total profit while taking into account
+		the margin check loss. */
+		this.profitTotal = (flippingItem.getRemainingGELimit() == 0) ? 0
+			: flippingItem.getRemainingGELimit() * profitEach - (plugin.getConfig().marginCheckLoss() ? profitEach : 0);
 		this.ROI = calculateROI();
 	}
 
@@ -329,25 +317,27 @@ public class FlippingItemPanel extends JPanel
 		Instant latestSellTime = flippingItem.getLatestSellTime();
 
 		//Update price texts with the string formatter
-		final String latestBuyString = formatTimeText(latestBuyTime);
-		final String latestSellString = formatTimeText(latestSellTime);
+		final String latestBuyString = formatPriceTimeText(latestBuyTime) + " old";
+		final String latestSellString = formatPriceTimeText(latestSellTime) + " old";
 
 		//As the config unit is in minutes.
-		latestBuyTimeAgo = latestBuyTime != null ? (int) (Instant.now().getEpochSecond() - latestBuyTime.getEpochSecond()) : 0;
-		latestSellTimeAgo = latestSellTime != null ? (int) (Instant.now().getEpochSecond() - latestSellTime.getEpochSecond()) : 0;
+		final int latestBuyTimeAgo = latestBuyTime != null ? (int) (Instant.now().getEpochSecond() - latestBuyTime.getEpochSecond()) : 0;
+		final int latestSellTimeAgo = latestSellTime != null ? (int) (Instant.now().getEpochSecond() - latestSellTime.getEpochSecond()) : 0;
 
 		//Check if, according to the user-defined settings, prices are outdated, else set default color.
 		if (latestBuyTimeAgo != 0 && latestBuyTimeAgo / 60 > plugin.getConfig().outOfDateWarning())
 		{
-			SwingUtilities.invokeLater(() -> {
+			SwingUtilities.invokeLater(() ->
+			{
 				buyPriceVal.setForeground(OUTDATED_COLOR);
-				buyPriceVal.setToolTipText(OUTDATED_STRING + latestBuyString);
+				buyPriceVal.setToolTipText("<html>" + OUTDATED_STRING + "<br>" + latestBuyString + "</html>");
 			});
 
 		}
 		else
 		{
-			SwingUtilities.invokeLater(() -> {
+			SwingUtilities.invokeLater(() ->
+			{
 				buyPriceVal.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
 				buyPriceVal.setToolTipText(latestBuyString);
 			});
@@ -356,15 +346,17 @@ public class FlippingItemPanel extends JPanel
 		//Sell value
 		if (latestSellTimeAgo != 0 && latestSellTimeAgo / 60 > plugin.getConfig().outOfDateWarning())
 		{
-			SwingUtilities.invokeLater(() -> {
+			SwingUtilities.invokeLater(() ->
+			{
 				sellPriceVal.setForeground(OUTDATED_COLOR);
-				sellPriceVal.setToolTipText(OUTDATED_STRING + latestSellString);
+				sellPriceVal.setToolTipText("<html>" + OUTDATED_STRING + "<br>" + latestSellString + "</html>");
 			});
 
 		}
 		else
 		{
-			SwingUtilities.invokeLater(() -> {
+			SwingUtilities.invokeLater(() ->
+			{
 				sellPriceVal.setForeground(ColorScheme.GRAND_EXCHANGE_ALCH);
 				sellPriceVal.setToolTipText(latestSellString);
 			});
@@ -374,25 +366,26 @@ public class FlippingItemPanel extends JPanel
 
 	//Helper to construct the price time tooltip string.
 	//If there's a method somewhere that does this already, please tell me. :)
-	private String formatTimeText(Instant timeInstant)
+	//TODO: Refactor using something other than Instant (LocalTime?)
+	private String formatPriceTimeText(Instant timeInstant)
 	{
 		if (timeInstant != null)
 		{
+			//Time since trade was done.
+			long timeAgo = (Instant.now().getEpochSecond() - timeInstant.getEpochSecond());
 
-			int timeAgo = (int) (Instant.now().getEpochSecond() - timeInstant.getEpochSecond());
-			String result = timeAgo + ((timeAgo == 1) ? " second old" : " seconds old");
+			String result = timeAgo + (timeAgo == 1 ? " second" : " seconds");
 			if (timeAgo > 60)
 			{
-
 				//Seconds to minutes.
-				int timeAgoMinutes = timeAgo / 60;
-				result = timeAgoMinutes + ((timeAgoMinutes == 1) ? " minute old" : " minutes old");
+				long timeAgoMinutes = timeAgo / 60;
+				result = timeAgoMinutes + (timeAgoMinutes == 1 ? " minute" : " minutes");
+
 				if (timeAgoMinutes > 60)
 				{
-
 					//Minutes to hours
-					int timeAgoHours = timeAgoMinutes / 60;
-					result = timeAgoHours + ((timeAgoHours == 1) ? " hour old" : " hours old");
+					long timeAgoHours = timeAgoMinutes / 60;
+					result = timeAgoHours + (timeAgoHours == 1 ? " hour" : " hours");
 				}
 			}
 			return result;
@@ -401,5 +394,46 @@ public class FlippingItemPanel extends JPanel
 		{
 			return "";
 		}
+	}
+
+	private String formatGELimitResetTime(Instant time)
+	{
+		DateTimeFormatter timeFormatter;
+		if (plugin.getConfig().twelveHourFormat())
+		{
+			timeFormatter = DateTimeFormatter.ofPattern("hh:mm a").withZone(ZoneId.systemDefault());
+		}
+		else
+		{
+			timeFormatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault());
+		}
+		return timeFormatter.format(time);
+	}
+
+	public void updateGELimits()
+	{
+		SwingUtilities.invokeLater(() ->
+		{
+			if (flippingItem.getGeLimitResetTime() != null && flippingItem.getGeLimitResetTime().isBefore(Instant.now()))
+			{
+				flippingItem.resetGELimit();
+			}
+
+			limitLabel.setText("GE limit: " + String.format(NUM_FORMAT, flippingItem.getRemainingGELimit()));
+			if (flippingItem.getGeLimitResetTime() == null)
+			{
+				limitLabel.setToolTipText("None has been bought in the past 4 hours.");
+			}
+			else
+			{
+				final long remainingSeconds = flippingItem.getGeLimitResetTime().getEpochSecond() - Instant.now().getEpochSecond();
+				final long remainingMinutes = remainingSeconds / 60 % 60;
+				final long remainingHours = remainingSeconds / 3600 % 24;
+				String timeString = String.format("%02d:%02d ", remainingHours, remainingMinutes) + (remainingHours > 1 ? "hours" : "hour");
+
+				limitLabel.setToolTipText("<html>" + "GE limit is reset in " + timeString + "."
+					+ "<br>This will be at " + formatGELimitResetTime(flippingItem.getGeLimitResetTime()) + ".<html>");
+			}
+		});
 	}
 }
