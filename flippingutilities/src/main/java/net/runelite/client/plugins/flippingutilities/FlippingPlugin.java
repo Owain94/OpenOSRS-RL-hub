@@ -63,18 +63,21 @@ import net.runelite.client.events.SessionOpen;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.http.api.ge.GrandExchangeTrade;
 import net.runelite.http.api.item.ItemStats;
+import org.pf4j.Extension;
 
-@Slf4j
+@Extension
 @PluginDescriptor(
 	name = "Flipping Utilities",
-	description = "Provides utilities for GE flipping"
+	description = "Provides utilities for GE flipping",
+	type = PluginType.UTILITY
 )
-
+@Slf4j
 public class FlippingPlugin extends Plugin
 {
 	//Limit the amount of trades every item holds.
