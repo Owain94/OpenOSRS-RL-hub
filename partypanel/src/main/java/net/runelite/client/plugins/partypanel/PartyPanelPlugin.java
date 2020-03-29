@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.partypanel;
 
+import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -47,7 +49,9 @@ import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.account.AccountSession;
 import net.runelite.client.account.SessionManager;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.PartyChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.SpriteManager;
@@ -89,19 +93,30 @@ public class PartyPanelPlugin extends Plugin
 	private ClientToolbar clientToolbar;
 
 	@Inject
+	private PartyPanelConfig config;
+
+	@Inject
 	private PartyService partyService;
 
 	@Inject
 	private SessionManager sessionManager;
 
 	@Inject
-	SpriteManager spriteManager;
+	@Getter(AccessLevel.PACKAGE)
+	private SpriteManager spriteManager;
 
 	@Inject
-	ItemManager itemManager;
+	@Getter(AccessLevel.PACKAGE)
+	private ItemManager itemManager;
 
 	@Inject
 	private WSClient wsClient;
+
+	@Provides
+	PartyPanelConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(PartyPanelConfig.class);
+	}
 
 	@Getter
 	private final Map<UUID, PartyPlayer> partyMembers = new HashMap<>();
@@ -134,16 +149,44 @@ public class PartyPanelPlugin extends Plugin
 			wsClient.changeSession(uuid);
 		}
 
-		if (isInParty())
+		if (isInParty() || config.alwaysShowIcon())
 		{
 			clientToolbar.addNavigation(navButton);
 			addedButton = true;
+		}
+
+		if (isInParty())
+		{
 			clientThread.invokeLater(() ->
 			{
 				myPlayer = new PartyPlayer(partyService.getLocalMember(), client, itemManager);
 				wsClient.send(myPlayer);
 			});
 		}
+	}
+
+	@Subscribe
+	protected void onConfigChanged(final ConfigChanged c)
+	{
+		if (!c.getGroup().equals("partypanel"))
+		{
+			return;
+		}
+
+		if (config.alwaysShowIcon())
+		{
+			if (!addedButton)
+			{
+				clientToolbar.addNavigation(navButton);
+				addedButton = true;
+			}
+		}
+		else if (addedButton && !isInParty())
+		{
+			clientToolbar.removeNavigation(navButton);
+			addedButton = false;
+		}
+		addedButton = config.alwaysShowIcon();
 	}
 
 	@Override
@@ -227,7 +270,7 @@ public class PartyPanelPlugin extends Plugin
 			SwingUtilities.invokeLater(() -> panel.removePartyPlayer(removed));
 		}
 
-		if (addedButton && (!isInParty() || partyService.getMembers().size() == 0))
+		if (addedButton && (!isInParty() || partyService.getMembers().size() == 0) && !config.alwaysShowIcon())
 		{
 			clientToolbar.removeNavigation(navButton);
 			addedButton = false;
@@ -247,7 +290,7 @@ public class PartyPanelPlugin extends Plugin
 		SwingUtilities.invokeLater(panel::refreshUI);
 		myPlayer = null;
 
-		if (!isInParty())
+		if (!isInParty() && !config.alwaysShowIcon())
 		{
 			clientToolbar.removeNavigation(navButton);
 			addedButton = false;
@@ -291,6 +334,15 @@ public class PartyPanelPlugin extends Plugin
 		{
 			myPlayer.updatePlayerInfo(client, itemManager);
 			changed = true;
+		}
+		else
+		{
+			final int energy = client.getEnergy();
+			if (myPlayer.getStats().getRunEnergy() != energy)
+			{
+				myPlayer.getStats().setRunEnergy(energy);
+				changed = true;
+			}
 		}
 
 		if (!Objects.equals(client.getLocalPlayer().getName(), myPlayer.getUsername()))

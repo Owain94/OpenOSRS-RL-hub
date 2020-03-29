@@ -115,7 +115,7 @@ class PartyPanel extends PluginPanel
 
 		for (final PartyPlayer player : players)
 		{
-			final PlayerBanner banner = new PlayerBanner(player, plugin.spriteManager);
+			final PlayerBanner banner = new PlayerBanner(player, plugin.getSpriteManager());
 			banner.addMouseListener(new MouseAdapter()
 			{
 				@Override
@@ -169,7 +169,7 @@ class PartyPanel extends PluginPanel
 		}
 		else
 		{
-			playerPanel = new PlayerPanel(selectedPlayer, plugin.spriteManager, plugin.itemManager);
+			playerPanel = new PlayerPanel(selectedPlayer, plugin.getSpriteManager(), plugin.getItemManager());
 		}
 		panel.add(playerPanel);
 
