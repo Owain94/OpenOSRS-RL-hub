@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Volcanic Mine"
 project.extra["PluginDescription"] = "Useful timers for when to start moving in Volcanic Mine"

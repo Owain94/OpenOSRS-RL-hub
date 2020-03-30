@@ -58,7 +58,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Stoned Tracker",
 	description = "Local data persistence and unique UI for the Loot Tracker",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class LootLoggerPlugin extends Plugin

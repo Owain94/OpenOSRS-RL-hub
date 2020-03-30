@@ -51,7 +51,8 @@ import org.pf4j.Extension;
 	name = "Bank Value Tracking",
 	description = "Track the value of your bank over time",
 	tags = {"bank", "value", "history", "tracking"},
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class BankHistoryPlugin extends Plugin

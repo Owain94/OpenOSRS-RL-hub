@@ -20,7 +20,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Health Notifier",
 	description = "Notifies you when the mob you are attacking is below certain health.",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class HealthNotifierPlugin extends Plugin

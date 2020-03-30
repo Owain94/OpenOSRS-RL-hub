@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.0.5"
 
 project.extra["PluginName"] = "Friends Exporter"
 project.extra["PluginDescription"] = "Adds a right click option to the friends tab that allows exporting of either friends or ignore list"

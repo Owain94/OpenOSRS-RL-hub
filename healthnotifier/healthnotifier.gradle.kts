@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2"
 
 project.extra["PluginName"] = "Health Notifier"
 project.extra["PluginDescription"] = "Notifies you when the mob you are attacking is below certain health"

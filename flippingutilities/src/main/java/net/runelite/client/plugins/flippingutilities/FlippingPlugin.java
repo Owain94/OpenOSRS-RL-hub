@@ -75,7 +75,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Flipping Utilities",
 	description = "Provides utilities for GE flipping",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class FlippingPlugin extends Plugin

@@ -76,7 +76,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Party Panel",
 	description = "Shows all kinds of information about your party members in a side panel",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class PartyPanelPlugin extends Plugin

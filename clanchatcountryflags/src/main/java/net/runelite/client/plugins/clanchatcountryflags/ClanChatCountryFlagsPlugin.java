@@ -52,7 +52,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Clan Chat Country flags",
 	description = "Shows the flag of the world next to the world number",
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 @Slf4j
 public class ClanChatCountryFlagsPlugin extends Plugin

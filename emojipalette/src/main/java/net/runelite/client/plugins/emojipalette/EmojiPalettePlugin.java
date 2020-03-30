@@ -50,7 +50,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Emoji palette",
 	description = "Shows a panel with all the emoji",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 public class EmojiPalettePlugin extends Plugin
 {

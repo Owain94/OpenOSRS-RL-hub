@@ -55,7 +55,8 @@ import org.pf4j.Extension;
 	name = "Essence Pouch",
 	description = "Shows how many essence are in an essnce pouch",
 	tags = {"ess", "runecraft"},
-	type = PluginType.SKILLING
+	type = PluginType.SKILLING,
+	enabledByDefault = false
 )
 @Slf4j
 public class EssPouchPlugin extends Plugin

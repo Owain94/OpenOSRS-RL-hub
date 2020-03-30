@@ -20,7 +20,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Teleport Logger",
 	description = "Utility for tracking a list of all ingame teleportation methods.",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class TeleportLoggerPlugin extends Plugin

@@ -55,7 +55,8 @@ import org.pf4j.Extension;
 	name = "Volcanic Mine",
 	description = "Useful timers for when to start moving in Volcanic Mine",
 	tags = {"volcanic", "mine", "vm", "mining", "timer", "warning"},
-	type = PluginType.SKILLING
+	type = PluginType.SKILLING,
+	enabledByDefault = false
 )
 @Slf4j
 public class VMPlugin extends Plugin

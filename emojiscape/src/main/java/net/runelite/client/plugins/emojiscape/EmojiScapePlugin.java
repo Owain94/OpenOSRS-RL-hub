@@ -55,7 +55,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "EmojiScape",
 	description = "Adds Runescape icons to chat",
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 @Slf4j
 public class EmojiScapePlugin extends Plugin

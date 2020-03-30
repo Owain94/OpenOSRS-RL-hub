@@ -63,7 +63,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "PvP Performance Tracker",
 	description = "Shows a panel and an overlay with your pvp performance",
-	type = PluginType.PVP
+	type = PluginType.PVP,
+	enabledByDefault = false
 )
 @Slf4j
 public class PvpPerformanceTrackerPlugin extends Plugin

@@ -36,7 +36,8 @@ import org.pf4j.Extension;
 	name = "Advanced Notifications",
 	tags = {"notifications", "inventory", "item"},
 	description = "An advanced notifications system",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class AdvancedNotificationsPlugin extends Plugin

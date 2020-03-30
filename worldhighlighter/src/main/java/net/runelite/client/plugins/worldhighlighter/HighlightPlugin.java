@@ -36,7 +36,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "World Highlighter",
 	description = "Highlights the world a friend or clanmember is on",
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 @Slf4j
 public class HighlightPlugin extends Plugin

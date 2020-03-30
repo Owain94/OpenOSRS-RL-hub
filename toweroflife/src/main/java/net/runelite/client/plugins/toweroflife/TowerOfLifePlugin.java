@@ -46,7 +46,8 @@ import org.pf4j.Extension;
 	name = "Tower of Life",
 	description = "Show icons for the altars in Tower of Life",
 	tags = {"overlay", "minigame", "tower", "life", "creature", "creation"},
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class TowerOfLifePlugin extends Plugin

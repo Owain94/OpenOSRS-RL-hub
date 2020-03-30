@@ -54,7 +54,8 @@ import org.pf4j.Extension;
 	name = "Crab Stun Timers",
 	description = "Timers for when crabs in CoX get unstunned.",
 	tags = {"overlay", "raid", "pvm", "timers"},
-	type = PluginType.MINIGAME
+	type = PluginType.MINIGAME,
+	enabledByDefault = false
 )
 @Slf4j
 public class CrabStunPlugin extends Plugin

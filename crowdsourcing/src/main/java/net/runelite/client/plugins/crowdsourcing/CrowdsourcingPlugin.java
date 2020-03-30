@@ -17,7 +17,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "OSRS Wiki Crowdsourcing",
 	description = "Help figure out skilling success rates, burn rates, more. See osrs.wiki/RS:CROWD",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class CrowdsourcingPlugin extends Plugin

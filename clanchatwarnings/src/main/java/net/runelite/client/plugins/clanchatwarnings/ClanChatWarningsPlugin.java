@@ -43,7 +43,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Clan Chat Warnings",
 	description = "Notifies you when players join clan chat. Supports adding notes to signal why you put them on the watchlist",
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 @Slf4j
 public class ClanChatWarningsPlugin extends Plugin
