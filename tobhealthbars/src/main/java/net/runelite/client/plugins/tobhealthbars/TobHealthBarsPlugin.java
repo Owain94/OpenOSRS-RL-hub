@@ -24,7 +24,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Tob Health Bars",
 	description = "Replaces the tob orbs with health bars",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class TobHealthBarsPlugin extends Plugin

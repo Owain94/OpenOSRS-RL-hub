@@ -34,7 +34,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Friends Exporter",
 	description = "Adds a right click option to the friends tab that allows exporting of either friends or ignore list",
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 @Slf4j
 public class FriendsExporterPlugin extends Plugin

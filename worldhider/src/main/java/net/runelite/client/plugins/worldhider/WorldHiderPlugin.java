@@ -41,10 +41,13 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 
 @Slf4j
 @PluginDescriptor(
-	name = "World Hider"
+	name = "World Hider",
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 public class WorldHiderPlugin extends Plugin
 {

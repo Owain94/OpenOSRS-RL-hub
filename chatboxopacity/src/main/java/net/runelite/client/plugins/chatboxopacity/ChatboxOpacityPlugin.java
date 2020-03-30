@@ -21,7 +21,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Chatbox Opacity",
 	type = PluginType.MISCELLANEOUS,
-	description = "Change the opacity on your transparent chatboxes"
+	description = "Change the opacity on your transparent chatboxes",
+	enabledByDefault = false
 )
 public class ChatboxOpacityPlugin extends Plugin
 {

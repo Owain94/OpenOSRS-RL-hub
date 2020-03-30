@@ -29,7 +29,8 @@ import org.pf4j.Extension;
 	name = "Skills Progress Bars",
 	description = "Adds progress bars to the skills tab to show how close the next level ups are",
 	tags = {"skills", "stats", "levels", "progress", "bars"},
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 
 @Slf4j

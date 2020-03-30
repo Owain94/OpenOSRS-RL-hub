@@ -34,7 +34,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Banked Experience",
 	description = "Shows banked experience",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class BankedExperiencePlugin extends Plugin

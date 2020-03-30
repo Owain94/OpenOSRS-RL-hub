@@ -38,6 +38,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
@@ -45,7 +46,9 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "H.A.M Store Room",
 	description = "Show green / red overlays on chests in H.A.M store room, depending on the keys you have",
-	tags = {"overlay"}
+	tags = {"overlay"},
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 public class HamPlugin extends Plugin
 {

@@ -25,7 +25,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Bank Value",
 	description = "Shows the value of your bank in the sidebar",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class BankValuePlugin extends Plugin

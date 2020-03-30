@@ -18,7 +18,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Tray Notifications",
 	description = "Allows for custom tray notifications. No longer do you have to deal with terrible windows tray notifications. Original author: abex",
-	type = PluginType.MISCELLANEOUS
+	type = PluginType.MISCELLANEOUS,
+	enabledByDefault = false
 )
 @Slf4j
 public class TrayNotificationsPlugin extends Plugin

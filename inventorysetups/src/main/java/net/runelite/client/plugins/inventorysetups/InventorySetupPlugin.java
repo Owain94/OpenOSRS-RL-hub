@@ -96,7 +96,8 @@ import org.pf4j.Extension;
 	name = "Inventory Setups",
 	description = "Save gear setups for specific activities",
 	tags = {"items", "inventory", "setups"},
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 public class InventorySetupPlugin extends Plugin
 {

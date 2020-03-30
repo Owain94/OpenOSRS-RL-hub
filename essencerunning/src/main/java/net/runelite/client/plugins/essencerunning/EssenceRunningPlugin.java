@@ -45,7 +45,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Essence Running",
 	description = "QoL for essence runners",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class EssenceRunningPlugin extends Plugin

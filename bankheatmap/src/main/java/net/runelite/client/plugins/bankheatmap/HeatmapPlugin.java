@@ -28,7 +28,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Bank Heatmap",
 	description = "Shows various heatmaps in your bank",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 @Slf4j
 public class HeatmapPlugin extends Plugin

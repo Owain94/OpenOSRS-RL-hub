@@ -27,7 +27,8 @@ import org.pf4j.Extension;
 @PluginDescriptor(
 	name = "Master Farmer",
 	description = "Utilities that help when thieving master farmers",
-	type = PluginType.SKILLING
+	type = PluginType.SKILLING,
+	enabledByDefault = false
 )
 @Slf4j
 public class MasterFarmerPlugin extends Plugin
