@@ -33,15 +33,15 @@ object Libraries {
         const val apacheCommonsText = "1.8"
         const val gson = "2.8.6"
         const val guava = "28.2-jre"
-        const val guice = "4.2.2"
+        const val guice = "4.2.3"
         const val jdatepicker = "1.3.2"
         const val jfreechart = "1.5.0"
         const val jopt = "5.0.4"
         const val lombok = "1.18.12"
-        const val okhttp3 = "4.4.0"
+        const val okhttp3 = "4.4.1"
         const val pf4j = "3.2.0"
         const val radiance = "2.5.1"
-        const val rxjava = "3.0.0"
+        const val rxjava = "3.0.1"
     }
 
     const val apacheCommonsText = "org.apache.commons:commons-text:${Versions.apacheCommonsText}"
