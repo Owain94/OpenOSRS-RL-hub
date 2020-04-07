@@ -40,13 +40,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -119,7 +118,8 @@ public class BankHistoryPanel extends PluginPanel
 		uiWrapperPanel.setMaximumSize(new Dimension(1280, 500));
 
 		//account selection
-		JComboBox<String> accountSelectionCombo = new JComboBox<>(new Vector<>(accounts));
+		JComboBox<String> accountSelectionCombo = new JComboBox<>();
+		accountSelectionCombo.setModel(new DefaultComboBoxModel<>(accounts.toArray(new String[0])));
 
 		accountSelectionCombo.addItemListener((change) ->
 			updateDataset(change.getItem().toString()));
@@ -127,13 +127,15 @@ public class BankHistoryPanel extends PluginPanel
 		String account = config.getDefaultAccount();
 
 		//Simple Date selection
-		JComboBox<String> simpleComboBox =
-			new JComboBox<>(
-				new Vector<>(
-					Stream.of(SimpleTimeSelection
-						.values())
-						.map(SimpleTimeSelection::getFormattedName)
-						.collect(Collectors.toList())));
+		JComboBox<String> simpleComboBox = new JComboBox<>();
+		simpleComboBox.setModel(
+			new DefaultComboBoxModel<>(
+				Stream.of(SimpleTimeSelection
+					.values())
+					.map(SimpleTimeSelection::getFormattedName)
+					.toArray(String[]::new)
+			)
+		);
 
 		simpleComboBox.setSelectedIndex(6);
 

@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.worldhighlighter;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Provides;
 import java.awt.Color;
@@ -9,6 +8,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
+import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -42,7 +42,7 @@ import org.pf4j.Extension;
 @Slf4j
 public class HighlightPlugin extends Plugin
 {
-	private static final ImmutableList<String> AFTER_OPTIONS = ImmutableList.of("Message", "Add ignore", "Remove friend", "Kick");
+	private static final List<String> AFTER_OPTIONS = List.of("Message", "Add ignore", "Remove friend", "Kick");
 	private static final TextComponent textComponent = new TextComponent();
 	private static final Color HIGHLIGHT_BORDER_COLOR;
 	private static final Color HIGHLIGHT_HOVER_BORDER_COLOR;

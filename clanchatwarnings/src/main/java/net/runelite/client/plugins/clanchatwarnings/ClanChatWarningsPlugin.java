@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.clanchatwarnings;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Provides;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ import org.pf4j.Extension;
 public class ClanChatWarningsPlugin extends Plugin
 {
 	private static final Splitter NEWLINE_SPLITTER = Splitter.on("\n").omitEmptyStrings().trimResults();
-	private static final ImmutableList<String> AFTER_OPTIONS = ImmutableList.of("Message", "Add ignore", "Remove friend", "Kick");
+	private static final List<String> AFTER_OPTIONS = List.of("Message", "Add ignore", "Remove friend", "Kick");
 	private final List<Pattern> warnings;
 	private final List<Pattern> warnPlayers;
 	private final List<Pattern> exemptPlayers;
@@ -253,9 +252,9 @@ public class ClanChatWarningsPlugin extends Plugin
 			String memberNameX = Text.toJagexName(member.getUsername());
 			String memberNameP = Text.toJagexName(member.getUsername());
 			String memberNameR = Text.toJagexName(member.getUsername());
-			StringBuffer sx;
-			StringBuffer sp;
-			StringBuffer sr;
+			StringBuilder sx;
+			StringBuilder sp;
+			StringBuilder sr;
 			if (memberNameX.equalsIgnoreCase(Text.toJagexName(this.client.getLocalPlayer().getName())))
 			{
 				return;
@@ -268,7 +267,7 @@ public class ClanChatWarningsPlugin extends Plugin
 			{ //For exempting people from being pinged
 				Pattern pattern = (Pattern) var2.next();
 				Matcher n = pattern.matcher(memberNameX.toLowerCase());
-				sx = new StringBuffer();
+				sx = new StringBuilder();
 				while (n.matches())
 				{
 					if (pattern.toString().substring(2, pattern.toString().length() - 2).equalsIgnoreCase(memberNameX.toLowerCase()))
@@ -321,7 +320,7 @@ public class ClanChatWarningsPlugin extends Plugin
 				}
 				pattern = Pattern.compile(nameP.toLowerCase());
 				Matcher l = pattern.matcher(memberNameP.toLowerCase());
-				sp = new StringBuffer();
+				sp = new StringBuilder();
 				while (l.matches())
 				{
 					if (nameP.equalsIgnoreCase(memberNameP))
@@ -370,7 +369,7 @@ public class ClanChatWarningsPlugin extends Plugin
 					}
 				}
 				Matcher m = pattern.matcher(memberNameR.toLowerCase());
-				sr = new StringBuffer();
+				sr = new StringBuilder();
 				while (m.find())
 				{
 					sendNotification(Text.toJagexName(member.getUsername()), note, 1);

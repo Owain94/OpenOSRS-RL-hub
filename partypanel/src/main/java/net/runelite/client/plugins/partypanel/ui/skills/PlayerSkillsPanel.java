@@ -24,7 +24,6 @@
  */
 package net.runelite.client.plugins.partypanel.ui.skills;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -37,29 +36,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import lombok.Getter;
 import net.runelite.api.Skill;
-import static net.runelite.api.Skill.AGILITY;
-import static net.runelite.api.Skill.ATTACK;
-import static net.runelite.api.Skill.CONSTRUCTION;
-import static net.runelite.api.Skill.COOKING;
-import static net.runelite.api.Skill.CRAFTING;
-import static net.runelite.api.Skill.DEFENCE;
-import static net.runelite.api.Skill.FARMING;
-import static net.runelite.api.Skill.FIREMAKING;
-import static net.runelite.api.Skill.FISHING;
-import static net.runelite.api.Skill.FLETCHING;
-import static net.runelite.api.Skill.HERBLORE;
-import static net.runelite.api.Skill.HITPOINTS;
-import static net.runelite.api.Skill.HUNTER;
-import static net.runelite.api.Skill.MAGIC;
-import static net.runelite.api.Skill.MINING;
-import static net.runelite.api.Skill.PRAYER;
-import static net.runelite.api.Skill.RANGED;
-import static net.runelite.api.Skill.RUNECRAFT;
-import static net.runelite.api.Skill.SLAYER;
-import static net.runelite.api.Skill.SMITHING;
-import static net.runelite.api.Skill.STRENGTH;
-import static net.runelite.api.Skill.THIEVING;
-import static net.runelite.api.Skill.WOODCUTTING;
+import static net.runelite.api.Skill.*;
 import net.runelite.api.SpriteID;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.plugins.partypanel.data.PartyPlayer;
@@ -71,7 +48,7 @@ public class PlayerSkillsPanel extends JPanel
 	/**
 	 * Skills ordered in the way they should be displayed in the panel.
 	 */
-	private static final List<Skill> SKILLS = ImmutableList.of(
+	private static final List<Skill> SKILLS = List.of(
 		ATTACK, HITPOINTS, MINING,
 		STRENGTH, AGILITY, SMITHING,
 		DEFENCE, HERBLORE, FISHING,
@@ -83,6 +60,7 @@ public class PlayerSkillsPanel extends JPanel
 	);
 
 	private static final ImmutableMap<Skill, Integer> SPRITE_MAP;
+
 	static
 	{
 		final ImmutableMap.Builder<Skill, Integer> map = ImmutableMap.builder();

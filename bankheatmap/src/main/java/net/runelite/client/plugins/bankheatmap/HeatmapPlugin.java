@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.bankheatmap;
 
-import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
@@ -41,7 +40,7 @@ public class HeatmapPlugin extends Plugin
 		GE
 	}
 
-	private static final List<Varbits> TAB_VARBITS = ImmutableList.of(
+	private static final List<Varbits> TAB_VARBITS = List.of(
 		Varbits.BANK_TAB_ONE_COUNT,
 		Varbits.BANK_TAB_TWO_COUNT,
 		Varbits.BANK_TAB_THREE_COUNT,

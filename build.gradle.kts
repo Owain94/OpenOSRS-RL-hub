@@ -9,6 +9,7 @@ buildscript {
 plugins {
     checkstyle
     java
+    id("com.simonharrer.modernizer") version "1.8.0-1" apply false
 }
 
 apply<BootstrapPlugin>()
@@ -48,6 +49,7 @@ subprojects {
 
     apply<JavaPlugin>()
     apply(plugin = "checkstyle")
+    apply(plugin = "com.simonharrer.modernizer")
 
     dependencies {
         annotationProcessor(Libraries.lombok)
