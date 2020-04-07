@@ -1,5 +1,3 @@
-import ProjectVersions.openosrsVersion
-
 buildscript {
     repositories {
         gradlePluginPortal()
@@ -10,6 +8,8 @@ plugins {
     checkstyle
     java
     id("com.simonharrer.modernizer") version "1.8.0-1" apply false
+    id("com.github.ben-manes.versions") version "0.28.0"
+    id("se.patrikerdes.use-latest-versions") version "0.2.13"
 }
 
 apply<BootstrapPlugin>()
@@ -52,23 +52,23 @@ subprojects {
     apply(plugin = "com.simonharrer.modernizer")
 
     dependencies {
-        annotationProcessor(Libraries.lombok)
-        annotationProcessor(Libraries.pf4j)
+        annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
+        annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.2.0")
 
-        compileOnly("com.openosrs:http-api:$openosrsVersion+")
-        compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
-        compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
+        compileOnly(group = "com.openosrs", name = "http-api", version = "3.2.1")
+        compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.2.1")
+        compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.2.1")
 
-        compileOnly(Libraries.apacheCommonsText)
-        compileOnly(Libraries.guava)
-        compileOnly(Libraries.guice)
-        compileOnly(Libraries.gson)
-        compileOnly(Libraries.jopt)
-        compileOnly(Libraries.lombok)
-        compileOnly(Libraries.okhttp3)
-        compileOnly(Libraries.pf4j)
-        compileOnly(Libraries.rxjava)
-        compileOnly(Libraries.substance)
+        compileOnly(group = "org.apache.commons", name = "commons-text", version = "1.8")
+        compileOnly(group = "com.google.guava", name = "guava", version = "28.2-jre")
+        compileOnly(group = "com.google.inject", name = "guice", version = "4.2.3", classifier = "no_aop")
+        compileOnly(group = "com.google.code.gson", name = "gson", version = "2.8.6")
+        compileOnly(group = "net.sf.jopt-simple", name = "jopt-simple", version = "5.0.4")
+        compileOnly(group = "org.projectlombok", name = "lombok", version = "1.18.12")
+        compileOnly(group = "com.squareup.okhttp3", name = "okhttp", version = "4.5.0")
+        compileOnly(group = "org.pf4j", name = "pf4j", version = "3.2.0")
+        compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.2")
+        compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "2.5.1")
     }
 
     checkstyle {
@@ -100,5 +100,27 @@ subprojects {
 
             exclude("**/Emoji.java")
         }
+    }
+}
+
+tasks {
+    named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
+        checkForGradleUpdate = false
+
+        resolutionStrategy {
+            componentSelection {
+                all {
+                    if (candidate.displayName.contains("fernflower") || isNonStable(candidate.version)) {
+                        reject("Non stable")
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    return listOf("ALPHA", "BETA", "RC").any {
+        version.toUpperCase().contains(it)
     }
 }
