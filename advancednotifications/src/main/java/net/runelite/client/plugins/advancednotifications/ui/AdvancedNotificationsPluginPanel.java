@@ -2,24 +2,24 @@ package net.runelite.client.plugins.advancednotifications.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.AbstractAction;
-import javax.swing.Box;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.border.EmptyBorder;
 import net.runelite.client.plugins.advancednotifications.AdvancedNotificationsPlugin;
 import net.runelite.client.plugins.advancednotifications.EmptyNotification;
 import net.runelite.client.plugins.advancednotifications.ItemNotification;
 import net.runelite.client.plugins.advancednotifications.Notification;
+import net.runelite.client.plugins.advancednotifications.NotificationGroup;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 
@@ -45,10 +45,10 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 		this.plugin = plugin;
 
 		setLayout(new BorderLayout());
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		JPanel northPanel = new JPanel(new BorderLayout());
-		northPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
+		northPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
 		JLabel title = new JLabel("Notifications");
 		title.setForeground(Color.WHITE);
@@ -70,6 +70,16 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				plugin.getNotifications().add(new EmptyNotification(plugin));
+				plugin.updateConfig();
+				rebuild();
+			}
+		}));
+		addPopup.add(new JMenuItem(new AbstractAction("Group")
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				plugin.getNotifications().add(new NotificationGroup(plugin));
 				plugin.updateConfig();
 				rebuild();
 			}
@@ -112,31 +122,27 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 	{
 		notificationView.removeAll();
 
+		int index = 0;
+		notificationView.add(new DropSpace(plugin, plugin, index++));
 		for (final Notification notif : plugin.getNotifications())
 		{
-			NotificationPanel panel = buildPanel(notif);
+			NotificationPanel<?> panel = NotificationPanel.buildPanel(plugin, notif);
 			if (panel != null)
 			{
 				notificationView.add(panel);
-				notificationView.add(Box.createRigidArea(new Dimension(0, 10)));
+				notificationView.add(new DropSpace(plugin, plugin, index++));
 			}
 		}
 
 		repaint();
 		revalidate();
-	}
 
-	private NotificationPanel buildPanel(Notification notif)
-	{
-		if (notif instanceof ItemNotification)
+		for (Component n : notificationView.getComponents())
 		{
-			return new ItemNotificationPanel((ItemNotification) notif);
+			if (n instanceof NotificationGroupPanel)
+			{
+				((NotificationGroupPanel) n).resetScroll();
+			}
 		}
-		if (notif instanceof EmptyNotification)
-		{
-			return new EmptyNotificationPanel((EmptyNotification) notif);
-		}
-
-		return null;
 	}
 }

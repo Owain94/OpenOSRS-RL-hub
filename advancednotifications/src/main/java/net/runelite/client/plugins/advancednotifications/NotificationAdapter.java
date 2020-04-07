@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.advancednotifications;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -8,14 +10,15 @@ import java.io.IOException;
 public class NotificationAdapter extends TypeAdapter<Notification>
 {
 	private final AdvancedNotificationsPlugin plugin;
-	private final ItemNotificationAdapter itemNotificationAdapter;
-	private final EmptyNotificationAdapter emptyNotificationAdapter;
+	private final Gson gson;
 
 	public NotificationAdapter(AdvancedNotificationsPlugin plugin)
 	{
 		this.plugin = plugin;
-		this.itemNotificationAdapter = new ItemNotificationAdapter();
-		this.emptyNotificationAdapter = new EmptyNotificationAdapter();
+		gson = new GsonBuilder()
+			.registerTypeAdapter(Notification.class, this)
+			.registerTypeAdapter(InventoryComparator.Pointer.class, new ComparatorAdapter())
+			.create();
 	}
 
 	@Override
@@ -23,7 +26,6 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 	{
 		out.beginObject();
 		out.name("type").value(idOf(o));
-		out.name("enabled").value(o.isEnabled());
 		out.name("data");
 		outTyped(out, o);
 		out.endObject();
@@ -34,7 +36,6 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 	{
 		int notificationType = -1;
 		Notification notification = null;
-		boolean enabled = true;
 
 		in.beginObject();
 		while (in.hasNext())
@@ -44,45 +45,51 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 				case "type":
 					notificationType = in.nextInt();
 					break;
-				case "enabled":
-					enabled = in.nextBoolean();
-					break;
 				case "data":
 					notification = ofType(in, notificationType);
 					break;
+				default:
+					in.skipValue();
 			}
 		}
 		in.endObject();
 
 		if (notification != null)
 		{
-			notification.setEnabled(enabled);
+			notification.setPlugin(plugin);
 		}
+
 		return notification;
 	}
 
-	private Notification ofType(JsonReader in, int type) throws IOException
+	private Notification ofType(JsonReader in, int type)
 	{
 		switch (type)
 		{
 			case 0:
-				return itemNotificationAdapter.read(plugin, in);
+				return gson.fromJson(in, ItemNotification.class);
 			case 1:
-				return emptyNotificationAdapter.read(plugin, in);
+				return gson.fromJson(in, EmptyNotification.class);
+			case 2:
+				return gson.fromJson(in, NotificationGroup.class);
 			default:
 				return null;
 		}
 	}
 
-	private void outTyped(JsonWriter out, Notification o) throws IOException
+	private void outTyped(JsonWriter out, Notification o)
 	{
 		if (o instanceof ItemNotification)
 		{
-			itemNotificationAdapter.write(plugin, out, (ItemNotification) o);
+			gson.toJson(o, ItemNotification.class, out);
 		}
 		else if (o instanceof EmptyNotification)
 		{
-			emptyNotificationAdapter.write(out, (EmptyNotification) o);
+			gson.toJson(o, EmptyNotification.class, out);
+		}
+		else if (o instanceof NotificationGroup)
+		{
+			gson.toJson(o, NotificationGroup.class, out);
 		}
 	}
 
@@ -95,6 +102,10 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 		if (o instanceof EmptyNotification)
 		{
 			return 1;
+		}
+		if (o instanceof NotificationGroup)
+		{
+			return 2;
 		}
 		return -1;
 	}

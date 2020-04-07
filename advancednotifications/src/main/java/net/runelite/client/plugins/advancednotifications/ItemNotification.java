@@ -7,22 +7,17 @@ public class ItemNotification extends Notification
 {
 	@Getter
 	@Setter
-	private String item;
-
+	private String item = "Coins";
 	@Getter
 	@Setter
-	private InventoryComparator comparator;
-
+	private InventoryComparator.Pointer comparator = new InventoryComparator.Pointer(InventoryComparator.COMPARATORS[0]);
 	@Getter
 	@Setter
-	private int comparatorParam;
+	private int comparatorParam = 0;
 
 	public ItemNotification(AdvancedNotificationsPlugin plugin)
 	{
 		super(plugin);
-		item = "Coins";
-		comparator = InventoryComparator.COMPARATORS[0];
-		comparatorParam = 0;
 	}
 
 	@Override
@@ -36,9 +31,9 @@ public class ItemNotification extends Notification
 		InventoryEvent e = (InventoryEvent) event;
 
 		if (getPlugin().getItemManager().getItemDefinition(e.getItemID()).getName().equalsIgnoreCase(item)
-			&& comparator.shouldNotify(e.getPreviousCount(), e.getCount(), comparatorParam))
+			&& comparator.object.shouldNotify(e.getPreviousCount(), e.getCount(), comparatorParam))
 		{
-			doNotification(comparator.notification(item, comparatorParam));
+			doNotification(comparator.object.notification(item, comparatorParam));
 		}
 	}
 }
