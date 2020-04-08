@@ -45,6 +45,7 @@ import net.runelite.api.Player;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.InteractingChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -91,6 +92,9 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 	private Client client;
 
 	@Inject
+	private ClientThread clientThread;
+
+	@Inject
 	private ClientToolbar clientToolbar;
 
 	@Inject
@@ -122,7 +126,7 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 		CONFIG = config;
 		PLUGIN = this;
 		panel = injector.getInstance(PvpPerformanceTrackerPanel.class);
-		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "skull_red.png");
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "/skull_red.png");
 		navButton = NavigationButton.builder()
 			.tooltip("PvP Fight History")
 			.icon(icon)
@@ -133,7 +137,7 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 		fightHistory = new ArrayList<>();
 		gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 		FightPerformance[] savedFights = gson.fromJson(config.fightHistoryData(), FightPerformance[].class);
-		FightHistory(savedFights);
+		fightHistory(savedFights);
 
 		// add the panel's nav button depending on config
 		if (config.showFightHistoryPanel() &&
@@ -286,7 +290,14 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 
 		if (hasOpponent() && event.getActor() != null)
 		{
-			currentFight.checkForAttackAnimations(event.getActor().getName());
+			clientThread.invokeLater(() ->
+			{
+				// must perform null checks again since this occurs a moment after the inital check.
+				if (hasOpponent() && event.getActor() != null && event.getActor().getName() != null)
+				{
+					currentFight.checkForAttackAnimations(event.getActor().getName());
+				}
+			});
 		}
 	}
 
@@ -326,7 +337,7 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 		}
 	}
 
-	void FightHistory(FightPerformance[] fights)
+	void fightHistory(FightPerformance[] fights)
 	{
 		fightHistory.addAll(Arrays.asList(fights));
 		if (config.fightHistoryLimit() > 0 && fightHistory.size() > config.fightHistoryLimit())
