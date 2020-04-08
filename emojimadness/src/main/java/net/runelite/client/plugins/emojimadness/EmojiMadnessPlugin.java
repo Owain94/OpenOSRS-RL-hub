@@ -271,21 +271,21 @@ public class EmojiMadnessPlugin extends Plugin
 	 */
 	private static String removeTags(String str)
 	{
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuilder stringBuilder = new StringBuilder();
 		Matcher matcher = TAG_REGEXP.matcher(str);
 		while (matcher.find())
 		{
-			matcher.appendReplacement(stringBuffer, "");
+			matcher.appendReplacement(stringBuilder, "");
 			String match = matcher.group(0);
 			switch (match)
 			{
 				case "<lt>":
 				case "<gt>":
-					stringBuffer.append(match);
+					stringBuilder.append(match);
 					break;
 			}
 		}
-		matcher.appendTail(stringBuffer);
-		return stringBuffer.toString();
+		matcher.appendTail(stringBuilder);
+		return stringBuilder.toString();
 	}
 }

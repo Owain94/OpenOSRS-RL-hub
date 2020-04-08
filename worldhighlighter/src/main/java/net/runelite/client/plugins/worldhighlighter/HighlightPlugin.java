@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.worldhighlighter;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Provides;
 import java.awt.Color;
@@ -9,6 +9,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
+import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -42,7 +43,7 @@ import org.pf4j.Extension;
 @Slf4j
 public class HighlightPlugin extends Plugin
 {
-	private static final ImmutableList<String> AFTER_OPTIONS = ImmutableList.of("Message", "Add ignore", "Remove friend", "Kick");
+	private static final List<String> AFTER_OPTIONS = List.of("Message", "Add ignore", "Remove friend", "Kick");
 	private static final TextComponent textComponent = new TextComponent();
 	private static final Color HIGHLIGHT_BORDER_COLOR;
 	private static final Color HIGHLIGHT_HOVER_BORDER_COLOR;
@@ -115,7 +116,7 @@ public class HighlightPlugin extends Plugin
 			if (this.client.getClanMembers()[c].getUsername().equals(playerName))
 			{
 				clan = true;
-				player = Text.toJagexName(this.client.getClanMembers()[c].getUsername());
+				player = toTrueName(this.client.getClanMembers()[c].getUsername());
 				world = this.client.getClanMembers()[c].getWorld();
 				if (world == this.client.getWorld())
 				{
@@ -135,6 +136,7 @@ public class HighlightPlugin extends Plugin
 			{
 				if (this.client.getFriends()[f].getName().equals(playerName))
 				{
+					player = toTrueName(this.client.getClanMembers()[f].getUsername());
 					world = this.client.getFriends()[f].getWorld();
 					if (world == this.client.getWorld())
 					{
@@ -269,15 +271,15 @@ public class HighlightPlugin extends Plugin
 		return this.clan;
 	}
 
-	public void resetClan()
-	{
-		this.clan = false;
-	}
-
 	static
 	{
 		HIGHLIGHT_BORDER_COLOR = Color.ORANGE;
 		HIGHLIGHT_HOVER_BORDER_COLOR = HIGHLIGHT_BORDER_COLOR.darker();
 		HIGHLIGHT_FILL_COLOR = new Color(0, 255, 0, 20);
+	}
+
+	private String toTrueName(String str)
+	{
+		return CharMatcher.ascii().retainFrom(str.replace('\u00A0', ' ')).trim();
 	}
 }

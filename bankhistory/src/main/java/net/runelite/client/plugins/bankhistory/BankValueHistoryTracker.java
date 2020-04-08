@@ -24,7 +24,6 @@
  */
 package net.runelite.client.plugins.bankhistory;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.inject.Provides;
 import java.io.File;
@@ -59,7 +58,7 @@ import net.runelite.http.api.RuneLiteAPI;
 @Slf4j
 public class BankValueHistoryTracker
 {
-	private static final List<Varbits> TAB_VARBITS = ImmutableList.of(
+	private static final List<Varbits> TAB_VARBITS = List.of(
 		Varbits.BANK_TAB_ONE_COUNT,
 		Varbits.BANK_TAB_TWO_COUNT,
 		Varbits.BANK_TAB_THREE_COUNT,

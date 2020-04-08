@@ -27,7 +27,7 @@
 package net.runelite.client.plugins.flippingutilities;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,10 +38,10 @@ import net.runelite.http.api.ge.GrandExchangeTrade;
 @AllArgsConstructor
 public class FlippingItem
 {
-	private static final int GE_RESET_TIME_SECONDS = 60 * 60 * 4;
+	private static int GE_RESET_TIME_SECONDS = 60 * 60 * 4;
 
 	@Getter
-	private List<GrandExchangeTrade> tradeHistory;
+	private ArrayList<GrandExchangeTrade> tradeHistory;
 
 	@Getter
 	private final int itemId;
@@ -73,6 +73,10 @@ public class FlippingItem
 
 	@Getter
 	private Instant geLimitResetTime;
+
+	@Getter
+	@Setter
+	private boolean isFrozen;
 
 	public void addTradeHistory(final GrandExchangeTrade trade)
 	{

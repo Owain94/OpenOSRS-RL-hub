@@ -28,7 +28,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Vector;
@@ -85,7 +84,7 @@ public class DatePickerPanel extends JPanel
 		hour.setSelectedItem("12");
 		minute = new JComboBox<>(getArrayOfIntegers(0, 60));
 		minute.setSelectedItem("00");
-		amPm = new JComboBox<>(new Vector<>(Arrays.asList("AM", "PM")));
+		amPm = new JComboBox<>(new String[]{"AM", "PM"});
 		amPm.setSelectedItem("AM");
 
 		addListeners();
@@ -155,6 +154,6 @@ public class DatePickerPanel extends JPanel
 
 	protected static String getFormattedTimeString(String s, boolean pad)
 	{
-		return pad ?  StringUtils.leftPad(s, 2, '0') : s;
+		return pad ? StringUtils.leftPad(s, 2, '0') : s;
 	}
 }

@@ -29,8 +29,8 @@ project.extra["PluginName"] = "Bank Value Tracking"
 project.extra["PluginDescription"] = "Track the value of your bank over time"
 
 dependencies {
-    implementation(Libraries.jfreechart)
-    implementation(Libraries.jdatepicker)
+    implementation(group = "net.sourceforge.jdatepicker", name = "jdatepicker", version = "1.3.2")
+    implementation(group = "org.jfree", name = "jfreechart", version = "1.5.0")
 }
 
 tasks {

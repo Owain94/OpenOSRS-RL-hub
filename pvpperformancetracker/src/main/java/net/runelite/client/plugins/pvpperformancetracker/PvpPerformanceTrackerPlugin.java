@@ -24,7 +24,6 @@
  */
 package net.runelite.client.plugins.pvpperformancetracker;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Provides;
@@ -75,7 +74,7 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 	public List<FightPerformance> fightHistory;
 
 	// Last man standing map regions, including lobby
-	private static final Set<Integer> LAST_MAN_STANDING_REGIONS = ImmutableSet.of(13617, 13658, 13659, 13660, 13914, 13915, 13916);
+	private static final Set<Integer> LAST_MAN_STANDING_REGIONS = Set.of(13617, 13658, 13659, 13660, 13914, 13915, 13916);
 
 
 	@Getter(AccessLevel.PACKAGE)

@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
@@ -24,23 +25,19 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.advancednotifications.ui.AdvancedNotificationsPluginPanel;
+import net.runelite.client.plugins.advancednotifications.ui.DropSpace;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
-import org.pf4j.Extension;
 
-@Extension
+@Slf4j
 @PluginDescriptor(
 	name = "Advanced Notifications",
 	tags = {"notifications", "inventory", "item"},
-	description = "An advanced notifications system",
-	type = PluginType.UTILITY,
-	enabledByDefault = false
+	description = "An advanced notifications system"
 )
-@Slf4j
-public class AdvancedNotificationsPlugin extends Plugin
+public class AdvancedNotificationsPlugin extends Plugin implements DraggableContainer
 {
 	private static final String CONFIG_GROUP = "advancednotifications";
 	private static final String CONFIG_KEY = "notifications";
@@ -68,6 +65,14 @@ public class AdvancedNotificationsPlugin extends Plugin
 	private AdvancedNotificationsPluginPanel pluginPanel;
 	private NavigationButton navigationButton;
 	private Item[] previousItems;
+
+	@Getter
+	private Notification dragging;
+	@Getter
+	private DraggableContainer draggingFrom;
+	@Getter
+	@Setter
+	private DropSpace dragHovering;
 
 	@Getter
 	private List<Notification> notifications;
@@ -123,7 +128,7 @@ public class AdvancedNotificationsPlugin extends Plugin
 		}
 
 		Gson gson = new GsonBuilder()
-			.registerTypeHierarchyAdapter(Notification.class, new NotificationAdapter(this))
+			.registerTypeAdapter(Notification.class, new NotificationAdapter(this))
 			.create();
 
 		notifications = gson.fromJson(json, new TypeToken<ArrayList<Notification>>()
@@ -194,14 +199,22 @@ public class AdvancedNotificationsPlugin extends Plugin
 		}
 
 		final Gson gson = new GsonBuilder()
-			.registerTypeHierarchyAdapter(Notification.class, new NotificationAdapter(this))
+			.registerTypeAdapter(Notification.class, new NotificationAdapter(this))
 			.create();
-		final String json = gson.toJson(notifications);
+		final String json = gson.toJson(notifications, new TypeToken<ArrayList<Notification>>()
+		{
+		}.getType());
 		configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY, json);
 	}
 
 	public void rebuildPluginPanel()
 	{
 		pluginPanel.rebuild();
+	}
+
+	public void setDragging(Notification dragging, DraggableContainer from)
+	{
+		this.dragging = dragging;
+		draggingFrom = from;
 	}
 }

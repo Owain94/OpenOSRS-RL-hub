@@ -2,13 +2,25 @@ package net.runelite.client.plugins.advancednotifications;
 
 public interface InventoryComparator
 {
+	class Pointer
+	{
+		public InventoryComparator object;
+
+		public Pointer(InventoryComparator object)
+		{
+			this.object = object;
+		}
+	}
 
 	boolean shouldNotify(int previousCount, int newCount, int param);
+
 	boolean takesParam();
+
 	String notification(String item, int param);
 
 	InventoryComparator COUNT_CHANGED = new InventoryComparator()
 	{
+
 		@Override
 		public boolean shouldNotify(int previousCount, int newCount, int param)
 		{

@@ -1,17 +1,21 @@
 package net.runelite.client.plugins.clanchatwarnings;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Provides;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -50,15 +54,15 @@ import org.pf4j.Extension;
 public class ClanChatWarningsPlugin extends Plugin
 {
 	private static final Splitter NEWLINE_SPLITTER = Splitter.on("\n").omitEmptyStrings().trimResults();
-	private static final ImmutableList<String> AFTER_OPTIONS = ImmutableList.of("Message", "Add ignore", "Remove friend", "Kick");
-	private final List<Pattern> warnings;
-	private final List<Pattern> warnPlayers;
-	private final List<Pattern> exemptPlayers;
-	private final List<Integer> coolTimer;
-	private final List<String> coolName;
-	private final List<Integer> trackTimer;
-	private final List<String> trackName;
-	private final List<String> clansName;
+	private static final String MESSAGE_DELIMITER = "~";
+	private static final List<String> AFTER_OPTIONS = List.of("Message", "Add ignore", "Remove friend", "Kick");
+	private final Map<Pattern, String> warnings = new HashMap<>();
+	private final Map<String, String> warnPlayers = new HashMap<>();
+	private final Set<String> exemptPlayers = new HashSet<>();
+	private final Map<String, Instant> cooldownMap = new HashMap<>();
+	private final List<Integer> trackTimer = new ArrayList<>();
+	private final List<String> trackName = new ArrayList<>();
+	private final List<String> clansName = new ArrayList<>();
 	private boolean hopping;
 	private int clanJoinedTick;
 	@Inject
@@ -67,18 +71,6 @@ public class ClanChatWarningsPlugin extends Plugin
 	private Notifier ping;
 	@Inject
 	private ClanChatWarningsConfig config;
-
-	public ClanChatWarningsPlugin()
-	{
-		this.warnings = new ArrayList();
-		this.exemptPlayers = new ArrayList();
-		this.warnPlayers = new ArrayList();
-		this.coolTimer = new ArrayList();
-		this.coolName = new ArrayList();
-		this.trackTimer = new ArrayList();
-		this.trackName = new ArrayList();
-		this.clansName = new ArrayList();
-	}
 
 	@Override
 	protected void startUp()
@@ -92,8 +84,7 @@ public class ClanChatWarningsPlugin extends Plugin
 		this.warnings.clear();
 		this.exemptPlayers.clear();
 		this.warnPlayers.clear();
-		this.coolTimer.clear();
-		this.coolName.clear();
+		this.cooldownMap.clear();
 		this.trackTimer.clear();
 		this.trackName.clear();
 		this.clansName.clear();
@@ -162,28 +153,20 @@ public class ClanChatWarningsPlugin extends Plugin
 		this.exemptPlayers.clear();
 		this.warnPlayers.clear();
 
-		Stream var10000 = Text.fromCSV(this.config.warnPlayers()).stream().map((s) -> {
-			return Pattern.compile(Pattern.quote(s), 2);
-		});
-		List var10001 = this.warnPlayers;
-		var10000.forEach(var10001::add);
-		Stream var10002 = NEWLINE_SPLITTER.splitToList(this.config.warnings()).stream().map((s) -> {
-			try
-			{
-				return Pattern.compile(s, 2);
-			}
-			catch (PatternSyntaxException var2)
-			{
-				return null;
-			}
-		}).filter(Objects::nonNull);
-		List var10003 = this.warnings;
-		var10002.forEach(var10003::add);
-		Stream var10004 = Text.fromCSV(this.config.exemptPlayers()).stream().map((s) -> {
-			return Pattern.compile(Pattern.quote(s), 2);
-		});
-		List var10005 = this.exemptPlayers;
-		var10004.forEach(var10005::add);
+		warnings.putAll(NEWLINE_SPLITTER.splitToList(this.config.warnings()).stream()
+			.map((s) -> s.toLowerCase().split(MESSAGE_DELIMITER))
+			.collect(Collectors.toMap(p -> Pattern.compile(p[0].trim(), Pattern.CASE_INSENSITIVE), p -> p.length > 1 ? p[1].trim() : ""))
+		);
+
+		exemptPlayers.addAll(Text.fromCSV(this.config.exemptPlayers()).stream()
+			.map((s) -> s.toLowerCase().trim())
+			.collect(Collectors.toSet())
+		);
+
+		warnPlayers.putAll(Text.fromCSV(this.config.warnPlayers()).stream()
+			.map((s) -> s.toLowerCase().split(MESSAGE_DELIMITER))
+			.collect(Collectors.toMap(p -> p[0].trim(), p -> p.length > 1 ? p[1].trim() : ""))
+		);
 	}
 
 
@@ -228,7 +211,7 @@ public class ClanChatWarningsPlugin extends Plugin
 		String name = event.getMember().getUsername();
 		if (trackName.contains(name.toLowerCase()))
 		{
-			sendNotification(Text.toJagexName(name), "", 2);
+			sendNotification(toTrueName(name), "", 2);
 			trackTimer.remove(trackName.indexOf(name.toLowerCase()));
 			trackName.remove(name.toLowerCase());
 		}
@@ -242,146 +225,31 @@ public class ClanChatWarningsPlugin extends Plugin
 		{
 			clansName.add(event.getMember().getUsername());
 		}
+
 		if (this.clanJoinedTick != this.client.getTickCount())
 		{
 			hopping = false;
 		}
-		//God have mercy on your soul if you're about to check how I did this.
-		if ((this.clanJoinedTick != this.client.getTickCount() || this.config.selfCheck()) && !hopping)
+
+		if (clanJoinedTick != client.getTickCount() || (this.config.selfCheck() && !hopping))
 		{
-			ClanMember member = event.getMember();
-			String memberNameX = Text.toJagexName(member.getUsername());
-			String memberNameP = Text.toJagexName(member.getUsername());
-			String memberNameR = Text.toJagexName(member.getUsername());
-			StringBuffer sx;
-			StringBuffer sp;
-			StringBuffer sr;
-			if (memberNameX.equalsIgnoreCase(Text.toJagexName(this.client.getLocalPlayer().getName())))
+			final ClanMember member = event.getMember();
+			final String memberName = toTrueName(member.getUsername().trim());
+			final String localName = client.getLocalPlayer() == null ? null : client.getLocalPlayer().getName();
+
+			if (memberName == null || (memberName.equalsIgnoreCase(localName) && !config.selfCheck()))
 			{
 				return;
 			}
-			if (coolName.contains(member.getUsername()))
+
+			final String warningMessage = getWarningMessageByUsername(memberName);
+			if (warningMessage != null)
 			{
-				return;
-			}
-			for (Iterator var2 = this.exemptPlayers.iterator(); var2.hasNext(); memberNameX = sx.toString())
-			{ //For exempting people from being pinged
-				Pattern pattern = (Pattern) var2.next();
-				Matcher n = pattern.matcher(memberNameX.toLowerCase());
-				sx = new StringBuffer();
-				while (n.matches())
+				if (config.cooldown() > 0)
 				{
-					if (pattern.toString().substring(2, pattern.toString().length() - 2).equalsIgnoreCase(memberNameX.toLowerCase()))
-					{
-						return;
-					}
+					cooldownMap.put(memberName.toLowerCase(), Instant.now());
 				}
-				n.appendTail(sx);
-			}
-			for (Iterator var4 = this.warnPlayers.iterator(); var4.hasNext(); memberNameP = sp.toString())
-			{ //For checking specific players
-				Pattern pattern = (Pattern) var4.next();
-				Pattern patternDiv = Pattern.compile("~");
-				//Yes Im aware this String is dumb, frankly I spent 20 mins trying to fix it and this is what worked so it stays.
-				String slash = "\\\\";
-				String[] sections = patternDiv.split(pattern.toString());
-				String note = "";
-				String nameP = "";
-				if (sections.length > 1)
-				{
-					for (Integer x = 0; x < sections.length; x++)
-					{
-						if (x == sections.length - 1)
-						{
-							String[] notes = sections[x].split(slash);
-							if (x > 1)
-							{
-								note += "~";
-							}
-							note += notes[0];
-						}
-						else if (x != 0)
-						{
-							if (x > 1)
-							{
-								note += "~";
-							}
-							note += sections[x];
-						}
-					}
-				}
-				if (sections.length == 1)
-				{
-					nameP = sections[0].substring(2, sections[0].length() - 2);
-					nameP = nameP.trim();
-				}
-				else
-				{
-					nameP = sections[0].substring(2, sections[0].trim().length());
-				}
-				pattern = Pattern.compile(nameP.toLowerCase());
-				Matcher l = pattern.matcher(memberNameP.toLowerCase());
-				sp = new StringBuffer();
-				while (l.matches())
-				{
-					if (nameP.equalsIgnoreCase(memberNameP))
-					{
-						sendNotification(Text.toJagexName(member.getUsername()), note, 1);
-						if (this.config.cooldown() > 0)
-						{
-							coolName.add(Text.toJagexName(member.getUsername()));
-							coolTimer.add((int) (this.config.cooldown() / .6));
-						}
-						break;
-					}
-				}
-				l.appendTail(sp);
-			}
-			for (Iterator var3 = this.warnings.iterator(); var3.hasNext(); memberNameR = sr.toString())
-			{ //For checking the regex
-				Pattern pattern = (Pattern) var3.next();
-				Pattern patternDiv = Pattern.compile("~");
-				//Yes Im aware this String is dumb, frankly I spent 20 mins trying to fix it and this is what worked so it stays.
-				String slash = "\\\\";
-				String[] sections = patternDiv.split(pattern.toString());
-				String note = "";
-				if (sections.length > 1)
-				{
-					for (Integer x = 0; x < sections.length; x++)
-					{
-						if (x == sections.length - 1)
-						{
-							String[] notes = sections[x].split(slash);
-							if (x > 1)
-							{
-								note += "~";
-							}
-							note += notes[0];
-							pattern = Pattern.compile(sections[0].trim().toLowerCase());
-						}
-						else if (x != 0)
-						{
-							if (x > 1)
-							{
-								note += "~";
-							}
-							note += sections[x];
-						}
-					}
-				}
-				Matcher m = pattern.matcher(memberNameR.toLowerCase());
-				sr = new StringBuffer();
-				while (m.find())
-				{
-					sendNotification(Text.toJagexName(member.getUsername()), note, 1);
-					if (this.config.cooldown() > 0)
-					{
-						coolName.add(Text.toJagexName(member.getUsername()));
-						coolTimer.add((int) (this.config.cooldown() / .6));
-					}
-					break;
-				}
-				m.appendTail(sr);
+				sendNotification(memberName, warningMessage, 1);
 			}
 		}
 	}
@@ -389,21 +257,6 @@ public class ClanChatWarningsPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		if (this.config.cooldown() > 0)
-		{
-			for (int i = 0; i < coolTimer.size(); i++)
-			{
-				if (coolTimer.get(i) > 0)
-				{
-					coolTimer.set(i, coolTimer.get(i) - 1);
-				}
-				else
-				{
-					coolTimer.remove(i);
-					coolName.remove(i);
-				}
-			}
-		}
 		if (!trackName.isEmpty())
 		{
 			for (int i = 0; i < trackTimer.size(); i++)
@@ -452,5 +305,59 @@ public class ClanChatWarningsPlugin extends Plugin
 	ClanChatWarningsConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(ClanChatWarningsConfig.class);
+	}
+
+
+	/**
+	 * Grabs the relevant warning message for the specified username accounting for all config options
+	 *
+	 * @param username players in-game name (shown in join message)
+	 * @return warning message or null if username should be ignored
+	 */
+	@Nullable
+	private String getWarningMessageByUsername(String username)
+	{
+		username = username.toLowerCase();
+		// This player is exempt from any warning.
+		if (exemptPlayers.contains(username))
+		{
+			return null;
+		}
+
+		if (cooldownMap.containsKey(username))
+		{
+			final Instant cutoff = Instant.now().minus(config.cooldown(), ChronoUnit.SECONDS);
+			// If the cutoff period is after (greater) than the stored time they should come off cooldown
+			if (cutoff.compareTo(cooldownMap.get(username)) > 0)
+			{
+				cooldownMap.remove(username);
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		// This player name is listed inside the config
+		if (warnPlayers.containsKey(username))
+		{
+			return warnPlayers.get(username);
+		}
+
+		for (final Map.Entry<Pattern, String> entry : warnings.entrySet())
+		{
+			final Matcher m = entry.getKey().matcher(username);
+			if (m.find())
+			{
+				return entry.getValue();
+			}
+		}
+
+		return null;
+	}
+
+	private String toTrueName(String str)
+	{
+		return CharMatcher.ascii().retainFrom(str.replace('\u00A0', ' ')).trim();
 	}
 }

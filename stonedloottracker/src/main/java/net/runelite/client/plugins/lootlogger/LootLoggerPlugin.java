@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.lootlogger;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -8,8 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -97,7 +97,7 @@ public class LootLoggerPlugin extends Plugin
 	private NavigationButton navButton;
 
 	@Getter
-	private Set<String> lootNames = new TreeSet<>();
+	private SetMultimap<LootRecordType, String> lootNames = HashMultimap.create();
 
 	private boolean prepared = false;
 	private boolean unsiredReclaiming = false;
@@ -179,6 +179,24 @@ public class LootLoggerPlugin extends Plugin
 
 	private void updateWriterUsername()
 	{
+		final String username = client.getUsername();
+		final boolean alreadyMigrated = Text.fromCSV(config.getMigratedUsers()).stream().anyMatch(username::equalsIgnoreCase);
+		// TODO: Remove this check once the deprecated migrateData call has been remove
+		if (alreadyMigrated)
+		{
+			writer.setPlayerUsername(client.getUsername());
+			localPlayerNameChanged();
+		}
+		else
+		{
+			migrateData();
+		}
+	}
+
+	// TODO: Remove in a future release
+	@Deprecated
+	private void migrateData()
+	{
 		if (fetchingUsername)
 		{
 			return;
@@ -193,7 +211,15 @@ public class LootLoggerPlugin extends Plugin
 					final Player local = client.getLocalPlayer();
 					if (local != null && local.getName() != null)
 					{
-						writer.setPlayerUsername(local.getName());
+						final boolean migrated = writer.migrateDataFromDisplayNameToUsername(local.getName(), client.getUsername());
+						if (migrated)
+						{
+							// Must wrap in new List since Text.fromCSV is an unmodifiableCollection
+							final List<String> users = new ArrayList<>(Text.fromCSV(config.getMigratedUsers()));
+							users.add(client.getUsername());
+							config.setMigratedUsers(String.join(",", users));
+						}
+						writer.setPlayerUsername(client.getUsername());
 						localPlayerNameChanged();
 						fetchingUsername = false;
 						return true;
@@ -211,8 +237,7 @@ public class LootLoggerPlugin extends Plugin
 
 	private void localPlayerNameChanged()
 	{
-		lootNames.clear();
-		lootNames.addAll(writer.getKnownFileNames());
+		lootNames = writer.getKnownFileNames();
 		SwingUtilities.invokeLater(panel::showSelectionView);
 	}
 
@@ -230,7 +255,7 @@ public class LootLoggerPlugin extends Plugin
 	private void addRecord(final LTRecord record)
 	{
 		writer.addLootTrackerRecord(record);
-		lootNames.add(record.getName());
+		lootNames.put(record.getType(), record.getName());
 		SwingUtilities.invokeLater(() -> panel.addLog(record));
 	}
 
@@ -248,7 +273,7 @@ public class LootLoggerPlugin extends Plugin
 		addRecord(record);
 	}
 
-	public Collection<LTRecord> getDataByName(String name)
+	public Collection<LTRecord> getDataByName(LootRecordType type, String name)
 	{
 		final BossTab tab = BossTab.getByName(name);
 		if (tab != null)
@@ -256,27 +281,28 @@ public class LootLoggerPlugin extends Plugin
 			name = tab.getName();
 		}
 
-		return writer.loadLootTrackerRecords(name);
+		return writer.loadLootTrackerRecords(type, name);
 	}
 
 	/**
 	 * Creates a loot log for this name and then attaches it to the UI when finished
+	 *
 	 * @param name record name
 	 */
-	public void requestLootLog(final String name)
+	public void requestLootLog(final LootRecordType type, final String name)
 	{
 		clientThread.invoke(() ->
 		{
-			final Collection<LTRecord> records = getDataByName(name);
+			final Collection<LTRecord> records = getDataByName(type, name);
 			final LootLog log = new LootLog(records, name);
 			SwingUtilities.invokeLater(() -> panel.useLog(log));
 		});
 	}
 
-	public boolean clearStoredDataByName(final String name)
+	public boolean clearStoredDataByName(final LootRecordType type, final String name)
 	{
-		lootNames.remove(name);
-		return writer.deleteLootTrackerRecords(name);
+		lootNames.remove(type, name);
+		return writer.deleteLootTrackerRecords(type, name);
 	}
 
 	@Subscribe
@@ -335,7 +361,7 @@ public class LootLoggerPlugin extends Plugin
 	{
 		clientThread.invokeLater(() ->
 		{
-			Collection<LTRecord> data = getDataByName(BossTab.ABYSSAL_SIRE.getName());
+			Collection<LTRecord> data = getDataByName(LootRecordType.NPC, BossTab.ABYSSAL_SIRE.getName());
 			ItemDefinition c = itemManager.getItemDefinition(itemID);
 			LTItemEntry itemEntry = new LTItemEntry(c.getName(), itemID, 1, 0);
 

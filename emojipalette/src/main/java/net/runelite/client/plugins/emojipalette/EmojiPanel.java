@@ -105,7 +105,7 @@ class EmojiPanel extends PluginPanel
 	 */
 	public static String unescapeTags(String str)
 	{
-		StringBuffer out = new StringBuffer(str.length());
+		StringBuilder out = new StringBuilder(str.length());
 		Matcher matcher = TAG_REGEXP.matcher(str);
 
 		while (matcher.find())

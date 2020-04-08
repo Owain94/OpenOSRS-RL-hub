@@ -7,17 +7,14 @@ public class EmptyNotification extends Notification
 {
 	@Getter
 	@Setter
-	private InventoryComparator comparator;
-
+	private InventoryComparator.Pointer comparator = new InventoryComparator.Pointer(InventoryComparator.COMPARATORS[0]);
 	@Getter
 	@Setter
-	private int comparatorParam;
+	private int comparatorParam = 0;
 
 	public EmptyNotification(AdvancedNotificationsPlugin plugin)
 	{
 		super(plugin);
-		this.comparator = InventoryComparator.COMPARATORS[0];
-		this.comparatorParam = 0;
 	}
 
 	@Override
@@ -30,9 +27,9 @@ public class EmptyNotification extends Notification
 
 		InventoryEvent e = (InventoryEvent) event;
 
-		if (e.getItemID() == -1 && comparator.shouldNotify(e.getPreviousCount(), e.getCount(), comparatorParam))
+		if (e.getItemID() == -1 && comparator.object.shouldNotify(e.getPreviousCount(), e.getCount(), comparatorParam))
 		{
-			doNotification(comparator.notification("empty space", comparatorParam));
+			doNotification(comparator.object.notification("empty space", comparatorParam));
 		}
 	}
 }
