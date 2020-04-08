@@ -156,11 +156,11 @@ public class FriendsExporterPlugin extends Plugin
 		FileWriter writer = new FileWriter(fileName, true);
 		for (int x = 0; x != client.getFriendsCount(); x++)
 		{
-			String friendName = Text.toJagexName(array[x].getName());
+			String friendName = array[x].getName();
 			String prevName = "";
 			if (!StringUtils.isEmpty(array[x].getPrevName()))
 			{
-				prevName = Text.toJagexName(array[x].getPrevName());
+				prevName = array[x].getPrevName();
 			}
 			String Writing = toWrite(x + 1, friendName, prevName, "");
 			try
@@ -199,12 +199,12 @@ public class FriendsExporterPlugin extends Plugin
 				String prevName = "";
 				for (int y = 0; y != client.getFriendsCount(); y++)
 				{
-					String friendName = Text.toJagexName(array[y].getName());
+					String friendName = array[y].getName();
 					if (friendName.equals(temp2[(x * 4) + 2].getText()))
 					{
 						if (!StringUtils.isEmpty(array[y].getPrevName()))
 						{
-							prevName = Text.toJagexName(array[y].getPrevName());
+							prevName = array[y].getPrevName();
 						}
 						break;
 					}
@@ -245,11 +245,11 @@ public class FriendsExporterPlugin extends Plugin
 		FileWriter writer = new FileWriter(fileName, true);
 		for (int x = 0; x != client.getIgnoreCount(); x++)
 		{
-			String friendName = Text.toJagexName(array[x].getName());
+			String friendName = array[x].getName();
 			String prevName = "";
 			if (!StringUtils.isEmpty(array[x].getPrevName()))
 			{
-				prevName = Text.toJagexName(array[x].getPrevName());
+				prevName = array[x].getPrevName();
 			}
 			String Writing = toWrite(x + 1, friendName, prevName, "");
 			try

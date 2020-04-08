@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.worldhighlighter;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Provides;
@@ -115,7 +116,7 @@ public class HighlightPlugin extends Plugin
 			if (this.client.getClanMembers()[c].getUsername().equals(playerName))
 			{
 				clan = true;
-				player = Text.toJagexName(this.client.getClanMembers()[c].getUsername());
+				player = toTrueName(this.client.getClanMembers()[c].getUsername());
 				world = this.client.getClanMembers()[c].getWorld();
 				if (world == this.client.getWorld())
 				{
@@ -135,6 +136,7 @@ public class HighlightPlugin extends Plugin
 			{
 				if (this.client.getFriends()[f].getName().equals(playerName))
 				{
+					player = toTrueName(this.client.getClanMembers()[f].getUsername());
 					world = this.client.getFriends()[f].getWorld();
 					if (world == this.client.getWorld())
 					{
@@ -269,15 +271,15 @@ public class HighlightPlugin extends Plugin
 		return this.clan;
 	}
 
-	public void resetClan()
-	{
-		this.clan = false;
-	}
-
 	static
 	{
 		HIGHLIGHT_BORDER_COLOR = Color.ORANGE;
 		HIGHLIGHT_HOVER_BORDER_COLOR = HIGHLIGHT_BORDER_COLOR.darker();
 		HIGHLIGHT_FILL_COLOR = new Color(0, 255, 0, 20);
+	}
+
+	private String toTrueName(String str)
+	{
+		return CharMatcher.ascii().retainFrom(str.replace('\u00A0', ' ')).trim();
 	}
 }
