@@ -281,13 +281,13 @@ public class NPCOverheadDialoguePlugin extends Plugin
 			{
 				setOverheadText(dialogue, npc, state);
 				state.setTicksWithoutMoving(0);
-				log.info("set " + npc + " overhead text");
+				log.debug("set " + npc + " overhead text");
 			}
 		}
 		else
 		{
 			state.setTicksWithoutMoving(state.getTicksWithoutMoving() + 1);
-			log.info("state's ticks without moving has been incremented to " + state.getTicksWithoutMoving());
+			log.debug("state's ticks without moving has been incremented to " + state.getTicksWithoutMoving());
 		}
 	}
 
@@ -349,7 +349,7 @@ public class NPCOverheadDialoguePlugin extends Plugin
 
 		final WorldPoint npcPos = npc.getWorldLocation();
 		final WorldPoint lastNpcPos = new WorldPoint(state.getLastXCoordinate(), state.getLastYCoordinate(), -1);
-		log.info("npc has moved? : " + (npcPos.distanceTo2D(lastNpcPos) > 0) + " : " + npcPos.distanceTo2D(lastNpcPos));
+		log.debug("npc has moved? : " + (npcPos.distanceTo2D(lastNpcPos) > 0) + " : " + npcPos.distanceTo2D(lastNpcPos));
 		state.setLastXCoordinate(npc.getWorldLocation().getX());
 		state.setLastYCoordinate(npc.getWorldLocation().getY());
 		return npcPos.distanceTo2D(lastNpcPos) > 0;
