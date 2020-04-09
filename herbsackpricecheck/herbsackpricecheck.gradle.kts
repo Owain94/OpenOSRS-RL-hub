@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.1"
 
-project.extra["PluginName"] = "NPC Overhead Dialog"
-project.extra["PluginDescription"] = "Displays NPC dialog over their head, includes custom ambient, walking, damage, and death dialog as well."
+project.extra["PluginName"] = "Herb Sack Price Check"
+project.extra["PluginDescription"] = "Tells you the price of the herbs in your herb sack"
 
 tasks {
     jar {

@@ -252,7 +252,7 @@ public class BankValueHistoryTracker
 						.bankValue(bankCalculation.calculate(getBankTabItems()))
 						.build());
 
-				log.info("New entry added!");
+				log.debug("New entry added!");
 				if (callback != null)
 				{
 					callback.accept("New entry added!");
@@ -260,7 +260,7 @@ public class BankValueHistoryTracker
 			}
 			else
 			{
-				log.info("No entry added.");
+				log.debug("No entry added.");
 				if (callback != null)
 				{
 					callback.accept("No entry added.");
