@@ -49,6 +49,8 @@ subprojects {
 
     apply<JavaPlugin>()
     apply(plugin = "checkstyle")
+    apply(plugin = "com.github.ben-manes.versions")
+    apply(plugin = "se.patrikerdes.use-latest-versions")
     apply(plugin = "com.simonharrer.modernizer")
 
     dependencies {
@@ -99,6 +101,20 @@ subprojects {
             group = "verification"
 
             exclude("**/Emoji.java")
+        }
+
+        named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
+            checkForGradleUpdate = false
+
+            resolutionStrategy {
+                componentSelection {
+                    all {
+                        if (candidate.displayName.contains("fernflower") || isNonStable(candidate.version)) {
+                            reject("Non stable")
+                        }
+                    }
+                }
+            }
         }
     }
 }

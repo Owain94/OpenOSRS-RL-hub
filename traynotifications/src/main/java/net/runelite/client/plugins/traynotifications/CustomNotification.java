@@ -52,7 +52,7 @@ class CustomNotification
 
 	private static final int AUTO_REMOVE_DELAY_MS = 5000;
 
-	private static final BufferedImage RUNELITE_ICON = ImageUtil.getResourceStreamFromClass(TrayNotificationsPlugin.class, "/util/runelite100.png");
+	private static final BufferedImage RUNELITE_ICON = ImageUtil.getResourceStreamFromClass(TrayNotificationsPlugin.class, "openosrs.png");
 
 	static void sendCustomNotification(
 		final String title,
