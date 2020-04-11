@@ -126,8 +126,10 @@ public class LootLoggerPlugin extends Plugin
 			.panel(panel)
 			.build();
 
-
-		clientToolbar.addNavigation(navButton);
+		if (config.enableUI())
+		{
+			clientToolbar.addNavigation(navButton);
+		}
 
 		// Attach necessary info from item manager on load, probably a better method
 		if (!prepared)
@@ -156,7 +158,10 @@ public class LootLoggerPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		clientToolbar.removeNavigation(navButton);
+		if (config.enableUI())
+		{
+			clientToolbar.removeNavigation(navButton);
+		}
 	}
 
 	@Subscribe
@@ -164,7 +169,22 @@ public class LootLoggerPlugin extends Plugin
 	{
 		if (event.getGroup().equals("lootlogger"))
 		{
-			SwingUtilities.invokeLater(panel::refreshUI);
+			if (event.getKey().equals("enableUI"))
+			{
+				if (config.enableUI())
+				{
+					clientToolbar.addNavigation(navButton);
+				}
+				else
+				{
+					clientToolbar.removeNavigation(navButton);
+				}
+			}
+
+			if (config.enableUI())
+			{
+				SwingUtilities.invokeLater(panel::refreshUI);
+			}
 		}
 	}
 
@@ -238,17 +258,20 @@ public class LootLoggerPlugin extends Plugin
 	private void localPlayerNameChanged()
 	{
 		lootNames = writer.getKnownFileNames();
-		SwingUtilities.invokeLater(panel::showSelectionView);
+		if (config.enableUI())
+		{
+			SwingUtilities.invokeLater(panel::showSelectionView);
+		}
 	}
 
 	private Collection<LTItemEntry> convertToLTItemEntries(Collection<ItemStack> stacks)
 	{
 		return stacks.stream().map(i ->
 		{
-			final ItemDefinition c = itemManager.getItemDefinition(i.getId());
-			final int id = c.getNote() == -1 ? c.getId() : c.getLinkedNoteId();
+			final ItemDefinition itemDefinition = itemManager.getItemDefinition(i.getId());
+			final int id = itemDefinition.getNote() == -1 ? itemDefinition.getId() : itemDefinition.getLinkedNoteId();
 			final int price = itemManager.getItemPrice(id);
-			return new LTItemEntry(c.getName(), i.getId(), i.getQuantity(), price);
+			return new LTItemEntry(itemDefinition.getName(), i.getId(), i.getQuantity(), price);
 		}).collect(Collectors.toList());
 	}
 
@@ -256,7 +279,10 @@ public class LootLoggerPlugin extends Plugin
 	{
 		writer.addLootTrackerRecord(record);
 		lootNames.put(record.getType(), record.getName());
-		SwingUtilities.invokeLater(() -> panel.addLog(record));
+		if (config.enableUI())
+		{
+			SwingUtilities.invokeLater(() -> panel.addLog(record));
+		}
 	}
 
 	@Subscribe
@@ -362,10 +388,10 @@ public class LootLoggerPlugin extends Plugin
 		clientThread.invokeLater(() ->
 		{
 			Collection<LTRecord> data = getDataByName(LootRecordType.NPC, BossTab.ABYSSAL_SIRE.getName());
-			ItemDefinition c = itemManager.getItemDefinition(itemID);
-			LTItemEntry itemEntry = new LTItemEntry(c.getName(), itemID, 1, 0);
+			ItemDefinition itemDefinition = itemManager.getItemDefinition(itemID);
+			LTItemEntry itemEntry = new LTItemEntry(itemDefinition.getName(), itemID, 1, 0);
 
-			log.debug("Received Unsired item: {}", c.getName());
+			log.debug("Received Unsired item: {}", itemDefinition.getName());
 
 			// Don't have data for sire, create a new record with just this data.
 			if (data == null)
@@ -382,7 +408,10 @@ public class LootLoggerPlugin extends Plugin
 			final LTRecord r = items.get(items.size() - 1);
 			r.addDropEntry(itemEntry);
 			writer.writeLootTrackerFile(BossTab.ABYSSAL_SIRE.getName(), items);
-			SwingUtilities.invokeLater(panel::refreshUI);
+			if (config.enableUI())
+			{
+				SwingUtilities.invokeLater(panel::refreshUI);
+			}
 		});
 	}
 
@@ -436,7 +465,7 @@ public class LootLoggerPlugin extends Plugin
 			Matcher n = NUMBER_PATTERN.matcher(chatMessage);
 			if (n.find())
 			{
-				killCountMap.put("BARROWS", Integer.valueOf(n.group()));
+				killCountMap.put("BARROWS", Integer.parseInt(n.group()));
 				return;
 			}
 		}
@@ -447,7 +476,7 @@ public class LootLoggerPlugin extends Plugin
 			Matcher n = NUMBER_PATTERN.matcher(chatMessage);
 			if (n.find())
 			{
-				killCountMap.put("CHAMBERS OF XERIC", Integer.valueOf(n.group()));
+				killCountMap.put("CHAMBERS OF XERIC", Integer.parseInt(n.group()));
 				return;
 			}
 		}
@@ -458,7 +487,7 @@ public class LootLoggerPlugin extends Plugin
 			Matcher n = NUMBER_PATTERN.matcher(chatMessage);
 			if (n.find())
 			{
-				killCountMap.put("THEATRE OF BLOOD", Integer.valueOf(n.group()));
+				killCountMap.put("THEATRE OF BLOOD", Integer.parseInt(n.group()));
 				return;
 			}
 		}
