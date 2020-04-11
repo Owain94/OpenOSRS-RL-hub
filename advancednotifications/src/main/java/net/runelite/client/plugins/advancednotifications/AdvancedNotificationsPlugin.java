@@ -25,18 +25,22 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.advancednotifications.ui.AdvancedNotificationsPluginPanel;
 import net.runelite.client.plugins.advancednotifications.ui.DropSpace;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
+import org.pf4j.Extension;
 
-@Slf4j
+@Extension
 @PluginDescriptor(
 	name = "Advanced Notifications",
 	tags = {"notifications", "inventory", "item"},
-	description = "An advanced notifications system"
+	description = "An advanced notifications system",
+	type = PluginType.UTILITY
 )
+@Slf4j
 public class AdvancedNotificationsPlugin extends Plugin implements DraggableContainer
 {
 	private static final String CONFIG_GROUP = "advancednotifications";
