@@ -9,6 +9,16 @@ import net.runelite.client.config.Range;
 public interface LootLoggerConfig extends Config
 {
 	@ConfigItem(
+		keyName = "enableUI",
+		name = "Enable Side-Panel",
+		description = "Controls whether the side panel should be displayed, data will be logged either way"
+	)
+	default boolean enableUI()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		position = 0,
 		keyName = "uniquesPlacement",
 		name = "Uniques Placement",
@@ -78,7 +88,8 @@ public interface LootLoggerConfig extends Config
 	@ConfigItem(
 		keyName = "migratedUsers",
 		name = "Migrated users",
-		description = "CSV of usernames (login name) that have been migrated"
+		description = "CSV of usernames (login name) that have been migrated",
+		hidden = true
 	)
 	default String getMigratedUsers()
 	{

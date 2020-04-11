@@ -132,19 +132,32 @@ public class LootRecordWriter
 		final File file = new File(folder, fileName);
 		final Collection<LTRecord> data = new ArrayList<>();
 
+		StringBuilder sb = new StringBuilder();
+
 		try (final BufferedReader br = new BufferedReader(new FileReader(file)))
 		{
+			// read line by line
 			String line;
+			int totalBrackets = 0;
 			while ((line = br.readLine()) != null)
 			{
-				// Skips the empty line at end of file
-				if (line.length() > 0)
+				if (line.contains("{"))
 				{
-					final LTRecord r = RuneLiteAPI.GSON.fromJson(line, LTRecord.class);
+					totalBrackets++;
+				}
+				if (line.contains("}"))
+				{
+					totalBrackets--;
+				}
+				sb.append(line);
+
+				if (totalBrackets == 0 && sb.length() > 0)
+				{
+					final LTRecord r = RuneLiteAPI.GSON.fromJson(sb.toString(), LTRecord.class);
 					data.add(r);
+					sb.setLength(0);
 				}
 			}
-
 		}
 		catch (FileNotFoundException e)
 		{
@@ -235,10 +248,11 @@ public class LootRecordWriter
 	public boolean migrateDataFromDisplayNameToUsername(final String displayName, final String username)
 	{
 		final File currentDirectory = new File(LOOT_RECORD_DIR, displayName);
+		final File newDirectory = new File(LOOT_RECORD_DIR, username);
+
 		if (!currentDirectory.exists())
 		{
-			// Most likely was already converted
-			return false;
+			return migrateDataLayout(newDirectory);
 		}
 
 		if (displayName.equalsIgnoreCase(username))
@@ -246,7 +260,6 @@ public class LootRecordWriter
 			return migrateDataLayout(currentDirectory);
 		}
 
-		final File newDirectory = new File(LOOT_RECORD_DIR, username);
 		final boolean renamed = currentDirectory.renameTo(newDirectory);
 		if (!renamed)
 		{
@@ -286,8 +299,13 @@ public class LootRecordWriter
 				);
 
 			final Set<LootRecordType> keys = filtered.keySet();
-			for (final LootRecordType key : keys)
+
+			for (LootRecordType key : keys)
 			{
+				if (key == null)
+				{
+					key = LootRecordType.NPC;
+				}
 				final File outputDir = new File(folder, key.name().toLowerCase());
 				outputDir.mkdir();
 
