@@ -125,7 +125,7 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 		CONFIG = config;
 		PLUGIN = this;
 		panel = injector.getInstance(PvpPerformanceTrackerPanel.class);
-		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "/skull_red.png");
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "skull_red.png");
 		navButton = NavigationButton.builder()
 			.tooltip("PvP Fight History")
 			.icon(icon)

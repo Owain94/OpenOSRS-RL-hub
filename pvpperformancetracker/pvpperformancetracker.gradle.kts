@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.0.6"
 
 project.extra["PluginName"] = "PvP Performance Tracker"
 project.extra["PluginDescription"] = "Shows a panel and an overlay with your pvp performance"
