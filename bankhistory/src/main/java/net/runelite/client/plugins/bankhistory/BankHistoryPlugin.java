@@ -26,9 +26,12 @@ package net.runelite.client.plugins.bankhistory;
 
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.WidgetHiddenChanged;
 import net.runelite.api.events.WidgetLoaded;
@@ -57,6 +60,9 @@ import org.pf4j.Extension;
 @Slf4j
 public class BankHistoryPlugin extends Plugin
 {
+	@Inject
+	private Client client;
+
 	@Inject
 	private BankValueHistoryTracker tracker;
 
@@ -172,7 +178,17 @@ public class BankHistoryPlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
-		if (event.getGameState().getState() == 40)
+		if (event.getGameState() == GameState.LOGGING_IN)
+		{
+			try
+			{
+				tracker.getFileForUser(client.getUsername());
+			}
+			catch (IOException ignored)
+			{
+			}
+		}
+		else if (event.getGameState() == GameState.CONNECTION_LOST)
 		{
 			bankHistoryPanel.setDatasetButton(false);
 		}
