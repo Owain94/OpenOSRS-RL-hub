@@ -24,16 +24,6 @@ public class FixedHideChatConstants
 		0
 	);
 
-	private static final Map.Entry<Integer, Integer> THEATRE_OF_BLOOD_DARK_OVERLAY_PARENT = new AbstractMap.SimpleEntry<>(
-		28,
-		0
-	);
-
-	private static final Map.Entry<Integer, Integer> THEATRE_OF_BLOOD_DARK_OVERLAY_BODY = new AbstractMap.SimpleEntry<>(
-		28,
-		1
-	);
-
 	static final Map.Entry<Integer, Integer> FIXED_MAIN = new AbstractMap.SimpleEntry<>(
 		WidgetID.FIXED_VIEWPORT_GROUP_ID,
 		12
@@ -51,7 +41,5 @@ public class FixedHideChatConstants
 	static final Set<Map.Entry<Integer, Integer>> TO_CONTRACT_WIDGETS = ImmutableSet
 		.<Map.Entry<Integer, Integer>>builder()
 		.add(FIXED_VIEWPORT_BANK_POPUP_CONTAINER)
-		.add(THEATRE_OF_BLOOD_DARK_OVERLAY_PARENT)
-		.add(THEATRE_OF_BLOOD_DARK_OVERLAY_BODY)
 		.build();
 }
