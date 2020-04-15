@@ -302,10 +302,13 @@ public class LootRecordWriter
 
 			for (LootRecordType key : keys)
 			{
+				Collection<LTRecord> recs = filtered.get(key);
 				if (key == null)
 				{
-					key = LootRecordType.NPC;
+					key = LootRecordType.UNKNOWN;
+					recs.forEach(m -> m.setType(LootRecordType.UNKNOWN));
 				}
+
 				final File outputDir = new File(folder, key.name().toLowerCase());
 				outputDir.mkdir();
 
@@ -317,7 +320,6 @@ public class LootRecordWriter
 				}
 				else
 				{
-					final Collection<LTRecord> recs = filtered.get(key);
 					try
 					{
 						final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(outputFile), false));
