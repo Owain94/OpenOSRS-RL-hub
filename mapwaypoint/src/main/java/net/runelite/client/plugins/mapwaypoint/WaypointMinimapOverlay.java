@@ -3,11 +3,11 @@ package net.runelite.client.plugins.mapwaypoint;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
@@ -15,11 +15,13 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
-public class WaypointTileOverlay extends Overlay
+public class WaypointMinimapOverlay extends Overlay
 {
-
-	private static final int DEFAULT_DRAW_DISTANCE = 25;
+	private static final int MAX_DRAW_DISTANCE = 16;
+	private static final int TILE_WIDTH = 4;
+	private static final int TILE_HEIGHT = 4;
 	private static final Color TILE_COLOR = new Color(0, 201, 198);
 
 	private final Client client;
@@ -27,60 +29,56 @@ public class WaypointTileOverlay extends Overlay
 	private final MapWaypointConfig config;
 
 	@Inject
-	private WaypointTileOverlay(Client client, MapWaypointPlugin plugin, MapWaypointConfig config)
+	private WaypointMinimapOverlay(Client client, MapWaypointPlugin plugin, MapWaypointConfig config)
 	{
 		this.client = client;
 		this.plugin = plugin;
 		this.config = config;
 		setPosition(OverlayPosition.DYNAMIC);
 		setPriority(OverlayPriority.LOW);
-		setLayer(OverlayLayer.ABOVE_SCENE);
+		setLayer(OverlayLayer.ABOVE_WIDGETS);
 	}
 
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (plugin.getWaypoint() != null && config.drawTile())
+		if (config.drawMinimap())
 		{
-			final WorldPoint waypoint = plugin.getWaypoint().getWorldPoint();
-
-			if (client.getPlane() == waypoint.getPlane())
+			WorldMapPoint waypoint = plugin.getWaypoint();
+			if (waypoint != null)
 			{
-				drawTile(graphics, waypoint);
+				drawOnMinimap(graphics, waypoint.getWorldPoint());
 			}
 		}
 
 		return null;
 	}
 
-	private void drawTile(Graphics2D graphics, WorldPoint waypoint)
+	private void drawOnMinimap(Graphics2D graphics, WorldPoint point)
 	{
-		final Player player = client.getLocalPlayer();
+		Player player = client.getLocalPlayer();
 		if (player == null)
 		{
 			return;
 		}
 
-		final int drawDistance = client.getScene().getDrawDistance() != 0 ? client.getScene().getDrawDistance() : DEFAULT_DRAW_DISTANCE;
-
-		final WorldPoint playerLocation = player.getWorldLocation();
-		if (waypoint.distanceTo(playerLocation) >= drawDistance)
+		if (point.distanceTo(player.getWorldLocation()) >= MAX_DRAW_DISTANCE)
 		{
 			return;
 		}
 
-		final LocalPoint lp = LocalPoint.fromWorld(client, waypoint);
+		LocalPoint lp = LocalPoint.fromWorld(client, point);
 		if (lp == null)
 		{
 			return;
 		}
 
-		final Polygon poly = Perspective.getCanvasTilePoly(client, lp);
-		if (poly == null)
+		Point posOnMinimap = Perspective.localToMinimap(client, lp);
+		if (posOnMinimap == null)
 		{
 			return;
 		}
 
-		OverlayUtil.renderPolygon(graphics, poly, TILE_COLOR);
+		OverlayUtil.renderMinimapRect(client, graphics, posOnMinimap, TILE_WIDTH, TILE_HEIGHT, TILE_COLOR);
 	}
 }

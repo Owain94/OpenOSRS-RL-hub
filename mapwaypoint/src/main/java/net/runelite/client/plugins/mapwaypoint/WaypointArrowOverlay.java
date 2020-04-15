@@ -3,10 +3,12 @@ package net.runelite.client.plugins.mapwaypoint;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 import javax.inject.Inject;
 import net.runelite.api.Client;
+import net.runelite.api.Player;
+import static net.runelite.api.SpriteID.MINIMAP_GUIDE_ARROW_YELLOW;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.game.SpriteManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ImageComponent;
@@ -16,24 +18,24 @@ import net.runelite.client.util.ImageUtil;
 
 public class WaypointArrowOverlay extends Overlay
 {
-
-	private static final BufferedImage ARROW_ICON = ImageUtil.getResourceStreamFromClass(MapWaypointPlugin.class, "arrow.png");
+	private BufferedImage ARROW_ICON;
 
 	private final Client client;
 	private final MapWaypointPlugin plugin;
 	private final PanelComponent panelComponent = new PanelComponent();
 	private final TitleComponent stepsComponent = TitleComponent.builder().build();
 
-	private int steps;
-
 	@Inject
-	private WaypointArrowOverlay(Client client, MapWaypointPlugin plugin)
+	private WaypointArrowOverlay(Client client, MapWaypointPlugin plugin, SpriteManager spriteManager)
 	{
+		setPosition(OverlayPosition.TOP_CENTER);
 		this.client = client;
 		this.plugin = plugin;
-		setPosition(OverlayPosition.TOP_CENTER);
 
-		steps = 0;
+		spriteManager.getSpriteAsync(MINIMAP_GUIDE_ARROW_YELLOW, 1, sprite ->
+		{
+			ARROW_ICON = ImageUtil.rotateImage(sprite, 3 * Math.PI / 2);
+		});
 	}
 
 	@Override
@@ -44,70 +46,49 @@ public class WaypointArrowOverlay extends Overlay
 			return null;
 		}
 
-		WorldPoint currentLocation = Objects.requireNonNull(client.getLocalPlayer()).getWorldLocation();
-		WorldPoint destination = plugin.getWaypoint().getWorldPoint();
+		final Player player = client.getLocalPlayer();
+		if (player == null)
+		{
+			return null;
+		}
 
-		double angle = calculateAngle(currentLocation, destination);
+		final WorldPoint currentLocation = player.getWorldLocation();
+		final WorldPoint destination = plugin.getWaypoint().getWorldPoint();
 
-		BufferedImage rotatedImage = ImageUtil.rotateImage(ARROW_ICON, 2.0 * Math.PI - angle);
-		BufferedImage finalImage = rotatedImage.getSubimage(0, 40, 130, 50);
+		final int distance = currentLocation.distanceTo(destination);
+		final String steps = "Steps: " + distance;
+
+		final BufferedImage arrow = calculateImageRotation(currentLocation, destination, graphics.getFontMetrics().stringWidth(steps));
+
+		stepsComponent.setText(steps);
 		panelComponent.getChildren().clear();
-		panelComponent.getChildren().add(new ImageComponent(finalImage));
-
-		stepsComponent.setText("Steps: " + steps);
+		panelComponent.getChildren().add(new ImageComponent(arrow));
 		panelComponent.getChildren().add(stepsComponent);
+		panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth(steps) + 10, 0));
 
 		return panelComponent.render(graphics);
 	}
 
-	private double calculateAngle(WorldPoint currentLocation, WorldPoint destination)
+	private BufferedImage calculateImageRotation(WorldPoint currentLocation, WorldPoint destination, int textLen)
 	{
-		int dx = destination.getX() - currentLocation.getX();
-		int dy = destination.getY() - currentLocation.getY();
-		steps = calculateSteps(dx, dy);
+		double angle = calculateAngle(currentLocation, destination);
+		final int dx = (textLen - ARROW_ICON.getWidth()) / 2;
 
-		double angle = Math.atan(Math.abs(((double) dy) / dx));
-		if (dx == 0)
-		{
-			if (dy > 0)
-			{
-				angle = Math.PI / 2.0;
-			}
-			else
-			{
-				angle = 3.0 * Math.PI / 2.0;
-			}
-		}
-		else if (dy == 0)
-		{
-			if (dx > 0)
-			{
-				angle = 0.0;
-			}
-			else
-			{
-				angle = Math.PI;
-			}
-		}
-		else if (dx < 0 && dy > 0)
-		{
-			angle = Math.PI - angle;
-		}
-		else if (dx < 0 && dy < 0)
-		{
-			angle += Math.PI;
-		}
-		else if (dx > 0 && dy < 0)
-		{
-			angle = 2.0 * Math.PI - angle;
-		}
+		final BufferedImage rotatedImage = ImageUtil.rotateImage(ARROW_ICON, 2.0 * Math.PI - angle);
+		final BufferedImage finalImage = new BufferedImage(rotatedImage.getWidth() + dx, ARROW_ICON.getHeight() + 2, BufferedImage.TYPE_INT_ARGB);
+		finalImage.getGraphics().drawImage(rotatedImage, dx, 0, null);
 
-		double clientAngle = (client.getMapAngle() / 2048.0) * 2.0 * Math.PI;
-		return angle - clientAngle;
+		return finalImage;
 	}
 
-	private int calculateSteps(int dx, int dy)
+	private double calculateAngle(WorldPoint currentLocation, WorldPoint destination)
 	{
-		return (int) Math.round(Math.sqrt(dx * dx + dy * dy));
+		final int dx = destination.getX() - currentLocation.getX();
+		final int dy = destination.getY() - currentLocation.getY();
+
+		final double angle = Math.atan2(dy, dx);
+		final double clientAngle = (client.getMapAngle() / 2048.0) * 2.0 * Math.PI;
+
+		return angle - clientAngle;
 	}
 }
