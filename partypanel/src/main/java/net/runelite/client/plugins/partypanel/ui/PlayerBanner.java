@@ -181,8 +181,7 @@ public class PlayerBanner extends JPanel
 		statsPanel.repaint();
 	}
 
-	private JPanel createIconPanel(final SpriteManager spriteManager, final int spriteID, final String name,
-								   final String value)
+	private JPanel createIconPanel(final SpriteManager spriteManager, final int spriteID, final String name, final String value)
 	{
 		final JLabel iconLabel = new JLabel();
 		iconLabel.setPreferredSize(STAT_ICON_SIZE);
