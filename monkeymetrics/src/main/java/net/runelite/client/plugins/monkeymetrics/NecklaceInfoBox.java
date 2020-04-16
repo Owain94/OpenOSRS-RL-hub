@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020, Lotto <https://github.com/devLotto>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,22 +22,49 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.monkeymetrics;
 
-version = "0.0.5"
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import net.runelite.api.Client;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.ui.overlay.infobox.InfoBox;
 
-project.extra["PluginName"] = "Party Panel"
-project.extra["PluginDescription"] = "Shows all kinds of information about your party members in a side panel"
+public class NecklaceInfoBox extends InfoBox
+{
+	// Game ticks until Bonecrusher necklace is activated after equipping.
+	private static final int NECKLACE_TIMER = 15;
 
-tasks {
-    jar {
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+	private final Client client;
+	private final int endTick;
+
+	public NecklaceInfoBox(BufferedImage image, Plugin plugin, Client client)
+	{
+		super(image, plugin);
+		setTooltip("Time remaining until Bonecrusher necklace is activated");
+		this.client = client;
+		this.endTick = client.getTickCount() + NECKLACE_TIMER + 1;
+	}
+
+	@Override
+	public String getText()
+	{
+		return String.valueOf(getTicksLeft());
+	}
+
+	public boolean isDone()
+	{
+		return getTicksLeft() <= 0;
+	}
+
+	private int getTicksLeft()
+	{
+		return endTick - client.getTickCount();
+	}
+
+	@Override
+	public Color getTextColor()
+	{
+		return null;
+	}
 }

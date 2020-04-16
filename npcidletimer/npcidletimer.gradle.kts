@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Party Panel"
-project.extra["PluginDescription"] = "Shows all kinds of information about your party members in a side panel"
+project.extra["PluginName"] = "NPC Idle Timer"
+project.extra["PluginDescription"] = "A utility to add overhead timers to select npcs to keep track of how long they have been standing on the same tile"
 
 tasks {
     jar {

@@ -22,7 +22,7 @@ public class MapWaypointInputListener implements MouseListener
 	{
 		if (mouseEvent.getButton() == 1 && (mouseEvent.getClickCount() == 2 || (config.shiftClick() && mouseEvent.isShiftDown())))
 		{
-			plugin.mouseClicked(mouseEvent);
+			plugin.mouseClicked();
 		}
 
 		return mouseEvent;
