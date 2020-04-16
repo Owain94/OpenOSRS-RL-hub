@@ -217,6 +217,8 @@ public enum Activity
 		ExperienceItem.MAHOGANY_LOGS, Secondaries.COINS_1500, new ItemStack(ItemID.MAHOGANY_PLANK, 1)),
 	MAHOGANY_PLANKS(ItemID.MAHOGANY_PLANK, "Mahogany products", 1, 140,
 		ExperienceItem.MAHOGANY_PLANK, null, null),
+	LONG_BONE(ItemID.LONG_BONE, "Long Bone", 30, 4500, ExperienceItem.LONG_BONE, null, null),
+	CURVED_BONE(ItemID.CURVED_BONE, "Curved Bone", 30, 6750, ExperienceItem.CURVED_BONE, null, null),
 	/**
 	 * Prayer
 	 */
@@ -511,6 +513,15 @@ public enum Activity
 		ExperienceItem.BATTLESTAFF, Secondaries.FIRE_ORB, new ItemStack(ItemID.FIRE_BATTLESTAFF, 1)),
 	AIR_BATTLESTAFF(ItemID.AIR_BATTLESTAFF, "Air battlestaff", 66, 137.5,
 		ExperienceItem.BATTLESTAFF, Secondaries.AIR_ORB, new ItemStack(ItemID.AIR_BATTLESTAFF, 1)),
+	// Gold Jewelery
+	GOLD_RING(ItemID.GOLD_RING, "Gold ring", 5, 15,
+		ExperienceItem.GOLD_BAR, null, new ItemStack(ItemID.GOLD_RING, 1)),
+	GOLD_NECKLACE(ItemID.GOLD_NECKLACE, "Gold necklace", 6, 20,
+		ExperienceItem.GOLD_BAR, null, new ItemStack(ItemID.GOLD_NECKLACE, 1)),
+	GOLD_BRACELET(ItemID.GOLD_BRACELET, "Gold bracelet", 7, 25,
+		ExperienceItem.GOLD_BAR, null, new ItemStack(ItemID.GOLD_BRACELET, 1)),
+	GOLD_AMULET_U(ItemID.GOLD_AMULET_U, "Gold amulet (u)", 8, 30,
+		ExperienceItem.GOLD_BAR, null, new ItemStack(ItemID.GOLD_AMULET_U, 1)),
 	/**
 	 * Smithing
 	 */
