@@ -56,6 +56,9 @@ public enum ExperienceItem
 	OAK_PLANK(ItemID.OAK_PLANK, Skill.CONSTRUCTION, "Planks"),
 	TEAK_PLANK(ItemID.TEAK_PLANK, Skill.CONSTRUCTION, "Planks"),
 	MAHOGANY_PLANK(ItemID.MAHOGANY_PLANK, Skill.CONSTRUCTION, "Planks"),
+	// Other
+	LONG_BONE(ItemID.LONG_BONE, Skill.CONSTRUCTION, "Other"),
+	CURVED_BONE(ItemID.CURVED_BONE, Skill.CONSTRUCTION, "Other"),
 	/**
 	 * Herblore
 	 */
@@ -191,6 +194,7 @@ public enum ExperienceItem
 	FLAX(ItemID.FLAX, Skill.CRAFTING, "Misc"),
 	MOLTEN_GLASS(ItemID.MOLTEN_GLASS, Skill.CRAFTING, "Misc"),
 	BATTLESTAFF(ItemID.BATTLESTAFF, Skill.CRAFTING, "Misc"),
+	GOLD_BAR(ItemID.GOLD_BAR, Skill.CRAFTING, "Misc"),
 	// D'hide/Dragon Leather
 	GREEN_DRAGONHIDE(ItemID.GREEN_DRAGONHIDE, Skill.CRAFTING, "D'hide"),
 	GREEN_DRAGON_LEATHER(ItemID.GREEN_DRAGON_LEATHER, Skill.CRAFTING, "D'hide"),
