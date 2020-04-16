@@ -62,7 +62,7 @@ subprojects {
         compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.2.1")
 
         compileOnly(group = "org.apache.commons", name = "commons-text", version = "1.8")
-        compileOnly(group = "com.google.guava", name = "guava", version = "28.2-jre")
+        compileOnly(group = "com.google.guava", name = "guava", version = "29.0-jre")
         compileOnly(group = "com.google.inject", name = "guice", version = "4.2.3", classifier = "no_aop")
         compileOnly(group = "com.google.code.gson", name = "gson", version = "2.8.6")
         compileOnly(group = "net.sf.jopt-simple", name = "jopt-simple", version = "5.0.4")
