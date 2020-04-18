@@ -35,23 +35,35 @@ public interface NPCIdleTimerConfig extends Config
 	@Alpha
 	@ConfigItem(
 		position = 2,
-		keyName = "timerColor",
-		name = "Color of timer",
+		keyName = "normalTimerColor",
+		name = "Normal time color",
 		description = "Configures the color of the timer"
 	)
-	default Color timerColor()
+	default Color normalTimerColor()
 	{
 		return Color.WHITE;
+	}
+
+	@Alpha
+	@ConfigItem(
+		position = 3,
+		keyName = "lowTimerColor",
+		name = "Low time color",
+		description = "Configures the color of the timer when remaining time is low"
+	)
+	default Color lowTimerColor()
+	{
+		return Color.RED;
 	}
 
 	@Range(
 		max = 300
 	)
 	@ConfigItem(
-		position = 3,
+		position = 4,
 		keyName = "maxDisplay",
-		name = "Time at which timer appears",
-		description = "The maximum time at which the timer is displayed"
+		name = "Time to start timer",
+		description = "The maximum seconds at which the timer is displayed"
 	)
 	default int maxDisplay()
 	{
@@ -62,7 +74,21 @@ public interface NPCIdleTimerConfig extends Config
 		max = 300
 	)
 	@ConfigItem(
-		position = 4,
+		position = 5,
+		keyName = "lowDisplay",
+		name = "Timer low value",
+		description = "The maximum seconds at which the timer is considered low"
+	)
+	default int lowDisplay()
+	{
+		return 30;
+	}
+
+	@Range(
+		max = 300
+	)
+	@ConfigItem(
+		position = 6,
 		keyName = "timerHeight",
 		name = "Height of timer",
 		description = "Change the vertical offset of the timer above the npc"
