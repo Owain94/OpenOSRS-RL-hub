@@ -165,7 +165,7 @@ public class ClanChatWarningsPlugin extends Plugin
 
 		warnPlayers.putAll(Text.fromCSV(this.config.warnPlayers()).stream()
 			.map((s) -> s.toLowerCase().split(MESSAGE_DELIMITER))
-			.collect(Collectors.toMap(p -> p[0].trim(), p -> p.length > 1 ? p[1].trim() : ""))
+			.collect(Collectors.toMap(p -> p[0].trim(), p -> p.length > 1 ? p[1].trim() : "", (p1, p2) -> p1))
 		);
 	}
 
