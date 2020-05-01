@@ -55,11 +55,11 @@ subprojects {
 
     dependencies {
         annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
-        annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.2.0")
+        annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.3.1")
 
-        compileOnly(group = "com.openosrs", name = "http-api", version = "3.2.2")
-        compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.2.2")
-        compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.2.2")
+        compileOnly(group = "com.openosrs", name = "http-api", version = "3.3.1")
+        compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.3.1")
+        compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.3.1")
 
         compileOnly(group = "org.apache.commons", name = "commons-text", version = "1.8")
         compileOnly(group = "com.google.guava", name = "guava", version = "29.0-jre")
@@ -67,9 +67,9 @@ subprojects {
         compileOnly(group = "com.google.code.gson", name = "gson", version = "2.8.6")
         compileOnly(group = "net.sf.jopt-simple", name = "jopt-simple", version = "5.0.4")
         compileOnly(group = "org.projectlombok", name = "lombok", version = "1.18.12")
-        compileOnly(group = "com.squareup.okhttp3", name = "okhttp", version = "4.5.0")
-        compileOnly(group = "org.pf4j", name = "pf4j", version = "3.2.0")
-        compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.2")
+        compileOnly(group = "com.squareup.okhttp3", name = "okhttp", version = "4.6.0")
+        compileOnly(group = "org.pf4j", name = "pf4j", version = "3.3.1")
+        compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.3")
         compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "2.5.1")
     }
 
