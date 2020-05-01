@@ -182,7 +182,7 @@ public class FakeIronPlugin extends Plugin
 		{
 			event.getMessageNode().setName(
 				getImgTag(iconIds.getOrDefault(selectedIcon, IconID.NO_ENTRY.getIndex())) +
-					event.getName());
+					Text.removeTags(event.getName()));
 		}
 	}
 
@@ -220,7 +220,7 @@ public class FakeIronPlugin extends Plugin
 		String[] chatbox = chatboxTypedText.getText().split(":", 2);
 		String rsn = Objects.requireNonNull(client.getLocalPlayer()).getName();
 
-		chatboxTypedText.setText(getImgTag(getIconIdx()) + rsn + ":" + chatbox[1]);
+		chatboxTypedText.setText(getImgTag(getIconIdx()) + Text.removeTags(rsn) + ":" + chatbox[1]);
 	}
 
 	private IndexedSprite getIndexedSprite(String file)

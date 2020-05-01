@@ -37,6 +37,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
@@ -594,7 +595,7 @@ public class InventorySetupPlugin extends Plugin
 						final int finalIdCopy = finalId;
 						searchInput = chatboxPanelManager.openTextInput("Enter amount")
 							.addCharValidator(arg -> arg >= 48 && arg <= 57) // only allow numbers (ASCII)
-							.onDone((input) ->
+							.onDone((Consumer<String>) (input) ->
 								clientThread.invokeLater(() ->
 								{
 									String inputParsed = input;

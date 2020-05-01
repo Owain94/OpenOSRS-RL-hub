@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.0.4"
 
 project.extra["PluginName"] = "Tray Notifications"
 project.extra["PluginDescription"] = "Allows for custom tray notifications. No longer do you have to deal with terrible windows tray notifications"

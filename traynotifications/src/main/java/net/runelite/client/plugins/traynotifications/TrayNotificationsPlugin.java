@@ -1,10 +1,15 @@
 package net.runelite.client.plugins.traynotifications;
 
+import com.google.inject.Provides;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.TrayIcon;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLiteProperties;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.NotificationFired;
@@ -25,10 +30,19 @@ import org.pf4j.Extension;
 public class TrayNotificationsPlugin extends Plugin
 {
 	@Inject
+	private TrayNotificationsConfig config;
+
+	@Inject
 	private ClientUI clientUI;
 
 	@Inject
 	private RuneLiteConfig runeLiteConfig;
+
+	public enum MonitorConfig
+	{
+		CURRENT_MONITOR,
+		MAIN_MONITOR
+	}
 
 	@Subscribe
 	public void onNotificationFired(NotificationFired event)
@@ -44,8 +58,28 @@ public class TrayNotificationsPlugin extends Plugin
 	private void sendCustomNotification(
 		final String title,
 		final String message,
-		final TrayIcon.MessageType type)
+		final TrayIcon.MessageType type
+	)
 	{
-		CustomNotification.sendCustomNotification(title, message, type, clientUI.getGraphicsConfiguration().getBounds());
+		GraphicsConfiguration graphicsConfiguration;
+
+		if (config.monitor() == MonitorConfig.CURRENT_MONITOR)
+		{
+			graphicsConfiguration = clientUI.getGraphicsConfiguration();
+		}
+		else
+		{
+			GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			GraphicsDevice device = environment.getDefaultScreenDevice();
+			graphicsConfiguration = device.getDefaultConfiguration();
+		}
+
+		CustomNotification.sendCustomNotification(title, message, type, graphicsConfiguration.getBounds());
+	}
+
+	@Provides
+	TrayNotificationsConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(TrayNotificationsConfig.class);
 	}
 }
