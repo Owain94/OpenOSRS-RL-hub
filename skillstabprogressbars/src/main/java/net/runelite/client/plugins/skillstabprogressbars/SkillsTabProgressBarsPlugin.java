@@ -98,7 +98,7 @@ public class SkillsTabProgressBarsPlugin extends Plugin
 	private void calculateAndStoreProgressToLevel(Skill skill, int currentXp, int currentLevel)
 	{
 		double progressToLevelNormalised = 1d;
-		if (currentLevel < Experience.MAX_REAL_LEVEL)
+		if (currentLevel > 0 && currentLevel < Experience.MAX_REAL_LEVEL)
 		{
 			final int xpForCurrentLevel = Experience.getXpForLevel(currentLevel);
 			progressToLevelNormalised =
