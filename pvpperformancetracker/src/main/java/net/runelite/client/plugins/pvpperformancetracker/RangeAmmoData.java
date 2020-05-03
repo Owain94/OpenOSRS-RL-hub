@@ -24,11 +24,11 @@
  */
 package net.runelite.client.plugins.pvpperformancetracker;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 
 public interface RangeAmmoData
 {
-	int RANGE_LEVEL = 112; // assume lvl 99 + potted
 	RangeAmmoData[] DIAMOND_BOLTS = {
 		BoltAmmo.DIAMOND_BOLTS_E,
 		StrongBoltAmmo.DIAMOND_BOLTS_E,
@@ -36,7 +36,9 @@ public interface RangeAmmoData
 	};
 
 	int getRangeStr();
+
 	double getBonusMaxHit(); // damage bonus from bolt specs.
+
 	double getDmgModifier(); // damage modifier from bolt specs.
 
 	interface RangeAmmoConfigData extends RangeAmmoData
@@ -44,26 +46,43 @@ public interface RangeAmmoData
 		String getName();
 	}
 
-	@Getter
+	@Getter(AccessLevel.PUBLIC)
 	enum BoltAmmo implements RangeAmmoConfigData
 	{
-		RUNITE_BOLTS("Runite Bolts", 115, 0, 1),
-		DRAGONSTONE_BOLTS_E("Dstone Bolts (e)", 117, ((int)(RANGE_LEVEL * .2)) * 0.06, 1),
-		DIAMOND_BOLTS_E("Diamond Bolts (e)", 105, 0, 1.015);
+		RUNITE_BOLTS("Runite Bolts", 115, 1),
+		//DRAGONSTONE_BOLTS_E("Dstone Bolts (e)", 117, ((int)(RANGE_LEVEL * .2)) * 0.06, 1),
+		DRAGONSTONE_BOLTS_E("Dstone Bolts (e)", 117, .2, 0.06, 1),
+		DIAMOND_BOLTS_E("Diamond Bolts (e)", 105, 1.015);
 
-		static EquipmentData[] WEAPONS_USING = { EquipmentData.RUNE_CROSSBOW, EquipmentData.RUNE_CROSSBOW_PVP };
+		static EquipmentData[] WEAPONS_USING = {EquipmentData.RUNE_CROSSBOW};
 
-		private String name;
-		private int rangeStr;
-		private double bonusMaxHit;
-		private double dmgModifier;
+		private final String name;
+		private final int rangeStr;
+		private final double specRangeLevelModifier;
+		private final double specChance;
+		private final double dmgModifier;
 
-		BoltAmmo(String name, int rangeStr, double bonusMaxHit, double dmgModifier)
+		BoltAmmo(String name, int rangeStr, double specRangeLevelModifier, double specChance, double dmgModifier)
 		{
 			this.name = name;
 			this.rangeStr = rangeStr;
-			this.bonusMaxHit = bonusMaxHit;
+			this.specRangeLevelModifier = specRangeLevelModifier;
+			this.specChance = specChance;
 			this.dmgModifier = dmgModifier;
+		}
+
+		BoltAmmo(String name, int rangeStr, double dmgModifier)
+		{
+			this.name = name;
+			this.rangeStr = rangeStr;
+			this.specRangeLevelModifier = 0;
+			this.specChance = 0;
+			this.dmgModifier = dmgModifier;
+		}
+
+		public double getBonusMaxHit()
+		{
+			return ((int) (PvpPerformanceTrackerPlugin.CONFIG.rangedLevel() * specRangeLevelModifier)) * specChance;
 		}
 
 		@Override
@@ -73,34 +92,49 @@ public interface RangeAmmoData
 		}
 	}
 
-	@Getter
+	@Getter(AccessLevel.PUBLIC)
 	enum StrongBoltAmmo implements RangeAmmoConfigData
 	{
-		RUNITE_BOLTS("Runite Bolts", 115, 0, 1),
-		DRAGONSTONE_BOLTS_E("Dstone Bolts (e)", 117, ((int)(RANGE_LEVEL * .2)) * .06, 1),
-		DIAMOND_BOLTS_E("Diamond Bolts (e)", 105, 0, 1.015),
-		DRAGONSTONE_DRAGON_BOLTS_E("Dstone DBolts (e)", 122, ((int)(RANGE_LEVEL * .2)) * .06, 1),
-		OPAL_DRAGON_BOLTS_E("Opal DBolts (e)", 122, ((int)(RANGE_LEVEL * .1)) * .05, 1),
-		DIAMOND_DRAGON_BOLTS_E("Diamond DBolts (e)", 122, 0, 1.015);
+		RUNITE_BOLTS("Runite Bolts", 115, 1),
+		DRAGONSTONE_BOLTS_E("Dstone Bolts (e)", 117, .2, .06, 1),
+		DIAMOND_BOLTS_E("Diamond Bolts (e)", 105, 1.015),
+		DRAGONSTONE_DRAGON_BOLTS_E("Dstone DBolts (e)", 122, .2, .06, 1),
+		OPAL_DRAGON_BOLTS_E("Opal DBolts (e)", 122, .1, .05, 1),
+		DIAMOND_DRAGON_BOLTS_E("Diamond DBolts (e)", 122, 1.015);
 
 		static EquipmentData[] WEAPONS_USING = {
 			EquipmentData.ARMADYL_CROSSBOW,
-			EquipmentData.ARMADYL_CROSSBOW_PVP,
 			EquipmentData.DRAGON_CROSSBOW,
 			EquipmentData.DRAGON_HUNTER_CROSSBOW
 		};
 
-		private String name;
-		private int rangeStr;
-		private double bonusMaxHit;
-		private double dmgModifier;
+		private final String name;
+		private final int rangeStr;
+		private final double specRangeLevelModifier;
+		private final double specChance;
+		private final double dmgModifier;
 
-		StrongBoltAmmo(String name, int rangeStr, double bonusMaxHit, double dmgModifier)
+		StrongBoltAmmo(String name, int rangeStr, double specRangeLevelModifier, double specChance, double dmgModifier)
 		{
 			this.name = name;
 			this.rangeStr = rangeStr;
-			this.bonusMaxHit = bonusMaxHit;
+			this.specRangeLevelModifier = specRangeLevelModifier;
+			this.specChance = specChance;
 			this.dmgModifier = dmgModifier;
+		}
+
+		StrongBoltAmmo(String name, int rangeStr, double dmgModifier)
+		{
+			this.name = name;
+			this.rangeStr = rangeStr;
+			this.specRangeLevelModifier = 0;
+			this.specChance = 0;
+			this.dmgModifier = dmgModifier;
+		}
+
+		public double getBonusMaxHit()
+		{
+			return ((int) (PvpPerformanceTrackerPlugin.CONFIG.rangedLevel() * specRangeLevelModifier)) * specChance;
 		}
 
 
@@ -111,26 +145,26 @@ public interface RangeAmmoData
 		}
 	}
 
-	@Getter
-	public enum DartAmmo implements RangeAmmoConfigData
+	@Getter(AccessLevel.PUBLIC)
+	enum DartAmmo implements RangeAmmoConfigData
 	{
-		ADAMANT_DARTS("Adamant Darts", 10, 0, 1),
-		RUNE_DARTS("Rune Darts", 14, 0, 1),
-		DRAGON_DARTS("Dragon Darts", 20, 0, 1);
+		ADAMANT_DARTS("Adamant Darts", 10),
+		RUNE_DARTS("Rune Darts", 14),
+		DRAGON_DARTS("Dragon Darts", 20);
 
-		static EquipmentData[] WEAPONS_USING = { EquipmentData.TOXIC_BLOWPIPE };
+		static EquipmentData[] WEAPONS_USING = {EquipmentData.TOXIC_BLOWPIPE};
 
-		private String name;
-		private int rangeStr;
-		private double bonusMaxHit;
-		private double dmgModifier;
+		private final String name;
+		private final int rangeStr;
+		private final double bonusMaxHit;
+		private final double dmgModifier;
 
-		DartAmmo(String name, int rangeStr, double bonusMaxHit, double dmgModifier)
+		DartAmmo(String name, int rangeStr)
 		{
 			this.name = name;
 			this.rangeStr = rangeStr;
-			this.bonusMaxHit = bonusMaxHit;
-			this.dmgModifier = dmgModifier;
+			this.bonusMaxHit = 0;
+			this.dmgModifier = 1;
 		}
 
 		@Override
@@ -140,16 +174,16 @@ public interface RangeAmmoData
 		}
 	}
 
-	@Getter
-	public enum OtherAmmo implements RangeAmmoData
+	@Getter(AccessLevel.PUBLIC)
+	enum OtherAmmo implements RangeAmmoData
 	{
 		AMETHYST_ARROWS(55),
 		DRAGON_ARROW(60),
 		DRAGON_JAVELIN(150);
 
-		private int rangeStr;
-		private double bonusMaxHit;
-		private double dmgModifier;
+		private final int rangeStr;
+		private final double bonusMaxHit;
+		private final double dmgModifier;
 
 		OtherAmmo(int rangeStr)
 		{

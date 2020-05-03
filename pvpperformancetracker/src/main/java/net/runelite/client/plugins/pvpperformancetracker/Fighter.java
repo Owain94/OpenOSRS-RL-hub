@@ -25,9 +25,14 @@
 package net.runelite.client.plugins.pvpperformancetracker;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.GraphicID;
 import net.runelite.api.Player;
 import net.runelite.client.game.ItemManager;
 
@@ -35,22 +40,43 @@ import net.runelite.client.game.ItemManager;
 @Getter(AccessLevel.PACKAGE)
 class Fighter
 {
-	private Player player;
+	private static final NumberFormat nf = NumberFormat.getInstance();
 
-	@Expose
-	private String name; // username
+	static // initialize number format
+	{
+		nf.setMaximumFractionDigits(1);
+		nf.setRoundingMode(RoundingMode.HALF_UP);
+	}
 
+	private final Player player;
 	@Expose
+	@SerializedName("n") // use 1 letter serialized variable names for more compact storage
+	private final String name; // username
+	@Expose
+	@SerializedName("a")
 	private int attackCount; // total number of attacks
-
 	@Expose
+	@SerializedName("s")
 	private int successCount; // total number of successful attacks
-
 	@Expose
-	private double totalDamage; // total deserved damage based on gear & opponent's pray
-
+	@SerializedName("d")
+	private double deservedDamage; // total deserved damage based on gear & opponent's pray
 	@Expose
+	@SerializedName("h") // h for "hitsplats", real hits
+	private int damageDealt;
+	@Expose
+	@SerializedName("m")
+	private int magicHitCount;
+	@Expose
+	@SerializedName("M")
+	private double magicHitCountDeserved;
+	@Expose
+	@SerializedName("x") // x for X_X
 	private boolean dead; // will be true if the fighter died in the fight
+
+	@Expose
+	@SerializedName("l")
+	private ArrayList<FightLogEntry> fightLogEntries;
 
 	private PvpDamageCalc pvpDamageCalc;
 
@@ -61,9 +87,28 @@ class Fighter
 		name = player.getName();
 		attackCount = 0;
 		successCount = 0;
-		totalDamage = 0;
+		deservedDamage = 0;
+		damageDealt = 0;
+		magicHitCount = 0;
+		magicHitCountDeserved = 0;
 		dead = false;
 		pvpDamageCalc = new PvpDamageCalc(itemManager);
+		fightLogEntries = new ArrayList<>();
+	}
+
+	// fighter that is bound to a player and gets updated during a fight
+	Fighter(String name, ArrayList<FightLogEntry> logs)
+	{
+		player = null;
+		this.name = name;
+		attackCount = 0;
+		successCount = 0;
+		deservedDamage = 0;
+		damageDealt = 0;
+		magicHitCount = 0;
+		magicHitCountDeserved = 0;
+		dead = false;
+		fightLogEntries = logs;
 	}
 
 	// create a basic Fighter to only hold stats, for the TotalStatsPanel,
@@ -74,30 +119,58 @@ class Fighter
 		this.name = name;
 		attackCount = 0;
 		successCount = 0;
-		totalDamage = 0;
+		deservedDamage = 0;
+		damageDealt = 0;
+		magicHitCount = 0;
+		magicHitCountDeserved = 0;
 		dead = false;
 	}
 
 	// add an attack to the counters depending if it is successful or not.
 	// also update the success rate with the new counts.
-	void addAttack(boolean successful, Player opponent, AnimationAttackType animationType)
+	void addAttack(boolean successful, Player opponent, AnimationData animationData)
 	{
-		double deservedDamage = pvpDamageCalc.getDamage(this.player, opponent, successful, animationType);
-		totalDamage += deservedDamage;
 		attackCount++;
-
 		if (successful)
 		{
 			successCount++;
 		}
+
+		pvpDamageCalc.updateDamageStats(player, opponent, successful, animationData);
+		deservedDamage += pvpDamageCalc.getAverageHit();
+
+		if (animationData.attackStyle == AnimationData.AttackStyle.MAGIC)
+		{
+			magicHitCountDeserved += pvpDamageCalc.getAccuracy();
+
+			if (opponent.getSpotAnimation() != GraphicID.SPLASH)
+			{
+				magicHitCount++;
+			}
+		}
+
+		FightLogEntry fightLogEntry = new FightLogEntry(player, opponent, pvpDamageCalc);
+		if (PvpPerformanceTrackerPlugin.CONFIG.fightLogInChat())
+		{
+			PvpPerformanceTrackerPlugin.PLUGIN.createChatMessage(fightLogEntry.toChatMessage());
+		}
+		fightLogEntries.add(fightLogEntry);
 	}
 
 	// this is to be used from the TotalStatsPanel which saves a total of multiple fights.
-	void addAttacks(int success, int total, double damage)
+	void addAttacks(int success, int total, double deservedDamage, int damageDealt, int magicHitCount, double magicHitCountDeserved)
 	{
 		successCount += success;
 		attackCount += total;
-		totalDamage += damage;
+		this.deservedDamage += deservedDamage;
+		this.damageDealt += damageDealt;
+		this.magicHitCount += magicHitCount;
+		this.magicHitCountDeserved += magicHitCountDeserved;
+	}
+
+	void addDamageDealt(int damage)
+	{
+		this.damageDealt += damage;
 	}
 
 	void died()
@@ -105,14 +178,9 @@ class Fighter
 		dead = true;
 	}
 
-	AnimationAttackStyle getAnimationAttackStyle()
+	AnimationData getAnimationData()
 	{
-		return AnimationAttackStyle.styleForAnimation(player.getAnimation());
-	}
-
-	AnimationAttackType getAnimationAttackType()
-	{
-		return AnimationAttackType.typeForAnimation(player.getAnimation());
+		return AnimationData.dataForAnimation(player.getAnimation());
 	}
 
 	// Return a simple string to display the current player's success rate.
@@ -120,9 +188,10 @@ class Fighter
 	// if shortString is true, the percentage is omitted, it only returns the fraction.
 	String getOffPrayStats(boolean shortString)
 	{
+		nf.setMaximumFractionDigits(0);
 		return shortString ?
 			successCount + "/" + attackCount :
-			successCount + "/" + attackCount + " (" + Math.round(calculateSuccessPercentage()) + "%)";
+			nf.format(successCount) + "/" + nf.format(attackCount) + " (" + Math.round(calculateSuccessPercentage()) + "%)";
 	}
 
 	String getOffPrayStats()
@@ -130,8 +199,44 @@ class Fighter
 		return getOffPrayStats(false);
 	}
 
+	String getMagicHitStats()
+	{
+		nf.setMaximumFractionDigits(0);
+		String stats = nf.format(magicHitCount);
+		nf.setMaximumFractionDigits(2);
+		stats += "/" + nf.format(magicHitCountDeserved);
+		return stats;
+	}
+
+	String getDeservedDmgString(Fighter opponent, int precision, boolean onlyDiff)
+	{
+		nf.setMaximumFractionDigits(precision);
+		double difference = deservedDamage - opponent.deservedDamage;
+		return onlyDiff ? (difference > 0 ? "+" : "") + nf.format(difference) :
+			nf.format(deservedDamage) + " (" + (difference > 0 ? "+" : "") + nf.format(difference) + ")";
+	}
+
+	String getDeservedDmgString(Fighter opponent)
+	{
+		return getDeservedDmgString(opponent, 0, false);
+	}
+
+
+	String getDmgDealtString(Fighter opponent, boolean onlyDiff)
+	{
+		int difference = damageDealt - opponent.damageDealt;
+		return onlyDiff ? (difference > 0 ? "+" : "") + difference :
+			damageDealt + " (" + (difference > 0 ? "+" : "") + difference + ")";
+	}
+
+	String getDmgDealtString(Fighter opponent)
+	{
+		return getDmgDealtString(opponent, false);
+	}
+
 	double calculateSuccessPercentage()
 	{
-		return (double) successCount / attackCount * 100.0;
+		return attackCount == 0 ? 0 :
+			(double) successCount / attackCount * 100.0;
 	}
 }
