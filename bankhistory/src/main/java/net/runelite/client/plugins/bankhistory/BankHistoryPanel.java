@@ -38,8 +38,9 @@ import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -47,6 +48,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -100,17 +102,22 @@ public class BankHistoryPanel extends PluginPanel
 		return configManager.getConfig(BankHistoryConfig.class);
 	}
 
-	public void init()
+	public void init(String username)
 	{
-		init(false);
+		init(username, false);
 	}
 
-	private void init(boolean isNewWindow)
+	public void init()
+	{
+		init("", false);
+	}
+
+	private void init(String username, boolean isNewWindow)
 	{
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setBorder(new EmptyBorder(10, 10, 10, 10));
-		List<String> accounts = tracker.getAvailableUsers();
+		Set<String> accounts = getAccounts(username);
 
 		//wraps all user ui components to set a maximum height
 		JPanel uiWrapperPanel = new JPanel();
@@ -120,6 +127,14 @@ public class BankHistoryPanel extends PluginPanel
 		//account selection
 		JComboBox<String> accountSelectionCombo = new JComboBox<>();
 		accountSelectionCombo.setModel(new DefaultComboBoxModel<>(accounts.toArray(new String[0])));
+
+		JCheckBox accountSelectionVisible = new JCheckBox("Show accounts");
+		accountSelectionVisible.setSelected(config.getShowAccounts());
+		accountSelectionVisible.addItemListener((event) -> {
+			accountSelectionCombo.setVisible(accountSelectionVisible.isSelected());
+		});
+
+		accountSelectionVisible.setFocusPainted(false);
 
 		accountSelectionCombo.addItemListener((change) ->
 			updateDataset(change.getItem().toString()));
@@ -214,7 +229,7 @@ public class BankHistoryPanel extends PluginPanel
 				BankHistoryPanel panel = new BankHistoryPanel();
 				panel.setTracker(tracker);
 				panel.setConfig(config);
-				panel.init(true);
+				panel.init(username, true);
 				dialog.setPreferredSize(new Dimension(500, 500));
 
 				dialog.getContentPane().add(panel, BorderLayout.CENTER);
@@ -229,7 +244,7 @@ public class BankHistoryPanel extends PluginPanel
 
 		//bank tab selection
 		JPanel tabPanel = new JPanel();
-		JComboBox<String> tabSelectionCombo = new JComboBox<>(DatePickerPanel.getArrayOfIntegers(0, 8, false));
+		JComboBox<String> tabSelectionCombo = new JComboBox<>(DatePickerPanel.getArrayOfIntegers(0, 10, false));
 		tabSelectionCombo.addItemListener((event) ->
 		{
 			currentBankTab = Integer.parseInt((String) event.getItem());
@@ -283,6 +298,7 @@ public class BankHistoryPanel extends PluginPanel
 
 		//add buttons/user interaction components here
 		uiWrapperPanel.add(accountSelectionCombo);
+		uiWrapperPanel.add(accountSelectionVisible);
 		uiWrapperPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		uiWrapperPanel.add(advancedContainer);
 		uiWrapperPanel.add(simpleContainer);
@@ -292,7 +308,7 @@ public class BankHistoryPanel extends PluginPanel
 		uiWrapperPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		add(Box.createRigidArea(new Dimension(0, 5)));
 
-		loadGraph(account.isEmpty() ? accounts.get(0) : account);
+		loadGraph(account.isEmpty() ? accounts.stream().findFirst().get() : account);
 
 		// Increase/decrease panel (change) panel
 		// Done after the graph is loaded so we have the data points available
@@ -314,6 +330,22 @@ public class BankHistoryPanel extends PluginPanel
 			add(Box.createRigidArea(new Dimension(0, 10)));
 			add(openInNewWindowContainer);
 		}
+	}
+
+	private Set<String> getAccounts(String username)
+	{
+		Set<String> result = new HashSet<>(tracker.getAvailableUsers());
+		if (!username.isEmpty())
+		{
+			result.add(username);
+		}
+
+		if (result.isEmpty())
+		{
+			throw new IllegalStateException("No accounts available");
+		}
+
+		return result;
 	}
 
 	private void updateDataset(String account)

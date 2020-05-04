@@ -23,30 +23,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.8"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Bank Value Tracking"
-project.extra["PluginDescription"] = "Track the value of your bank over time"
-
-dependencies {
-    implementation(group = "net.sourceforge.jdatepicker", name = "jdatepicker", version = "1.3.2")
-    implementation(group = "org.jfree", name = "jfreechart", version = "1.5.0")
-}
+project.extra["PluginName"] = "Probability calculator"
+project.extra["PluginDescription"] = "Calculates the statistical probability of various mechanics such as drops"
 
 tasks {
     jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(configurations.runtimeClasspath.get()
-                .map { if (it.isDirectory) it else zipTree(it) })
-        val sourcesMain = sourceSets.main.get()
-        from(sourcesMain.output)
-
         manifest {
             attributes(mapOf(
                     "Plugin-Version" to project.version,
                     "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Dependencies" to nameToId("loottracker"),
                     "Plugin-Description" to project.extra["PluginDescription"],
                     "Plugin-License" to project.extra["PluginLicense"]
             ))
