@@ -24,11 +24,15 @@
  */
 package net.runelite.client.plugins.bankhistory;
 
+import com.google.common.base.Strings;
 import com.google.inject.Provides;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
 import javax.inject.Inject;
+import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -71,7 +75,6 @@ public class BankHistoryPlugin extends Plugin
 
 	private NavigationButton navButton;
 	private BankHistoryPanel bankHistoryPanel;
-	private DefaultBankValuePanel defaultBankValuePanel;
 
 	@Provides
 	BankHistoryConfig getConfig(ConfigManager configManager)
@@ -88,45 +91,77 @@ public class BankHistoryPlugin extends Plugin
 			.tooltip("Bank Value History")
 			.icon(icon)
 			.priority(10)
-			.panel(getDesiredPanel())
 			.build();
 
+		setActivePanel("");
 		clientToolbar.addNavigation(navButton);
 	}
 
-	private PluginPanel getDesiredPanel()
+
+	private void setActivePanel(String username)
 	{
-		PluginPanel defaultPanel = getDefaultPanel();
-		if (getDefaultPanel() == null)
+		if (!Strings.isNullOrEmpty(username) || hasAccountData())
 		{
 			if (bankHistoryPanel == null)
 			{
+				log.trace("Setting the active panel to the bank history panel");
 				bankHistoryPanel = injector.getInstance(BankHistoryPanel.class);
-				bankHistoryPanel.init();
+				bankHistoryPanel.init(username);
+				setCurrentPanel(bankHistoryPanel);
 			}
-
-			return bankHistoryPanel;
 		}
-
-		return defaultPanel;
+		else
+		{
+			log.trace("Setting the active panel to the default panel");
+			DefaultBankValuePanel panel = new DefaultBankValuePanel();
+			panel.init();
+			setCurrentPanel(panel);
+		}
 	}
 
-	private PluginPanel getDefaultPanel()
+	private void setCurrentPanel(PluginPanel pluginPanel)
 	{
-		List<String> accounts = tracker.getAvailableUsers();
-
-		if (accounts.isEmpty())
+		if (navButton.getPanel() != pluginPanel)
 		{
-			if (defaultBankValuePanel == null)
+			PluginPanel panel = navButton.getPanel();
+			if (panel == null)
 			{
-				defaultBankValuePanel = new DefaultBankValuePanel();
-				defaultBankValuePanel.init();
+				navButton.setPanel(pluginPanel);
+				return;
 			}
 
-			return defaultBankValuePanel;
-		}
+			Container con = panel.getParent();
 
-		return null;
+			if (con != null)
+			{
+				navButton.setPanel(pluginPanel);
+				removeExistingPanel(con);
+				con.add(pluginPanel, BorderLayout.NORTH);
+				con.revalidate();
+				con.repaint();
+			}
+		}
+	}
+
+	private void removeExistingPanel(Container con)
+	{
+		Component[] comps = con.getComponents();
+		if (comps != null)
+		{
+			for (Component component : comps)
+			{
+				if (component instanceof PluginPanel)
+				{
+					log.trace("Removing plugin panel instance from container");
+					con.remove(component);
+				}
+			}
+		}
+	}
+
+	private boolean hasAccountData()
+	{
+		return !tracker.getAvailableUsers().isEmpty();
 	}
 
 	@Override
@@ -136,26 +171,22 @@ public class BankHistoryPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onWidgetLoaded(final WidgetLoaded event)
+	public void onWidgetLoaded(final WidgetLoaded event) throws InvocationTargetException, InterruptedException
 	{
 		if (event.getGroupId() == WidgetID.BANK_GROUP_ID)
 		{
-			if (navButton.getPanel() != bankHistoryPanel)
-			{
-				PluginPanel panel = getDesiredPanel();
-
-				if (panel == bankHistoryPanel)
-				{
-					navButton.setPanel(panel);
-				}
-			}
-
-			if (bankHistoryPanel != null)
+			log.trace("Player opened the bank");
+			SwingUtilities.invokeAndWait(() -> this.setActivePanel(client.getUsername()));
+			if (isHistoryPanelActive())
 			{
 				bankHistoryPanel.setDatasetButton(true);
-				tracker.addEntry();
 			}
 		}
+	}
+
+	private boolean isHistoryPanelActive()
+	{
+		return bankHistoryPanel != null && navButton.getPanel() == bankHistoryPanel;
 	}
 
 	@Subscribe
@@ -178,17 +209,7 @@ public class BankHistoryPlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
-		if (event.getGameState() == GameState.LOGGING_IN)
-		{
-			try
-			{
-				tracker.getFileForUser(client.getUsername());
-			}
-			catch (IOException ignored)
-			{
-			}
-		}
-		else if (event.getGameState() == GameState.CONNECTION_LOST)
+		if (event.getGameState() == GameState.CONNECTION_LOST)
 		{
 			bankHistoryPanel.setDatasetButton(false);
 		}
