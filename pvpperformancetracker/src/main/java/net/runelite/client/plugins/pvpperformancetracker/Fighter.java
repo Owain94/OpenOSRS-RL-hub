@@ -29,7 +29,6 @@ import com.google.gson.annotations.SerializedName;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GraphicID;
@@ -37,7 +36,7 @@ import net.runelite.api.Player;
 import net.runelite.client.game.ItemManager;
 
 @Slf4j
-@Getter(AccessLevel.PACKAGE)
+@Getter
 class Fighter
 {
 	private static final NumberFormat nf = NumberFormat.getInstance();
@@ -48,10 +47,10 @@ class Fighter
 		nf.setRoundingMode(RoundingMode.HALF_UP);
 	}
 
-	private final Player player;
+	private Player player;
 	@Expose
 	@SerializedName("n") // use 1 letter serialized variable names for more compact storage
-	private final String name; // username
+	private String name; // username
 	@Expose
 	@SerializedName("a")
 	private int attackCount; // total number of attacks
@@ -152,7 +151,7 @@ class Fighter
 		FightLogEntry fightLogEntry = new FightLogEntry(player, opponent, pvpDamageCalc);
 		if (PvpPerformanceTrackerPlugin.CONFIG.fightLogInChat())
 		{
-			PvpPerformanceTrackerPlugin.PLUGIN.createChatMessage(fightLogEntry.toChatMessage());
+			PvpPerformanceTrackerPlugin.PLUGIN.sendChatMessage(fightLogEntry.toChatMessage());
 		}
 		fightLogEntries.add(fightLogEntry);
 	}

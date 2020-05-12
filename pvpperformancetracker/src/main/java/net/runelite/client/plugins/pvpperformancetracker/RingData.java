@@ -1,9 +1,8 @@
 package net.runelite.client.plugins.pvpperformancetracker;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter(AccessLevel.PACKAGE)
+@Getter
 public enum RingData
 {
 	SEERS_RING("Seers Ring", 6731),
@@ -15,8 +14,8 @@ public enum RingData
 	BRIMSTONE_RING("Brimstone Ring", 22975),
 	NONE("None", -1);
 
-	private final String name;
-	private final int itemId;
+	private String name;
+	private int itemId;
 
 	RingData(String name, int itemId)
 	{

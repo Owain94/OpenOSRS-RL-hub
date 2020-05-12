@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.Instant;
-import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.GraphicID;
 import net.runelite.api.HeadIcon;
@@ -15,10 +14,11 @@ import net.runelite.client.chat.ChatMessageBuilder;
 import org.apache.commons.text.WordUtils;
 
 // A fight log entry for a single Fighter. Will be saved in a List of FightLogEntries in the Fighter class.
-@Getter(AccessLevel.PACKAGE)
+@Getter
 public class FightLogEntry implements Comparable<FightLogEntry>
 {
 	public static final NumberFormat nf;
+
 	static
 	{
 		nf = NumberFormat.getInstance();
@@ -32,7 +32,7 @@ public class FightLogEntry implements Comparable<FightLogEntry>
 	public String attackerName;
 	@Expose
 	@SerializedName("t")
-	private final long time;
+	private long time;
 
 
 	// attacker data
@@ -40,36 +40,36 @@ public class FightLogEntry implements Comparable<FightLogEntry>
 	@SerializedName("G")
 	// current attacker's gear. The attacker is not necessarily the competitor.
 	// Set using PlayerComposition::getEquipmentIds
-	private final int[] attackerGear;
+	private int[] attackerGear;
 	@Expose
 	@SerializedName("O")
-	private final HeadIcon attackerOverhead;
+	private HeadIcon attackerOverhead;
 	@Expose
 	@SerializedName("m") // m because movement?
-	private final AnimationData animationData;
+	private AnimationData animationData;
 	@Expose
 	@SerializedName("d")
-	private final double deservedDamage;
+	private double deservedDamage;
 	@Expose
 	@SerializedName("a")
-	private final double accuracy;
+	private double accuracy;
 	@Expose
 	@SerializedName("h") // h for highest hit
-	private final int maxHit;
+	private int maxHit;
 	@Expose
 	@SerializedName("l") // l for lowest hit
-	private final int minHit;
+	private int minHit;
 	@Expose
 	@SerializedName("s")
-	private final boolean splash; // true if it was a magic attack and it splashed
+	private boolean splash; // true if it was a magic attack and it splashed
 
 	// defender data
 	@Expose
 	@SerializedName("g")
-	private final int[] defenderGear;
+	private int[] defenderGear;
 	@Expose
 	@SerializedName("o")
-	private final HeadIcon defenderOverhead;
+	private HeadIcon defenderOverhead;
 
 	public FightLogEntry(Player attacker, Player defender, PvpDamageCalc pvpDamageCalc)
 	{
@@ -88,7 +88,7 @@ public class FightLogEntry implements Comparable<FightLogEntry>
 		this.defenderOverhead = defender.getOverheadIcon();
 	}
 
-	public FightLogEntry(int [] attackerGear, int deservedDamage, double accuracy, int minHit, int maxHit, int [] defenderGear, String attackerName)
+	public FightLogEntry(int[] attackerGear, int deservedDamage, double accuracy, int minHit, int maxHit, int[] defenderGear, String attackerName)
 	{
 		this.attackerName = attackerName;
 		this.attackerGear = attackerGear;
@@ -145,6 +145,6 @@ public class FightLogEntry implements Comparable<FightLogEntry>
 		// if diff = 0, return 0. Otherwise, divide diff by its absolute value. This will result in
 		// -1 for negative numbers, and 1 for positive numbers, keeping the sign and a safely small int.
 		return diff == 0 ? 0 :
-			(int)(diff / Math.abs(diff));
+			(int) (diff / Math.abs(diff));
 	}
 }

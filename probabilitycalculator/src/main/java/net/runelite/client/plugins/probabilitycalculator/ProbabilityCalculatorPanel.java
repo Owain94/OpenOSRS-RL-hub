@@ -8,9 +8,15 @@ import net.runelite.client.ui.PluginPanel;
 
 class ProbabilityCalculatorPanel extends PluginPanel
 {
+
+	private ProbabilityCalculatorInputArea inputArea;
+	private ProbabilityCalculatorOutputArea outputArea;
+
 	ProbabilityCalculatorPanel(ProbabilityCalculatorInputArea inputArea, ProbabilityCalculatorOutputArea outputArea)
 	{
 		super();
+		this.inputArea = inputArea;
+		this.outputArea = outputArea;
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		setLayout(new GridBagLayout());
 

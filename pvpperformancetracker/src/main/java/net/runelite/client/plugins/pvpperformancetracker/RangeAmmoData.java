@@ -24,7 +24,6 @@
  */
 package net.runelite.client.plugins.pvpperformancetracker;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 
 public interface RangeAmmoData
@@ -46,7 +45,7 @@ public interface RangeAmmoData
 		String getName();
 	}
 
-	@Getter(AccessLevel.PUBLIC)
+	@Getter
 	enum BoltAmmo implements RangeAmmoConfigData
 	{
 		RUNITE_BOLTS("Runite Bolts", 115, 1),
@@ -56,11 +55,11 @@ public interface RangeAmmoData
 
 		static EquipmentData[] WEAPONS_USING = {EquipmentData.RUNE_CROSSBOW};
 
-		private final String name;
-		private final int rangeStr;
-		private final double specRangeLevelModifier;
-		private final double specChance;
-		private final double dmgModifier;
+		private String name;
+		private int rangeStr;
+		private double specRangeLevelModifier;
+		private double specChance;
+		private double dmgModifier;
 
 		BoltAmmo(String name, int rangeStr, double specRangeLevelModifier, double specChance, double dmgModifier)
 		{
@@ -92,7 +91,7 @@ public interface RangeAmmoData
 		}
 	}
 
-	@Getter(AccessLevel.PUBLIC)
+	@Getter
 	enum StrongBoltAmmo implements RangeAmmoConfigData
 	{
 		RUNITE_BOLTS("Runite Bolts", 115, 1),
@@ -108,11 +107,11 @@ public interface RangeAmmoData
 			EquipmentData.DRAGON_HUNTER_CROSSBOW
 		};
 
-		private final String name;
-		private final int rangeStr;
-		private final double specRangeLevelModifier;
-		private final double specChance;
-		private final double dmgModifier;
+		private String name;
+		private int rangeStr;
+		private double specRangeLevelModifier;
+		private double specChance;
+		private double dmgModifier;
 
 		StrongBoltAmmo(String name, int rangeStr, double specRangeLevelModifier, double specChance, double dmgModifier)
 		{
@@ -145,8 +144,8 @@ public interface RangeAmmoData
 		}
 	}
 
-	@Getter(AccessLevel.PUBLIC)
-	enum DartAmmo implements RangeAmmoConfigData
+	@Getter
+	public enum DartAmmo implements RangeAmmoConfigData
 	{
 		ADAMANT_DARTS("Adamant Darts", 10),
 		RUNE_DARTS("Rune Darts", 14),
@@ -154,10 +153,10 @@ public interface RangeAmmoData
 
 		static EquipmentData[] WEAPONS_USING = {EquipmentData.TOXIC_BLOWPIPE};
 
-		private final String name;
-		private final int rangeStr;
-		private final double bonusMaxHit;
-		private final double dmgModifier;
+		private String name;
+		private int rangeStr;
+		private double bonusMaxHit;
+		private double dmgModifier;
 
 		DartAmmo(String name, int rangeStr)
 		{
@@ -174,16 +173,16 @@ public interface RangeAmmoData
 		}
 	}
 
-	@Getter(AccessLevel.PUBLIC)
-	enum OtherAmmo implements RangeAmmoData
+	@Getter
+	public enum OtherAmmo implements RangeAmmoData
 	{
 		AMETHYST_ARROWS(55),
 		DRAGON_ARROW(60),
 		DRAGON_JAVELIN(150);
 
-		private final int rangeStr;
-		private final double bonusMaxHit;
-		private final double dmgModifier;
+		private int rangeStr;
+		private double bonusMaxHit;
+		private double dmgModifier;
 
 		OtherAmmo(int rangeStr)
 		{

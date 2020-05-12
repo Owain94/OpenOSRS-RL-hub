@@ -71,12 +71,12 @@ public class TotalStatsPanel extends JPanel
 		nf2.setRoundingMode(RoundingMode.HALF_UP);
 	}
 
-	private final JLabel killsLabel;
-	private final JLabel deathsLabel;
-	private final JLabel offPrayStatsLabel;
-	private final JLabel deservedDmgStatsLabel;
-	private final JLabel dmgDealtStatsLabel;
-	private final JLabel magicHitCountStatsLabel;
+	private JLabel killsLabel;
+	private JLabel deathsLabel;
+	private JLabel offPrayStatsLabel;
+	private JLabel deservedDmgStatsLabel;
+	private JLabel dmgDealtStatsLabel;
+	private JLabel magicHitCountStatsLabel;
 	private Fighter totalStats;
 
 	private int numKills = 0;
@@ -234,12 +234,29 @@ public class TotalStatsPanel extends JPanel
 			}
 		});
 
-		// Create "Export Fight History" popup menu/context menu item exportFightHistory
+		// Create "Export Fight History" popup menu/context menu item
 		final JMenuItem exportFightHistory = new JMenuItem("Export Fight History");
 		exportFightHistory.addActionListener(e -> PLUGIN.exportFightHistory());
 
+		// Create "Import Fight History" popup menu/context menu item
+		final JMenuItem fightHistory = new JMenuItem("Import Fight History");
+		fightHistory.addActionListener(e ->
+		{
+			// display a simple input dialog to request json data to import.
+			String fightHistoryData = JOptionPane.showInputDialog(this, "Enter the fight history data you wish to import:", "Import Fight History", JOptionPane.INFORMATION_MESSAGE);
+
+			// if the string is less than 2 chars, it is definitely invalid (or they pressed Cancel), so skip.
+			if (fightHistoryData == null || fightHistoryData.length() < 2)
+			{
+				return;
+			}
+
+			PLUGIN.userFightHistoryData(fightHistoryData);
+		});
+
 		popupMenu.add(resetAllFights);
 		popupMenu.add(exportFightHistory);
+		popupMenu.add(fightHistory);
 		setComponentPopupMenu(popupMenu);
 
 		setLabels();

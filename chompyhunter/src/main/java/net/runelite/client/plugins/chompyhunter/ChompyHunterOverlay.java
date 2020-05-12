@@ -8,7 +8,6 @@ import java.awt.Shape;
 import java.time.Duration;
 import java.time.Instant;
 import javax.inject.Inject;
-import net.runelite.api.Client;
 import net.runelite.api.Point;
 import net.runelite.api.util.Text;
 import net.runelite.client.ui.overlay.Overlay;
@@ -16,17 +15,16 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
+
 public class ChompyHunterOverlay extends Overlay
 {
 
 	private final ChompyHunterPlugin plugin;
-	private final Client client;
 
 	@Inject
-	public ChompyHunterOverlay(ChompyHunterPlugin plugin, Client client)
+	public ChompyHunterOverlay(ChompyHunterPlugin plugin)
 	{
 		this.plugin = plugin;
-		this.client = client;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 	}

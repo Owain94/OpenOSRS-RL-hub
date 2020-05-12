@@ -45,17 +45,17 @@ public class PvpPerformanceTrackerOverlay extends Overlay
 	private final PvpPerformanceTrackerPlugin plugin;
 	private final PvpPerformanceTrackerConfig config;
 
-	private final TitleComponent overlayTitle;
+	private TitleComponent overlayTitle;
 
-	private final LineComponent simpleConfigOverlayFirstLine; // Left: player's RSN, Right: off-pray %
-	private final LineComponent simpleConfigOverlaySecondLine; // Same as above but for opponent
+	private LineComponent simpleConfigOverlayFirstLine; // Left: player's RSN, Right: off-pray %
+	private LineComponent simpleConfigOverlaySecondLine; // Same as above but for opponent
 
 	// The main overlay is like the panel, each line is optionally turned off.
-	private final LineComponent overlayFirstLine; // Left: player's RSN, Right: Opponent RSN
-	private final LineComponent overlaySecondLine; // left: player's off-pray stats, right: opponent's off-pray stats
-	private final LineComponent overlayThirdLine; // left: player's deserved dps stats, right: opponent's deserved dps stats
-	private final LineComponent overlayFourthLine; // left: player's damage dealt stats, right: opponent's damage dealt stats
-	private final LineComponent overlayFifthLine; // left: player's magic attacks hit stats, right: opponent's magic attacks hit stats
+	private LineComponent overlayFirstLine; // Left: player's RSN, Right: Opponent RSN
+	private LineComponent overlaySecondLine; // left: player's off-pray stats, right: opponent's off-pray stats
+	private LineComponent overlayThirdLine; // left: player's deserved dps stats, right: opponent's deserved dps stats
+	private LineComponent overlayFourthLine; // left: player's damage dealt stats, right: opponent's damage dealt stats
+	private LineComponent overlayFifthLine; // left: player's magic attacks hit stats, right: opponent's magic attacks hit stats
 
 	@Inject
 	private PvpPerformanceTrackerOverlay(PvpPerformanceTrackerPlugin plugin, PvpPerformanceTrackerConfig config)

@@ -17,8 +17,8 @@ public class ProbabilityCalculatorOutputArea extends JPanel
 	private double atLeastChance;
 	private double zeroChance;
 	private double exactChance;
-	private int killCount;
-	private int dropsReceived;
+	private long killCount;
+	private long dropsReceived;
 	private double dropRate;
 	private String strAtLeastChance;
 	private String strExactChance;
@@ -27,6 +27,7 @@ public class ProbabilityCalculatorOutputArea extends JPanel
 	private DecimalFormat df;
 	private String dfPattern;
 	private final ProbabilityCalculatorConfig config;
+	private StringBuilder strBldr;
 
 	ProbabilityCalculatorOutputArea(double dropRate, int killCount, int dropsReceived, ProbabilityCalculatorConfig config)
 	{
@@ -81,14 +82,24 @@ public class ProbabilityCalculatorOutputArea extends JPanel
 		{
 			outputMsg = "You've somehow cheated the RNG gods and managed to get more drops than you got kills. What is this sorcery?!";
 		}
-		else if (dropRate > 1.0 || dropRate < 0.0)
+		else if (dropRate >= 1.0 || dropRate <= 0.0)
 		{
-			outputMsg = "Please use a drop rate value between 0.0 and 1.0.";
+			outputMsg = "Please use a drop rate value that is between 0.0 and 1.0, exclusively.";
 		}
 		else
 		{
 			exactChance = binomialProb(killCount, dropsReceived, dropRate);
+			if (Double.isNaN(exactChance))
+			{
+				outputMsg = "Your input for kill count or drops received is too large for this calculator. Please user smaller amounts.";
+				return;
+			}
 			zeroChance = Math.pow(1.0 - dropRate, killCount);
+			if (Double.isNaN(zeroChance))
+			{
+				outputMsg = "Your input for kill count or drops received is too large for this calculator. Please user smaller amounts.";
+				return;
+			}
 			if (dropsReceived == 1.0)
 			{
 				atLeastChance = 1.0 - zeroChance;
@@ -101,6 +112,11 @@ public class ProbabilityCalculatorOutputArea extends JPanel
 					atLeastChance += binomialProb(killCount, i, dropRate);
 				}
 				atLeastChance = 1.0 - atLeastChance;
+				if (Double.isNaN(atLeastChance))
+				{
+					outputMsg = "Your input for kill count or drops received is too large for this calculator. Please user smaller amounts.";
+					return;
+				}
 			}
 
 			strAtLeastChance = df.format(Math.abs(atLeastChance * 100.0));
@@ -118,6 +134,7 @@ public class ProbabilityCalculatorOutputArea extends JPanel
 			{
 				strZeroChance = "~" + strZeroChance;
 			}
+
 			outputMsg = "At " + killCount + " kills, " + dropsReceived + " drop(s), and a drop rate of " + dropRate + ", your chances are:\n\n" +
 				"Chance to get at least " + dropsReceived + " drop(s):\n" + strAtLeastChance + "%\n\n" +
 				"Chance to get exactly " + dropsReceived + " drop(s):\n" + strExactChance + "%\n\n" +
@@ -140,20 +157,23 @@ public class ProbabilityCalculatorOutputArea extends JPanel
 		repaint();
 	}
 
-	void updatedfPattern()
+	private void updatedfPattern()
 	{
-		StringBuilder pattern = new StringBuilder();
 		if (config.getDecimalPlaces() > 0)
 		{
-			pattern.append("#.").append("#".repeat(Math.max(0, config.getDecimalPlaces())));
+			strBldr = new StringBuilder();
+			strBldr.append("#.");
+			for (int i = 0; i < config.getDecimalPlaces(); i++)
+			{
+				strBldr.append("#");
+			}
+			dfPattern = strBldr.toString();
 		}
 		else
 		{
-			pattern.append("#");
+			dfPattern = "#";
 		}
-		dfPattern = pattern.toString();
-
 		df = new DecimalFormat(dfPattern);
-
 	}
+
 }

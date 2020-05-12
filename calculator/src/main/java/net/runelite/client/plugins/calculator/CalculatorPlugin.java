@@ -26,7 +26,6 @@ package net.runelite.client.plugins.calculator;
 
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
-import net.runelite.api.Client;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
@@ -41,23 +40,20 @@ import org.pf4j.Extension;
 	name = "calculator",
 	description = "Calculator panel",
 	enabledByDefault = false,
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	tags = {"math"}
 )
 public class CalculatorPlugin extends Plugin
 {
 	@Inject
-	private Client client;
-
-	@Inject
 	private ClientToolbar clientToolbar;
 
-	private CalculatorPluginPanel panel;
 	private NavigationButton navButton;
 
 	@Override
 	protected void startUp()
 	{
-		panel = new CalculatorPluginPanel(client);
+		CalculatorPluginPanel panel = new CalculatorPluginPanel();
 
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "icon.png");
 
@@ -76,5 +72,4 @@ public class CalculatorPlugin extends Plugin
 	{
 		clientToolbar.removeNavigation(navButton);
 	}
-
 }

@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.chattranscripts;
 
+import java.awt.Color;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -22,7 +23,7 @@ public interface SnipConfig extends Config
 		keyName = "clipboard",
 		name = "Copy to clipboard",
 		description = "Copies the image to clipboard after generating.",
-		position = 4
+		position = 5
 	)
 	default boolean clipboard()
 	{
@@ -33,7 +34,7 @@ public interface SnipConfig extends Config
 		keyName = "save",
 		name = "Save after generation",
 		description = "Saves the transcript image after creation.",
-		position = 2
+		position = 3
 	)
 	default boolean saveImage()
 	{
@@ -44,11 +45,23 @@ public interface SnipConfig extends Config
 		keyName = "open",
 		name = "Open after saving",
 		description = "Opens the image after saving.",
-		position = 3
+		position = 4
 	)
 	default boolean postOpen()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+
+		keyName = "bgcolor",
+		name = "Background color",
+		description = "Color behind the text.",
+		position = 2
+	)
+	default Color BgColor()
+	{
+		return new Color(208, 188, 157);
 	}
 
 }
