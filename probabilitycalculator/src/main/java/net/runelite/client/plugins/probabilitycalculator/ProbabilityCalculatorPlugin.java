@@ -24,6 +24,7 @@ import org.pf4j.Extension;
 )
 public class ProbabilityCalculatorPlugin extends Plugin
 {
+
 	@Inject
 	private ProbabilityCalculatorConfig config;
 
@@ -43,19 +44,17 @@ public class ProbabilityCalculatorPlugin extends Plugin
 		input = new ProbabilityCalculatorInputArea();
 		output = new ProbabilityCalculatorOutputArea(dropRate, killCount, dropsReceived, config);
 		ProbabilityCalculatorPanel panel = new ProbabilityCalculatorPanel(input, output);
+		//panel.init(config);
 
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(ProbabilityCalculatorPlugin.class, "probabilitycalculator_icon.png");
 
 		//Action listeners
-		input.getUiDropRate().addActionListener(e -> {
-			onFieldDropRateUpdated();
-		});
-		input.getUiKillCount().addActionListener(e -> {
-			onFieldKillCountUpdated();
-		});
-		input.getUiDropsReceived().addActionListener(e -> {
-			onFieldDropsReceivedUpdated();
-		});
+		input.getUiDropRate().addActionListener(e ->
+			onFieldDropRateUpdated());
+		input.getUiKillCount().addActionListener(e ->
+			onFieldKillCountUpdated());
+		input.getUiDropsReceived().addActionListener(e ->
+			onFieldDropsReceivedUpdated());
 
 		//Focus listeners
 		input.getUiDropRate().addFocusListener(buildFocusAdapter(e -> onFieldDropRateUpdated()));
@@ -73,12 +72,6 @@ public class ProbabilityCalculatorPlugin extends Plugin
 
 		clientToolbar.addNavigation(navButton);
 
-	}
-
-	@Override
-	protected void shutDown()
-	{
-		clientToolbar.removeNavigation(navButton);
 	}
 
 	private void onFieldDropRateUpdated()
@@ -121,6 +114,12 @@ public class ProbabilityCalculatorPlugin extends Plugin
 				focusLostConsumer.accept(e);
 			}
 		};
+	}
+
+	@Override
+	protected void shutDown()
+	{
+		clientToolbar.removeNavigation(navButton);
 	}
 
 	@Provides

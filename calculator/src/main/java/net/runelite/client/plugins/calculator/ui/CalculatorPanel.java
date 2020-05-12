@@ -24,10 +24,11 @@
  */
 package net.runelite.client.plugins.calculator.ui;
 
-import java.awt.GridLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import net.runelite.client.plugins.calculator.CalculatorPlugin;
@@ -37,6 +38,9 @@ import org.apache.commons.lang3.StringUtils;
 public class CalculatorPanel extends JPanel
 {
 	private static final ImageIcon PLUS_MINUS_ICON;
+	private static final Insets INSETS_LEFT_BORDER = new Insets(1, 0, 1, 1);
+	private static final Insets INSETS_RIGHT_BORDER = new Insets(1, 1, 1, 0);
+	private static final Insets INSETS = new Insets(1, 1, 1, 1);
 
 	static
 	{
@@ -44,10 +48,9 @@ public class CalculatorPanel extends JPanel
 		PLUS_MINUS_ICON = new ImageIcon(plusMinusIcon);
 	}
 
-	private final Map<String, CalculatorButton> buttonMap = new HashMap<>();
-
 	private final CalculatorPluginPanel panel;
 	private final DisplayField displayField;
+	private final GridBagConstraints c;
 
 	protected CalculatorPanel(CalculatorPluginPanel panel)
 	{
@@ -56,7 +59,12 @@ public class CalculatorPanel extends JPanel
 		this.panel = panel;
 		this.displayField = panel.getDisplayField();
 
-		setLayout(new GridLayout(4, 4, 4, 4));
+		setLayout(new GridBagLayout());
+
+		c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
 
 		CalculatorButton plusMinus = new CalculatorButton(PLUS_MINUS_ICON);
 
@@ -77,9 +85,12 @@ public class CalculatorPanel extends JPanel
 
 		addButton("/");
 		addButton("0");
-		add(plusMinus);
-		buttonMap.put("plusMinus", plusMinus);
+		addComp(plusMinus);
 		addButton("=");
+
+		addButton("C");
+		c.gridwidth = 3;
+		addButton("Clear History");
 
 		plusMinus.addActionListener(e ->
 		{
@@ -131,11 +142,23 @@ public class CalculatorPanel extends JPanel
 					// Divide by 0 error occured
 					return;
 				}
+				// Add new calculation to history before the displayField is updated
 				panel.getHistoryPanel().addHistoryItem(displayField.getText() + " =", displayField.getResult().toString());
+			}
+			else if (text.equals("C"))
+			{
+				displayField.clear();
+				return;
+			}
+			else if (text.equals("Clear History"))
+			{
+				panel.getHistoryPanel().clearHistory();
+				return;
 			}
 			else if (StringUtils.isNumeric(text))
 			{
 				int num = Integer.parseInt(text);
+				// Previous calculation has finised. Start again
 				if (displayField.isFinished())
 				{
 					displayField.reset();
@@ -144,6 +167,7 @@ public class CalculatorPanel extends JPanel
 				}
 				else
 				{
+					// If there is no action saved, assume we're working with num1
 					if (displayField.getCalculatorAction() == null)
 					{
 						Integer num1 = displayField.getNum1();
@@ -194,6 +218,8 @@ public class CalculatorPanel extends JPanel
 			}
 			else
 			{
+				// If the calculation is finished and there's a previous result to work from,
+				// set num1 as the previous result and continue
 				if (displayField.isFinished() && displayField.getPreviousResult() != null)
 				{
 					displayField.reset();
@@ -223,7 +249,28 @@ public class CalculatorPanel extends JPanel
 			}
 			displayField.update();
 		});
-		buttonMap.put(key, btn);
-		add(btn);
+		addComp(btn);
+	}
+
+	private void addComp(Component component)
+	{
+		switch (c.gridx)
+		{
+			case 0:
+				c.insets = INSETS_LEFT_BORDER;
+				break;
+			case 3:
+				c.insets = INSETS_RIGHT_BORDER;
+				break;
+			default:
+				c.insets = INSETS;
+		}
+		if (c.gridwidth == 3)
+		{
+			c.insets = INSETS_RIGHT_BORDER;
+		}
+		add(component, c);
+		c.gridx = ++c.gridx % 4;
+		c.gridy = c.gridx == 0 ? ++c.gridy : c.gridy;
 	}
 }

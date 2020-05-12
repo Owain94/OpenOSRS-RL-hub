@@ -31,7 +31,6 @@ import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.AnimationID;
@@ -45,7 +44,7 @@ import net.runelite.client.game.ItemManager;
 // This is not a guaranteed way of determining the better competitor, since someone casting
 // barrage in full tank gear can count as a successful attack. It's a good general idea, though.
 @Slf4j
-@Getter(AccessLevel.PACKAGE)
+@Getter
 public class FightPerformance implements Comparable<FightPerformance>
 {
 	// Delay to assume a fight is over. May seem long, but sometimes people barrage &
@@ -61,10 +60,10 @@ public class FightPerformance implements Comparable<FightPerformance>
 
 	@Expose
 	@SerializedName("c") // use 1 letter serialized variable names for more compact storage
-	private final Fighter competitor;
+	private Fighter competitor;
 	@Expose
 	@SerializedName("o")
-	private final Fighter opponent;
+	private Fighter opponent;
 	@Expose
 	@SerializedName("t")
 	private long lastFightTime; // last fight time saved as epochMilli timestamp (serializing an Instant was a bad time)
@@ -268,14 +267,22 @@ public class FightPerformance implements Comparable<FightPerformance>
 
 	boolean competitorMagicHitsLuckier()
 	{
-		return (competitor.getMagicHitCount() / competitor.getMagicHitCountDeserved()) >
+		double competitorRate = (competitor.getMagicHitCountDeserved() == 0) ? 0 :
+			(competitor.getMagicHitCount() / competitor.getMagicHitCountDeserved());
+		double opponentRate = (opponent.getMagicHitCountDeserved() == 0) ? 0 :
 			(opponent.getMagicHitCount() / opponent.getMagicHitCountDeserved());
+
+		return competitorRate > opponentRate;
 	}
 
 	boolean opponentMagicHitsLuckier()
 	{
-		return (opponent.getMagicHitCount() / opponent.getMagicHitCountDeserved()) >
+		double competitorRate = (competitor.getMagicHitCountDeserved() == 0) ? 0 :
 			(competitor.getMagicHitCount() / competitor.getMagicHitCountDeserved());
+		double opponentRate = (opponent.getMagicHitCountDeserved() == 0) ? 0 :
+			(opponent.getMagicHitCount() / opponent.getMagicHitCountDeserved());
+
+		return opponentRate > competitorRate;
 	}
 
 	public double getCompetitorDeservedDmgDiff()

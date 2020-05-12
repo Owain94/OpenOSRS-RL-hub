@@ -53,6 +53,8 @@ public class HistoryPanel extends JPanel
 
 	protected void addHistoryItem(String line1, String line2)
 	{
+		// Herein lies my horrible attempt at creating a new item at the top and pushing everything else down
+		// ¯\_(ツ)_/¯
 		removeAll();
 		HistoryItemPanel itemPanel = new HistoryItemPanel(line1, line2);
 		itemPanels.add(0, itemPanel);
@@ -62,6 +64,14 @@ public class HistoryPanel extends JPanel
 			c.gridy++;
 		});
 
+		repaint();
+		revalidate();
+	}
+
+	protected void clearHistory()
+	{
+		removeAll();
+		itemPanels.clear();
 		repaint();
 		revalidate();
 	}

@@ -25,6 +25,7 @@
 package net.runelite.client.plugins.calculator.ui;
 
 import javax.swing.JTextField;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,17 +34,13 @@ import lombok.Getter;
 @Data
 public class DisplayField extends JTextField
 {
+	@AllArgsConstructor
+	@Getter
 	protected enum Action
 	{
 		ADDITION("+"), SUBTRACTION("-"), MULTIPLICATION("*"), DIVISION("/");
 
-		@Getter
 		private final String character;
-
-		Action(String character)
-		{
-			this.character = character;
-		}
 	}
 
 	private Integer num1;
@@ -72,7 +69,6 @@ public class DisplayField extends JTextField
 				result = num1 * num2;
 				break;
 			case DIVISION:
-				// TODO: Handle divide by 0
 				if (num2 == 0)
 				{
 					reset();
@@ -95,6 +91,13 @@ public class DisplayField extends JTextField
 		result = null;
 		text = null;
 		update();
+	}
+
+	protected void clear()
+	{
+		reset();
+		finished = true;
+		previousResult = null;
 	}
 
 	protected void update()

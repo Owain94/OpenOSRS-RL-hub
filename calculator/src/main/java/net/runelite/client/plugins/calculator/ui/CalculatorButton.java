@@ -47,5 +47,7 @@ public class CalculatorButton extends JButton
 	public CalculatorButton(Icon icon)
 	{
 		super(icon);
+
+		setPreferredSize(PREFERRED_SIZE);
 	}
 }

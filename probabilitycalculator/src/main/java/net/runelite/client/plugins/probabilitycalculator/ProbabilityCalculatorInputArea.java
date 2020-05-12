@@ -72,7 +72,7 @@ public class ProbabilityCalculatorInputArea extends JPanel
 		}
 		catch (NumberFormatException e)
 		{
-			return 0.0;
+			return 0.1;
 		}
 	}
 

@@ -20,6 +20,5 @@ class Chompy
 		this.npc = npc;
 		this.spawnTime = Instant.now().plus(60,
 			ChronoUnit.SECONDS);
-		;
 	}
 }
