@@ -29,7 +29,7 @@ project.extra["PluginName"] = "InfluxDB"
 project.extra["PluginDescription"] = "Saves statistics to InfluxDB"
 
 dependencies {
-    implementation(group = "org.influxdb", name = "influxdb-java", version = "2.15")
+    implementation(group = "org.influxdb", name = "influxdb-java", version = "2.18")
 }
 
 tasks {
