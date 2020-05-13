@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.10"
+version = "0.0.1"
 
-project.extra["PluginName"] = "PvP Performance Tracker"
-project.extra["PluginDescription"] = "Estimate performance in PvP by tracking various stats."
+project.extra["PluginName"] = "Group Iron Man"
+project.extra["PluginDescription"] = "Adds the capability to play Group Iron Man"
 
 tasks {
     jar {
