@@ -99,7 +99,7 @@ public class CrabStunPlugin extends Plugin
 		}
 		final int CRAB_STUN_GRAPHIC = 245;
 		Actor actor = event.getActor();
-		if (actor.getName() != null && actor.getName().contains("Jewelled Crab") && actor.getAnimation() == CRAB_STUN_GRAPHIC)
+		if (actor.getName() != null && actor.getName().contains("Jewelled Crab") && actor.getSpotAnimation() == CRAB_STUN_GRAPHIC)
 		{
 			WorldPoint worldPoint = actor.getWorldLocation();
 			CrabStun stunEvent = new CrabStun(actor, worldPoint, Instant.now(), getStunDurationTicks(), 0);
