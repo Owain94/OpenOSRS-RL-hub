@@ -120,7 +120,7 @@ class FightPerformancePanel extends JPanel
 		if (frameIcon == null || deathIcon == null)
 		{
 			// load & rescale red skull icon used to show if a player/opponent died in a fight and as the frame icon.
-			frameIcon = new ImageIcon(ImageUtil.getResourceStreamFromClass(getClass(), "/skull_red.png")).getImage();
+			frameIcon = new ImageIcon(ImageUtil.getResourceStreamFromClass(getClass(), "skull_red.png")).getImage();
 			deathIcon = new ImageIcon(frameIcon.getScaledInstance(12, 12, Image.SCALE_DEFAULT));
 		}
 
