@@ -14,6 +14,21 @@ public class FixedHideChatConstants
 		561
 	);
 
+	private static final Map.Entry<Integer, Integer>  CHATBOX_MESSAGES_DIALOG_NPC = new AbstractMap.SimpleEntry<>(
+		WidgetInfo.DIALOG_NPC.getGroupId(),
+		WidgetInfo.DIALOG_NPC.getChildId()
+	);
+
+	private static final Map.Entry<Integer, Integer>  CHATBOX_MESSAGES_DIALOG_PLAYER = new AbstractMap.SimpleEntry<>(
+		WidgetInfo.DIALOG_PLAYER.getGroupId(),
+		WidgetInfo.DIALOG_PLAYER.getChildId()
+	);
+
+	private static final Map.Entry<Integer, Integer>  CHATBOX_MESSAGES_DIALOG_SPRITE = new AbstractMap.SimpleEntry<>(
+		WidgetInfo.DIALOG_SPRITE.getGroupId(),
+		WidgetInfo.DIALOG_SPRITE.getChildId()
+	);
+
 	private static final Map.Entry<Integer, Integer> CHATBOX_MESSAGES_CONTAINER = new AbstractMap.SimpleEntry<>(
 		WidgetInfo.CHATBOX_CONTAINER.getGroupId(),
 		WidgetInfo.CHATBOX_CONTAINER.getChildId()
@@ -46,6 +61,9 @@ public class FixedHideChatConstants
 		.<Map.Entry<Integer, Integer>>builder()
 		.add(CHATBOX_MESSAGES_DIALOG)
 		.add(CHATBOX_MESSAGES_CONTAINER)
+		.add(CHATBOX_MESSAGES_DIALOG_NPC)
+		.add(CHATBOX_MESSAGES_DIALOG_PLAYER)
+		.add(CHATBOX_MESSAGES_DIALOG_SPRITE)
 		.build();
 
 	static final Set<Map.Entry<Integer, Integer>> TO_CONTRACT_WIDGETS = ImmutableSet

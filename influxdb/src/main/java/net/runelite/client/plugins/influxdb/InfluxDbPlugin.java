@@ -6,6 +6,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
@@ -17,6 +19,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.StatChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
@@ -32,6 +35,7 @@ import org.pf4j.Extension;
 	type = PluginType.MISCELLANEOUS,
 	enabledByDefault = false
 )
+@Slf4j
 public class InfluxDbPlugin extends Plugin
 {
 	private int flushTaskInterval;
@@ -48,6 +52,9 @@ public class InfluxDbPlugin extends Plugin
 
 	@Inject
 	private InfluxDbConfig config;
+
+	@Inject
+	private Client client;
 
 	@Inject
 	private MeasurementCreator measurer;
@@ -126,6 +133,38 @@ public class InfluxDbPlugin extends Plugin
 		if (config.writeSelfMeta())
 		{
 			writer.submit(measurer.createSelfMeasurement());
+		}
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged changed)
+	{
+		if (!config.writeKillCount())
+		{
+			return;
+		}
+		// Piggyback on the chat commands plugin to record kill count to avoid
+		// duplicating the complex logic to keep up to date on kill counts
+		if (!changed.getGroup().startsWith("killcount.") || changed.getNewValue() == null)
+		{
+			return;
+		}
+		if (!changed.getGroup().equals("killcount." + client.getUsername().toLowerCase()))
+		{
+			return;
+		}
+		try
+		{
+			String boss = changed.getKey();
+			int kc = Integer.parseInt(changed.getNewValue());
+			writer.submit(measurer.createKillCountMeasurement(boss, kc));
+		}
+		catch (NumberFormatException ex)
+		{
+			log.debug("Failed to parse KC for boss {} value {}",
+				changed.getKey(),
+				changed.getNewValue(),
+				ex);
 		}
 	}
 

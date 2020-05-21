@@ -2,13 +2,15 @@ package net.runelite.client.plugins.inventoryscrabble;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
+import com.google.inject.Provides;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
@@ -19,9 +21,16 @@ import net.runelite.api.Player;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.util.Text;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.chat.ChatColorType;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -35,10 +44,9 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
-@Slf4j
 public class InventoryScrabblePlugin extends Plugin
 {
-
+	static final String CONFIG_GROUP = "inventoryscrabble";
 	private static final Set<Integer> TUTORIAL_ISLAND_REGIONS = Set.of(12336, 12335, 12592, 12080, 12079, 12436);
 
 	@Inject
@@ -48,7 +56,13 @@ public class InventoryScrabblePlugin extends Plugin
 	private ClientThread clientThread;
 
 	@Inject
+	private InventoryScrabbleConfig config;
+
+	@Inject
 	private ItemManager itemManager;
+
+	@Inject
+	private ChatMessageManager chatMessageManager;
 
 	private boolean onTutorialIsland;
 	private Multiset<Character> counts;
@@ -56,7 +70,6 @@ public class InventoryScrabblePlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		log.info("Inventory Scrabble started!");
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			clientThread.invokeLater(() -> {
@@ -70,26 +83,48 @@ public class InventoryScrabblePlugin extends Plugin
 	protected void shutDown()
 	{
 		counts.clear();
-		log.info("Inventory Scrabble stopped!");
 	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (client.getGameState() == GameState.LOGGED_IN && event.getGroup().equals(CONFIG_GROUP))
+		{
+			clientThread.invokeLater(this::gatherItemNames);
+		}
+	}
+
 
 	private void gatherItemNames()
 	{
 		final ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
+		final ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
+		counts = HashMultiset.create();
 
-		if (inventory != null)
+		addCharsFrom(inventory);
+
+		if (config.wornItems())
 		{
-			counts = HashMultiset.create();
-			Arrays.stream(inventory.getItems())
-				.map(item -> itemManager.getItemDefinition(item.getId())
-					.getName()
-					.toLowerCase())
-				.filter(name -> !name.equals("null"))
-				.map(name -> Text.removeTags(name)
-					.replaceAll("[^a-z]", "")
-					.charAt(0))
-				.forEach(c -> counts.add(c));
+			addCharsFrom(equipment);
 		}
+	}
+
+	private void addCharsFrom(ItemContainer container)
+	{
+		if (container == null)
+		{
+			return;
+		}
+
+		Arrays.stream(container.getItems())
+			.map(item -> itemManager.getItemDefinition(item.getId())
+				.getName()
+				.toLowerCase())
+			.filter(name -> !name.equals("null"))
+			.map(name -> Text.removeTags(name)
+				.replaceAll("[^a-z]", "")
+				.charAt(0))
+			.forEach(c -> counts.add(c));
 	}
 
 	@Subscribe
@@ -105,7 +140,8 @@ public class InventoryScrabblePlugin extends Plugin
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (event.getItemContainer() == client.getItemContainer(InventoryID.INVENTORY))
+		if (event.getItemContainer() == client.getItemContainer(InventoryID.INVENTORY)
+			|| event.getItemContainer() == client.getItemContainer(InventoryID.EQUIPMENT))
 		{
 			gatherItemNames();
 		}
@@ -129,7 +165,7 @@ public class InventoryScrabblePlugin extends Plugin
 		{
 			int type = entry.getOpcode();
 
-			if (isNpcEntry(type))
+			if (isNpcEntry(type) || config.hardMode() && isObjectEntry(type))
 			{
 				String target = entry.getTarget();
 
@@ -158,7 +194,20 @@ public class InventoryScrabblePlugin extends Plugin
 
 	Multiset<Character> cleanTarget(String target)
 	{
-		String noTags = Text.removeTags(target).toLowerCase();
+		String name = onlyName(target);
+		Multiset<Character> targetCount = HashMultiset.create();
+		char[] chars = name.toLowerCase().replaceAll("[^a-z]", "").toCharArray();
+		for (char c : chars)
+		{
+			targetCount.add(c);
+		}
+
+		return targetCount;
+	}
+
+	private String onlyName(String target)
+	{
+		String noTags = Text.removeTags(target);
 
 		// Do not include level in the comparison
 		int idx = noTags.indexOf('(');
@@ -169,14 +218,7 @@ public class InventoryScrabblePlugin extends Plugin
 			name = noTags.substring(0, idx);
 		}
 
-		Multiset<Character> targetCount = HashMultiset.create();
-		char[] chars = name.replaceAll("[^a-z]", "").toCharArray();
-		for (char c : chars)
-		{
-			targetCount.add(c);
-		}
-
-		return targetCount;
+		return name;
 	}
 
 	boolean isNpcEntry(int type)
@@ -203,6 +245,25 @@ public class InventoryScrabblePlugin extends Plugin
 		}
 	}
 
+	boolean isObjectEntry(int type)
+	{
+		MenuOpcode action = MenuOpcode.of(type);
+
+		switch (action)
+		{
+			case SPELL_CAST_ON_GAME_OBJECT:
+			case ITEM_USE_ON_GAME_OBJECT:
+			case GAME_OBJECT_FIRST_OPTION:
+			case GAME_OBJECT_SECOND_OPTION:
+			case GAME_OBJECT_THIRD_OPTION:
+			case GAME_OBJECT_FOURTH_OPTION:
+			case GAME_OBJECT_FIFTH_OPTION:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	private void checkArea()
 	{
 		final Player player = client.getLocalPlayer();
@@ -210,5 +271,64 @@ public class InventoryScrabblePlugin extends Plugin
 		{
 			onTutorialIsland = true;
 		}
+	}
+
+	@Subscribe
+	public void onMenuOptionClicked(MenuOptionClicked event)
+	{
+		if (event.getMenuOpcode() != MenuOpcode.EXAMINE_NPC
+			&& (!config.hardMode() || event.getMenuOpcode() != MenuOpcode.EXAMINE_OBJECT))
+		{
+			return;
+		}
+
+		Multiset<Character> targetChars = cleanTarget(event.getTarget());
+		Multiset<Character> diff = Multisets.difference(targetChars, counts);
+
+		if (diff.isEmpty())
+		{
+			return;
+		}
+
+		String name = onlyName(event.getTarget());
+
+		final StringBuilder sb = new StringBuilder();
+
+		diff.entrySet().stream().forEach(e -> {
+			Character c = Character.toUpperCase(e.getElement());
+			sb.append(" ").append(c);
+			if (e.getCount() > 1)
+			{
+				sb.append("x").append(e.getCount());
+			}
+		});
+
+		sendChatMessage(sb.toString(), name.trim());
+	}
+
+	private void sendChatMessage(String missingChars, String name)
+	{
+		final String message = new ChatMessageBuilder()
+			.append(ChatColorType.NORMAL)
+			.append("[Scrabble]").append(" Missing")
+			.append(ChatColorType.HIGHLIGHT)
+			.append(missingChars)
+			.append(ChatColorType.NORMAL)
+			.append(" to allow interactions with ")
+			.append(name)
+			.append(".")
+			.build();
+
+		chatMessageManager.queue(
+			QueuedMessage.builder()
+				.type(ChatMessageType.CONSOLE)
+				.runeLiteFormattedMessage(message)
+				.build());
+	}
+
+	@Provides
+	InventoryScrabbleConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(InventoryScrabbleConfig.class);
 	}
 }

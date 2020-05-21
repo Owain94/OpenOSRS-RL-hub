@@ -56,4 +56,26 @@ public interface SkillsTabProgressBarsConfig extends Config
 	{
 		return 3;
 	}
+
+	@ConfigItem(
+		keyName = "virtualLevels",
+		name = "Show for virtual levels",
+		description = "Show progress towards 'virtual levels' past 99",
+		position = 5
+	)
+	default boolean virtualLevels()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "showGoals",
+		name = "Show goals progress",
+		description = "Show progress towards the goals you set using the in-game XP menu in addition to progress towards individual levels",
+		position = 6
+	)
+	default boolean showGoals()
+	{
+		return false;
+	}
 }

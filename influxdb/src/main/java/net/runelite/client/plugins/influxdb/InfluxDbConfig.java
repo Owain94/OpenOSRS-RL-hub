@@ -85,6 +85,16 @@ public interface InfluxDbConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "writeKillCount",
+		name = "Submit Kill Count",
+		description = "Submits boss kill counts (requires Chat Commands plugin)"
+	)
+	default boolean writeKillCount()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "writeInterval",
 		name = "Recording interval",
 		description = "Minimum interval between measurements"

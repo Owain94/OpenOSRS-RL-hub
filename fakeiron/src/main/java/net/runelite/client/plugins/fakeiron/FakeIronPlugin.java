@@ -134,29 +134,31 @@ public class FakeIronPlugin extends Plugin
 
 	private void loadSprites()
 	{
-		IndexedSprite[] modIcons = client.getModIcons();
-		IndexedSprite[] newAry = Arrays.copyOf(modIcons, Math.toIntExact(
-			modIcons.length +
-				Stream.of(FakeIronIcons.values()).filter(icon -> !icon.getImagePath().equals("")).count()));
-		int modIconsStart = modIcons.length - 1;
+		clientThread.invoke(() -> {
+			IndexedSprite[] modIcons = client.getModIcons();
+			IndexedSprite[] newAry = Arrays.copyOf(modIcons, Math.toIntExact(
+				modIcons.length +
+					Stream.of(FakeIronIcons.values()).filter(icon -> !icon.getImagePath().equals("")).count()));
+			int modIconsStart = modIcons.length - 1;
 
-		iconIds.put(FakeIronIcons.IRONMAN, IconID.IRONMAN.getIndex());
-		iconIds.put(FakeIronIcons.ULTIMATE, IconID.ULTIMATE_IRONMAN.getIndex());
-		iconIds.put(FakeIronIcons.HCIM, IconID.HARDCORE_IRONMAN.getIndex());
+			iconIds.put(FakeIronIcons.IRONMAN, IconID.IRONMAN.getIndex());
+			iconIds.put(FakeIronIcons.ULTIMATE, IconID.ULTIMATE_IRONMAN.getIndex());
+			iconIds.put(FakeIronIcons.HCIM, IconID.HARDCORE_IRONMAN.getIndex());
 
-		for (FakeIronIcons icon : FakeIronIcons.values())
-		{
-			if (icon.getImagePath().equals(""))
+			for (FakeIronIcons icon : FakeIronIcons.values())
 			{
-				continue;
+				if (icon.getImagePath().equals(""))
+				{
+					continue;
+				}
+
+				final IndexedSprite sprite = getIndexedSprite(icon.getImagePath());
+				newAry[++modIconsStart] = sprite;
+				iconIds.put(icon, modIconsStart);
 			}
 
-			final IndexedSprite sprite = getIndexedSprite(icon.getImagePath());
-			newAry[++modIconsStart] = sprite;
-			iconIds.put(icon, modIconsStart);
-		}
-
-		client.setModIcons(newAry);
+			client.setModIcons(newAry);
+		});
 	}
 
 	@Override

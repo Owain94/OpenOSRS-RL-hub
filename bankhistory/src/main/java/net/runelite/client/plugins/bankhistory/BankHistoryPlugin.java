@@ -104,7 +104,7 @@ public class BankHistoryPlugin extends Plugin
 		{
 			if (bankHistoryPanel == null)
 			{
-				log.trace("Setting the active panel to the bank history panel");
+				log.debug("Setting the active panel to the bank history panel");
 				bankHistoryPanel = injector.getInstance(BankHistoryPanel.class);
 				bankHistoryPanel.init(username);
 				setCurrentPanel(bankHistoryPanel);
@@ -112,7 +112,7 @@ public class BankHistoryPlugin extends Plugin
 		}
 		else
 		{
-			log.trace("Setting the active panel to the default panel");
+			log.debug("Setting the active panel to the default panel");
 			DefaultBankValuePanel panel = new DefaultBankValuePanel();
 			panel.init();
 			setCurrentPanel(panel);
@@ -152,7 +152,7 @@ public class BankHistoryPlugin extends Plugin
 			{
 				if (component instanceof PluginPanel)
 				{
-					log.trace("Removing plugin panel instance from container");
+					log.debug("Removing plugin panel instance from container");
 					con.remove(component);
 				}
 			}
@@ -175,7 +175,7 @@ public class BankHistoryPlugin extends Plugin
 	{
 		if (event.getGroupId() == WidgetID.BANK_GROUP_ID)
 		{
-			log.trace("Player opened the bank");
+			log.debug("Player opened the bank");
 			SwingUtilities.invokeAndWait(() -> this.setActivePanel(client.getUsername()));
 			if (isHistoryPanelActive())
 			{

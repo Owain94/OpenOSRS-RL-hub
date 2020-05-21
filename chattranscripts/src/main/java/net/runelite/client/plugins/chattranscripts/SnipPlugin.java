@@ -30,13 +30,10 @@ public class SnipPlugin extends Plugin
 
 	@Inject
 	private ClientToolbar clientToolbar;
-
 	@Inject
 	private SnipConfig config;
-
 	@Inject
 	private ClanManager clanManager;
-
 	private SnipPanel panel;
 	private NavigationButton button;
 	final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "227-0.png");
