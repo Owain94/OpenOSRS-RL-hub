@@ -646,7 +646,7 @@ public class TheatreOfBloodStatsPlugin extends Plugin
 				.append("\n")
 				.append(ChatColorType.NORMAL)
 				.append("Pre Screech Damage - ")
-				.append(Color.RED, DMG_FORMAT.format(xarpusPreScreech) + " (" + DECIMAL_FORMAT.format(percent) + ")")
+				.append(Color.RED, DMG_FORMAT.format(xarpusPreScreech) + " (" + DECIMAL_FORMAT.format(percent) + "%)")
 				.build();
 
 			if (message != null)

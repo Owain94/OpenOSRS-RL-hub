@@ -216,9 +216,9 @@ public class SnipPanel extends PluginPanel
 	private Boolean scrubChat(String start, String end)
 	{
 		Ready = false;
-		if (client.getWidget(162, 58) != null)
+		if (client.getWidget(162, 59) != null)
 		{
-			Widget[] Testing = client.getWidget(162, 58).getDynamicChildren();
+			Widget[] Testing = client.getWidget(162, 59).getDynamicChildren();
 			if (Testing.length == 0)
 			{
 				return (false);
