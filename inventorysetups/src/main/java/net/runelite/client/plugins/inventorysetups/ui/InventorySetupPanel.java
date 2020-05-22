@@ -31,10 +31,8 @@ import javax.swing.JPopupMenu;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupPlugin;
 
-
 public class InventorySetupPanel extends JPanel
 {
-
 	protected final InventorySetupPlugin plugin;
 	protected final InventorySetupPluginPanel panel;
 	protected final InventorySetup inventorySetup;

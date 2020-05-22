@@ -32,35 +32,36 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import joptsimple.internal.Strings;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.ItemID;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.MenuOpcode;
 import net.runelite.api.SpriteID;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.VarClientStr;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.api.events.VarClientIntChanged;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.vars.InputType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -74,6 +75,7 @@ import net.runelite.client.events.SessionClose;
 import net.runelite.client.events.SessionOpen;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemVariationMapping;
+import net.runelite.client.game.SpriteManager;
 import net.runelite.client.game.chatbox.ChatboxItemSearch;
 import net.runelite.client.game.chatbox.ChatboxPanelManager;
 import net.runelite.client.game.chatbox.ChatboxTextInput;
@@ -86,8 +88,10 @@ import net.runelite.client.plugins.inventorysetups.ui.InventorySetupPluginPanel;
 import net.runelite.client.plugins.inventorysetups.ui.InventorySetupSlot;
 import net.runelite.client.plugins.runepouch.Runes;
 import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.JagexColors;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.components.colorpicker.ColorPickerManager;
+import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
@@ -100,26 +104,24 @@ import org.pf4j.Extension;
 	type = PluginType.UTILITY,
 	enabledByDefault = false
 )
+@Slf4j
 public class InventorySetupPlugin extends Plugin
 {
 
 	public static final String CONFIG_GROUP = "inventorysetups";
 	public static final String CONFIG_KEY = "setups";
 	public static final String CONFIG_KEY_COMPACT_MODE = "compactMode";
+	public static final String CONFIG_KEY_HIDE_BUTTON = "hideHelpButton";
 	public static final String INV_SEARCH = "inv:";
 	public static final String LABEL_SEARCH = "Inv. Setup";
+	private static final String OPEN_SETUP_MENU_ENTRY = "Open setup";
+	private static final String RETURN_TO_OVERVIEW_ENTRY = "Close current setup";
 	private static final int NUM_INVENTORY_ITEMS = 28;
 	private static final int NUM_EQUIPMENT_ITEMS = 14;
-	private static final Varbits[] RUNE_POUCH_AMOUNT_VARBITS =
-		{
-			Varbits.RUNE_POUCH_AMOUNT1, Varbits.RUNE_POUCH_AMOUNT2, Varbits.RUNE_POUCH_AMOUNT3
-		};
-	private static final Varbits[] RUNE_POUCH_RUNE_VARBITS =
-		{
-			Varbits.RUNE_POUCH_RUNE1, Varbits.RUNE_POUCH_RUNE2, Varbits.RUNE_POUCH_RUNE3
-		};
+	private static final int SPELLBOOK_VARBIT = 4070;
 
 	@Inject
+	@Getter
 	private Client client;
 
 	@Inject
@@ -129,9 +131,14 @@ public class InventorySetupPlugin extends Plugin
 	private ItemManager itemManager;
 
 	@Inject
+	@Getter
+	private SpriteManager spriteManager;
+
+	@Inject
 	private ClientToolbar clientToolbar;
 
 	@Inject
+	@Getter
 	private ClientThread clientThread;
 
 	@Inject
@@ -166,8 +173,16 @@ public class InventorySetupPlugin extends Plugin
 
 	private ChatboxTextInput searchInput;
 
-	// Used to remember if filtering is currently active in the bank
-	private boolean filteringActive = false;
+	private boolean doBankSearchOnNextGameTick;
+
+	private static final Varbits[] RUNE_POUCH_AMOUNT_VARBITS =
+		{
+			Varbits.RUNE_POUCH_AMOUNT1, Varbits.RUNE_POUCH_AMOUNT2, Varbits.RUNE_POUCH_AMOUNT3
+		};
+	private static final Varbits[] RUNE_POUCH_RUNE_VARBITS =
+		{
+			Varbits.RUNE_POUCH_RUNE1, Varbits.RUNE_POUCH_RUNE2, Varbits.RUNE_POUCH_RUNE3
+		};
 
 	private final HotkeyListener returnToSetupsHotkeyListener = new HotkeyListener(() -> config.returnToSetupsHotkey())
 	{
@@ -196,7 +211,7 @@ public class InventorySetupPlugin extends Plugin
 					return false;
 				}
 
-				doBankSearch(false);
+				doBankSearch(InputType.SEARCH, false);
 				return true;
 			});
 		}
@@ -213,10 +228,53 @@ public class InventorySetupPlugin extends Plugin
 	{
 		if (event.getGroup().equals(CONFIG_GROUP))
 		{
-			if (event.getKey().equals(CONFIG_KEY_COMPACT_MODE))
+			if (event.getKey().equals(CONFIG_KEY_COMPACT_MODE) || event.getKey().equals(CONFIG_KEY_HIDE_BUTTON))
 			{
 				panel.rebuild();
 			}
+		}
+	}
+
+	@Subscribe
+	public void onMenuEntryAdded(MenuEntryAdded event)
+	{
+		if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
+			&& event.getOption().equals("Search"))
+		{
+			insertMenuEntry(event, LABEL_SEARCH, event.getTarget());
+		}
+
+		Widget bankWidget = client.getWidget(WidgetInfo.BANK_TITLE_BAR);
+		if (bankWidget == null || bankWidget.isHidden())
+		{
+			return;
+		}
+
+		if (event.getOption().equals("Show worn items"))
+		{
+			MenuEntry[] menuEntries = client.getMenuEntries();
+			final int oldMenuSize = menuEntries.length;
+			menuEntries = Arrays.copyOf(menuEntries, oldMenuSize + inventorySetups.size() + 1);
+
+			for (int i = 0; i < inventorySetups.size(); i++)
+			{
+				MenuEntry menuEntry = menuEntries[oldMenuSize + i] = new MenuEntry();
+				menuEntry.setOption(OPEN_SETUP_MENU_ENTRY);
+				menuEntry.setTarget(ColorUtil.prependColorTag(inventorySetups.get(inventorySetups.size() - 1 - i).getName(), JagexColors.MENU_TARGET));
+
+				// The param will used to find the correct setup if a menu entry is clicked
+				menuEntry.setIdentifier(inventorySetups.size() - 1 - i);
+				menuEntry.setOpcode(MenuOpcode.RUNELITE.getId());
+			}
+
+			// add menu entry to close setup
+			MenuEntry menuEntryCloseSetup = menuEntries[menuEntries.length - 1] = new MenuEntry();
+			menuEntryCloseSetup.setOption(RETURN_TO_OVERVIEW_ENTRY);
+			menuEntryCloseSetup.setOpcode(MenuOpcode.RUNELITE.getId());
+			menuEntryCloseSetup.setTarget("");
+			menuEntryCloseSetup.setIdentifier(0);
+
+			client.setMenuEntries(menuEntries);
 		}
 	}
 
@@ -228,7 +286,8 @@ public class InventorySetupPlugin extends Plugin
 	@Override
 	public void startUp()
 	{
-		panel = new InventorySetupPluginPanel(this, itemManager);
+		this.doBankSearchOnNextGameTick = false;
+		this.panel = new InventorySetupPluginPanel(this, itemManager);
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "inventorysetups_icon.png");
 
 		navButton = NavigationButton.builder()
@@ -245,27 +304,21 @@ public class InventorySetupPlugin extends Plugin
 		// load all the inventory setups from the config file
 		clientThread.invokeLater(() ->
 		{
-			if (client.getGameState() != GameState.LOGIN_SCREEN)
+			switch (client.getGameState())
 			{
-				return false;
+				case STARTING:
+				case UNKNOWN:
+					return false;
 			}
 
 			loadConfig();
 
 			SwingUtilities.invokeLater(() ->
-			{
-				panel.rebuild();
-			});
+				panel.rebuild());
 
 			return true;
 		});
-	}
 
-	@Override
-	public void shutDown()
-	{
-		clientToolbar.removeNavigation(navButton);
-		bankSearch.reset(true);
 	}
 
 	public void addInventorySetup()
@@ -292,13 +345,16 @@ public class InventorySetupPlugin extends Plugin
 				runePouchData = getRunePouchData();
 			}
 
+			int spellbook = getCurrentSpellbook();
+
 			final InventorySetup invSetup = new InventorySetup(inv, eqp, runePouchData, name,
 				config.highlightColor(),
 				config.highlightStackDifference(),
 				config.highlightVariationDifference(),
 				config.highlightDifference(),
 				config.bankFilter(),
-				config.highlightUnorderedDifference());
+				config.highlightUnorderedDifference(),
+				spellbook);
 			addInventorySetupClientThread(invSetup);
 		});
 	}
@@ -316,7 +372,7 @@ public class InventorySetupPlugin extends Plugin
 
 		Collections.swap(inventorySetups, invIndex, invIndex + 1);
 		panel.rebuild();
-		updateJsonConfig();
+		updateConfig();
 	}
 
 	public void moveSetupUp(final InventorySetup setup)
@@ -332,7 +388,7 @@ public class InventorySetupPlugin extends Plugin
 
 		Collections.swap(inventorySetups, invIndex, invIndex - 1);
 		panel.rebuild();
-		updateJsonConfig();
+		updateConfig();
 	}
 
 	public List<InventorySetup> filterSetups(String textToFilter)
@@ -343,14 +399,14 @@ public class InventorySetupPlugin extends Plugin
 			.collect(Collectors.toList());
 	}
 
-	public void doBankSearch(boolean ignoreFilter)
+	public void doBankSearch(InputType type, boolean ignoreFilter)
 	{
 		final InventorySetup currentSelectedSetup = panel.getCurrentSelectedSetup();
 
 		if (currentSelectedSetup != null && (ignoreFilter || currentSelectedSetup.isFilterBank()))
 		{
 			client.setVarbit(Varbits.CURRENT_BANK_TAB, 0);
-			bankSearch.search(InputType.SEARCH, INV_SEARCH + currentSelectedSetup.getName(), true);
+			bankSearch.search(type, INV_SEARCH + currentSelectedSetup.getName(), true);
 
 			// When tab is selected with search window open, the search window closes but the search button
 			// stays highlighted, this solves that issue
@@ -367,48 +423,118 @@ public class InventorySetupPlugin extends Plugin
 	}
 
 	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		// filter the bank if the requirements are met
+		// this is for when withdraw-x or deposit-x are clicked.
+		if (doBankSearchOnNextGameTick
+			&& panel.getCurrentSelectedSetup() != null
+			&& client.getVar(VarClientInt.INPUT_TYPE) == InputType.NONE.getType()
+			&& !bankIsFiltered())
+		{
+			doBankSearch(InputType.NONE, false);
+			doBankSearchOnNextGameTick = false;
+		}
+	}
+
+	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
-			&& event.getOption().equals(LABEL_SEARCH))
+		if (event.getMenuOpcode() == MenuOpcode.RUNELITE)
 		{
-			doBankSearch(true);
+			if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
+				&& event.getOption().equals(LABEL_SEARCH))
+			{
+				doBankSearch(InputType.SEARCH, true);
+				return;
+			}
+
+			if (event.getOption().equals(OPEN_SETUP_MENU_ENTRY))
+			{
+				assert event.getIdentifier() >= 0 && event.getIdentifier() < inventorySetups.size() : "Action param out of range";
+
+				resetBankSearch();
+				panel.setCurrentInventorySetup(inventorySetups.get(event.getIdentifier()), true);
+				return;
+			}
+
+			if (event.getOption().equals(RETURN_TO_OVERVIEW_ENTRY))
+			{
+				panel.returnToOverviewPanel();
+			}
 		}
 
-		if (panel.getCurrentSelectedSetup() != null
-			&& event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
+		if (panel.getCurrentSelectedSetup() == null)
+		{
+			return;
+		}
+
+		if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
 			&& client.getWidget(WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND).getSpriteId() != SpriteID.EQUIPMENT_SLOT_SELECTED)
 		{
 			// This ensures that when clicking Search when tab is selected, the search input is opened rather
 			// than client trying to close it first
 			client.setVar(VarClientStr.INPUT_TEXT, "");
 			client.setVar(VarClientInt.INPUT_TYPE, 0);
+
+			// don't allow the bank to retry a filter if the search button is clicked
+			doBankSearchOnNextGameTick = false;
+		}
+
+		// if withdraw or deposit x is clicked, we need to refilter the bank
+		if ((event.getParam1() == WidgetInfo.BANK_ITEM_CONTAINER.getId()
+			|| event.getParam1() == WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId())
+			&& event.getMenuOpcode() == MenuOpcode.CC_OP_LOW_PRIORITY
+			&& (event.getOption().equalsIgnoreCase("withdraw-x")
+			|| event.getOption().equalsIgnoreCase("deposit-x"))
+			&& bankIsFiltered())
+		{
+			doBankSearchOnNextGameTick = true;
+		}
+
+		// if a bank tab is clicked, then make sure we do not try to filter
+		if (doBankSearchOnNextGameTick
+			&& event.getParam1() == WidgetInfo.BANK_TAB_CONTAINER.getId()
+			&& event.getOption().startsWith("View"))
+		{
+			doBankSearchOnNextGameTick = false;
 		}
 	}
 
 	@Subscribe
 	public void onVarClientIntChanged(VarClientIntChanged event)
 	{
-		if (event.getIndex() != 386)
+		if (event.getIndex() == 386)
 		{
-			return;
+			// must be invoked later otherwise causes freezing.
+			clientThread.invokeLater(() ->
+			{
+				// Note: small bug here because when the settings or equip items button is pressed
+				// it will re filter the bank even if the user has clicked somewhere to remove the filter
+				// possible fix: use MenuOptionClicked for buttons and check spriteId to see if they are being unclicked
+				// and go back to widgetOpened to check if the bank was opened.
+
+				// checks to see if the hide worn items button was clicked or bank was opened
+				int value = client.getVarcIntValue(386);
+				if (value == 0)
+				{
+					doBankSearch(InputType.SEARCH, false);
+				}
+			});
+		}
+	}
+
+	@Subscribe
+	public void onVarbitChanged(VarbitChanged event)
+	{
+
+		if (event.getIndex() == 439 && client.getGameState() == GameState.LOGGED_IN)
+		{
+			// must be invoked later otherwise causes freezing.
+			clientThread.invokeLater(() ->
+				panel.highlightSpellbook());
 		}
 
-		// must be invoked later otherwise causes freezing.
-		clientThread.invokeLater(() ->
-		{
-			// Note: small bug here because when the settings or equip items button is pressed
-			// it will re filter the bank even if the user has clicked somewhere to remove the filter
-			// possible fix: use MenuOptionClicked for buttons and check spriteId to see if they are being unclicked
-			// and go back to widgetOpened to check if the bank was opened.
-
-			// checks to see if the hide worn items button was clicked or bank was opened
-			int value = client.getVarcIntValue(386);
-			if (value == 0)
-			{
-				doBankSearch(false);
-			}
-		});
 	}
 
 	public void resetBankSearch()
@@ -419,6 +545,7 @@ public class InventorySetupPlugin extends Plugin
 	public List<InventorySetupItem> getRunePouchData()
 	{
 		List<InventorySetupItem> runePouchData = new ArrayList<>();
+
 		for (int i = 0; i < RUNE_POUCH_RUNE_VARBITS.length; i++)
 		{
 			int runeId = client.getVar(RUNE_POUCH_RUNE_VARBITS[i]);
@@ -445,9 +572,6 @@ public class InventorySetupPlugin extends Plugin
 
 		switch (eventName)
 		{
-			case "setBankTitle":
-				filteringActive = false;
-				break;
 			case "bankSearchFilter":
 			{
 				String search = stringStack[stringStackSize - 1];
@@ -455,7 +579,6 @@ public class InventorySetupPlugin extends Plugin
 				boolean invSearch = search.startsWith(INV_SEARCH);
 				if (invSearch)
 				{
-					filteringActive = true;
 					final InventorySetup currentSetup = panel.getCurrentSelectedSetup();
 
 					if (currentSetup != null)
@@ -476,14 +599,13 @@ public class InventorySetupPlugin extends Plugin
 				break;
 			}
 			case "getSearchingTagTab":
-				if (panel.getCurrentSelectedSetup() != null && filteringActive)
+				if (panel.getCurrentSelectedSetup() == null)
 				{
-					intStack[intStackSize - 1] = 1;
+					return;
 				}
-				else
-				{
-					intStack[intStackSize - 1] = 0;
-				}
+
+				// check if the bank is filtered. If it is, don't lay out again.
+				intStack[intStackSize - 1] = bankIsFiltered() ? 1 : 0;
 				break;
 		}
 	}
@@ -515,7 +637,8 @@ public class InventorySetupPlugin extends Plugin
 			setup.updateRunePouch(runePouchData);
 			setup.updateInventory(inv);
 			setup.updateEquipment(eqp);
-			updateJsonConfig();
+			setup.updateSpellbook(getCurrentSpellbook());
+			updateConfig();
 			panel.refreshCurrentSetup();
 		});
 	}
@@ -546,7 +669,7 @@ public class InventorySetupPlugin extends Plugin
 			}
 
 			container.set(slot.getIndexInSlot(), newItem);
-			updateJsonConfig();
+			updateConfig();
 			panel.refreshCurrentSetup();
 		});
 
@@ -554,7 +677,6 @@ public class InventorySetupPlugin extends Plugin
 
 	public void updateSlotFromSearch(final InventorySetupSlot slot)
 	{
-
 		if (client.getGameState() != GameState.LOGGED_IN)
 		{
 			JOptionPane.showMessageDialog(panel,
@@ -595,7 +717,8 @@ public class InventorySetupPlugin extends Plugin
 						final int finalIdCopy = finalId;
 						searchInput = chatboxPanelManager.openTextInput("Enter amount")
 							.addCharValidator(arg -> arg >= 48 && arg <= 57) // only allow numbers (ASCII)
-							.onDone((Consumer<String>) (input) ->
+							.onDone((input) ->
+							{
 								clientThread.invokeLater(() ->
 								{
 									String inputParsed = input;
@@ -619,10 +742,11 @@ public class InventorySetupPlugin extends Plugin
 									}
 
 									container.set(slot.getIndexInSlot(), newItem);
-									updateJsonConfig();
+									updateConfig();
 									panel.refreshCurrentSetup();
 
-								})).build();
+								});
+							}).build();
 					}
 					else
 					{
@@ -636,12 +760,26 @@ public class InventorySetupPlugin extends Plugin
 						}
 
 						container.set(slot.getIndexInSlot(), newItem);
-						updateJsonConfig();
+						updateConfig();
 						panel.refreshCurrentSetup();
 					}
 
 				}))
 			.build();
+	}
+
+	public void updateSpellbookInSetup(int newSpellbook)
+	{
+		assert panel.getCurrentSelectedSetup() != null : "Setup is null";
+		assert newSpellbook >= 0 && newSpellbook < 4 : "New spellbook out of range";
+
+		clientThread.invokeLater(() ->
+		{
+			panel.getCurrentSelectedSetup().updateSpellbook(newSpellbook);
+			updateConfig();
+			panel.refreshCurrentSetup();
+		});
+
 	}
 
 	public void removeInventorySetup(final InventorySetup setup)
@@ -657,10 +795,10 @@ public class InventorySetupPlugin extends Plugin
 
 		inventorySetups.remove(setup);
 		panel.rebuild();
-		updateJsonConfig();
+		updateConfig();
 	}
 
-	public void updateJsonConfig()
+	public void updateConfig()
 	{
 		final Gson gson = new Gson();
 		final String json = gson.toJson(inventorySetups);
@@ -702,7 +840,6 @@ public class InventorySetupPlugin extends Plugin
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-
 		// check to see that the container is the equipment or inventory
 		ItemContainer container = event.getItemContainer();
 
@@ -714,7 +851,6 @@ public class InventorySetupPlugin extends Plugin
 		{
 			panel.highlightEquipment();
 		}
-
 	}
 
 	@Subscribe
@@ -722,16 +858,14 @@ public class InventorySetupPlugin extends Plugin
 	{
 		panel.highlightInventory();
 		panel.highlightEquipment();
+		panel.highlightSpellbook();
 	}
 
-	@Subscribe
-	public void onMenuEntryAdded(MenuEntryAdded event)
+	// Must be called on client thread!
+	public int getCurrentSpellbook()
 	{
-		if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
-			&& event.getOption().equals("Search"))
-		{
-			insertMenuEntry(event, LABEL_SEARCH, event.getTarget());
-		}
+		assert client.isClientThread() : "getCurrentSpellbook must be called on Client Thread";
+		return client.getVarbitValue(SPELLBOOK_VARBIT);
 	}
 
 	public List<InventorySetupItem> getNormalizedContainer(final InventorySetupSlotID id)
@@ -824,11 +958,14 @@ public class InventorySetupPlugin extends Plugin
 			}.getType();
 
 			final InventorySetup newSetup = gson.fromJson(setup, type);
-			if (newSetup.getRune_pouch() == null && checkIfContainerContainsItem(ItemID.RUNE_POUCH, newSetup.getInventory(), false, true))
+			clientThread.invokeLater(() ->
 			{
-				newSetup.updateRunePouch(getRunePouchData());
-			}
-			addInventorySetupClientThread(newSetup);
+				if (newSetup.getRune_pouch() == null && checkIfContainerContainsItem(ItemID.RUNE_POUCH, newSetup.getInventory(), false, true))
+				{
+					newSetup.updateRunePouch(getRunePouchData());
+				}
+				addInventorySetupClientThread(newSetup);
+			});
 		}
 		catch (Exception e)
 		{
@@ -837,6 +974,13 @@ public class InventorySetupPlugin extends Plugin
 				"Import Setup Failed",
 				JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	@Override
+	public void shutDown()
+	{
+		clientToolbar.removeNavigation(navButton);
+		bankSearch.reset(true);
 	}
 
 	public boolean isHighlightingAllowed()
@@ -877,47 +1021,21 @@ public class InventorySetupPlugin extends Plugin
 
 				}.getType();
 				inventorySetups = gson.fromJson(json, type);
-				for (final InventorySetup setup : inventorySetups)
+				clientThread.invokeLater(() ->
 				{
-					if (setup.getRune_pouch() == null && checkIfContainerContainsItem(ItemID.RUNE_POUCH, setup.getInventory(), false, true))
+					for (final InventorySetup setup : inventorySetups)
 					{
-						setup.updateRunePouch(getRunePouchData());
+						if (setup.getRune_pouch() == null && checkIfContainerContainsItem(ItemID.RUNE_POUCH, setup.getInventory(), false, true))
+						{
+							setup.updateRunePouch(getRunePouchData());
+						}
 					}
-				}
+				});
 			}
 			catch (Exception e)
 			{
 				inventorySetups = new ArrayList<>();
-
-				//Populate with old inventorysetups
-				final Gson gson = new Gson();
-				Type type = new TypeToken<HashMap<String, InventorySetupOld>>()
-				{
-				}.getType();
-
-				Map<String, InventorySetupOld> oldSetups = new HashMap<>(gson.fromJson(json, type));
-
-				for (String name : oldSetups.keySet())
-				{
-					InventorySetup newSetup = new InventorySetup(
-						new ArrayList<>(oldSetups.get(name).getInventory()),
-						new ArrayList<>(oldSetups.get(name).getEquipment()),
-						null,
-						name,
-						config.highlightColor(),
-						config.highlightStackDifference(),
-						config.highlightVariationDifference(),
-						config.highlightDifference(),
-						config.bankFilter(),
-						config.highlightUnorderedDifference());
-
-					inventorySetups.add(newSetup);
-				}
-
 			}
-
-			inventorySetups = inventorySetups.stream()
-				.sorted(Comparator.comparing(InventorySetup::getName, String::compareToIgnoreCase)).collect(Collectors.toCollection(ArrayList::new));
 		}
 	}
 
@@ -926,12 +1044,9 @@ public class InventorySetupPlugin extends Plugin
 		SwingUtilities.invokeLater(() ->
 		{
 			inventorySetups.add(newSetup);
-			inventorySetups = inventorySetups.stream()
-				.sorted(Comparator.comparing(InventorySetup::getName, String::compareToIgnoreCase)).collect(Collectors.toCollection(ArrayList::new));
-
 			panel.rebuild();
 
-			updateJsonConfig();
+			updateConfig();
 		});
 	}
 
@@ -993,7 +1108,6 @@ public class InventorySetupPlugin extends Plugin
 
 	private boolean updateIfRunePouch(final InventorySetupSlot slot, final InventorySetupItem oldItem, final InventorySetupItem newItem)
 	{
-
 		if (ItemVariationMapping.map(newItem.getId()) == ItemID.RUNE_POUCH)
 		{
 
@@ -1001,12 +1115,10 @@ public class InventorySetupPlugin extends Plugin
 			{
 
 				SwingUtilities.invokeLater(() ->
-				{
 					JOptionPane.showMessageDialog(panel,
 						"You can't have a Rune Pouch there.",
 						"Invalid Item",
-						JOptionPane.ERROR_MESSAGE);
-				});
+						JOptionPane.ERROR_MESSAGE));
 
 				return false;
 			}
@@ -1015,12 +1127,10 @@ public class InventorySetupPlugin extends Plugin
 			if (slot.getParentSetup().getRune_pouch() != null && ItemVariationMapping.map(oldItem.getId()) != ItemID.RUNE_POUCH)
 			{
 				SwingUtilities.invokeLater(() ->
-				{
 					JOptionPane.showMessageDialog(panel,
 						"You can't have two Rune Pouches.",
 						"Invalid Item",
-						JOptionPane.ERROR_MESSAGE);
-				});
+						JOptionPane.ERROR_MESSAGE));
 				return false;
 			}
 
@@ -1028,11 +1138,26 @@ public class InventorySetupPlugin extends Plugin
 		}
 		else if (ItemVariationMapping.map(oldItem.getId()) == ItemID.RUNE_POUCH)
 		{
-			// if the old item is a rune pouch, need to update it to null 
+			// if the old item is a rune pouch, need to update it to null
 			slot.getParentSetup().updateRunePouch(null);
 		}
 
 		return true;
+	}
+
+	private boolean bankIsFiltered()
+	{
+		if (panel.getCurrentSelectedSetup() != null)
+		{
+			Widget bankWidget = client.getWidget(WidgetInfo.BANK_TITLE_BAR);
+			if (bankWidget == null || bankWidget.isHidden())
+			{
+				return false;
+			}
+			String bankTitle = bankWidget.getText();
+			return bankTitle.equalsIgnoreCase("Showing items: <col=ff0000>" + INV_SEARCH + panel.getCurrentSelectedSetup().getName() + "</col>");
+		}
+		return false;
 	}
 
 	private void insertMenuEntry(MenuEntryAdded event, String option, String target)

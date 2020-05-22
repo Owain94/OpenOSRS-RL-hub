@@ -53,7 +53,6 @@ import net.runelite.client.util.ImageUtil;
 
 public class InventorySetupStandardPanel extends InventorySetupPanel
 {
-
 	private static final Border NAME_BOTTOM_BORDER = new CompoundBorder(
 		BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
 		BorderFactory.createLineBorder(ColorScheme.DARKER_GRAY_COLOR));
@@ -205,7 +204,7 @@ public class InventorySetupStandardPanel extends InventorySetupPanel
 				if (SwingUtilities.isLeftMouseButton(mouseEvent))
 				{
 					inventorySetup.setName(nameInput.getText());
-					plugin.updateJsonConfig();
+					plugin.updateConfig();
 
 					nameInput.setEditable(false);
 					updateNameActions(false);
@@ -316,7 +315,7 @@ public class InventorySetupStandardPanel extends InventorySetupPanel
 					inventorySetup.setFilterBank(!inventorySetup.isFilterBank());
 					bankFilterIndicator.setToolTipText(inventorySetup.isFilterBank() ? "Disable bank filtering" : "Enable bank filtering");
 					updateBankFilterLabel();
-					plugin.updateJsonConfig();
+					plugin.updateConfig();
 				}
 			}
 
@@ -345,7 +344,7 @@ public class InventorySetupStandardPanel extends InventorySetupPanel
 					inventorySetup.setStackDifference(!inventorySetup.isStackDifference());
 					stackDifferenceIndicator.setToolTipText(inventorySetup.isStackDifference() ? "Disable highlighting for stack differences" : "Enable highlighting for stack differences");
 					updateStackDifferenceLabel();
-					plugin.updateJsonConfig();
+					plugin.updateConfig();
 				}
 			}
 
@@ -374,7 +373,7 @@ public class InventorySetupStandardPanel extends InventorySetupPanel
 					inventorySetup.setVariationDifference(!inventorySetup.isVariationDifference());
 					variationDifferenceIndicator.setToolTipText(inventorySetup.isVariationDifference() ? "Disable highlighting for variation differences" : "Enable highlighting for variation differences");
 					updateVariationDifferenceLabel();
-					plugin.updateJsonConfig();
+					plugin.updateConfig();
 				}
 			}
 
@@ -403,7 +402,7 @@ public class InventorySetupStandardPanel extends InventorySetupPanel
 					inventorySetup.setUnorderedHighlight(!inventorySetup.isUnorderedHighlight());
 					unorderedHighlightIndicator.setToolTipText(inventorySetup.isUnorderedHighlight() ? "Enable default ordered highlighting" : "Only highlight items that are missing from the inventory and ignore order");
 					updateUnorderedHighlightIndicator();
-					plugin.updateJsonConfig();
+					plugin.updateConfig();
 				}
 			}
 
@@ -433,7 +432,7 @@ public class InventorySetupStandardPanel extends InventorySetupPanel
 					highlightIndicator.setToolTipText(inventorySetup.isHighlightDifference() ? "Disable highlighting" : "Enable highlighting");
 					updateToggleHighlightLabel();
 					updateHighlightColorLabel();
-					plugin.updateJsonConfig();
+					plugin.updateConfig();
 				}
 			}
 
@@ -650,7 +649,7 @@ public class InventorySetupStandardPanel extends InventorySetupPanel
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
-				plugin.updateJsonConfig();
+				plugin.updateConfig();
 			}
 		});
 

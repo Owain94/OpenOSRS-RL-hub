@@ -53,7 +53,7 @@ public class InventorySetupEquipmentPanel extends InventorySetupContainerPanel
 		for (EquipmentInventorySlot slot : EquipmentInventorySlot.values())
 		{
 			final InventorySetupSlot setupSlot = new InventorySetupSlot(ColorScheme.DARKER_GRAY_COLOR, InventorySetupSlotID.EQUIPMENT, slot.getSlotIdx());
-			super.addMouseListenerToSlot(setupSlot);
+			super.addUpdateFromSetupAndSearchMouseListenersToSlot(setupSlot);
 			equipmentSlots.put(slot, setupSlot);
 		}
 
@@ -80,6 +80,19 @@ public class InventorySetupEquipmentPanel extends InventorySetupContainerPanel
 	}
 
 	@Override
+	public void setSlots(final InventorySetup setup)
+	{
+		for (final EquipmentInventorySlot slot : EquipmentInventorySlot.values())
+		{
+			int i = slot.getSlotIdx();
+			super.setContainerSlot(i, equipmentSlots.get(slot), setup);
+		}
+
+		validate();
+		repaint();
+	}
+
+	@Override
 	public void highlightSlotDifferences(final List<InventorySetupItem> currEquipment, final InventorySetup inventorySetup)
 	{
 		final List<InventorySetupItem> equipToCheck = inventorySetup.getEquipment();
@@ -93,19 +106,6 @@ public class InventorySetupEquipmentPanel extends InventorySetupContainerPanel
 			int slotIdx = slot.getSlotIdx();
 			super.highlightDifferentSlotColor(inventorySetup, equipToCheck.get(slotIdx), currEquipment.get(slotIdx), equipmentSlots.get(slot));
 		}
-	}
-
-	@Override
-	public void setSlots(final InventorySetup setup)
-	{
-		for (final EquipmentInventorySlot slot : EquipmentInventorySlot.values())
-		{
-			int i = slot.getSlotIdx();
-			super.setContainerSlot(i, equipmentSlots.get(slot), setup);
-		}
-
-		validate();
-		repaint();
 	}
 
 	@Override

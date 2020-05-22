@@ -126,7 +126,6 @@ public class InventorySetupRunePouchPanel extends InventorySetupContainerPanel
 		{
 			slot.setBackground(setup.getHighlightColor());
 		}
-
 		isHighlighted = true;
 	}
 }
