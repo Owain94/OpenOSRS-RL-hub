@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020, melky <https://github.com/melkypie>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,21 +23,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+package net.runelite.client.plugins.clanchatcountryflags;
 
-project.extra["PluginName"] = "Clan Chat Country Flags"
-project.extra["PluginDescription"] = "Shows the flag of the world next to the world number"
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-tasks {
-    jar {
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+@ConfigGroup("worldflags")
+public interface WorldFlagsConfig extends Config
+{
+	@ConfigItem(
+		keyName = "showClanFlags",
+		name = "Show clan chat flags",
+		description = "Show amount of time remaining instead of completion time",
+		position = 1
+	)
+	default boolean showClanFlags()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "showFriendsFlags",
+		name = "Show friends flags",
+		description = "Show amount of time remaining instead of completion time",
+		position = 2
+	)
+	default boolean showFriendsFlags()
+	{
+		return true;
+	}
 }

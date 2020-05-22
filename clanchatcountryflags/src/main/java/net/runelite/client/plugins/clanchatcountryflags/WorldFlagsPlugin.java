@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.clanchatcountryflags;
 
+import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import javax.inject.Inject;
@@ -34,10 +35,13 @@ import net.runelite.api.IndexedSprite;
 import net.runelite.api.ScriptID;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ScriptPostFired;
+import net.runelite.api.util.Text;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -50,13 +54,13 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-	name = "Clan Chat Country flags",
+	name = "World country flags",
 	description = "Shows the flag of the world next to the world number",
 	type = PluginType.MISCELLANEOUS,
 	enabledByDefault = false
 )
 @Slf4j
-public class ClanChatCountryFlagsPlugin extends Plugin
+public class WorldFlagsPlugin extends Plugin
 {
 	private int modIconsStart = -1;
 
@@ -69,18 +73,29 @@ public class ClanChatCountryFlagsPlugin extends Plugin
 	@Inject
 	private ClientThread clientThread;
 
+	@Inject
+	private WorldFlagsConfig config;
+
+	@Provides
+	WorldFlagsConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(WorldFlagsConfig.class);
+	}
+
 	@Override
 	protected void startUp()
 	{
 		loadRegionIcons();
-		clientThread.invoke(() -> toggleWorldsToFlags(true));
+		clientThread.invoke(() -> toggleWorldsToFlags(config.showClanFlags(), true));
+		clientThread.invoke(() -> toggleWorldsToFlags(config.showFriendsFlags(), false));
 	}
 
 	@Override
 	protected void shutDown()
 	{
 		unloadRegionIcons();
-		clientThread.invoke(() -> toggleWorldsToFlags(false));
+		clientThread.invoke(() -> toggleWorldsToFlags(false, true));
+		clientThread.invoke(() -> toggleWorldsToFlags(false, false));
 	}
 
 	@Subscribe
@@ -93,13 +108,35 @@ public class ClanChatCountryFlagsPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onScriptPostFired(ScriptPostFired event)
+	public void onConfigChanged(ConfigChanged event)
 	{
-		if (event.getScriptId() != ScriptID.CLAN_CHAT_CHANNEL_BUILD)
+		if (!event.getGroup().equals("worldflags"))
 		{
 			return;
 		}
-		clientThread.invoke(() -> toggleWorldsToFlags(true));
+
+		if (event.getKey().equals("showClanFlags"))
+		{
+			clientThread.invoke(() -> toggleWorldsToFlags(config.showClanFlags(), true));
+		}
+		else if (event.getKey().equals("showFriendsFlags"))
+		{
+			clientThread.invoke(() -> toggleWorldsToFlags(config.showFriendsFlags(), false));
+		}
+	}
+
+	@Subscribe
+	public void onScriptPostFired(ScriptPostFired event)
+	{
+		if (event.getScriptId() == ScriptID.CLAN_CHAT_CHANNEL_BUILD)
+		{
+			clientThread.invoke(() -> toggleWorldsToFlags(config.showClanFlags(), true));
+		}
+		else if (event.getScriptId() == ScriptID.FRIENDS_UPDATE)
+		{
+			clientThread.invoke(() -> toggleWorldsToFlags(config.showFriendsFlags(), false));
+		}
+
 	}
 
 	private void loadRegionIcons()
@@ -111,13 +148,13 @@ public class ClanChatCountryFlagsPlugin extends Plugin
 			return;
 		}
 
-		final ClanWorldRegion[] worldRegions = ClanWorldRegion.values();
+		final WorldRegionFlag[] worldRegions = WorldRegionFlag.values();
 		final IndexedSprite[] newModIcons = Arrays.copyOf(modIcons, modIcons.length + worldRegions.length);
 		modIconsStart = modIcons.length;
 
 		for (int i = 0; i < worldRegions.length; i++)
 		{
-			final ClanWorldRegion worldRegion = worldRegions[i];
+			final WorldRegionFlag worldRegion = worldRegions[i];
 
 			final BufferedImage image = worldRegion.loadImage();
 			final IndexedSprite sprite = ImageUtil.getImageIndexedSprite(image, client);
@@ -137,7 +174,7 @@ public class ClanChatCountryFlagsPlugin extends Plugin
 			return;
 		}
 
-		final ClanWorldRegion[] worldRegions = ClanWorldRegion.values();
+		final WorldRegionFlag[] worldRegions = WorldRegionFlag.values();
 		//Icons that were loaded before region icons were loaded
 		final IndexedSprite[] oldModIcons = Arrays.copyOf(modIcons, modIconsStart);
 
@@ -153,64 +190,70 @@ public class ClanChatCountryFlagsPlugin extends Plugin
 		client.setModIcons(newModIcons);
 	}
 
-	private void toggleWorldsToFlags(boolean worldsToFlags)
+	private void toggleWorldsToFlags(boolean worldsToFlags, boolean flagMode)
 	{
-		Widget clanChatList = client.getWidget(WidgetInfo.CLAN_CHAT_LIST);
-		if (clanChatList == null || clanChatList.getChildren() == null)
+		Widget containerWidget;
+		if (flagMode)
+		{
+			containerWidget = client.getWidget(WidgetInfo.CLAN_CHAT_LIST);
+		}
+		else
+		{
+			containerWidget = client.getWidget(WidgetInfo.FRIEND_LIST_NAMES_CONTAINER);
+		}
+
+		if (containerWidget == null || containerWidget.getChildren() == null)
 		{
 			return;
 		}
 
 		if (worldsToFlags)
 		{
-			changeWorldsToFlags(clanChatList);
+			changeWorldsToFlags(containerWidget, flagMode);
 		}
 		else
 		{
-			changeFlagsToWorlds(clanChatList);
+			changeFlagsToWorlds(containerWidget, flagMode);
 		}
 	}
 
-	private void changeWorldsToFlags(Widget clanChatList)
+	private void changeWorldsToFlags(Widget containerWidget, boolean flagMode) // true - clan, false - friends
 	{
 		final WorldResult worldResult = worldService.getWorlds();
-
-		if (worldResult == null)
+		// Iterate every 3 widgets starting at 1, since the order of widgets is name, world, icon (for clan chat)
+		// Iterate every 3 widget starting at 2, since the order is name, previous name icon, world (for friends)
+		for (int i = flagMode ? 1 : 2; i < containerWidget.getChildren().length; i += 3)
 		{
-			return;
-		}
-
-		// Iterate every 3 widgets, since the order of widgets is name, world, icon
-		for (int i = 1; i < clanChatList.getChildren().length; i += 3)
-		{
-			Widget listWidget = clanChatList.getChild(i);
-			final String worldString = listWidget.getText();
+			final Widget listWidget = containerWidget.getChild(i);
+			String worldString = Text.removeTags(listWidget.getText());
 			// In case the string already contains a country flag
 			if (!worldString.matches("^World\\s?.*$"))
 			{
 				continue;
 			}
-			final int worldNumber = Integer.parseInt(listWidget.getText().replace("World ", ""));
+			worldString = worldString.replace("World ", "");
+			final int worldNumber = Integer.parseInt(worldString);
 
-			final World clanMemberWorld = worldResult.findWorld(worldNumber);
-			if (clanMemberWorld == null)
+			final World targetPlayerWorld = worldResult.findWorld(worldNumber);
+			if (targetPlayerWorld == null)
 			{
 				continue;
 			}
 
-			final int worldRegionId = clanMemberWorld.getLocation(); // 0 - us, 1 - gb, 3 - au, 7 - de
-			final int regionModIconId = ClanWorldRegion.getByRegionId(worldRegionId).ordinal() + modIconsStart;
+			final int worldRegionId = targetPlayerWorld.getLocation(); // 0 - us, 1 - gb, 3 - au, 7 - de
+			final int regionModIconId = WorldRegionFlag.getByRegionId(worldRegionId).ordinal() + modIconsStart;
 
-			listWidget.setText(worldNumber + " <img=" + (regionModIconId) + ">");
+			listWidget.setText(listWidget.getText().replace("World ", "") + " <img=" + (regionModIconId) + ">");
 		}
 	}
 
-	private void changeFlagsToWorlds(Widget clanChatList)
+	private void changeFlagsToWorlds(Widget containerWidget, boolean flagMode) // true - clan, false - friends
 	{
-		// Iterate every 3 widgets, since the order of widgets is name, world, icon
-		for (int i = 1; i < clanChatList.getChildren().length; i += 3)
+		// Iterate every 3 widgets starting at 1, since the order of widgets is name, world, icon (for clan chat)
+		// Iterate every 3 widget starting at 2, since the order is name, previous name icon, world (for friends)
+		for (int i = flagMode ? 1 : 2; i < containerWidget.getChildren().length; i += 3)
 		{
-			Widget listWidget = clanChatList.getChild(i);
+			final Widget listWidget = containerWidget.getChild(i);
 			final String worldString = listWidget.getText();
 			// In case the string already has been changed back to World
 			if (!worldString.matches("^.*\\s?<img=\\d+>$"))
