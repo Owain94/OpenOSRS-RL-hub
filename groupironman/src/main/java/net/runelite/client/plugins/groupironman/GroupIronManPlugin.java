@@ -22,12 +22,17 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
+import org.pf4j.Extension;
 
-@Slf4j
+@Extension
 @PluginDescriptor(
 	name = "Group Iron Man",
-	description = "Adds the capability to play Group Ironman"
+	description = "Adds the capability to play Group Ironman",
+	type = PluginType.GAMEMODE,
+	enabledByDefault = false
 )
+@Slf4j
 public class GroupIronManPlugin extends Plugin
 {
 	@Inject
