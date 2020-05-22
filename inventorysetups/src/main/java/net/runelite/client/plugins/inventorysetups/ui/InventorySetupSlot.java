@@ -24,8 +24,11 @@
  */
 package net.runelite.client.plugins.inventorysetups.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -48,7 +51,7 @@ public class InventorySetupSlot extends JPanel
 	private InventorySetup parentSetup;
 
 	@Getter
-	private int indexInSlot;
+	private final int indexInSlot;
 
 	public InventorySetupSlot(Color color, InventorySetupSlotID id, int indexInSlot)
 	{
@@ -57,9 +60,11 @@ public class InventorySetupSlot extends JPanel
 		this.parentSetup = null;
 		this.indexInSlot = indexInSlot;
 		imageLabel.setVerticalAlignment(SwingConstants.CENTER);
+		imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(46, 42));
 		setBackground(color);
-		add(imageLabel);
+		add(imageLabel, BorderLayout.CENTER);
 	}
 
 	public void setImageLabel(String toolTip, AsyncBufferedImage itemImage)
@@ -79,4 +84,20 @@ public class InventorySetupSlot extends JPanel
 		repaint();
 	}
 
+	public void setImageLabel(String toolTip, BufferedImage itemImage)
+	{
+		if (itemImage == null || toolTip == null)
+		{
+			imageLabel.setToolTipText("");
+			imageLabel.setIcon(null);
+			imageLabel.revalidate();
+			return;
+		}
+
+		imageLabel.setToolTipText(toolTip);
+		imageLabel.setIcon(new ImageIcon(itemImage));
+
+		validate();
+		repaint();
+	}
 }

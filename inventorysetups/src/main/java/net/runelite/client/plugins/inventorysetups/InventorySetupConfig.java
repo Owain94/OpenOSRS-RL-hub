@@ -31,6 +31,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Keybind;
 import static net.runelite.client.plugins.inventorysetups.InventorySetupPlugin.CONFIG_KEY_COMPACT_MODE;
+import static net.runelite.client.plugins.inventorysetups.InventorySetupPlugin.CONFIG_KEY_HIDE_BUTTON;
 
 @ConfigGroup(InventorySetupPlugin.CONFIG_GROUP)
 public interface InventorySetupConfig extends Config
@@ -39,7 +40,7 @@ public interface InventorySetupConfig extends Config
 		keyName = "bankFilter",
 		name = "Default Filter Bank",
 		description = "Configures the default setting for bank filtering in new setups",
-		position = 0
+		position = 1
 	)
 	default boolean bankFilter()
 	{
@@ -72,7 +73,7 @@ public interface InventorySetupConfig extends Config
 		keyName = "highlightUnorderedDifference",
 		name = "Default Highlight Unordered Difference",
 		description = "Configures the default setting for unordered highlighting in new setups",
-		position = 3
+		position = 2
 	)
 	default boolean highlightUnorderedDifference()
 	{
@@ -101,7 +102,7 @@ public interface InventorySetupConfig extends Config
 	{
 		return Color.RED;
 	}
-	
+
 	@ConfigItem(
 		keyName = "returnToSetupsHotkey",
 		name = "Return To Setups Hotkey",
@@ -131,6 +132,17 @@ public interface InventorySetupConfig extends Config
 		position = 8
 	)
 	default boolean compactMode()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = CONFIG_KEY_HIDE_BUTTON,
+		name = "Hide Help Button",
+		description = "Hide the help button",
+		position = 9
+	)
+	default boolean hideButton()
 	{
 		return false;
 	}

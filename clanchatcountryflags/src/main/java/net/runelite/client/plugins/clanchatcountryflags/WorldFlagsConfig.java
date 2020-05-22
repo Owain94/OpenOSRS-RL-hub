@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020, melky <https://github.com/melkypie>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,31 +23,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.12"
+package net.runelite.client.plugins.clanchatcountryflags;
 
-project.extra["PluginName"] = "Inventory Setups"
-project.extra["PluginDescription"] = "Save inventory setups"
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-dependencies {
-    compileOnly("com.openosrs.externals:banktags:0.0.+")
-    compileOnly("com.openosrs.externals:runepouch:0.0.+")
-}
+@ConfigGroup("worldflags")
+public interface WorldFlagsConfig extends Config
+{
+	@ConfigItem(
+		keyName = "showClanFlags",
+		name = "Show clan chat flags",
+		description = "Show amount of time remaining instead of completion time",
+		position = 1
+	)
+	default boolean showClanFlags()
+	{
+		return true;
+	}
 
-tasks {
-    jar {
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Dependencies" to
-                            arrayOf(
-                                    nameToId("banktags"),
-                                    nameToId("runepouch")
-                            ).joinToString(),
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+	@ConfigItem(
+		keyName = "showFriendsFlags",
+		name = "Show friends flags",
+		description = "Show amount of time remaining instead of completion time",
+		position = 2
+	)
+	default boolean showFriendsFlags()
+	{
+		return true;
+	}
 }

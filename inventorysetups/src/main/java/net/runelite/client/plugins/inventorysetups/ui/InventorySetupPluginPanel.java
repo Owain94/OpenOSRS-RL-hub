@@ -35,6 +35,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -46,6 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import net.runelite.api.InventoryID;
+import net.runelite.api.vars.InputType;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupItem;
@@ -55,26 +57,61 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.ui.components.PluginErrorPanel;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.client.util.LinkBrowser;
 
 public class InventorySetupPluginPanel extends PluginPanel
 {
-	private static ImageIcon COMPACT_VIEW_ICON;
-	private static ImageIcon COMPACT_VIEW_HOVER_ICON;
-	private static ImageIcon NO_COMPACT_VIEW_ICON;
-	private static ImageIcon NO_COMPACT_VIEW_HOVER_ICON;
-	private static ImageIcon ADD_ICON;
-	private static ImageIcon ADD_HOVER_ICON;
-	private static ImageIcon BACK_ICON;
-	private static ImageIcon BACK_HOVER_ICON;
-	private static ImageIcon IMPORT_ICON;
-	private static ImageIcon IMPORT_HOVER_ICON;
-	private static ImageIcon UPDATE_ICON;
-	private static ImageIcon UPDATE_HOVER_ICON;
+	private static final ImageIcon HELP_ICON;
+	private static final ImageIcon HELP_HOVER_ICON;
+	private static final ImageIcon COMPACT_VIEW_ICON;
+	private static final ImageIcon COMPACT_VIEW_HOVER_ICON;
+	private static final ImageIcon NO_COMPACT_VIEW_ICON;
+	private static final ImageIcon NO_COMPACT_VIEW_HOVER_ICON;
+	private static final ImageIcon ADD_ICON;
+	private static final ImageIcon ADD_HOVER_ICON;
+	private static final ImageIcon BACK_ICON;
+	private static final ImageIcon BACK_HOVER_ICON;
+	private static final ImageIcon IMPORT_ICON;
+	private static final ImageIcon IMPORT_HOVER_ICON;
+	private static final ImageIcon UPDATE_ICON;
+	private static final ImageIcon UPDATE_HOVER_ICON;
 
-	private static String MAIN_TITLE;
+	private static final String MAIN_TITLE;
+
+	private final JPanel noSetupsPanel;
+	private final JPanel invEqPanel;
+	private final JPanel overviewPanel;
+	private final JScrollPane contentWrapperPane;
+
+	private final JPanel overviewTopRightButtonsPanel;
+	private final JPanel setupTopRightButtonsPanel;
+
+	private final JLabel title;
+	private final JLabel helpButton;
+	private final JLabel compactViewMarker;
+	private final JLabel addMarker;
+	private final JLabel addImportMarker;
+	private final JLabel updateMarker;
+	private final JLabel backMarker;
+
+	private final IconTextField searchBar;
+
+	private final InventorySetupInventoryPanel invPanel;
+	private final InventorySetupEquipmentPanel eqpPanel;
+	private final InventorySetupRunePouchPanel rpPanel;
+	private final InventorySetupSpellbookPanel sbPanel;
+
+	@Getter
+	private InventorySetup currentSelectedSetup;
+
+	private final InventorySetupPlugin plugin;
 
 	static
 	{
+		final BufferedImage helpIcon = ImageUtil.getResourceStreamFromClass(InventorySetupPlugin.class, "help_button.png");
+		HELP_ICON = new ImageIcon(helpIcon);
+		HELP_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(helpIcon, 0.53f));
+
 		final BufferedImage compactIcon = ImageUtil.getResourceStreamFromClass(InventorySetupPlugin.class, "compact_mode_icon.png");
 		final BufferedImage compactIconHover = ImageUtil.luminanceOffset(compactIcon, -150);
 		COMPACT_VIEW_ICON = new ImageIcon(compactIcon);
@@ -102,26 +139,6 @@ public class InventorySetupPluginPanel extends PluginPanel
 		MAIN_TITLE = "Inventory Setups";
 	}
 
-	private final JPanel noSetupsPanel;
-	private final JPanel invEqPanel;
-	private final JPanel overviewPanel;
-	private final JScrollPane contentWrapperPane;
-	private final JPanel overviewTopRightButtonsPanel;
-	private final JPanel setupTopRightButtonsPanel;
-	private final JLabel title;
-	private final JLabel compactViewMarker;
-	private final JLabel addMarker;
-	private final JLabel addImportMarker;
-	private final JLabel updateMarker;
-	private final JLabel backMarker;
-	private final IconTextField searchBar;
-	private final InventorySetupInventoryPanel invPanel;
-	private final InventorySetupEquipmentPanel eqpPanel;
-	private final InventorySetupRunePouchPanel rpPanel;
-	private final InventorySetupPlugin plugin;
-	@Getter
-	private InventorySetup currentSelectedSetup;
-
 	public InventorySetupPluginPanel(final InventorySetupPlugin plugin, final ItemManager itemManager)
 	{
 		super(false);
@@ -130,6 +147,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 		this.rpPanel = new InventorySetupRunePouchPanel(itemManager, plugin);
 		this.invPanel = new InventorySetupInventoryPanel(itemManager, plugin, rpPanel);
 		this.eqpPanel = new InventorySetupEquipmentPanel(itemManager, plugin);
+		this.sbPanel = new InventorySetupSpellbookPanel(itemManager, plugin);
 		this.noSetupsPanel = new JPanel();
 		this.invEqPanel = new JPanel();
 		this.overviewPanel = new JPanel();
@@ -138,6 +156,32 @@ public class InventorySetupPluginPanel extends PluginPanel
 		this.title = new JLabel();
 		title.setText(MAIN_TITLE);
 		title.setForeground(Color.WHITE);
+
+		this.helpButton = new JLabel(HELP_ICON);
+		helpButton.setToolTipText("Click for help. This button can be hidden in the config.");
+		helpButton.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mousePressed(MouseEvent e)
+			{
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					LinkBrowser.browse("https://github.com/dillydill123/inventory-setups#inventory-setups");
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e)
+			{
+				helpButton.setIcon(HELP_HOVER_ICON);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e)
+			{
+				helpButton.setIcon(HELP_ICON);
+			}
+		});
 
 		this.compactViewMarker = new JLabel(COMPACT_VIEW_ICON);
 		compactViewMarker.addMouseListener(new MouseAdapter()
@@ -164,7 +208,6 @@ public class InventorySetupPluginPanel extends PluginPanel
 				compactViewMarker.setIcon(plugin.getConfig().compactMode() ? COMPACT_VIEW_ICON : NO_COMPACT_VIEW_ICON);
 			}
 		});
-
 
 		this.addImportMarker = new JLabel(IMPORT_ICON);
 		addImportMarker.setToolTipText("Import a new inventory setup");
@@ -291,11 +334,18 @@ public class InventorySetupPluginPanel extends PluginPanel
 		overviewTopRightButtonsPanel.setVisible(true);
 		setupTopRightButtonsPanel.setVisible(false);
 
+		final JPanel titleAndHelpButton = new JPanel();
+		titleAndHelpButton.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		titleAndHelpButton.add(title);
+		titleAndHelpButton.add(helpButton);
+		helpButton.setBorder(new EmptyBorder(0, 8, 0, 0));
+
 		// the top panel that has the title and the buttons, and search bar
 		final JPanel titleAndMarkersPanel = new JPanel();
 		titleAndMarkersPanel.setLayout(new BorderLayout());
-		titleAndMarkersPanel.add(title, BorderLayout.WEST);
+		titleAndMarkersPanel.add(titleAndHelpButton, BorderLayout.WEST);
 		titleAndMarkersPanel.add(markersPanel, BorderLayout.EAST);
+
 		this.searchBar = new IconTextField();
 		searchBar.setIcon(IconTextField.Icon.SEARCH);
 		searchBar.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
@@ -339,6 +389,8 @@ public class InventorySetupPluginPanel extends PluginPanel
 		invEqPanel.add(rpPanel);
 		invEqPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		invEqPanel.add(eqpPanel);
+		invEqPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		invEqPanel.add(sbPanel);
 
 		// setup the error panel. It's wrapped around a normal panel
 		// so it doesn't stretch to fill the parent panel
@@ -368,7 +420,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 		// make sure the invEq panel isn't visible upon startup
 		invEqPanel.setVisible(false);
-
+		helpButton.setVisible(!plugin.getConfig().hideButton());
 		updateCompactViewMarker();
 	}
 
@@ -376,7 +428,6 @@ public class InventorySetupPluginPanel extends PluginPanel
 	{
 		overviewPanel.setLayout(new GridBagLayout());
 		overviewPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-
 		updateCompactViewMarker();
 
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -412,9 +463,13 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 	public void rebuild()
 	{
+		returnToOverviewPanel();
 		overviewPanel.removeAll();
+
+		final String text = searchBar.getText();
 		List<InventorySetup> setupsToAdd = searchBar.getText().isEmpty() ? plugin.getInventorySetups() : plugin.filterSetups(searchBar.getText());
 		init(setupsToAdd);
+
 		revalidate();
 		repaint();
 	}
@@ -433,6 +488,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 		invPanel.setSlots(inventorySetup);
 		rpPanel.setSlots(inventorySetup);
 		eqpPanel.setSlots(inventorySetup);
+		sbPanel.setSlots(inventorySetup);
 
 		overviewTopRightButtonsPanel.setVisible(false);
 		setupTopRightButtonsPanel.setVisible(true);
@@ -442,6 +498,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 		overviewPanel.setVisible(false);
 
 		title.setText(inventorySetup.getName());
+		helpButton.setVisible(false);
 		searchBar.setVisible(false);
 
 		// only show the rune pouch if the setup has a rune pouch
@@ -449,6 +506,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 		highlightInventory();
 		highlightEquipment();
+		highlightSpellbook();
 
 		if (resetScrollBar)
 		{
@@ -456,7 +514,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 			this.contentWrapperPane.getVerticalScrollBar().setValue(0);
 		}
 
-		plugin.doBankSearch(false);
+		plugin.doBankSearch(InputType.SEARCH, false);
 
 		validate();
 		repaint();
@@ -503,14 +561,34 @@ public class InventorySetupPluginPanel extends PluginPanel
 		eqpPanel.highlightSlotDifferences(eqp, currentSelectedSetup);
 	}
 
+	public void highlightSpellbook()
+	{
+		// if the panel itself isn't visible, don't waste time doing any highlighting logic
+		if (!invEqPanel.isVisible())
+		{
+			return;
+		}
+
+		if (!currentSelectedSetup.isHighlightDifference() || !plugin.isHighlightingAllowed())
+		{
+			sbPanel.resetSlotColors();
+			return;
+		}
+
+		// pass it a dummy container because it only needs the current selected setup
+		sbPanel.highlightSlotDifferences(new ArrayList<>(), currentSelectedSetup);
+
+	}
+
 	public void returnToOverviewPanel()
 	{
-		noSetupsPanel.setVisible(false);
+		noSetupsPanel.setVisible(plugin.getInventorySetups().size() == 0);
 		invEqPanel.setVisible(false);
-		overviewPanel.setVisible(true);
+		overviewPanel.setVisible(plugin.getInventorySetups().size() > 0);
 		overviewTopRightButtonsPanel.setVisible(true);
 		setupTopRightButtonsPanel.setVisible(false);
 		title.setText(MAIN_TITLE);
+		helpButton.setVisible(!plugin.getConfig().hideButton());
 		currentSelectedSetup = null;
 		searchBar.setVisible(true);
 		plugin.resetBankSearch();

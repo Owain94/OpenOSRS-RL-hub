@@ -64,6 +64,5 @@ public class InventorySetupCompactPanel extends InventorySetupPanel
 				nameInput.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 			}
 		});
-
 	}
 }

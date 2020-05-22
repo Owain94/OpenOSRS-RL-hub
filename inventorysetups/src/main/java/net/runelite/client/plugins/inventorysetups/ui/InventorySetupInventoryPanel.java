@@ -28,7 +28,6 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JPanel;
 import net.runelite.api.ItemID;
 import net.runelite.client.game.ItemManager;
@@ -42,12 +41,11 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 
 public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 {
-
 	private static final int ITEMS_PER_ROW = 4;
 	private static final int NUM_INVENTORY_ITEMS = 28;
 
 	private List<InventorySetupSlot> inventorySlots;
-	private InventorySetupRunePouchPanel rpPanel;
+	private final InventorySetupRunePouchPanel rpPanel;
 
 	InventorySetupInventoryPanel(final ItemManager itemManager, final InventorySetupPlugin plugin, final InventorySetupRunePouchPanel rpPanel)
 	{
@@ -69,8 +67,20 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 		for (int i = 0; i < NUM_INVENTORY_ITEMS; i++)
 		{
 			containerSlotsPanel.add(inventorySlots.get(i));
-			super.addMouseListenerToSlot(inventorySlots.get(i));
+			super.addUpdateFromSetupAndSearchMouseListenersToSlot(inventorySlots.get(i));
 		}
+	}
+
+	@Override
+	public void setSlots(final InventorySetup setup)
+	{
+		for (int i = 0; i < NUM_INVENTORY_ITEMS; i++)
+		{
+			super.setContainerSlot(i, inventorySlots.get(i), setup);
+		}
+
+		validate();
+		repaint();
 	}
 
 	@Override
@@ -99,20 +109,10 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 			super.highlightDifferentSlotColor(inventorySetup, inventoryToCheck.get(i), currInventory.get(i), inventorySlots.get(i));
 		}
 
-		handleRunePouchHighlighting(inventorySetup, currInvHasRunePouch);
+		final boolean currInvHasRunePouchFinal = currInvHasRunePouch;
+		plugin.getClientThread().invokeLater(() ->
+			handleRunePouchHighlighting(inventorySetup, currInvHasRunePouchFinal));
 
-	}
-
-	@Override
-	public void setSlots(final InventorySetup setup)
-	{
-		for (int i = 0; i < NUM_INVENTORY_ITEMS; i++)
-		{
-			super.setContainerSlot(i, inventorySlots.get(i), setup);
-		}
-
-		validate();
-		repaint();
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 
 	private void doUnorderedHighlighting(final List<InventorySetupItem> currInventory, final InventorySetup inventorySetup)
 	{
-		Map<ImmutablePair<Integer, Integer>, Integer> currInvMap = new HashMap<>();
+		HashMap<ImmutablePair<Integer, Integer>, Integer> currInvMap = new HashMap<>();
 
 		boolean currInvHasRunePouch = false;
 		for (final InventorySetupItem item : currInventory)
@@ -197,7 +197,9 @@ public class InventorySetupInventoryPanel extends InventorySetupContainerPanel
 
 		}
 
-		handleRunePouchHighlighting(inventorySetup, currInvHasRunePouch);
+		final boolean currInvHasRunePouchFinal = currInvHasRunePouch;
+		plugin.getClientThread().invokeLater(() ->
+			handleRunePouchHighlighting(inventorySetup, currInvHasRunePouchFinal));
 
 	}
 
