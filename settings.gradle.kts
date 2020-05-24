@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-rootProject.name = "OpenOSRS Plugins"
+rootProject.name = "OpenOSRS RL hub"
 
 include(":advancednotifications")
 include(":bankedexperience")
