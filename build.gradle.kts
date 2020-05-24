@@ -116,6 +116,11 @@ subprojects {
                 }
             }
         }
+
+        register<Copy>("copyDeps") {
+            into("./build/deps/")
+            from(configurations["runtimeClasspath"])
+        }
     }
 }
 
