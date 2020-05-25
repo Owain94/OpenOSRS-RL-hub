@@ -152,9 +152,9 @@ public class FriendsExporterPlugin extends Plugin
 
 		File fileName = new File(RuneLite.RUNELITE_DIR, client.getLocalPlayer().getName() + " Friends " + format(new Date()) + ".txt");
 		purgeList(fileName);
-		Friend[] array = client.getFriends();
+		Friend[] array = this.client.getFriendContainer().getMembers();
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x != client.getFriendsCount(); x++)
+		for (int x = 0; x != this.client.getFriendContainer().getMembers().length; x++)
 		{
 			String friendName = array[x].getName();
 			String prevName = "";
@@ -185,7 +185,7 @@ public class FriendsExporterPlugin extends Plugin
 
 		File fileName = new File(RuneLite.RUNELITE_DIR, client.getLocalPlayer().getName() + " Ranks " + format(new Date()) + ".txt");
 		purgeList(fileName);
-		Friend[] array = client.getFriends();
+		Friend[] array = this.client.getFriendContainer().getMembers();
 		Widget temp;
 		Widget[] temp2;
 		temp = client.getWidget(94, 28);
@@ -197,7 +197,7 @@ public class FriendsExporterPlugin extends Plugin
 			if (!rank.equals("Not in clan") || config.showUnranked())
 			{
 				String prevName = "";
-				for (int y = 0; y != client.getFriendsCount(); y++)
+				for (int y = 0; y != this.client.getFriendContainer().getMembers().length; y++)
 				{
 					String friendName = array[y].getName();
 					if (friendName.equals(temp2[(x * 4) + 2].getText()))
@@ -241,9 +241,9 @@ public class FriendsExporterPlugin extends Plugin
 
 		File fileName = new File(RuneLite.RUNELITE_DIR, client.getLocalPlayer().getName() + " Ignore " + format(new Date()) + ".txt");
 		purgeList(fileName);
-		Ignore[] array = client.getIgnores();
+		Ignore[] array = this.client.getIgnoreContainer().getMembers();
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x != client.getIgnoreCount(); x++)
+		for (int x = 0; x != this.client.getIgnoreContainer().getMembers().length; x++)
 		{
 			String friendName = array[x].getName();
 			String prevName = "";
