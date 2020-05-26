@@ -45,7 +45,6 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.flippingutilities.Flip;
 import net.runelite.client.plugins.flippingutilities.FlippingItem;
@@ -61,7 +60,6 @@ import net.runelite.client.ui.FontManager;
 import net.runelite.client.util.AsyncBufferedImage;
 import net.runelite.client.util.QuantityFormatter;
 
-@Slf4j
 public class StatItemPanel extends JPanel
 {
 	private static final Border ITEM_INFO_BORDER = new CompoundBorder(
@@ -76,11 +74,11 @@ public class StatItemPanel extends JPanel
 		BorderFactory.createMatteBorder(0, 0, 2, 0, ColorScheme.LIGHT_GRAY_COLOR),
 		BorderFactory.createEmptyBorder(3, 5, 3, 5));
 
-	private FlippingPlugin plugin;
+	private final FlippingPlugin plugin;
 	@Getter
-	private FlippingItem flippingItem;
+	private final FlippingItem flippingItem;
 
-	private StatsPanel statsPanel;
+	private final StatsPanel statsPanel;
 
 	private long totalProfit;
 	private long totalExpense;
@@ -97,42 +95,42 @@ public class StatItemPanel extends JPanel
 	 identifying information about the item.
 	 */
 	//Holds the item icon, name, item profit labels and collapse icon
-	private JPanel titlePanel = new JPanel(new BorderLayout());
+	private final JPanel titlePanel = new JPanel(new BorderLayout());
 	//Holds the name and item profit labels
-	private JPanel nameAndProfitTitlePanel = new JPanel(new BorderLayout());
+	private final JPanel nameAndProfitTitlePanel = new JPanel(new BorderLayout());
 
 	//Shows the name label for the item
-	private JLabel nameTitleLabel = new JLabel();
+	private final JLabel nameTitleLabel;
 	//Shows the item's profit
-	private JLabel itemProfitTitleLabel = new JLabel();
+	private final JLabel itemProfitTitleLabel = new JLabel();
 
 	//Shows the item's icon
-	private JPanel itemIconTitlePanel = new JPanel(new BorderLayout());
+	private final JPanel itemIconTitlePanel = new JPanel(new BorderLayout());
 	//Label that controls the collapse function of the item panel.
-	private JLabel collapseIconTitleLabel = new JLabel();
+	private final JLabel collapseIconTitleLabel = new JLabel();
 
 	//Contains the sub info container and trade history panel.
-	private JPanel subInfoAndHistoryContainer = new JPanel(new BorderLayout());
+	private final JPanel subInfoAndHistoryContainer = new JPanel(new BorderLayout());
 
-	private JLabel totalProfitValLabel = new JLabel("", SwingConstants.RIGHT);
-	private JLabel profitEachValLabel = new JLabel("", SwingConstants.RIGHT);
-	private JLabel timeOfLastFlipValLabel = new JLabel("", SwingConstants.RIGHT);
-	private JLabel quantityValLabel = new JLabel("", SwingConstants.RIGHT);
-	private JLabel roiValLabel = new JLabel("", SwingConstants.RIGHT);
-	private JLabel avgBuyPriceValLabel = new JLabel("", SwingConstants.RIGHT);
-	private JLabel avgSellPriceValLabel = new JLabel("", SwingConstants.RIGHT);
+	private final JLabel totalProfitValLabel = new JLabel("", SwingConstants.RIGHT);
+	private final JLabel profitEachValLabel = new JLabel("", SwingConstants.RIGHT);
+	private final JLabel timeOfLastFlipValLabel = new JLabel("", SwingConstants.RIGHT);
+	private final JLabel quantityValLabel = new JLabel("", SwingConstants.RIGHT);
+	private final JLabel roiValLabel = new JLabel("", SwingConstants.RIGHT);
+	private final JLabel avgBuyPriceValLabel = new JLabel("", SwingConstants.RIGHT);
+	private final JLabel avgSellPriceValLabel = new JLabel("", SwingConstants.RIGHT);
 
 	/* These panels contain the sub information regarding the item.
 	   Subinfos are general statistics about an item over the time interval currently selected. */
 
-	private JPanel totalProfitPanel = new JPanel(new BorderLayout());
-	private JPanel profitEachPanel = new JPanel(new BorderLayout());
-	private JPanel timeOfLastFlipPanel = new JPanel(new BorderLayout());
-	private JPanel quantityPanel = new JPanel(new BorderLayout());
-	private JPanel padPanel = new JPanel(new BorderLayout());
-	private JPanel roiPanel = new JPanel(new BorderLayout());
-	private JPanel avgBuyPricePanel = new JPanel(new BorderLayout());
-	private JPanel avgSellPricePanel = new JPanel(new BorderLayout());
+	private final JPanel totalProfitPanel = new JPanel(new BorderLayout());
+	private final JPanel profitEachPanel = new JPanel(new BorderLayout());
+	private final JPanel timeOfLastFlipPanel = new JPanel(new BorderLayout());
+	private final JPanel quantityPanel = new JPanel(new BorderLayout());
+	private final JPanel padPanel = new JPanel(new BorderLayout());
+	private final JPanel roiPanel = new JPanel(new BorderLayout());
+	private final JPanel avgBuyPricePanel = new JPanel(new BorderLayout());
+	private final JPanel avgSellPricePanel = new JPanel(new BorderLayout());
 
 	private final JPanel[] subInfoPanelArray = {totalProfitPanel, profitEachPanel, timeOfLastFlipPanel, quantityPanel,
 		padPanel, roiPanel, avgBuyPricePanel, avgSellPricePanel};
@@ -141,15 +139,15 @@ public class StatItemPanel extends JPanel
 
 	/* Trade History containers. */
 	//Wraps the title label panel and the item history container.
-	private JPanel tradeHistoryPanel = new JPanel(new BorderLayout());
-	private JPanel tradeHistoryTitlePanel = new JPanel(new BorderLayout());
+	private final JPanel tradeHistoryPanel = new JPanel(new BorderLayout());
+	private final JPanel tradeHistoryTitlePanel = new JPanel(new BorderLayout());
 	//Holds the individual trades in the history.
-	private JPanel tradeHistoryItemContainer = new JPanel(new GridBagLayout());
+	private final JPanel tradeHistoryItemContainer = new JPanel(new GridBagLayout());
 
-	private JLabel collapseTradeHistoryIconLabel = new JLabel(CLOSE_ICON);
+	private final JLabel collapseTradeHistoryIconLabel = new JLabel(CLOSE_ICON);
 
 	//Constraints for tradeHistoryItemContainer.
-	private GridBagConstraints constraints = new GridBagConstraints();
+	private final GridBagConstraints constraints = new GridBagConstraints();
 
 	/**
 	 * This panel represents the middle layer of information. It contains general information about the item
@@ -170,10 +168,7 @@ public class StatItemPanel extends JPanel
 		//Get parent
 		statsPanel = plugin.getStatPanel();
 
-		//Make sure the item name fits. This has to be called BEFORE the label is made.
-		nameTitleLabel.setPreferredSize(new Dimension(0, 0));
 		nameTitleLabel = new JLabel(flippingItem.getItemName());
-		nameTitleLabel.setBorder(new EmptyBorder(0, 0, 2, 0));
 
 		updateDisplays();
 
@@ -197,7 +192,7 @@ public class StatItemPanel extends JPanel
 		itemIconTitlePanel.add(itemLabel, BorderLayout.WEST);
 		itemIconTitlePanel.add(deleteLabel, BorderLayout.EAST);
 		itemIconTitlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR.darker());
-		itemIconTitlePanel.setBorder(new EmptyBorder(0, 2, 0, 5));
+		itemIconTitlePanel.setBorder(new EmptyBorder(5, 2, 0, 5));
 		itemIconTitlePanel.addMouseListener(new MouseAdapter()
 		{
 			@Override
@@ -226,6 +221,7 @@ public class StatItemPanel extends JPanel
 		nameAndProfitTitlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR.darker());
 		nameAndProfitTitlePanel.add(nameTitleLabel, BorderLayout.NORTH);
 		nameAndProfitTitlePanel.add(itemProfitTitleLabel, BorderLayout.SOUTH);
+		nameAndProfitTitlePanel.setPreferredSize(new Dimension(0, 0));
 
 		/* Collapse icon */
 		collapseIconTitleLabel.setIcon(flippingItem.isShouldExpandStatItem() ? OPEN_ICON : CLOSE_ICON);
@@ -273,6 +269,7 @@ public class StatItemPanel extends JPanel
 			}
 		});
 
+		titlePanel.setComponentPopupMenu(UIUtilities.createGeTrackerLinksPopup(flippingItem));
 		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR.darker());
 		titlePanel.setBorder(new EmptyBorder(2, 2, 2, 2));
 

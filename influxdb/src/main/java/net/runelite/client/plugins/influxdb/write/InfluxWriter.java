@@ -5,13 +5,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.influxdb.InfluxDbConfig;
 import net.runelite.client.plugins.influxdb.MeasurementCreator;
 import org.apache.commons.lang3.StringUtils;
-import org.influxdb.BatchOptions;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 
@@ -42,21 +42,27 @@ public class InfluxWriter
 
 	private synchronized Optional<InfluxDB> getInflux()
 	{
+		if (StringUtils.isEmpty(config.getDatabase()))
+		{
+			return Optional.empty();
+		}
+
 		String newServerUrl = config.getServerUrl();
 		String newServerUser = config.getServerUsername();
 		String newServerPass = config.getServerPassword();
 
-		if (!Objects.equals(newServerUrl, serverUrl) || !Objects.equals(newServerUser, serverUser) || !Objects.equals(newServerPass, serverPass))
+		if (!Objects.equals(newServerUrl, serverUrl)
+			|| !Objects.equals(newServerUser, serverUser)
+			|| !Objects.equals(newServerPass, serverPass)
+			|| cachedServer == null)
 		{
-			serverUrl = newServerUrl;
-			serverUser = newServerUser;
-			serverPass = newServerPass;
-
 			if (cachedServer != null)
 			{
-				cachedServer.flush();
 				cachedServer.close();
 				cachedServer = null;
+				serverUrl = null;
+				serverUser = null;
+				serverPass = null;
 			}
 
 			if (!StringUtils.isEmpty(serverUrl))
@@ -69,17 +75,13 @@ public class InfluxWriter
 				{
 					cachedServer = InfluxDBFactory.connect(serverUrl, serverUser, serverPass);
 				}
-				cachedServer.enableBatch(BatchOptions.DEFAULTS);
+				cachedServer.enableBatch(1000, 1, TimeUnit.SECONDS);
 			}
+			serverUrl = newServerUrl;
+			serverUser = newServerUser;
+			serverPass = newServerPass;
 		}
-		return Optional.ofNullable(cachedServer).map(influx -> {
-			String db = config.getDatabase();
-			if (StringUtils.isEmpty(db))
-			{
-				return null;
-			}
-			return influx.setDatabase(db);
-		});
+		return Optional.ofNullable(cachedServer);
 	}
 
 	private Writer writer(Series s)
@@ -182,7 +184,7 @@ public class InfluxWriter
 			getInflux().ifPresent(influxDB -> {
 				String pt = flush.toInflux().lineProtocol();
 				log.debug("Writing {}", pt);
-				influxDB.write(pt);
+				influxDB.write(config.getDatabase(), config.getServerRetentionPolicy(), InfluxDB.ConsistencyLevel.ONE, pt);
 			});
 		}
 	}

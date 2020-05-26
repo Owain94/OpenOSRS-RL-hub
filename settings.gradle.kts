@@ -87,6 +87,7 @@ include(":toweroflife")
 include(":traynotifications")
 include(":volcanicmine")
 include(":volcanicminestabilitytracker")
+include(":wellness")
 include(":worldhider")
 include(":worldhighlighter")
 

@@ -29,20 +29,18 @@ package net.runelite.client.plugins.flippingutilities;
 
 import com.google.gson.annotations.SerializedName;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.events.GrandExchangeOfferChanged;
 
 /**
- * This class stores information from a {@link GrandExchangeOfferChanged} event.
- * A {@link GrandExchangeOfferChanged} event has all of the information needed already, but passing it
- * around when current methods like addFlipTrade, addToTradesList, and updateFlip expect a
- * {@Link GrandExchangeTrade} would require a lot of changes in existing code. Instead, by subclassing
- * GrandExchangeTrade and adding two new fields that are needed for future changes, backwards
- * compatibility is maintained, while allowing new work using the additional info stored in this class.
+ * This class stores information from a {@link GrandExchangeOfferChanged} event and is populated with
+ * extra information such as ticksSinceFirstOffer and quantitySinceLastOffer based on previous offers
+ * belonging to the same trade as it.
  */
-
 @Data
 @AllArgsConstructor
 public class OfferInfo
@@ -76,6 +74,17 @@ public class OfferInfo
 	private boolean validStatOffer;
 	@SerializedName("vFO")
 	private boolean validFlippingOffer;
+
+	/**
+	 * a offer always belongs to a flipping item. Every flipping item was flipped by an account and only one account and
+	 * has a flipped by attribute. So, the reason this attribute is here is because during the process of creating
+	 * the account wide trade list, we merge flipping items flipped by several different accounts into one. Thus, in that
+	 * case, a flipping item would have been flipped by multiple accounts so each offer needs to be marked to
+	 * differentiate offer. This functionality is currently only used in getFlips as, when getting the flips for the
+	 * account wide list, you don't want to match offers from different accounts!
+	 */
+	@SerializedName("mB")
+	private String madeBy;
 
 	/**
 	 * Returns a boolean representing that the offer is a complete offer. A complete offer signifies
@@ -137,7 +146,8 @@ public class OfferInfo
 			totalQuantityInTrade,
 			quantitySinceLastOffer,
 			validStatOffer,
-			validFlippingOffer);
+			validFlippingOffer,
+			madeBy);
 	}
 
 	public boolean equals(Object other)
@@ -156,5 +166,30 @@ public class OfferInfo
 
 		return state == otherOffer.getState() && currentQuantityInTrade == otherOffer.getCurrentQuantityInTrade()
 			&& quantitySinceLastOffer == otherOffer.getQuantitySinceLastOffer();
+	}
+
+	public static OfferInfo fromGrandExchangeEvent(GrandExchangeOfferChanged event)
+	{
+		GrandExchangeOffer offer = event.getOffer();
+
+		boolean isBuy = offer.getState() == GrandExchangeOfferState.BOUGHT
+			|| offer.getState() == GrandExchangeOfferState.CANCELLED_BUY
+			|| offer.getState() == GrandExchangeOfferState.BUYING;
+
+		return new OfferInfo(
+			isBuy,
+			offer.getItemId(),
+			offer.getQuantitySold(),
+			offer.getQuantitySold() == 0 ? 0 : offer.getSpent() / offer.getQuantitySold(),
+			Instant.now().truncatedTo(ChronoUnit.SECONDS),
+			event.getSlot(),
+			offer.getState(),
+			0,
+			0,
+			offer.getTotalQuantity(),
+			0,
+			true,
+			true,
+			null);
 	}
 }

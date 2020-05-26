@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.8"
+version = "0.0.3"
 
-project.extra["PluginName"] = "Flipping Utilities"
-project.extra["PluginDescription"] = "Provides utilities for GE flipping"
+project.extra["PluginName"] = "Wellness Notifications"
+project.extra["PluginDescription"] = "A plugin to add reminders that promote wellness and healthy gaming."
 
 tasks {
     jar {

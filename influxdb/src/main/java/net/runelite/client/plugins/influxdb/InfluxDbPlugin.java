@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.influxdb;
 
 import com.google.inject.Provides;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -24,10 +23,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.influxdb.write.InfluxWriter;
-import net.runelite.client.task.Schedule;
-import org.pf4j.Extension;
 
-@Extension
 @PluginDescriptor(
 	name = "InfluxDB",
 	description = "Saves statistics to InfluxDB",
@@ -38,7 +34,6 @@ import org.pf4j.Extension;
 @Slf4j
 public class InfluxDbPlugin extends Plugin
 {
-	private int flushTaskInterval;
 	private ScheduledFuture<?> flushTask;
 
 	@Provides
@@ -102,6 +97,10 @@ public class InfluxDbPlugin extends Plugin
 			return;
 		}
 		Item[] items = container.getItems();
+		if (items == null)
+		{
+			return;
+		}
 
 		InventoryID id = null;
 		for (InventoryID val : InventoryID.values())
@@ -139,6 +138,15 @@ public class InfluxDbPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged changed)
 	{
+		if (InfluxDbConfig.GROUP.equals(changed.getGroup()))
+		{
+			failureBackoff = 0;
+			if (InfluxDbConfig.WRITE_INTERVAL.equals(changed.getKey()))
+			{
+				unscheduleFlush();
+				scheduleFlush();
+			}
+		}
 		if (!config.writeKillCount())
 		{
 			return;
@@ -168,22 +176,32 @@ public class InfluxDbPlugin extends Plugin
 		}
 	}
 
-	@Schedule(period = 15, unit = ChronoUnit.SECONDS, asynchronous = true)
+	private int failures = 0;
+	private int failureBackoff = 0;
+
 	public void flush()
 	{
-		writer.flush();
-		int currentInterval = config.writeIntervalSeconds();
-		if (currentInterval != flushTaskInterval)
+		if (failureBackoff > 0)
 		{
-			unscheduleFlush();
-			scheduleFlush();
+			failureBackoff--;
+			return;
+		}
+		try
+		{
+			writer.flush();
+			failures = 0;
+		}
+		catch (RuntimeException ex)
+		{
+			failures++;
+			log.error("Failed to write to influxDB " + failures + " times", ex);
+			failureBackoff = Math.min(32, failures * failures);
 		}
 	}
 
 	private synchronized void scheduleFlush()
 	{
-		flushTaskInterval = config.writeIntervalSeconds();
-		this.flushTask = executor.scheduleWithFixedDelay(this::flush, flushTaskInterval, flushTaskInterval, TimeUnit.SECONDS);
+		this.flushTask = executor.scheduleWithFixedDelay(this::flush, config.writeIntervalSeconds(), config.writeIntervalSeconds(), TimeUnit.SECONDS);
 	}
 
 	private synchronized void unscheduleFlush()

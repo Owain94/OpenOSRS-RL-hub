@@ -42,7 +42,7 @@ public class StatItemHistoryPanel extends JPanel
 {
 	JLabel timeSince = new JLabel("", SwingConstants.CENTER);
 
-	private Flip flip;
+	private final Flip flip;
 
 	StatItemHistoryPanel(Flip flip)
 	{
