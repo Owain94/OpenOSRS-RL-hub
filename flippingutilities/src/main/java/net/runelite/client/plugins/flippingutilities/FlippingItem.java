@@ -30,9 +30,11 @@ import com.google.gson.annotations.SerializedName;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.runelite.api.events.GrandExchangeOfferChanged;
 
 /**
  * This class is the representation of an item that a user is flipping. It contains information about the
@@ -41,9 +43,11 @@ import net.runelite.api.events.GrandExchangeOfferChanged;
  * {@link HistoryManager} and is used to get the profits for this item, how many more of it you can buy
  * until the ge limit refreshes, and when the next ge limit refreshes.
  * <p>
- * This class is the model behind a {@link FlippingItemPanel} as its data is used to create the contents
+ * This class is the model behind a FlippingItemPanel as its data is used to create the contents
  * of a panel which is then displayed.
  */
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class FlippingItem
 {
 	@SerializedName("id")
@@ -52,6 +56,7 @@ public class FlippingItem
 
 	@SerializedName("name")
 	@Getter
+	@NonNull
 	private final String itemName;
 
 	@SerializedName("tGL")
@@ -98,32 +103,30 @@ public class FlippingItem
 	private boolean shouldExpandHistory = false;
 
 	@SerializedName("h")
+	@Getter
+	@Setter
 	private HistoryManager history = new HistoryManager();
 
 	@SerializedName("fB")
 	@Getter
-	private String flippedBy;
+	@NonNull
+	private final String flippedBy;
 
-	public FlippingItem(int itemId, String itemName, int totalGeLimit, String flippedBy)
+	//utility for cloning an instant...
+	private Instant ci(Instant i)
 	{
-		this.itemId = itemId;
-		this.itemName = itemName;
-		this.totalGELimit = totalGeLimit;
-		this.flippedBy = flippedBy;
+		if (i == null)
+		{
+			return null;
+		}
+		return Instant.ofEpochMilli(i.toEpochMilli());
 	}
 
-	/**
-	 * This method updates the history of an item and the latest buy and sell times.
-	 * It is invoked every time a new offer is received as every new offer will change the history
-	 * and either the latest buy or sell times.
-	 * See {@link FlippingPlugin#onGrandExchangeOfferChanged(GrandExchangeOfferChanged)}
-	 *
-	 * @param newOffer new offer just received
-	 */
-	public void update(OfferInfo newOffer)
+	public FlippingItem clone()
 	{
-		updateHistory(newOffer);
-		updateLatestTimes(newOffer);
+		return new FlippingItem(itemId, itemName, totalGELimit, marginCheckBuyPrice, marginCheckSellPrice,
+			ci(marginCheckBuyTime), ci(marginCheckSellTime), ci(latestBuyTime), ci(latestSellTime), ci(latestActivityTime),
+			shouldExpandStatItem, shouldExpandHistory, history.clone(), flippedBy);
 	}
 
 	/**
@@ -187,6 +190,33 @@ public class FlippingItem
 		}
 	}
 
+	/**
+	 * combines two flipping items together (this only make sense if they are for the same item) by adding
+	 * their histories together and retaining the other properties of the latest active item.
+	 *
+	 * @return merged flipping item
+	 */
+	public static FlippingItem merge(FlippingItem item1, FlippingItem item2)
+	{
+		if (item1 == null)
+		{
+			return item2;
+		}
+
+		if (item1.getLatestActivityTime().compareTo(item2.getLatestActivityTime()) >= 0)
+		{
+			item1.getHistory().getStandardizedOffers().addAll(item2.getHistory().getStandardizedOffers());
+			return item1;
+		}
+		else
+		{
+			item2.getHistory().getStandardizedOffers().addAll(item1.getHistory().getStandardizedOffers());
+			return item2;
+		}
+
+
+	}
+
 	public long currentProfit(List<OfferInfo> tradeList)
 	{
 		return history.currentProfit(tradeList);
@@ -227,7 +257,7 @@ public class FlippingItem
 		history.validateGeProperties();
 	}
 
-	public ArrayList<Flip> getFlips(Instant earliestTime)
+	public List<Flip> getFlips(Instant earliestTime)
 	{
 		return history.getFlips(earliestTime);
 	}
@@ -255,4 +285,24 @@ public class FlippingItem
 		history.invalidateOffers(panelSelection, offerList);
 	}
 
+	//generated to string from intellij. I made it not create a representation of the history cause it would be too
+	//long and you typically don't want to see that.
+	@Override
+	public String toString()
+	{
+		return "FlippingItem{" + "itemId=" + itemId +
+			", itemName='" + itemName + '\'' +
+			", totalGELimit=" + totalGELimit +
+			", marginCheckBuyPrice=" + marginCheckBuyPrice +
+			", marginCheckSellPrice=" + marginCheckSellPrice +
+			", marginCheckBuyTime=" + marginCheckBuyTime +
+			", marginCheckSellTime=" + marginCheckSellTime +
+			", latestBuyTime=" + latestBuyTime +
+			", latestSellTime=" + latestSellTime +
+			", latestActivityTime=" + latestActivityTime +
+			", shouldExpandStatItem=" + shouldExpandStatItem +
+			", shouldExpandHistory=" + shouldExpandHistory +
+			", madeBy='" + flippedBy + '\'' +
+			'}';
+	}
 }

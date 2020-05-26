@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -52,7 +53,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.flippingutilities.FlippingItem;
 import net.runelite.client.plugins.flippingutilities.FlippingPlugin;
@@ -65,8 +65,6 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.ui.components.PluginErrorPanel;
 
-
-@Slf4j
 public class FlippingPanel extends JPanel
 {
 	@Getter
@@ -94,7 +92,10 @@ public class FlippingPanel extends JPanel
 	public final JPanel centerPanel = new JPanel(cardLayout);
 
 	//Keeps track of all items currently displayed on the panel.
-	private ArrayList<FlippingItemPanel> activePanels = new ArrayList<>();
+	private final ArrayList<FlippingItemPanel> activePanels = new ArrayList<>();
+
+	@Getter
+	JLabel resetIcon;
 
 	public FlippingPanel(final FlippingPlugin plugin, final ItemManager itemManager, ScheduledExecutorService executor)
 	{
@@ -159,7 +160,7 @@ public class FlippingPanel extends JPanel
 			"For items to show up, margin check an item.");
 
 		//Clears the config and resets the items panel.
-		final JLabel resetIcon = new JLabel(RESET_ICON);
+		resetIcon = new JLabel(RESET_ICON);
 		resetIcon.setToolTipText("Reset trade history");
 		resetIcon.setPreferredSize(ICON_SIZE);
 		resetIcon.addMouseListener(new MouseAdapter()
@@ -169,9 +170,18 @@ public class FlippingPanel extends JPanel
 			{
 				if (SwingUtilities.isLeftMouseButton(e))
 				{
-					resetPanel();
-					cardLayout.show(centerPanel, FlippingPanel.getWELCOME_PANEL());
-					rebuild(plugin.getTradesForCurrentView());
+					//Display warning message
+					final int result = JOptionPane.showOptionDialog(resetIcon, "Are you sure you want to reset the flipping panel?",
+						"Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
+						null, new String[]{"Yes", "No"}, "No");
+
+					//If the user pressed "Yes"
+					if (result == JOptionPane.YES_OPTION)
+					{
+						resetPanel();
+						cardLayout.show(centerPanel, FlippingPanel.getWELCOME_PANEL());
+						rebuild(plugin.getTradesForCurrentView());
+					}
 				}
 			}
 
@@ -194,6 +204,7 @@ public class FlippingPanel extends JPanel
 			resetPanel();
 			plugin.getStatPanel().resetPanel();
 			rebuild(plugin.getTradesForCurrentView());
+			plugin.getStatPanel().rebuild(plugin.getTradesForCurrentView());
 		});
 
 		final JPopupMenu popupMenu = new JPopupMenu();
@@ -221,72 +232,67 @@ public class FlippingPanel extends JPanel
 		add(container, BorderLayout.CENTER);
 	}
 
-	private void initializeFlippingPanel(List<FlippingItem> flippingItems)
+	public void rebuild(List<FlippingItem> flippingItems)
 	{
-		if (flippingItems == null || flippingItems.size() == 0)
-		{
-			cardLayout.show(centerPanel, WELCOME_PANEL);
-			return;
-		}
-
 		//Reset active panel list.
 		activePanels.clear();
 
-
-		cardLayout.show(centerPanel, ITEMS_PANEL);
-
-		int index = 0;
-		for (FlippingItem item : flippingItems)
-		{
-			if (!item.hasValidOffers(HistoryManager.PanelSelection.FLIPPING))
-			{
-				continue;
-			}
-
-			FlippingItemPanel newPanel = new FlippingItemPanel(plugin, itemManager, item);
-
-			newPanel.clearButton.addMouseListener(new MouseAdapter()
-			{
-				@Override
-				public void mouseClicked(MouseEvent e)
-				{
-					if (e.getButton() == MouseEvent.BUTTON1)
-					{
-						deleteItemPanel(newPanel);
-						rebuild(plugin.getTradesForCurrentView());
-					}
-				}
-			});
-
-			if (index++ > 0)
-			{
-				JPanel marginWrapper = new JPanel(new BorderLayout());
-				marginWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
-				marginWrapper.setBorder(new EmptyBorder(4, 0, 0, 0));
-				marginWrapper.add(newPanel, BorderLayout.NORTH);
-				flippingItemsPanel.add(marginWrapper, constraints);
-			}
-			else
-			{
-				flippingItemsPanel.add(newPanel, constraints);
-			}
-			constraints.gridy++;
-			activePanels.add(newPanel);
-		}
-
-		if (activePanels.isEmpty())
-		{
-			cardLayout.show(centerPanel, WELCOME_PANEL);
-		}
-
-	}
-
-	public void rebuild(List<FlippingItem> flippingItems)
-	{
-		flippingItemsPanel.removeAll();
 		SwingUtilities.invokeLater(() ->
 		{
-			initializeFlippingPanel(flippingItems);
+			flippingItemsPanel.removeAll();
+
+			if (flippingItems == null || flippingItems.size() == 0)
+			{
+				cardLayout.show(centerPanel, WELCOME_PANEL);
+				return;
+			}
+
+			cardLayout.show(centerPanel, ITEMS_PANEL);
+
+			int index = 0;
+			for (FlippingItem item : flippingItems)
+			{
+				if (!item.hasValidOffers(HistoryManager.PanelSelection.FLIPPING))
+				{
+					continue;
+				}
+
+				FlippingItemPanel newPanel = new FlippingItemPanel(plugin, itemManager, item);
+
+				newPanel.clearButton.addMouseListener(new MouseAdapter()
+				{
+					@Override
+					public void mouseClicked(MouseEvent e)
+					{
+						if (e.getButton() == MouseEvent.BUTTON1)
+						{
+							deleteItemPanel(newPanel);
+							rebuild(plugin.getTradesForCurrentView());
+						}
+					}
+				});
+
+				if (index++ > 0)
+				{
+					JPanel marginWrapper = new JPanel(new BorderLayout());
+					marginWrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
+					marginWrapper.setBorder(new EmptyBorder(4, 0, 0, 0));
+					marginWrapper.add(newPanel, BorderLayout.NORTH);
+					flippingItemsPanel.add(marginWrapper, constraints);
+				}
+				else
+				{
+					flippingItemsPanel.add(newPanel, constraints);
+				}
+				constraints.gridy++;
+				activePanels.add(newPanel);
+			}
+
+			if (activePanels.isEmpty())
+			{
+				cardLayout.show(centerPanel, WELCOME_PANEL);
+			}
+
 			revalidate();
 			repaint();
 		});

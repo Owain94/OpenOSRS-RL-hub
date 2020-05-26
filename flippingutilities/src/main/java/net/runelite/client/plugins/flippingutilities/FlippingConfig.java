@@ -42,16 +42,6 @@ public interface FlippingConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "storeTradeHistory",
-		name = "Store session trade history",
-		description = "Store your trade history to have your previous trade data show up on new game sessions"
-	)
-	default boolean storeTradeHistory()
-	{
-		return true;
-	}
-
-	@ConfigItem(
 		keyName = "outOfDateWarning",
 		name = "Set how long before prices are outdated",
 		description = "Set how long before warning that prices are outdated"
@@ -113,15 +103,4 @@ public interface FlippingConfig extends Config
 		return Fonts.SMALL_FONT;
 	}
 
-	@ConfigItem(
-		keyName = "multiAccTracking",
-		name = "Enable multi account tracking",
-		description = "<html>Enabling this feature gives you access to a dropdown"
-			+ "<br>which allows you to see each of your accounts flips and profits in isolation."
-			+ "<br>This is very useful if you flip on multiple accounts.</html>"
-	)
-	default boolean multiAccTracking()
-	{
-		return false;
-	}
 }
