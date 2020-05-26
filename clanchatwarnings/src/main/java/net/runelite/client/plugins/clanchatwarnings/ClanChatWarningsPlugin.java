@@ -208,7 +208,7 @@ public class ClanChatWarningsPlugin extends Plugin
 	@Subscribe
 	public void onClanMemberLeft(ClanMemberLeft event)
 	{
-		String name = event.getMember().getUsername();
+		String name = event.getMember().getName();
 		if (trackName.contains(name.toLowerCase()))
 		{
 			sendNotification(toTrueName(name), "", 2);
@@ -223,7 +223,7 @@ public class ClanChatWarningsPlugin extends Plugin
 	{
 		if (this.config.track())
 		{
-			clansName.add(event.getMember().getUsername());
+			clansName.add(event.getMember().getName());
 		}
 
 		if (this.clanJoinedTick != this.client.getTickCount())
@@ -234,7 +234,7 @@ public class ClanChatWarningsPlugin extends Plugin
 		if (clanJoinedTick != client.getTickCount() || (this.config.selfCheck() && !hopping))
 		{
 			final ClanMember member = event.getMember();
-			final String memberName = toTrueName(member.getUsername().trim());
+			final String memberName = toTrueName(member.getName().trim());
 			final String localName = client.getLocalPlayer() == null ? null : client.getLocalPlayer().getName();
 
 			if (memberName == null || (memberName.equalsIgnoreCase(localName) && !config.selfCheck()))

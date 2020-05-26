@@ -31,6 +31,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.Friend;
+import net.runelite.api.Ignore;
+import net.runelite.api.NameableContainer;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptPostFired;
@@ -91,7 +94,8 @@ public class WorldHiderPlugin extends Plugin
 	{
 		final boolean isMember = client.getVar(VarPlayer.MEMBERSHIP_DAYS) > 0;
 
-		final int friendCount = client.getFriendsCount();
+		final NameableContainer<Friend> friendContainer = client.getFriendContainer();
+		final int friendCount = friendContainer.getCount();
 		if (friendCount >= 0)
 		{
 			final int limit = isMember ? 400 : 200;
@@ -107,7 +111,8 @@ public class WorldHiderPlugin extends Plugin
 			setFriendsListTitle(title);
 		}
 
-		final int ignoreCount = client.getIgnoreCount();
+		final NameableContainer<Ignore> ignoreContainer = client.getIgnoreContainer();
+		final int ignoreCount = ignoreContainer.getCount();
 		if (ignoreCount >= 0)
 		{
 			final int limit = isMember ? 400 : 200;

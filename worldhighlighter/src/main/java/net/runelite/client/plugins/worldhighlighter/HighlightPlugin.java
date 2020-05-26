@@ -111,33 +111,36 @@ public class HighlightPlugin extends Plugin
 	private void highlight(String playerName)
 	{
 		clan = false;
-		for (int c = 0; c != this.client.getClanChatCount(); c++)
+		if (this.client.getClanMemberManager() != null)
 		{
-			if (this.client.getClanMembers()[c].getUsername().equals(playerName))
+			for (int c = 0; c != this.client.getClanMemberManager().getMembers().length; c++)
 			{
-				clan = true;
-				player = toTrueName(this.client.getClanMembers()[c].getUsername());
-				world = this.client.getClanMembers()[c].getWorld();
-				if (world == this.client.getWorld())
+				if (this.client.getClanMemberManager().getMembers()[c].getName().equals(playerName))
 				{
-					sendNotification(2);
-					this.resetWorld();
+					clan = true;
+					player = toTrueName(this.client.getClanMemberManager().getMembers()[c].getName());
+					world = this.client.getClanMemberManager().getMembers()[c].getWorld();
+					if (world == this.client.getWorld())
+					{
+						sendNotification(2);
+						this.resetWorld();
+					}
+					else
+					{
+						sendNotification(4);
+					}
+					break;
 				}
-				else
-				{
-					sendNotification(4);
-				}
-				break;
 			}
 		}
 		if (!clan)
 		{
-			for (int f = 0; f != this.client.getFriendsCount(); f++)
+			for (int f = 0; f != this.client.getFriendContainer().getCount(); f++)
 			{
-				if (this.client.getFriends()[f].getName().equals(playerName))
+				if (this.client.getFriendContainer().getMembers()[f].getName().equals(playerName))
 				{
-					player = toTrueName(this.client.getClanMembers()[f].getUsername());
-					world = this.client.getFriends()[f].getWorld();
+					player = toTrueName(this.client.getFriendContainer().getMembers()[f].getName());
+					world = this.client.getFriendContainer().getMembers()[f].getWorld();
 					if (world == this.client.getWorld())
 					{
 						sendNotification(2);

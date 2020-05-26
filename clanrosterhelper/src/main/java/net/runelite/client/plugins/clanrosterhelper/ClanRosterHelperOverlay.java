@@ -218,7 +218,7 @@ public class ClanRosterHelperOverlay extends Overlay
 	 */
 	private boolean isIgnored(String rsn)
 	{
-		Ignore[] ignores = this.plugin.getClient().getIgnores();
+		Ignore[] ignores = this.plugin.getClient().getIgnoreContainer().getMembers();
 		for (Ignore ignore : ignores)
 		{
 			if (ignore.getName().equalsIgnoreCase(rsn))
