@@ -83,31 +83,38 @@ public class FriendsExporterPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event) throws Exception
+	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event)
 	{
 		if (event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB ||
 			event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB ||
 			event.getWidget() == WidgetInfo.FIXED_VIEWPORT_CLAN_CHAT_TAB ||
 			event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_CLAN_CHAT_TAB)
 		{
-			if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Friends List"))
+			try
 			{
-				exportFriendsList();
-			}
-			else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Ignore List"))
-			{
-				exportIgnoreList();
-			}
-			else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Rank List"))
-			{
-				if (clan)
+				if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Friends List"))
 				{
-					exportRankList();
+					exportFriendsList();
 				}
-				else
+				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Ignore List"))
 				{
-					client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Clan Chat tab to export this list.", "");
+					exportIgnoreList();
 				}
+				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Rank List"))
+				{
+					if (clan)
+					{
+						exportRankList();
+					}
+					else
+					{
+						client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Clan Chat tab to export this list.", "");
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				log.error("Exporting failed", e);
 			}
 			refreshShiftClickCustomizationMenus();
 		}
