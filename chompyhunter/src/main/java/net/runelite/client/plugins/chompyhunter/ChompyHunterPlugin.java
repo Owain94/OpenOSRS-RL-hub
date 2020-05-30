@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.chompyhunter;
 
+import com.google.inject.Provides;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,8 @@ import net.runelite.api.NPC;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
+import net.runelite.client.Notifier;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -33,6 +36,15 @@ public class ChompyHunterPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
+	@Inject
+	private ChompyHunterConfig config;
+
+	@Provides
+	ChompyHunterConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(ChompyHunterConfig.class);
+	}
+
 	@Override
 	protected void startUp()
 	{
@@ -51,7 +63,6 @@ public class ChompyHunterPlugin extends Plugin
 		chompies.clear();
 		ChompyKills = 0;
 		StartTime = null;
-
 	}
 
 	@Getter(AccessLevel.PACKAGE)
@@ -71,6 +82,9 @@ public class ChompyHunterPlugin extends Plugin
 
 	@Inject
 	private ChompyHunterInfoOverlay overlayInfo;
+
+	@Inject
+	private Notifier notifier;
 
 	@Subscribe
 	public void onChatMessage(ChatMessage chatMessage)
@@ -102,6 +116,10 @@ public class ChompyHunterPlugin extends Plugin
 			if (name.equals("Chompy bird") && !chompies.containsKey(npc.getIndex()))
 			{
 				chompies.put(npc.getIndex(), new Chompy(npc));
+				if (config.notifyChompySpawn())
+				{
+					notifier.notify("A chompy has spawned!");
+				}
 			}
 		}
 	}

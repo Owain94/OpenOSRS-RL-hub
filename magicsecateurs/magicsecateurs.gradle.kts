@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Bank Heatmap"
-project.extra["PluginDescription"] = "Shows various heatmaps in your bank"
+project.extra["PluginName"] = "Magic Secateurs"
+project.extra["PluginDescription"] = "Highlight when magic secateurs aren't equipped on a farming run"
 
 tasks {
     jar {
