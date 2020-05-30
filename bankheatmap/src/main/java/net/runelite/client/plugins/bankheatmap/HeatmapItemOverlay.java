@@ -38,6 +38,7 @@ import net.runelite.api.ItemDefinition;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.bankheatmap.HeatmapPlugin.HEATMAP_MODE;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 import net.runelite.client.util.ImageUtil;
 
@@ -67,10 +68,10 @@ public class HeatmapItemOverlay extends WidgetItemOverlay
 	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem itemWidget)
 	{
 		HeatmapItem hItem = plugin.getHeatmapItem(itemId);
-		HeatmapPlugin.HEATMAP_MODE mode = plugin.getHeatmapMode();
+		HEATMAP_MODE mode = plugin.getHeatmapMode();
 		if (hItem == null || itemWidget.getWidget().getParentId() != WidgetInfo.BANK_ITEM_CONTAINER.getId()
-			|| mode == HeatmapPlugin.HEATMAP_MODE.NULL
-			|| (mode == HeatmapPlugin.HEATMAP_MODE.GE && hItem.getGePrice() < 1) || (mode == HeatmapPlugin.HEATMAP_MODE.HA && hItem.getAlchPrice() < 1))
+			|| mode == HEATMAP_MODE.NULL
+			|| (mode == HEATMAP_MODE.GE && hItem.getGePrice() < 1) || (mode == HEATMAP_MODE.HA && hItem.getAlchPrice() < 1))
 		{
 			return;
 		}
@@ -94,12 +95,12 @@ public class HeatmapItemOverlay extends WidgetItemOverlay
 		return new Color(c.getRed(), c.getGreen(), c.getBlue(), ALPHA);
 	}
 
-	private BufferedImage getImage(HeatmapItem item, HeatmapPlugin.HEATMAP_MODE mode)
+	private BufferedImage getImage(HeatmapItem item, HEATMAP_MODE mode)
 	{
 		ItemDefinition itemDefinition = itemManager.getItemDefinition(item.getId());
 		boolean stackable = item.getQuantity() > 1 || itemDefinition.isStackable();
 		BufferedImage image = itemManager.getImage(item.getId(), item.getQuantity(), stackable);
-		Color color = getColor(mode == HeatmapPlugin.HEATMAP_MODE.GE ? item.getGeFactor() : item.getAlchFactor());
+		Color color = getColor(mode == HEATMAP_MODE.GE ? item.getGeFactor() : item.getAlchFactor());
 		return ImageUtil.fillImage(image, color);
 	}
 }

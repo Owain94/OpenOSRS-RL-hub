@@ -52,8 +52,6 @@ public class HeatmapPlugin extends Plugin
 		Varbits.BANK_TAB_NINE_COUNT
 	);
 
-	private static final int BANK_MENU_WIDGET_ID = (WidgetID.BANK_GROUP_ID << 16) + 107;
-
 	@Inject
 	private Client client;
 
@@ -89,10 +87,7 @@ public class HeatmapPlugin extends Plugin
 		{
 			Item[] items = getBankTabItems();
 			heatmapItemOverlay.getHeatmapImages().invalidateAll();
-			if (items != null)
-			{
-				heatmapCalculation.calculate(items);
-			}
+			heatmapCalculation.calculate(items);
 		}
 	}
 
@@ -100,7 +95,7 @@ public class HeatmapPlugin extends Plugin
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
 		if (event.getOpcode() != MenuOpcode.CC_OP.getId() || !event.getOption().equals("Show menu")
-			|| event.getParam1() != BANK_MENU_WIDGET_ID)
+			|| (event.getParam1() >> 16) != WidgetID.BANK_GROUP_ID)
 		{
 			return;
 		}
@@ -134,7 +129,7 @@ public class HeatmapPlugin extends Plugin
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		if ((event.getMenuOpcode() != MenuOpcode.WIDGET_FOURTH_OPTION && event.getMenuOpcode() != MenuOpcode.WIDGET_FIFTH_OPTION)
-			|| !event.getOption().startsWith("Toggle"))
+			|| (event.getParam1() >> 16) != WidgetID.BANK_GROUP_ID || !event.getOption().startsWith("Toggle"))
 		{
 			return;
 		}

@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.influxdb;
 
 import com.google.inject.Provides;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +24,10 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.influxdb.write.InfluxWriter;
+import net.runelite.client.util.ExecutorServiceExceptionLogger;
+import org.pf4j.Extension;
 
+@Extension
 @PluginDescriptor(
 	name = "InfluxDB",
 	description = "Saves statistics to InfluxDB",
@@ -54,8 +58,10 @@ public class InfluxDbPlugin extends Plugin
 	@Inject
 	private MeasurementCreator measurer;
 
-	@Inject
-	private ScheduledExecutorService executor;
+	/**
+	 * Don't use a shared executor because we don't want to block any game threads.
+	 */
+	private final ScheduledExecutorService executor = new ExecutorServiceExceptionLogger(Executors.newSingleThreadScheduledExecutor());
 
 	@Subscribe
 	public void onStatChanged(StatChanged statChanged)
@@ -143,8 +149,7 @@ public class InfluxDbPlugin extends Plugin
 			failureBackoff = 0;
 			if (InfluxDbConfig.WRITE_INTERVAL.equals(changed.getKey()))
 			{
-				unscheduleFlush();
-				scheduleFlush();
+				rescheduleFlush();
 			}
 		}
 		if (!config.writeKillCount())
@@ -199,7 +204,7 @@ public class InfluxDbPlugin extends Plugin
 		}
 	}
 
-	private synchronized void scheduleFlush()
+	private synchronized void rescheduleFlush()
 	{
 		this.flushTask = executor.scheduleWithFixedDelay(this::flush, config.writeIntervalSeconds(), config.writeIntervalSeconds(), TimeUnit.SECONDS);
 	}
@@ -216,7 +221,7 @@ public class InfluxDbPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		scheduleFlush();
+		rescheduleFlush();
 	}
 
 	@Override
