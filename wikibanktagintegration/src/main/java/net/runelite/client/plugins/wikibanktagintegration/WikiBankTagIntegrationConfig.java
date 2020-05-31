@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020 Mitch Barnett <mitch@mitchbarnett.com Discord: Wizard Mitch#5072 Reddit: Wizard_Mitch>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,21 +23,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+package net.runelite.client.plugins.wikibanktagintegration;
 
-project.extra["PluginName"] = "Resource packs"
-project.extra["PluginDescription"] = "Allows you to change the look of the UI in runescape"
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-tasks {
-    jar {
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+@ConfigGroup("wikibanktagintegration")
+public interface WikiBankTagIntegrationConfig extends Config
+{
+	@ConfigItem(
+		keyName = "chatCommand",
+		name = "Chat command",
+		description = "The chat command to use the plugin default is bt"
+	)
+	default String chatCommand()
+	{
+		return "bt";
+	}
 }

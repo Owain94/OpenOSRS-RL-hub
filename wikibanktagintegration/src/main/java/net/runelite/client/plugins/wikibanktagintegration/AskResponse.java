@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020 Mitch Barnett <mitch@mitchbarnett.com Discord: Wizard Mitch#5072 Reddit: Wizard_Mitch>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,21 +23,69 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+package net.runelite.client.plugins.wikibanktagintegration;
 
-project.extra["PluginName"] = "Resource packs"
-project.extra["PluginDescription"] = "Allows you to change the look of the UI in runescape"
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+import java.util.Map;
 
-tasks {
-    jar {
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+public class AskResponse
+{
+	@SerializedName("query-continue-offset")
+	public int continueOffset;
+	public Query query;
+
+	public class Query
+	{
+		List<Request> printrequests;
+		Map<String, Results> results;
+		String serialiser;
+		int version;
+		Meta meta;
+
+		public class Request
+		{
+			public String label;
+			public String key;
+			public String redi;
+			public String typeid;
+			public int mode;
+		}
+
+		public Map<String, Results> getMasterlist()
+		{
+			return results;
+		}
+
+		public void setMasterlist(Map<String, Results> masterlist)
+		{
+			this.results = masterlist;
+		}
+
+		public class Results
+		{
+			Printouts printouts;
+			String fulltext;
+			String fullurl;
+			int namespace;
+			String exists;
+			String displaytitle;
+
+			public class Printouts
+			{
+				@SerializedName("All Item ID")
+				List<Integer> allItemID;
+			}
+		}
+
+
+		public class Meta
+		{
+			String hash;
+			int counting;
+			int offset;
+			String source;
+			String time;
+		}
+	}
 }
