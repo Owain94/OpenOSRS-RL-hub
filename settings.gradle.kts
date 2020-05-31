@@ -90,6 +90,7 @@ include(":traynotifications")
 include(":volcanicmine")
 include(":volcanicminestabilitytracker")
 include(":wellness")
+include(":wikibanktagintegration")
 include(":worldhider")
 include(":worldhighlighter")
 
