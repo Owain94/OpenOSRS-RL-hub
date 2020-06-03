@@ -23,15 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Bank Tag Generation"
-project.extra["PluginDescription"] = "Allows the creation of bank tags from categories on the offical OSRS wiki"
-
-dependencies {
-    compileOnly("com.openosrs.externals:banktags:0.0.+")
-    compileOnly("com.openosrs.externals:cluescroll:0.0.+")
-}
+project.extra["PluginName"] = "XP Grapher"
+project.extra["PluginDescription"] = "Shows a real time XP graph for any skill"
 
 tasks {
     jar {
@@ -40,11 +35,6 @@ tasks {
                     "Plugin-Version" to project.version,
                     "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Dependencies" to
-                            arrayOf(
-                                    nameToId("banktags"),
-                                    nameToId("cluescroll")
-                            ).joinToString(),
                     "Plugin-Description" to project.extra["PluginDescription"],
                     "Plugin-License" to project.extra["PluginLicense"]
             ))

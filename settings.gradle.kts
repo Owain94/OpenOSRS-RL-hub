@@ -84,6 +84,7 @@ include(":stonedloottracker")
 include(":skillstabprogressbars")
 include(":teleportlogger")
 include(":theatreofbloodstats")
+include(":timetolevel")
 include(":tobhealthbars")
 include(":toweroflife")
 include(":traynotifications")
@@ -93,6 +94,7 @@ include(":wellness")
 include(":wikibanktagintegration")
 include(":worldhider")
 include(":worldhighlighter")
+include(":xpgrapher")
 
 for (project in rootProject.children) {
     project.apply {
