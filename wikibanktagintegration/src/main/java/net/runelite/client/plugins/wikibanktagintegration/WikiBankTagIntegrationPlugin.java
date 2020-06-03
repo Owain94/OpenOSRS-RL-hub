@@ -57,7 +57,7 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-	name = "Wiki Bank Tag Integration",
+	name = "Bank Tag Generation",
 	description = "Allows the creation of bank tags from categories on the offical OSRS wiki",
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
@@ -83,9 +83,13 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	{
 		String[] args = commandExecuted.getArguments();
 
-		if (commandExecuted.getCommand().equals(config.chatCommand()) && args.length == 1)
+		if (commandExecuted.getCommand().equals(config.categoryChatCommand()) && args.length == 1)
 		{
 			addTagsFromCategory(args[0]);
+		}
+		else if (commandExecuted.getCommand().equals(config.dropsChatCommand()) && args.length == 1)
+		{
+			addTagsFromDrops(args[0]);
 		}
 	}
 
@@ -93,6 +97,31 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	WikiBankTagIntegrationConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(WikiBankTagIntegrationConfig.class);
+	}
+
+	/**
+	 * Adds a tag of the monster to items found in the provided osrs monster drops
+	 *
+	 * @param monster The name of the osrs wiki category to generate a list of items to tag.
+	 */
+	private void addTagsFromDrops(String monster)
+	{
+		List<Integer> items = getDropIDs(monster);
+
+		tagItems(items, monster + " drops");
+
+		if (items.size() == 0)
+		{
+			String message = "No drops found for " + monster;
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", message, "");
+		}
+		else
+		{
+			String message = "Added " + monster + " drops tag to " + String.valueOf(items.size()) + " items.";
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", message, "");
+			createTab(monster + " drops", Collections.min(items));
+		}
+
 	}
 
 	/**
@@ -113,7 +142,7 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 		}
 		else
 		{
-			String message = "Added " + category + " tag to " + items.size() + " items.";
+			String message = "Added " + category + " tag to " + String.valueOf(items.size()) + " items.";
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", message, "");
 			createTab(category, Collections.min(items));
 		}
@@ -176,7 +205,32 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	{
 		try
 		{
-			String wikiResponse = getWikiResponse(category).body().string();
+			String query = "[[category:" + category + "]]|?All+Item+ID";
+			String wikiResponse = getWikiResponse(query).body().string();
+			return getIDsFromJSON(wikiResponse);
+		}
+		catch (IOException e)
+		{
+			String message = "There was an error retrieving data";
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", message, "");
+
+			log.error(e.getMessage());
+			return Collections.emptyList();
+		}
+	}
+
+	/**
+	 * Gets the item IDs of all items drops by a monster
+	 *
+	 * @param monster The name of the OSRS monster that will be Item Ids will be generated from
+	 * @return A list of Item IDs found for the provided category.
+	 */
+	private List<Integer> getDropIDs(String monster)
+	{
+		try
+		{
+			String query = "[[Drop from::" + monster + "]]|?Dropped item.All+Item+ID";
+			String wikiResponse = getWikiResponse(query).body().string();
 			return getIDsFromJSON(wikiResponse);
 		}
 		catch (IOException e)
@@ -192,13 +246,13 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	/**
 	 * Makes and returns results for an ask Query the OSRS wiki for all item IDs in the provided category
 	 *
-	 * @param category The name of the OSRS wiki category that will be Item Ids will be generated from
+	 * @param query The name of the OSRS wiki category that will be Item Ids will be generated from
 	 * @return A okhttp3 HTTP response containing the results of a ask query in JSON format
 	 */
-	private Response getWikiResponse(String category) throws IOException
+	private Response getWikiResponse(String query) throws IOException
 	{
 		Request request = new Request.Builder()
-			.url(createQueryURL(category))
+			.url(createQueryURL(query))
 			.build();
 
 		return RuneLiteAPI.CLIENT.newCall(request).execute();
@@ -208,12 +262,12 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	/**
 	 * Makes a query URL to get all item IDs in the supplied category
 	 *
-	 * @param category The name of the OSRS wiki category to be used in the query
+	 * @param query The query to be used
 	 * @return The full query URL
 	 */
-	String createQueryURL(String category)
+	String createQueryURL(String query)
 	{
-		return "https://oldschool.runescape.wiki/api.php?action=ask&query=[[Category:" + category + "]]|+limit=10000" + "|?All+Item+ID&format=json";
+		return "https://oldschool.runescape.wiki/api.php?action=ask&query=" + query + "|+limit=2000&format=json";
 	}
 
 	/**
