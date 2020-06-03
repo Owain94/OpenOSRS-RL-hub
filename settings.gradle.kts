@@ -94,6 +94,7 @@ include(":wellness")
 include(":wikibanktagintegration")
 include(":worldhider")
 include(":worldhighlighter")
+include(":xpgrapher")
 
 for (project in rootProject.children) {
     project.apply {
