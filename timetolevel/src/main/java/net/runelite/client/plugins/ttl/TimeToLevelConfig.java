@@ -22,7 +22,7 @@ public interface TimeToLevelConfig extends Config
 	)
 	default String rates()
 	{
-		return null;
+		return "";
 	}
 
 
