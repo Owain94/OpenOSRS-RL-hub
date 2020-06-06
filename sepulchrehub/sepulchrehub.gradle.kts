@@ -23,23 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.0.1"
 
-project.extra["PluginName"] = "InfluxDB"
-project.extra["PluginDescription"] = "Saves statistics to InfluxDB"
-
-dependencies {
-    implementation(group = "org.influxdb", name = "influxdb-java", version = "2.19")
-}
+project.extra["PluginName"] = "Sepulchre"
+project.extra["PluginDescription"] = "Highlights arrows and swords in the Sepulchre"
 
 tasks {
     jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(configurations.runtimeClasspath.get()
-                .map { if (it.isDirectory) it else zipTree(it) })
-        val sourcesMain = sourceSets.main.get()
-        from(sourcesMain.output)
-
         manifest {
             attributes(mapOf(
                     "Plugin-Version" to project.version,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,32 +22,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.sepulchrehub;
 
-version = "0.0.5"
+import java.awt.Color;
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-project.extra["PluginName"] = "InfluxDB"
-project.extra["PluginDescription"] = "Saves statistics to InfluxDB"
-
-dependencies {
-    implementation(group = "org.influxdb", name = "influxdb-java", version = "2.19")
-}
-
-tasks {
-    jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(configurations.runtimeClasspath.get()
-                .map { if (it.isDirectory) it else zipTree(it) })
-        val sourcesMain = sourceSets.main.get()
-        from(sourcesMain.output)
-
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+@ConfigGroup("sepulchre")
+public interface SepulchreConfig extends Config
+{
+	@ConfigItem(
+		keyName = "highlightColor",
+		name = "Highlight Color",
+		description = "Highlight color"
+	)
+	default Color highlightColor()
+	{
+		return Color.GREEN;
+	}
 }
