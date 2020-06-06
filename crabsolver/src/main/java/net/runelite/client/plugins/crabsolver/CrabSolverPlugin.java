@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
+import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
@@ -16,7 +16,9 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
+import org.pf4j.Extension;
 
+@Extension
 @PluginDescriptor(
 	name = "Crab Solver",
 	description = "Shows the correct color for each crab crystal",
@@ -38,7 +40,7 @@ public class CrabSolverPlugin extends Plugin
 	}
 
 	@Getter
-	private final Map<CrabCrystal, LocalPoint> crystalMap = new HashMap<>();
+	private final Map<CrabCrystal, GameObject> crystalMap = new HashMap<>();
 
 	@Override
 	public void startUp()
@@ -71,7 +73,7 @@ public class CrabSolverPlugin extends Plugin
 			return;
 		}
 
-		crystalMap.put(crystal, e.getGameObject().getLocalLocation());
+		crystalMap.put(crystal, e.getGameObject());
 	}
 
 	@Subscribe

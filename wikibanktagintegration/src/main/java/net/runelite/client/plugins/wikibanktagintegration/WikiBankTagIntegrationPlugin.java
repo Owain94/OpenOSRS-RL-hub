@@ -45,11 +45,11 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
+import net.runelite.client.plugins.banktags.BankTagsPlugin;
 import static net.runelite.client.plugins.banktags.BankTagsPlugin.CONFIG_GROUP;
 import static net.runelite.client.plugins.banktags.BankTagsPlugin.ICON_SEARCH;
 import static net.runelite.client.plugins.banktags.BankTagsPlugin.TAG_TABS_CONFIG;
 import net.runelite.client.plugins.banktags.TagManager;
-import net.runelite.client.plugins.cluescrolls.ClueScrollPlugin;
 import net.runelite.http.api.RuneLiteAPI;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -63,7 +63,7 @@ import org.pf4j.Extension;
 	type = PluginType.MISCELLANEOUS
 )
 @Slf4j
-@PluginDependency(value = ClueScrollPlugin.class) // Required for bank tags TagManager
+@PluginDependency(value = BankTagsPlugin.class) // Required for bank tags TagManager
 public class WikiBankTagIntegrationPlugin extends Plugin
 {
 	@Inject

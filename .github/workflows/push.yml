@@ -64,7 +64,7 @@ jobs:
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable
@@ -284,7 +284,7 @@ jobs:
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable

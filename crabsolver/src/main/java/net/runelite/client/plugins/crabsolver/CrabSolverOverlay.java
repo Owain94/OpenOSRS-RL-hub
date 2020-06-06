@@ -69,15 +69,15 @@ public class CrabSolverOverlay extends Overlay
 			return null;
 		}
 
-		final WorldPoint playerPosition = WorldPoint.fromLocalInstance(client, client.getLocalPlayer().getLocalLocation());
-		plugin.getCrystalMap().forEach((crabCrystal, localPoint) ->
+		final WorldPoint playerPosition = client.getLocalPlayer().getWorldLocation();
+		plugin.getCrystalMap().forEach((crabCrystal, gameObject) ->
 		{
-			if (playerPosition.distanceTo(WorldPoint.fromLocalInstance(client, localPoint)) > MAX_RENDER_DISTANCE)
+			if (playerPosition.distanceTo(gameObject.getWorldLocation()) > MAX_RENDER_DISTANCE)
 			{
 				return;
 			}
 
-			final Point point = Perspective.localToCanvas(client, localPoint, client.getPlane(), 0);
+			final Point point = Perspective.localToCanvas(client, gameObject.getLocalLocation(), client.getPlane(), 0);
 			if (point == null)
 			{
 				return;
@@ -97,7 +97,7 @@ public class CrabSolverOverlay extends Overlay
 					return;
 				}
 
-				OverlayUtil.renderImageLocation(client, graphics, localPoint, icon, 0);
+				OverlayUtil.renderImageLocation(client, graphics, gameObject.getLocalLocation(), icon, 0);
 			}
 		});
 
