@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2"
 
 project.extra["PluginName"] = "RuneCafe Cash Flow"
-project.extra["PluginDescription"] = "RuneCafe plugin providing OpenOSRS integration to track your cash flow on the GE."
+project.extra["PluginDescription"] = "Plugin providing RuneLite integration for rune.cafe."
 
 tasks {
     jar {

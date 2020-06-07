@@ -2,6 +2,7 @@ package net.runelite.client.plugins.runecafecashflow;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.widgets.Widget;
 
 public class GEHistoryRecord
@@ -30,6 +31,16 @@ public class GEHistoryRecord
 		this.coinsEach = coinsEach;
 		this.itemId = itemId;
 		this.qty = qty;
+	}
+
+	public GEHistoryRecord(GrandExchangeOffer o)
+	{
+		this.action = BoughtOrSold.fromState(o.getState());
+		this.coins = o.getSpent();
+		this.coinsEach = o.getSpent() / o.getQuantitySold();
+		this.qty = o.getQuantitySold();
+		this.itemId = o.getItemId();
+		this.itemName = "";
 	}
 
 	public GEHistoryRecord(Widget[] src, int offset)

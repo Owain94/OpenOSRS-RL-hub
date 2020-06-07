@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.0.1"
 
-project.extra["PluginName"] = "XP Grapher"
-project.extra["PluginDescription"] = "Shows a real time XP graph for any skill"
+project.extra["PluginName"] = "Hide Widgets"
+project.extra["PluginDescription"] = "Adds a hotkey that allows you to hide all the UI widgets for a clean look (Resizable only)"
 
 tasks {
     jar {

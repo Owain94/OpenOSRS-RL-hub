@@ -37,6 +37,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import static net.runelite.client.plugins.traynotifications.TrayNotificationsPlugin.CornerConfig.*;
 import net.runelite.client.ui.ClientUI;
 import net.runelite.client.util.ImageUtil;
 import org.pushingpixels.substance.internal.SubstanceSynapse;
@@ -58,7 +59,8 @@ class CustomNotification
 		final String title,
 		final String message,
 		final TrayIcon.MessageType type,
-		final Rectangle display)
+		final Rectangle display,
+		final TrayNotificationsPlugin.CornerConfig cornerConfig)
 	{
 		JFrame window = new JFrame();
 		window.setIconImage(ClientUI.ICON);
@@ -71,10 +73,31 @@ class CustomNotification
 
 		fullySaturateColors(window);
 
+		int x;
+		int y;
+
+		if (cornerConfig == BOTTOM_LEFT || cornerConfig == TOP_LEFT)
+		{
+			x = PADDING;
+		}
+		else
+		{
+			x = display.x + display.width - WIDTH - PADDING;
+		}
+
+		if (cornerConfig == TOP_RIGHT || cornerConfig == TOP_LEFT)
+		{
+			y = PADDING;
+		}
+		else
+		{
+			y = display.x + display.width - WIDTH - PADDING;
+		}
+
 		// Position in lower right corner of the display containing parent
 		window.setBounds(
-			display.x + display.width - WIDTH - PADDING,
-			display.y + display.height - HEIGHT - PADDING,
+			x,
+			y,
 			WIDTH,
 			HEIGHT
 		);

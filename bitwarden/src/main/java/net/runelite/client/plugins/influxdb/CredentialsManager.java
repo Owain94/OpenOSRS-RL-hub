@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
+import net.runelite.client.ui.ClientUI;
 
 final class CredentialsManager
 {
@@ -121,8 +122,6 @@ final class CredentialsManager
 				return;
 			}
 		}
-
-		client.setPassword("");
 	}
 
 	void clearSessionKey()
@@ -178,7 +177,7 @@ final class CredentialsManager
 			JPasswordField pass = new JPasswordField(128);
 			panel.add(label);
 			panel.add(pass);
-			int option = JOptionPane.showOptionDialog(null, panel, "",
+			int option = JOptionPane.showOptionDialog(ClientUI.getFrame(), panel, "Bitwarden",
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
 				null, null, "");
 			if (option == 0) // pressing OK button

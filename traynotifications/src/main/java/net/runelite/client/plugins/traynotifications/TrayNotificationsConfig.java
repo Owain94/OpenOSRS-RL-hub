@@ -16,4 +16,14 @@ public interface TrayNotificationsConfig extends Config
 	{
 		return TrayNotificationsPlugin.MonitorConfig.CURRENT_MONITOR;
 	}
+
+	@ConfigItem(
+		keyName = "corner",
+		name = "Corner",
+		description = "Which corner of your monitor do you want to display the notification on"
+	)
+	default TrayNotificationsPlugin.CornerConfig corner()
+	{
+		return TrayNotificationsPlugin.CornerConfig.BOTTOM_RIGHT;
+	}
 }
