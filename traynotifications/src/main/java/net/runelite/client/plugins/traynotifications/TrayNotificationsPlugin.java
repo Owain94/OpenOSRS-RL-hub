@@ -44,6 +44,14 @@ public class TrayNotificationsPlugin extends Plugin
 		MAIN_MONITOR
 	}
 
+	public enum CornerConfig
+	{
+		TOP_LEFT,
+		TOP_RIGHT,
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT
+	}
+
 	@Subscribe
 	public void onNotificationFired(NotificationFired event)
 	{
@@ -74,7 +82,7 @@ public class TrayNotificationsPlugin extends Plugin
 			graphicsConfiguration = device.getDefaultConfiguration();
 		}
 
-		CustomNotification.sendCustomNotification(title, message, type, graphicsConfiguration.getBounds());
+		CustomNotification.sendCustomNotification(title, message, type, graphicsConfiguration.getBounds(), config.corner());
 	}
 
 	@Provides

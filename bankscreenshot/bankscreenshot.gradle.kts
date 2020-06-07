@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.0.1"
 
-project.extra["PluginName"] = "XP Grapher"
-project.extra["PluginDescription"] = "Shows a real time XP graph for any skill"
+project.extra["PluginName"] = "Bank Screenshot"
+project.extra["PluginDescription"] = "Take screenshots of your bank"
 
 tasks {
     jar {
