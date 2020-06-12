@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import net.runelite.client.plugins.flippingutilities.Flip;
-import net.runelite.client.plugins.flippingutilities.ui.UIUtilities;
+import net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.FontManager;
@@ -42,7 +42,7 @@ public class StatItemHistoryPanel extends JPanel
 {
 	JLabel timeSince = new JLabel("", SwingConstants.CENTER);
 
-	private final Flip flip;
+	private Flip flip;
 
 	StatItemHistoryPanel(Flip flip)
 	{
@@ -59,11 +59,11 @@ public class StatItemHistoryPanel extends JPanel
 
 		if (flip.isMarginCheck())
 		{
-			timeSince.setText("Margin Checked " + "(" + UIUtilities.formatDuration(flip.getTime()) + " ago)");
+			timeSince.setText("Margin Checked " + "(" + UIUtilities.formatDurationTruncated(flip.getTime()) + " ago)");
 		}
 		else
 		{
-			timeSince.setText(QuantityFormatter.formatNumber(flip.getQuantity()) + " Flipped (" + UIUtilities.formatDuration(flip.getTime()) + " ago)");
+			timeSince.setText(QuantityFormatter.formatNumber(flip.getQuantity()) + " Flipped (" + UIUtilities.formatDurationTruncated(flip.getTime()) + " ago)");
 		}
 
 		JLabel buyPriceText = new JLabel("Buy Price:");
@@ -114,16 +114,16 @@ public class StatItemHistoryPanel extends JPanel
 		add(infoContainer, BorderLayout.CENTER);
 	}
 
-	public void updateTime()
+	public void updateTimeDisplay()
 	{
 		if (flip.isMarginCheck())
 		{
-			timeSince.setText("Margin Checked (" + UIUtilities.formatDuration(flip.getTime()) + " ago)");
+			timeSince.setText("Margin Checked (" + UIUtilities.formatDurationTruncated(flip.getTime()) + " ago)");
 		}
 		else
 		{
 			timeSince.setText(QuantityFormatter.formatNumber(flip.getQuantity()) + " Flipped "
-				+ "(" + UIUtilities.formatDuration(flip.getTime()) + " ago)");
+				+ "(" + UIUtilities.formatDurationTruncated(flip.getTime()) + " ago)");
 		}
 	}
 

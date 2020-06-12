@@ -23,10 +23,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.0.1"
 
-project.extra["PluginName"] = "XP Grapher"
-project.extra["PluginDescription"] = "Shows a real time XP graph for any skill"
+project.extra["PluginName"] = "Chat Logger"
+project.extra["PluginDescription"] = "Logs clan chat messages to a file in runelite's folder"
+
+dependencies {
+    compileOnly(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
+}
 
 tasks {
     jar {

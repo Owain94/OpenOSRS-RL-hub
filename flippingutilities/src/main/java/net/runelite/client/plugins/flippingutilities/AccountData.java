@@ -26,6 +26,8 @@
 
 package net.runelite.client.plugins.flippingutilities;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,4 +39,18 @@ public class AccountData
 {
 	private Map<Integer, OfferInfo> lastOffers = new HashMap<>();
 	private List<FlippingItem> trades = new ArrayList<>();
+	private Instant sessionStartTime = Instant.now();
+	private Duration accumulatedSessionTime = Duration.ZERO;
+	private Instant lastSessionTimeUpdate;
+
+	/**
+	 * resets all session related data associated with an account. This is only ever called when the plugin first starts
+	 * as thats when a new session is "started".
+	 */
+	public void startNewSession()
+	{
+		sessionStartTime = Instant.now();
+		accumulatedSessionTime = Duration.ZERO;
+		lastSessionTimeUpdate = null;
+	}
 }

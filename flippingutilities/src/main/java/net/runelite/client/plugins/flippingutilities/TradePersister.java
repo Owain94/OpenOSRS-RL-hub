@@ -47,6 +47,7 @@ import net.runelite.client.RuneLite;
 @Slf4j
 public class TradePersister
 {
+
 	//this is in {user's home directory}/.runelite/flipping
 	public static final File PARENT_DIRECTORY = new File(RuneLite.RUNELITE_DIR, "flipping");
 
@@ -62,6 +63,7 @@ public class TradePersister
 	{
 		if (!PARENT_DIRECTORY.exists())
 		{
+			log.info("flipping directory doesn't exist yet so it's being created");
 			if (!PARENT_DIRECTORY.mkdir())
 			{
 				throw new IOException("unable to create parent directory!");
@@ -69,8 +71,11 @@ public class TradePersister
 		}
 		else
 		{
+			log.info("flipping directory already exists so it's not being created");
 			if (OLD_FILE.exists())
 			{
+				log.info("trades.json exists and is being partitioned into separate files to match the new way of storing" +
+					"trades");
 				partitionOldFile(OLD_FILE);
 				OLD_FILE.delete();
 
@@ -140,7 +145,7 @@ public class TradePersister
 			}
 			catch (IOException e)
 			{
-				log.error("error while partitioning trades.json into files for each account. error = {}, display name = {}.",
+				log.info("error while partitioning trades.json into files for each account. error = {}, display name = {}.",
 					e, displayName);
 			}
 		}
@@ -159,7 +164,13 @@ public class TradePersister
 		for (File f : PARENT_DIRECTORY.listFiles())
 		{
 			String displayName = f.getName().split("\\.")[0];
+			log.info("loading data for {}", displayName);
 			AccountData accountData = loadFromFile(f);
+			if (accountData == null)
+			{
+				log.info("data for {} is null for some reason, setting it to a empty AccountData object", displayName);
+				accountData = new AccountData();
+			}
 			accountsData.put(displayName, accountData);
 		}
 
@@ -171,6 +182,11 @@ public class TradePersister
 		log.info("loading data for {}", displayName);
 		File accountFile = new File(PARENT_DIRECTORY, displayName + ".json");
 		AccountData accountData = loadFromFile(accountFile);
+		if (accountData == null)
+		{
+			log.info("data for {} is null for some reason, setting it to a empty AccountData object", displayName);
+			accountData = new AccountData();
+		}
 		return accountData;
 	}
 
@@ -194,6 +210,7 @@ public class TradePersister
 	 */
 	public static void storeTrades(String displayName, AccountData data) throws IOException
 	{
+		log.info("storing trades for {}", displayName);
 		File accountFile = new File(PARENT_DIRECTORY, displayName + ".json");
 		final Gson gson = new Gson();
 		final String json = gson.toJson(data);
@@ -203,5 +220,21 @@ public class TradePersister
 	public static long lastModified(String fileName)
 	{
 		return new File(PARENT_DIRECTORY, fileName).lastModified();
+	}
+
+	public static void deleteFile(String fileName)
+	{
+		File accountFile = new File(PARENT_DIRECTORY, fileName);
+		if (accountFile.exists())
+		{
+			if (accountFile.delete())
+			{
+				log.info("{} deleted", fileName);
+			}
+			else
+			{
+				log.info("unable to delete {}", fileName);
+			}
+		}
 	}
 }

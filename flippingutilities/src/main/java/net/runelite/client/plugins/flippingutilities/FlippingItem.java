@@ -110,7 +110,7 @@ public class FlippingItem
 	@SerializedName("fB")
 	@Getter
 	@NonNull
-	private final String flippedBy;
+	private String flippedBy;
 
 	//utility for cloning an instant...
 	private Instant ci(Instant i)
@@ -290,19 +290,21 @@ public class FlippingItem
 	@Override
 	public String toString()
 	{
-		return "FlippingItem{" + "itemId=" + itemId +
-			", itemName='" + itemName + '\'' +
-			", totalGELimit=" + totalGELimit +
-			", marginCheckBuyPrice=" + marginCheckBuyPrice +
-			", marginCheckSellPrice=" + marginCheckSellPrice +
-			", marginCheckBuyTime=" + marginCheckBuyTime +
-			", marginCheckSellTime=" + marginCheckSellTime +
-			", latestBuyTime=" + latestBuyTime +
-			", latestSellTime=" + latestSellTime +
-			", latestActivityTime=" + latestActivityTime +
-			", shouldExpandStatItem=" + shouldExpandStatItem +
-			", shouldExpandHistory=" + shouldExpandHistory +
-			", madeBy='" + flippedBy + '\'' +
-			'}';
+		final StringBuilder sb = new StringBuilder("FlippingItem{");
+		sb.append("itemId=").append(itemId);
+		sb.append(", itemName='").append(itemName).append('\'');
+		sb.append(", totalGELimit=").append(totalGELimit);
+		sb.append(", marginCheckBuyPrice=").append(marginCheckBuyPrice);
+		sb.append(", marginCheckSellPrice=").append(marginCheckSellPrice);
+		sb.append(", marginCheckBuyTime=").append(marginCheckBuyTime);
+		sb.append(", marginCheckSellTime=").append(marginCheckSellTime);
+		sb.append(", latestBuyTime=").append(latestBuyTime);
+		sb.append(", latestSellTime=").append(latestSellTime);
+		sb.append(", latestActivityTime=").append(latestActivityTime);
+		sb.append(", shouldExpandStatItem=").append(shouldExpandStatItem);
+		sb.append(", shouldExpandHistory=").append(shouldExpandHistory);
+		sb.append(", madeBy='").append(flippedBy).append('\'');
+		sb.append('}');
+		return sb.toString();
 	}
 }

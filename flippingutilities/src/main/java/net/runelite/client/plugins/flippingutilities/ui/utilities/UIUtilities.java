@@ -24,15 +24,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.runelite.client.plugins.flippingutilities.ui;
+package net.runelite.client.plugins.flippingutilities.ui.utilities;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Normalizer;
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -40,9 +42,12 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.flippingutilities.FlippingItem;
 import net.runelite.client.plugins.flippingutilities.FlippingPlugin;
 import net.runelite.client.util.ColorUtil;
@@ -54,6 +59,7 @@ import okhttp3.HttpUrl;
 /**
  * This class contains various methods that the UI uses to format their visuals.
  */
+@Slf4j
 public class UIUtilities
 {
 
@@ -84,6 +90,14 @@ public class UIUtilities
 
 	public static final ImageIcon DELETE_ICON;
 
+	public static final ImageIcon SETTINGS_ICON;
+
+	public static final ImageIcon ACCOUNT_ICON;
+
+	public static final ImageIcon DELETE_BUTTON;
+
+	public static final ImageIcon HIGHLIGHT_DELETE_BUTTON;
+
 	static
 	{
 		final BufferedImage openIcon = ImageUtil
@@ -99,15 +113,42 @@ public class UIUtilities
 		final BufferedImage deleteIcon = ImageUtil
 			.getResourceStreamFromClass(FlippingPlugin.class, "delete_icon.png");
 		DELETE_ICON = new ImageIcon(deleteIcon);
+
+		final BufferedImage settingsIcon = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "settings_icon.png");
+		SETTINGS_ICON = new ImageIcon(settingsIcon);
+
+		final BufferedImage accountIcon = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "gnome.png");
+		ACCOUNT_ICON = new ImageIcon(accountIcon);
+
+		final BufferedImage deleteButton = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "deleteButton.png");
+		DELETE_BUTTON = new ImageIcon(deleteButton);
+
+		final BufferedImage highlightDeleteButton = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "highlightDeleteButton.png");
+		HIGHLIGHT_DELETE_BUTTON = new ImageIcon(highlightDeleteButton);
+	}
+
+	/**
+	 * Formats a duration into HH:MM:SS
+	 *
+	 * @param duration
+	 * @return a string in the format HH:MM:SS
+	 */
+	public static String formatDuration(Duration duration)
+	{
+		long seconds = duration.toMillis() / 1000;
+		return String.format("%02d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
 	}
 
 	/**
 	 * This method formats a string time from an instant from the time, as specified by the parameter, until now.
+	 * It truncates the time representation to the greatest unit. For example, 65 seconds will become a minute
+	 * (not a minute and 5 seconds), 70 minutes will become an hour (not an hour and 10 minutes), etc. This is to
+	 * save space on the panels.
 	 *
 	 * @param fromInstant The start of the duration
 	 * @return A formatted string.
 	 */
-	public static String formatDuration(Instant fromInstant)
+	public static String formatDurationTruncated(Instant fromInstant)
 	{
 		if (fromInstant != null)
 		{
@@ -245,6 +286,7 @@ public class UIUtilities
 			.build()
 			.toString();
 
+		log.info("Opening OSRS Exchange: " + url);
 		return url;
 	}
 
@@ -304,6 +346,7 @@ public class UIUtilities
 			.build()
 			.toString();
 
+		log.info("Opening Platinum Tokens: " + url);
 		return url;
 	}
 
@@ -322,5 +365,14 @@ public class UIUtilities
 		popupMenu.add(openPlatinumTokens);
 
 		return popupMenu;
+	}
+
+	public static JDialog createModalFromPanel(Component parent, JPanel panel)
+	{
+		JDialog modal = new JDialog();
+		modal.setSize(new Dimension(panel.getSize()));
+		modal.add(panel);
+		modal.setLocationRelativeTo(parent);
+		return modal;
 	}
 }

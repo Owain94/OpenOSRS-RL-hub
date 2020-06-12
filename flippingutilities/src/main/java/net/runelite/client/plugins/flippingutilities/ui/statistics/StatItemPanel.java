@@ -45,21 +45,23 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.flippingutilities.Flip;
 import net.runelite.client.plugins.flippingutilities.FlippingItem;
 import net.runelite.client.plugins.flippingutilities.FlippingPlugin;
 import net.runelite.client.plugins.flippingutilities.OfferInfo;
-import net.runelite.client.plugins.flippingutilities.ui.UIUtilities;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.CLOSE_ICON;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.DELETE_ICON;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.OPEN_ICON;
+import net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.CLOSE_ICON;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.DELETE_ICON;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.OPEN_ICON;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.util.AsyncBufferedImage;
 import net.runelite.client.util.QuantityFormatter;
 
+@Slf4j
 public class StatItemPanel extends JPanel
 {
 	private static final Border ITEM_INFO_BORDER = new CompoundBorder(
@@ -74,11 +76,11 @@ public class StatItemPanel extends JPanel
 		BorderFactory.createMatteBorder(0, 0, 2, 0, ColorScheme.LIGHT_GRAY_COLOR),
 		BorderFactory.createEmptyBorder(3, 5, 3, 5));
 
-	private final FlippingPlugin plugin;
+	private FlippingPlugin plugin;
 	@Getter
-	private final FlippingItem flippingItem;
+	private FlippingItem flippingItem;
 
-	private final StatsPanel statsPanel;
+	private StatsPanel statsPanel;
 
 	private long totalProfit;
 	private long totalExpense;
@@ -95,42 +97,42 @@ public class StatItemPanel extends JPanel
 	 identifying information about the item.
 	 */
 	//Holds the item icon, name, item profit labels and collapse icon
-	private final JPanel titlePanel = new JPanel(new BorderLayout());
+	private JPanel titlePanel = new JPanel(new BorderLayout());
 	//Holds the name and item profit labels
-	private final JPanel nameAndProfitTitlePanel = new JPanel(new BorderLayout());
+	private JPanel nameAndProfitTitlePanel = new JPanel(new BorderLayout());
 
 	//Shows the name label for the item
-	private final JLabel nameTitleLabel;
+	private JLabel nameTitleLabel;
 	//Shows the item's profit
-	private final JLabel itemProfitTitleLabel = new JLabel();
+	private JLabel itemProfitTitleLabel = new JLabel();
 
 	//Shows the item's icon
-	private final JPanel itemIconTitlePanel = new JPanel(new BorderLayout());
+	private JPanel itemIconTitlePanel = new JPanel(new BorderLayout());
 	//Label that controls the collapse function of the item panel.
-	private final JLabel collapseIconTitleLabel = new JLabel();
+	private JLabel collapseIconTitleLabel = new JLabel();
 
 	//Contains the sub info container and trade history panel.
-	private final JPanel subInfoAndHistoryContainer = new JPanel(new BorderLayout());
+	private JPanel subInfoAndHistoryContainer = new JPanel(new BorderLayout());
 
-	private final JLabel totalProfitValLabel = new JLabel("", SwingConstants.RIGHT);
-	private final JLabel profitEachValLabel = new JLabel("", SwingConstants.RIGHT);
-	private final JLabel timeOfLastFlipValLabel = new JLabel("", SwingConstants.RIGHT);
-	private final JLabel quantityValLabel = new JLabel("", SwingConstants.RIGHT);
-	private final JLabel roiValLabel = new JLabel("", SwingConstants.RIGHT);
-	private final JLabel avgBuyPriceValLabel = new JLabel("", SwingConstants.RIGHT);
-	private final JLabel avgSellPriceValLabel = new JLabel("", SwingConstants.RIGHT);
+	private JLabel totalProfitValLabel = new JLabel("", SwingConstants.RIGHT);
+	private JLabel profitEachValLabel = new JLabel("", SwingConstants.RIGHT);
+	private JLabel timeOfLastFlipValLabel = new JLabel("", SwingConstants.RIGHT);
+	private JLabel quantityValLabel = new JLabel("", SwingConstants.RIGHT);
+	private JLabel roiValLabel = new JLabel("", SwingConstants.RIGHT);
+	private JLabel avgBuyPriceValLabel = new JLabel("", SwingConstants.RIGHT);
+	private JLabel avgSellPriceValLabel = new JLabel("", SwingConstants.RIGHT);
 
 	/* These panels contain the sub information regarding the item.
 	   Subinfos are general statistics about an item over the time interval currently selected. */
 
-	private final JPanel totalProfitPanel = new JPanel(new BorderLayout());
-	private final JPanel profitEachPanel = new JPanel(new BorderLayout());
-	private final JPanel timeOfLastFlipPanel = new JPanel(new BorderLayout());
-	private final JPanel quantityPanel = new JPanel(new BorderLayout());
-	private final JPanel padPanel = new JPanel(new BorderLayout());
-	private final JPanel roiPanel = new JPanel(new BorderLayout());
-	private final JPanel avgBuyPricePanel = new JPanel(new BorderLayout());
-	private final JPanel avgSellPricePanel = new JPanel(new BorderLayout());
+	private JPanel totalProfitPanel = new JPanel(new BorderLayout());
+	private JPanel profitEachPanel = new JPanel(new BorderLayout());
+	private JPanel timeOfLastFlipPanel = new JPanel(new BorderLayout());
+	private JPanel quantityPanel = new JPanel(new BorderLayout());
+	private JPanel padPanel = new JPanel(new BorderLayout());
+	private JPanel roiPanel = new JPanel(new BorderLayout());
+	private JPanel avgBuyPricePanel = new JPanel(new BorderLayout());
+	private JPanel avgSellPricePanel = new JPanel(new BorderLayout());
 
 	private final JPanel[] subInfoPanelArray = {totalProfitPanel, profitEachPanel, timeOfLastFlipPanel, quantityPanel,
 		padPanel, roiPanel, avgBuyPricePanel, avgSellPricePanel};
@@ -139,15 +141,15 @@ public class StatItemPanel extends JPanel
 
 	/* Trade History containers. */
 	//Wraps the title label panel and the item history container.
-	private final JPanel tradeHistoryPanel = new JPanel(new BorderLayout());
-	private final JPanel tradeHistoryTitlePanel = new JPanel(new BorderLayout());
+	private JPanel tradeHistoryPanel = new JPanel(new BorderLayout());
+	private JPanel tradeHistoryTitlePanel = new JPanel(new BorderLayout());
 	//Holds the individual trades in the history.
-	private final JPanel tradeHistoryItemContainer = new JPanel(new GridBagLayout());
+	private JPanel tradeHistoryItemContainer = new JPanel(new GridBagLayout());
 
-	private final JLabel collapseTradeHistoryIconLabel = new JLabel(CLOSE_ICON);
+	private JLabel collapseTradeHistoryIconLabel = new JLabel(CLOSE_ICON);
 
 	//Constraints for tradeHistoryItemContainer.
-	private final GridBagConstraints constraints = new GridBagConstraints();
+	private GridBagConstraints constraints = new GridBagConstraints();
 
 	/**
 	 * This panel represents the middle layer of information. It contains general information about the item
@@ -491,12 +493,12 @@ public class StatItemPanel extends JPanel
 		if (!tradeHistory.isEmpty())
 		{
 			OfferInfo lastRecordedTrade = tradeHistory.get(tradeHistory.size() - 1);
-			timeOfLastFlipValLabel.setText(UIUtilities.formatDuration(lastRecordedTrade.getTime()) + " ago");
+			timeOfLastFlipValLabel.setText(UIUtilities.formatDurationTruncated(lastRecordedTrade.getTime()) + " ago");
 			timeOfLastFlipPanel.setToolTipText(UIUtilities.formatTime(lastRecordedTrade.getTime(), plugin.getConfig().twelveHourFormat(), true));
 
 			for (StatItemHistoryPanel panel : activePanels)
 			{
-				panel.updateTime();
+				panel.updateTimeDisplay();
 			}
 		}
 	}

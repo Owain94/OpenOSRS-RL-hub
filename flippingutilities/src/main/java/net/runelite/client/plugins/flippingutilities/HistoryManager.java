@@ -32,6 +32,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -164,7 +165,8 @@ public class HistoryManager
 			//offer means the slot history is over.
 			if (!newOffer.isComplete())
 			{
-				slotHistory.put(newOfferSlot, new ArrayList<>(Collections.singletonList(newOffer)));
+				slotHistory.put(newOfferSlot, new ArrayList<>(Arrays.asList(newOffer)));
+
 			}
 		}
 
@@ -586,13 +588,13 @@ public class HistoryManager
 			}
 
 			//if the buy is more than 1 minute before the sell, its probably not for that sell.
-			else if (!(millisBetweenBuyAndSell < 60000))
+			else if (millisBetweenBuyAndSell >= 0 && !(millisBetweenBuyAndSell < 60000))
 			{
 				remainder.add(buy);
 			}
 
 			//if the sell comes before the buy its a stand alone insta sell (a "half" margin check")
-			else
+			else if (millisBetweenBuyAndSell < 0)
 			{
 				remainder.add(sell);
 				sellIdx++;

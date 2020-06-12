@@ -2,8 +2,8 @@ package net.runelite.client.plugins.xpgrapher;
 
 import com.google.inject.Provides;
 import java.util.ArrayList;
-import java.util.List;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.events.GameTick;
@@ -23,21 +23,14 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class XpGrapherPlugin extends Plugin
 {
-
 	@Inject
 	private Client client;
 
 	@Inject
 	private XpGrapherConfig config;
-
-	@Inject
-	private XpGrapherOverlay overlay;
-
-	@Inject
-	private OverlayManager overlayManager;
-
 
 	@Provides
 	XpGrapherConfig provideConfig(ConfigManager configManager)
@@ -53,11 +46,18 @@ public class XpGrapherPlugin extends Plugin
 	public int width = 200;
 	public int height = 100;
 
-	public List<Integer> xpList = new ArrayList<>();
-	public List<Integer[]> graphPoints = new ArrayList<>();
+	public ArrayList<Integer> xpList = new ArrayList<Integer>();
+	public ArrayList<Integer[]> graphPoints = new ArrayList<Integer[]>();
 
 	public int minimumXp = -1;
 	public int maximumXp = -1;
+
+	@Inject
+	private XpGrapherOverlay overlay;
+
+	@Inject
+	private OverlayManager overlayManager;
+
 	@Override
 	public void startUp()
 	{
@@ -73,7 +73,6 @@ public class XpGrapherPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
-
 		skillXP = client.getSkillExperience((skillToGraph));
 		xpList.add(skillXP);
 
@@ -87,12 +86,12 @@ public class XpGrapherPlugin extends Plugin
 		return config;
 	}
 
-	public void update(List<Integer> xpList)
+	public void update(ArrayList xpList)
 	{
 		width = config.graphWidth();
 		height = config.graphHeight();
 
-		List<Integer[]> newList = new ArrayList<>();
+		ArrayList<Integer[]> newList = new ArrayList<Integer[]>();
 
 		for (int x = 0; x < width; x++)
 		{
@@ -124,14 +123,14 @@ public class XpGrapherPlugin extends Plugin
 			}
 			else
 			{
-				maxXp = xpList.get(xpList.size() - 1);
+				maxXp = (int) xpList.get(xpList.size() - 1);
 			}
-			int minXp = xpList.get(0);
+			int minXp = (int) xpList.get(0);
 			int xpRange = maxXp - minXp;
 			int xpGained;
 			if (dataIndex >= 0)
 			{
-				xpGained = xpList.get(dataIndex) - minXp;
+				xpGained = (int) xpList.get(dataIndex) - minXp;
 			}
 			else
 			{
@@ -139,14 +138,15 @@ public class XpGrapherPlugin extends Plugin
 			}
 
 			double ratioVertical = xpGained / (double) xpRange;
+			//System.out.println(xpGained/(double)xpRange);
 			int y = height - (int) ((double) height * ratioVertical);
+			//System.out.println(y);
 
 			Integer[] newEntry = {x, y};
 			newList.add(newEntry);
 
 			minimumXp = minXp;
 			maximumXp = maxXp;
-
 		}
 
 		graphPoints = newList;

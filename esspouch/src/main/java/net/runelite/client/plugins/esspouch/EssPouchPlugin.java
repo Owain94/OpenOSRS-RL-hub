@@ -53,7 +53,7 @@ import org.pf4j.Extension;
 @Extension
 @PluginDescriptor(
 	name = "Essence Pouch",
-	description = "Shows how many essence are in an essnce pouch",
+	description = "Shows how many essence are in an essence pouch",
 	tags = {"ess", "runecraft"},
 	type = PluginType.SKILLING,
 	enabledByDefault = false
@@ -63,7 +63,7 @@ public class EssPouchPlugin extends Plugin
 {
 	private static final int INVENTORY_SIZE = 28;
 
-	private static final Pattern POUCH_CHECK_MESSAGE = Pattern.compile("^There (?:is|are) ([a-z]+)(?: pure)? essences? in this pouch\\.$");
+	private static final Pattern POUCH_CHECK_MESSAGE = Pattern.compile("^There (?:is|are) ([a-z]+)(?: pure| daeyalt)? essences? in this pouch\\.$");
 	private static final ImmutableMap<String, Integer> TEXT_TO_NUMBER = ImmutableMap.<String, Integer>builder()
 		.put("no", 0)
 		.put("one", 1)
@@ -166,6 +166,7 @@ public class EssPouchPlugin extends Plugin
 			switch (item.getId())
 			{
 				case ItemID.PURE_ESSENCE:
+				case ItemID.DAEYALT_ESSENCE:
 					newEss += 1;
 					break;
 				case -1:

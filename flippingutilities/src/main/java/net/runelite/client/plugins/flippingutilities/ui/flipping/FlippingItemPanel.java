@@ -43,17 +43,19 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.flippingutilities.FlippingItem;
 import net.runelite.client.plugins.flippingutilities.FlippingPlugin;
-import net.runelite.client.plugins.flippingutilities.ui.UIUtilities;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.DELETE_ICON;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.ICON_SIZE;
+import net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.DELETE_ICON;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.ICON_SIZE;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.util.AsyncBufferedImage;
 import net.runelite.client.util.QuantityFormatter;
 
+@Slf4j
 public class FlippingItemPanel extends JPanel
 {
 	private static final String NUM_FORMAT = "%,d";
@@ -70,7 +72,7 @@ public class FlippingItemPanel extends JPanel
 	private float roi;
 	@Getter
 	private final FlippingItem flippingItem;
-	private final FlippingPlugin plugin;
+	private FlippingPlugin plugin;
 
 	/* Labels */
 	JLabel buyPriceVal = new JLabel();
@@ -368,8 +370,8 @@ public class FlippingItemPanel extends JPanel
 		Instant latestSellTime = flippingItem.getMarginCheckSellTime();
 
 		//Update price texts with the string formatter
-		final String latestBuyString = UIUtilities.formatDuration(latestBuyTime) + " old";
-		final String latestSellString = UIUtilities.formatDuration(latestSellTime) + " old";
+		final String latestBuyString = UIUtilities.formatDurationTruncated(latestBuyTime) + " old";
+		final String latestSellString = UIUtilities.formatDurationTruncated(latestSellTime) + " old";
 
 		//As the config unit is in minutes.
 		final int latestBuyTimeAgo =

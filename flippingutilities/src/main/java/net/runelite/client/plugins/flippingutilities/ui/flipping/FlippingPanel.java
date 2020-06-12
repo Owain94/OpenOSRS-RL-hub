@@ -53,18 +53,21 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.flippingutilities.FlippingItem;
 import net.runelite.client.plugins.flippingutilities.FlippingPlugin;
 import net.runelite.client.plugins.flippingutilities.HistoryManager;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.ICON_SIZE;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.RESET_HOVER_ICON;
-import static net.runelite.client.plugins.flippingutilities.ui.UIUtilities.RESET_ICON;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.ICON_SIZE;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.RESET_HOVER_ICON;
+import static net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities.RESET_ICON;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.ui.components.PluginErrorPanel;
 
+
+@Slf4j
 public class FlippingPanel extends JPanel
 {
 	@Getter
@@ -92,7 +95,7 @@ public class FlippingPanel extends JPanel
 	public final JPanel centerPanel = new JPanel(cardLayout);
 
 	//Keeps track of all items currently displayed on the panel.
-	private final ArrayList<FlippingItemPanel> activePanels = new ArrayList<>();
+	private ArrayList<FlippingItemPanel> activePanels = new ArrayList<>();
 
 	@Getter
 	JLabel resetIcon;
@@ -140,7 +143,7 @@ public class FlippingPanel extends JPanel
 		searchBar.setHoverBackgroundColor(ColorScheme.DARKER_GRAY_HOVER_COLOR);
 		searchBar.setMinimumSize(new Dimension(0, 35));
 		searchBar.addActionListener(e -> executor.execute(this::updateSearch));
-		searchBar.addClearListener(e -> updateSearch());
+		searchBar.addClearListener(this::updateSearch);
 		searchBar.addKeyListener(key ->
 		{
 			if (runningRequest != null)
@@ -225,11 +228,11 @@ public class FlippingPanel extends JPanel
 
 		//To switch between greeting and items panels
 		cardLayout.show(centerPanel, WELCOME_PANEL);
-
 		container.add(topPanel, BorderLayout.NORTH);
 		container.add(centerPanel, BorderLayout.CENTER);
 
 		add(container, BorderLayout.CENTER);
+
 	}
 
 	public void rebuild(List<FlippingItem> flippingItems)
