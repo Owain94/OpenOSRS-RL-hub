@@ -138,7 +138,8 @@ public class ProbabilityCalculatorOutputArea extends JPanel
 			outputMsg = "At " + killCount + " kills, " + dropsReceived + " drop(s), and a drop rate of " + dropRate + ", your chances are:\n\n" +
 				"Chance to get at least " + dropsReceived + " drop(s):\n" + strAtLeastChance + "%\n\n" +
 				"Chance to get exactly " + dropsReceived + " drop(s):\n" + strExactChance + "%\n\n" +
-				"Chance to get zero drops:\n" + strZeroChance + "%";
+				"Chance to get zero drops:\n" + strZeroChance + "%\n\n" + "==========================\n\n" + "Expected drop(s) for given input:\n" + (int) Math.round(dropRate * killCount) +
+				"\n\nExpected kill count for given input:\n" + (int) Math.ceil(dropsReceived / dropRate);
 		}
 	}
 

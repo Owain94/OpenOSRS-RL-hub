@@ -34,9 +34,9 @@ public class ProbabilityCalculatorPlugin extends Plugin
 	private ProbabilityCalculatorInputArea input;
 	private ProbabilityCalculatorOutputArea output;
 	private NavigationButton navButton;
-	private double dropRate = 1.0 / 5;
-	private int killCount = 20;
-	private int dropsReceived = 4;
+	private double dropRate = 1.0 / 100;
+	private int killCount = 100;
+	private int dropsReceived = 1;
 
 	@Override
 	protected void startUp()

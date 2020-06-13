@@ -27,6 +27,7 @@
 package net.runelite.client.plugins.flippingutilities.ui.flipping;
 
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.FontID;
 import net.runelite.api.VarClientStr;
@@ -38,6 +39,7 @@ import net.runelite.api.widgets.WidgetSizeMode;
 import net.runelite.api.widgets.WidgetTextAlignment;
 import net.runelite.api.widgets.WidgetType;
 
+@Slf4j
 public class FlippingItemWidget
 {
 	private final Widget parent;

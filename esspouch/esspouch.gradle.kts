@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.0.4"
 
 project.extra["PluginName"] = "Essence Pouch"
-project.extra["PluginDescription"] = "Shows how many essence are in an essnce pouch"
+project.extra["PluginDescription"] = "Shows how many essence are in an essence pouch"
 
 tasks {
     jar {

@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.text.DecimalFormat;
+import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -15,11 +16,13 @@ import net.runelite.client.ui.overlay.components.LayoutableRenderableEntity;
 
 public class XpGrapherOverlay extends OverlayPanel
 {
-	private final XpGrapherPlugin grapherPlugin;
+	private final Client client;
+	private XpGrapherPlugin grapherPlugin;
 
 	@Inject
-	private XpGrapherOverlay(XpGrapherPlugin grapherPlugin)
+	private XpGrapherOverlay(Client client, XpGrapherPlugin grapherPlugin)
 	{
+		this.client = client;
 		this.grapherPlugin = grapherPlugin;
 		setLayer(OverlayLayer.ABOVE_WIDGETS);
 		setPosition(OverlayPosition.BOTTOM_LEFT);
@@ -37,7 +40,6 @@ public class XpGrapherOverlay extends OverlayPanel
 			graphics.setColor(Color.WHITE);
 			int numberOfPoints = grapherPlugin.graphPoints.size();
 
-
 			DecimalFormat formatter = new DecimalFormat("#,###");
 
 			int xpRange = grapherPlugin.maximumXp - grapherPlugin.minimumXp;
@@ -54,7 +56,11 @@ public class XpGrapherOverlay extends OverlayPanel
 				int xpAtMarkStringHeight = graphics.getFontMetrics().getHeight();
 				graphics.setColor(Color.WHITE);
 				String xpAtMarkStringFormatted = formatter.format(xpAtMark);
-				graphics.drawString(xpAtMarkStringFormatted, -xpAtMarkStringWidth - 10, i * grapherPlugin.height / numberOfDivisions + xpAtMarkStringHeight / 2);
+				int xpAtNextMark = grapherPlugin.maximumXp - xpRange / numberOfDivisions * (i + 1);
+				if (xpAtNextMark != xpAtMark)
+				{
+					graphics.drawString(xpAtMarkStringFormatted, grapherPlugin.width + 5, i * grapherPlugin.height / numberOfDivisions + xpAtMarkStringHeight / 2 - 4);
+				}
 			}
 			graphics.setColor(Color.WHITE);
 			int xpAtBottom = grapherPlugin.minimumXp;
@@ -62,10 +68,8 @@ public class XpGrapherOverlay extends OverlayPanel
 			int xpAtBottomStringWidth = graphics.getFontMetrics().stringWidth(xpAtBottomString);
 			int xpAtBottomStringHeight = graphics.getFontMetrics().getHeight();
 
-
 			String xpAtBottomStringFormatted = formatter.format(xpAtBottom);
-			graphics.drawString(xpAtBottomStringFormatted, -xpAtBottomStringWidth - 10, grapherPlugin.height + xpAtBottomStringHeight / 2);
-
+			graphics.drawString(xpAtBottomStringFormatted, grapherPlugin.width + 5, grapherPlugin.height + xpAtBottomStringHeight / 2 - 4);
 
 			graphics.setColor(Color.WHITE);
 			int oldX = -1;
@@ -77,8 +81,11 @@ public class XpGrapherOverlay extends OverlayPanel
 				int y = point[1];
 				if (y < grapherPlugin.height && y >= 0)
 				{
-					graphics.drawLine(x, y, x, y);
+					graphics.setColor(new Color(255, 255, 255, 50));
 				}
+				graphics.drawLine(x, grapherPlugin.height, x, y);
+				graphics.setColor(Color.WHITE);
+				graphics.drawLine(x, y, x, y);
 				if (oldX != -1 && oldY != -1)
 				{
 					graphics.drawLine(oldX + 1, oldY, x, y);
@@ -87,12 +94,11 @@ public class XpGrapherOverlay extends OverlayPanel
 				oldX = x;
 				oldY = y;
 			}
-			String skillName = grapherPlugin.getConfig().skillToGraph().getName();
+			String skillName = grapherPlugin.getConfig().skillToGraph().getName() + " XP";
 			int skillNameWidth = graphics.getFontMetrics().stringWidth(skillName);
 			int skillNameHeight = graphics.getFontMetrics().getHeight();
 
 			graphics.drawString(skillName, grapherPlugin.width / 2 - skillNameWidth / 2, -skillNameHeight / 2);
-
 
 			String timeLabel = "";
 
@@ -122,9 +128,7 @@ public class XpGrapherOverlay extends OverlayPanel
 
 				graphics.drawString(timeLabel, timeLabelX, timeLabelY);
 				graphics.drawString("0", -graphics.getFontMetrics().stringWidth("0") / 2, timeLabelY);
-
 			}
-
 
 			return new Dimension(grapherPlugin.width, grapherPlugin.height);
 		}
@@ -151,7 +155,6 @@ public class XpGrapherOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-
 		panelComponent.getChildren().add(graphEntity);
 		panelComponent.setBackgroundColor(new Color(0, 0, 0, 0));
 
