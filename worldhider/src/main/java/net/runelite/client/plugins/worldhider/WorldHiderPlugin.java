@@ -195,7 +195,7 @@ public class WorldHiderPlugin extends Plugin
 	private void hideClanWorlds()
 	{
 		int world = client.getWorld();
-		Widget clan = client.getWidget(WidgetInfo.CLAN_CHAT_LIST);
+		Widget clan = client.getWidget(WidgetInfo.FRIENDS_CHAT_LIST);
 
 		if (clan == null || client.getLocalPlayer() == null)
 		{

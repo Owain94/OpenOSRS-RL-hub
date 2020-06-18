@@ -31,12 +31,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import net.runelite.api.ClanMemberRank;
 import net.runelite.api.Client;
+import net.runelite.api.FriendsChatRank;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.Widget;
 import static net.runelite.client.RuneLite.SCREENSHOT_DIR;
-import net.runelite.client.game.ClanManager;
+import net.runelite.client.game.FriendChatManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import org.apache.commons.lang3.StringUtils;
@@ -61,13 +61,13 @@ public class SnipPanel extends PluginPanel
 	@Inject
 	private SnipConfig config;
 	@Inject
-	private ClanManager clanManager;
+	private FriendChatManager friendChatManager;
 
-	public SnipPanel(SnipConfig config, Client client, ClanManager clanManager)
+	public SnipPanel(SnipConfig config, Client client, FriendChatManager friendChatManager)
 	{
 		this.client = client;
 		this.config = config;
-		this.clanManager = clanManager;
+		this.friendChatManager = friendChatManager;
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -352,7 +352,7 @@ public class SnipPanel extends PluginPanel
 					int url = Integer.valueOf(newerSplit.get(y));
 					if (url > 10)
 					{
-						url -= (clanManager.getIconNumber(ClanMemberRank.OWNER) - 27);
+						url -= (friendChatManager.getIconNumber(FriendsChatRank.OWNER) - 27);
 					}
 					URL path = getClass().getResource(url + ".png");
 					String path2;

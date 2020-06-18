@@ -19,14 +19,14 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
-import net.runelite.api.ClanMember;
 import net.runelite.api.Client;
+import net.runelite.api.FriendsChatMember;
 import net.runelite.api.GameState;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.MenuOpcode;
-import net.runelite.api.events.ClanChanged;
-import net.runelite.api.events.ClanMemberJoined;
-import net.runelite.api.events.ClanMemberLeft;
+import net.runelite.api.events.FriendsChatChanged;
+import net.runelite.api.events.FriendsChatMemberJoined;
+import net.runelite.api.events.FriendsChatMemberLeft;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
@@ -206,7 +206,7 @@ public class ClanChatWarningsPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onClanMemberLeft(ClanMemberLeft event)
+	public void onFriendsChatMemberLeft(FriendsChatMemberLeft event)
 	{
 		String name = event.getMember().getName();
 		if (trackName.contains(name.toLowerCase()))
@@ -219,7 +219,7 @@ public class ClanChatWarningsPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onClanMemberJoined(ClanMemberJoined event)
+	public void onFriendsChatMemberJoined(FriendsChatMemberJoined event)
 	{
 		if (this.config.track())
 		{
@@ -233,11 +233,11 @@ public class ClanChatWarningsPlugin extends Plugin
 
 		if (clanJoinedTick != client.getTickCount() || (this.config.selfCheck() && !hopping))
 		{
-			final ClanMember member = event.getMember();
+			final FriendsChatMember member = event.getMember();
 			final String memberName = toTrueName(member.getName().trim());
 			final String localName = client.getLocalPlayer() == null ? null : client.getLocalPlayer().getName();
 
-			if (memberName == null || (memberName.equalsIgnoreCase(localName) && !config.selfCheck()))
+			if (memberName.equalsIgnoreCase(localName) && !config.selfCheck())
 			{
 				return;
 			}
@@ -293,7 +293,7 @@ public class ClanChatWarningsPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onClanChanged(ClanChanged event)
+	public void onFriendsChatChanged(FriendsChatChanged event)
 	{
 		if (event.isJoined())
 		{

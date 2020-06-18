@@ -128,7 +128,7 @@ public class WorldFlagsPlugin extends Plugin
 	@Subscribe
 	public void onScriptPostFired(ScriptPostFired event)
 	{
-		if (event.getScriptId() == ScriptID.CLAN_CHAT_CHANNEL_BUILD)
+		if (event.getScriptId() == ScriptID.FRIENDS_CHAT_CHANNEL_REBUILD)
 		{
 			clientThread.invoke(() -> toggleWorldsToFlags(config.showClanFlags(), true));
 		}
@@ -195,7 +195,7 @@ public class WorldFlagsPlugin extends Plugin
 		Widget containerWidget;
 		if (flagMode)
 		{
-			containerWidget = client.getWidget(WidgetInfo.CLAN_CHAT_LIST);
+			containerWidget = client.getWidget(WidgetInfo.FRIENDS_CHAT_LIST);
 		}
 		else
 		{
