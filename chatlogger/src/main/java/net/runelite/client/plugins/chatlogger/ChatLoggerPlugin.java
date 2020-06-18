@@ -7,8 +7,10 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
-import net.runelite.api.ChatMessageType;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -25,10 +27,60 @@ import org.slf4j.LoggerFactory;
 )
 public class ChatLoggerPlugin extends Plugin
 {
-	private Logger logger;
+
+	private static final String BASE_DIRECTORY = System.getProperty("user.home") + "/.runelite/chatlogs/";
+
+	@Inject
+	private ChatLoggerConfig config;
+
+	private Logger publicChatLogger;
+	private Logger privateChatLogger;
+	private Logger friendsChatLogger;
+
+	@Provides
+	ChatLoggerConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(ChatLoggerConfig.class);
+	}
 
 	@Override
 	protected void startUp()
+	{
+		publicChatLogger = setupLogger("PublicChatLogger", "public");
+		privateChatLogger = setupLogger("PrivateChatLogger", "private");
+		friendsChatLogger = setupLogger("FriendsChatLogger", "friends");
+	}
+
+	@Subscribe
+	public void onChatMessage(ChatMessage event)
+	{
+		switch (event.getType())
+		{
+
+			case FRIENDSCHAT:
+				if (config.logFriendsChat())
+				{
+					friendsChatLogger.info("[{}] {}: {}", event.getSender(), event.getName(), event.getMessage());
+				}
+				break;
+			case PRIVATECHAT:
+			case MODPRIVATECHAT:
+				if (config.logPrivateChat())
+				{
+					privateChatLogger.info("{}: {}", event.getName(), event.getMessage());
+				}
+				break;
+			case MODCHAT:
+			case PUBLICCHAT:
+				if (config.logPublicChat())
+				{
+					publicChatLogger.info("{}: {}", event.getName(), event.getMessage());
+				}
+				break;
+		}
+	}
+
+	private Logger setupLogger(String loggerName, String subFolder)
 	{
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
@@ -37,10 +89,10 @@ public class ChatLoggerPlugin extends Plugin
 		encoder.setPattern("%d{HH:mm:ss} %msg%n");
 		encoder.start();
 
-		String basePath = System.getProperty("user.home") + "/.runelite/clanchatlogs/";
+		String directory = BASE_DIRECTORY + subFolder + "/";
 
 		RollingFileAppender<ILoggingEvent> appender = new RollingFileAppender<>();
-		appender.setFile(basePath + "latest.log");
+		appender.setFile(directory + "latest.log");
 		appender.setAppend(true);
 		appender.setEncoder(encoder);
 		appender.setContext(context);
@@ -48,27 +100,19 @@ public class ChatLoggerPlugin extends Plugin
 		TimeBasedRollingPolicy<ILoggingEvent> logFilePolicy = new TimeBasedRollingPolicy<>();
 		logFilePolicy.setContext(context);
 		logFilePolicy.setParent(appender);
-		logFilePolicy.setFileNamePattern(basePath + "chatlog_%d{yyyy-MM-dd}.log");
+		logFilePolicy.setFileNamePattern(directory + "chatlog_%d{yyyy-MM-dd}.log");
 		logFilePolicy.setMaxHistory(30);
 		logFilePolicy.start();
 
 		appender.setRollingPolicy(logFilePolicy);
 		appender.start();
 
-		logger = context.getLogger(ChatLoggerPlugin.class);
+		Logger logger = context.getLogger(loggerName);
 		logger.detachAndStopAllAppenders();
 		logger.setAdditive(false);
 		logger.setLevel(Level.INFO);
 		logger.addAppender(appender);
-	}
 
-	@Subscribe
-	public void onChatMessage(ChatMessage event)
-	{
-
-		if (event.getType() == ChatMessageType.FRIENDSCHAT)
-		{
-			logger.info("[{}] {}: {}", event.getSender(), event.getName(), event.getMessage());
-		}
+		return logger;
 	}
 }

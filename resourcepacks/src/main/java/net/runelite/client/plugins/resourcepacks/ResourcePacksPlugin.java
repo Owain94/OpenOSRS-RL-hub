@@ -33,9 +33,6 @@ import org.pf4j.Extension;
 @Slf4j
 public class ResourcePacksPlugin extends Plugin
 {
-	private static final int ADJUSTED_TAB_WIDTH = 33;
-	private static final int ORIGINAL_TAB_WIDTH = 38;
-
 	@Inject
 	private Client client;
 
@@ -57,10 +54,7 @@ public class ResourcePacksPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		if (checkIfResourcePackPathIsNotEmpty())
-		{
-			clientThread.invoke(this::updateAllOverrides);
-		}
+		clientThread.invokeLater(this::updateAllOverrides);
 	}
 
 	@Override
@@ -68,7 +62,7 @@ public class ResourcePacksPlugin extends Plugin
 	{
 		clientThread.invoke(() ->
 		{
-			adjustWidgetDimensions(ORIGINAL_TAB_WIDTH);
+			adjustWidgetDimensions(false);
 			removeGameframe();
 		});
 	}
@@ -76,22 +70,19 @@ public class ResourcePacksPlugin extends Plugin
 	@Subscribe
 	public void onBeforeRender(BeforeRender event)
 	{
-		adjustWidgetDimensions(ADJUSTED_TAB_WIDTH);
+		adjustWidgetDimensions(true);
 	}
 
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if (event.getGroup().equals("resourcepacks"))
+		if (event.getGroup().equals("resourcepacks") && event.getKey().equals("resourcePack"))
 		{
-			if (event.getKey().equals("resourcePack"))
-			{
-				clientThread.invoke(this::removeGameframe);
-				if (checkIfResourcePackPathIsNotEmpty())
-				{
-					clientThread.invoke(this::updateAllOverrides);
-				}
-			}
+			clientThread.invoke(this::updateAllOverrides);
+		}
+		else if (event.getGroup().equals("banktags") && event.getKey().equals("useTabs"))
+		{
+			clientThread.invoke(this::updateAllOverrides);
 		}
 	}
 
@@ -102,6 +93,12 @@ public class ResourcePacksPlugin extends Plugin
 		for (SpriteOverride spriteOverride : SpriteOverride.values())
 		{
 			client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
+		}
+		for (TabSprites tabSprite : TabSprites.values())
+		{
+			BufferedImage image = ImageUtil.getResourceStreamFromClass(getClass(), tabSprite.getFileName());
+			Sprite sp = ImageUtil.getImageSprite(image, client);
+			client.getSpriteOverrides().put(tabSprite.getSpriteId(), sp);
 		}
 	}
 
@@ -159,6 +156,10 @@ public class ResourcePacksPlugin extends Plugin
 			}
 			else
 			{
+				if (spriteOverride.getSpriteID() < -200)
+				{
+					client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
+				}
 				client.getSpriteOverrides().put(spriteOverride.getSpriteID(), spritePixels);
 			}
 		}
@@ -179,22 +180,74 @@ public class ResourcePacksPlugin extends Plugin
 
 	private void updateAllOverrides()
 	{
+		if (!checkIfResourcePackPathIsNotEmpty())
+		{
+			return;
+		}
 		removeGameframe();
 		overrideSprites();
-		adjustWidgetDimensions(ORIGINAL_TAB_WIDTH);
-		adjustWidgetDimensions(ADJUSTED_TAB_WIDTH);
+		adjustWidgetDimensions(false);
+		adjustWidgetDimensions(true);
 	}
 
-	// Adjust certain tabs to match other tabs because of Jagex's inconsistent tab sizes
-	private void adjustWidgetDimensions(int width)
+	private void adjustWidgetDimensions(boolean modify)
 	{
 		for (WidgetResize widgetResize : WidgetResize.values())
 		{
-			Widget widget = client.getWidget(widgetResize.getWidgetInfo());
+			Widget widget = client.getWidget(widgetResize.getGroup(), widgetResize.getChild());
 
 			if (widget != null)
 			{
-				widget.setOriginalWidth(width);
+				if (widgetResize.getOriginalX() != null)
+				{
+					if (modify)
+					{
+						widget.setOriginalX(widgetResize.getModifiedX());
+					}
+					else
+					{
+						widget.setOriginalX(widgetResize.getOriginalX());
+					}
+				}
+
+				if (widgetResize.getOriginalY() != null)
+				{
+					if (modify)
+					{
+						widget.setOriginalY(widgetResize.getModifiedY());
+					}
+					else
+					{
+						widget.setOriginalY(widgetResize.getOriginalY());
+					}
+				}
+
+				if (widgetResize.getOriginalWidth() != null)
+				{
+					if (modify)
+					{
+						widget.setOriginalWidth(widgetResize.getModifiedWidth());
+					}
+					else
+					{
+						widget.setOriginalWidth(widgetResize.getOriginalWidth());
+					}
+				}
+
+				if (widgetResize.getOriginalHeight() != null)
+				{
+					if (modify)
+					{
+						widget.setOriginalWidth(widgetResize.getModifiedHeight());
+					}
+					else
+					{
+						widget.setOriginalWidth(widgetResize.getOriginalHeight());
+					}
+				}
+			}
+			if (widget != null)
+			{
 				widget.revalidate();
 			}
 		}

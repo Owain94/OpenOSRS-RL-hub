@@ -3,6 +3,7 @@ package net.runelite.client.plugins.chattranscripts;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -23,6 +24,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class SnipPlugin extends Plugin
 {
 	@Inject

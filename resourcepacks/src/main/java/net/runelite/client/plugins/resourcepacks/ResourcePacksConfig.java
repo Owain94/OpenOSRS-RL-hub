@@ -7,6 +7,7 @@ import net.runelite.client.config.ConfigItem;
 @ConfigGroup("resourcepacks")
 public interface ResourcePacksConfig extends Config
 {
+
 	enum ResourcePack
 	{
 		FIRST,

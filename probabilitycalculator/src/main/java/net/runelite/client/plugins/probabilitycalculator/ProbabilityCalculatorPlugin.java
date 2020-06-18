@@ -6,6 +6,7 @@ import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
 import java.util.function.Consumer;
 import javax.inject.Inject;
+import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -24,6 +25,8 @@ import org.pf4j.Extension;
 )
 public class ProbabilityCalculatorPlugin extends Plugin
 {
+	@Inject
+	private Client client;
 
 	@Inject
 	private ProbabilityCalculatorConfig config;
@@ -31,6 +34,7 @@ public class ProbabilityCalculatorPlugin extends Plugin
 	@Inject
 	private ClientToolbar clientToolbar;
 
+	private ProbabilityCalculatorPanel panel;
 	private ProbabilityCalculatorInputArea input;
 	private ProbabilityCalculatorOutputArea output;
 	private NavigationButton navButton;
@@ -43,7 +47,7 @@ public class ProbabilityCalculatorPlugin extends Plugin
 	{
 		input = new ProbabilityCalculatorInputArea();
 		output = new ProbabilityCalculatorOutputArea(dropRate, killCount, dropsReceived, config);
-		ProbabilityCalculatorPanel panel = new ProbabilityCalculatorPanel(input, output);
+		panel = new ProbabilityCalculatorPanel(input, output);
 		//panel.init(config);
 
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(ProbabilityCalculatorPlugin.class, "probabilitycalculator_icon.png");
