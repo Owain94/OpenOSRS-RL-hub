@@ -7,7 +7,7 @@ import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.game.ClanManager;
+import net.runelite.client.game.FriendChatManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
@@ -33,7 +33,7 @@ public class SnipPlugin extends Plugin
 	@Inject
 	private SnipConfig config;
 	@Inject
-	private ClanManager clanManager;
+	private FriendChatManager friendChatManager;
 	private SnipPanel panel;
 	private NavigationButton button;
 	final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "227-0.png");
@@ -41,7 +41,7 @@ public class SnipPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		panel = new SnipPanel(config, client, clanManager);
+		panel = new SnipPanel(config, client, friendChatManager);
 		button = NavigationButton.builder()
 			.tooltip("Chat Transcripts")
 			.icon(icon)

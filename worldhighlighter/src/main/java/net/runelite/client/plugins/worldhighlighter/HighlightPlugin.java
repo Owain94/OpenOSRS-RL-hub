@@ -111,15 +111,15 @@ public class HighlightPlugin extends Plugin
 	private void highlight(String playerName)
 	{
 		clan = false;
-		if (this.client.getClanMemberManager() != null)
+		if (this.client.getFriendsChatManager() != null)
 		{
-			for (int c = 0; c != this.client.getClanMemberManager().getMembers().length; c++)
+			for (int c = 0; c != this.client.getFriendsChatManager().getMembers().length; c++)
 			{
-				if (this.client.getClanMemberManager().getMembers()[c].getName().equals(playerName))
+				if (this.client.getFriendsChatManager().getMembers()[c].getName().equals(playerName))
 				{
 					clan = true;
-					player = toTrueName(this.client.getClanMemberManager().getMembers()[c].getName());
-					world = this.client.getClanMemberManager().getMembers()[c].getWorld();
+					player = toTrueName(this.client.getFriendsChatManager().getMembers()[c].getName());
+					world = this.client.getFriendsChatManager().getMembers()[c].getWorld();
 					if (world == this.client.getWorld())
 					{
 						sendNotification(2);
