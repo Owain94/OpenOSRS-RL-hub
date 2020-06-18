@@ -11,6 +11,9 @@ public class NotificationGroup extends Notification implements DraggableContaine
 	@Setter
 	private String name = "Group";
 	@Getter
+	@Setter
+	private boolean collapsed = false;
+	@Getter
 	private final List<Notification> notifications = new ArrayList<>();
 
 	public NotificationGroup(AdvancedNotificationsPlugin plugin)

@@ -1,3 +1,8 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
 package net.runelite.client.plugins.worldhighlighter;
 
 import java.awt.Dimension;
@@ -37,7 +42,7 @@ class HighlightOverlay extends Overlay
 			if (this.plugin.getClan())
 			{
 				String player = this.plugin.getPlayer();
-				if (player.equals(""))
+				if (player == "")
 				{
 					this.hasScrolled = 0;
 					return null;
@@ -48,24 +53,31 @@ class HighlightOverlay extends Overlay
 					if (clanContainer != null && !clanContainer.isHidden())
 					{
 						Widget found = null;
-						for (Widget clany : clanContainer.getDynamicChildren())
+						Widget[] var8 = clanContainer.getDynamicChildren();
+						int var9 = var8.length;
+						for (int var10 = 0; var10 < var9; ++var10)
 						{
+							Widget clany = var8[var10];
 							if (clany.getText().contains(player))
 							{
 								found = clany;
 								break;
 							}
 						}
-						if (found != null)
+						if (found == null)
+						{
+							return null;
+						}
+						else
 						{
 							if (this.hasScrolled != found.getRelativeY())
 							{
 								this.hasScrolled = found.getRelativeY();
-								this.plugin.scrollToWidget(this.client.getWidget(WidgetInfo.FRIENDS_CHAT_LIST), this.client.getWidget(7, 17), found);
+								this.plugin.scrollToWidget(this.client.getWidget(WidgetInfo.FRIENDS_CHAT_LIST), this.client.getWidget(7, 17), new Widget[]{found});
 							}
-							this.plugin.highlightWidget(graphics, found, this.client.getWidget(WidgetInfo.FRIENDS_CHAT_LIST), PADDING, null);
+							this.plugin.highlightWidget(graphics, found, this.client.getWidget(WidgetInfo.FRIENDS_CHAT_LIST), PADDING, (String) null);
+							return null;
 						}
-						return null;
 					}
 					else if (hasScrolled != 0)
 					{
@@ -93,24 +105,31 @@ class HighlightOverlay extends Overlay
 					if (worldContainer != null && !worldContainer.isHidden())
 					{
 						Widget found = null;
-						for (Widget track : worldContainer.getDynamicChildren())
+						Widget[] var8 = worldContainer.getDynamicChildren();
+						int var9 = var8.length;
+						for (int var10 = 0; var10 < var9; ++var10)
 						{
+							Widget track = var8[var10];
 							if (track.getName().contains("" + world))
 							{
 								found = track;
 								break;
 							}
 						}
-						if (found != null)
+						if (found == null)
+						{
+							return null;
+						}
+						else
 						{
 							if (this.hasScrolled != world)
 							{
 								this.hasScrolled = world;
-								this.plugin.scrollToWidget(this.client.getWidget(69, 15), this.client.getWidget(69, 18), found);
+								this.plugin.scrollToWidget(this.client.getWidget(69, 15), this.client.getWidget(69, 18), new Widget[]{found});
 							}
-							this.plugin.highlightWidget(graphics, found, this.client.getWidget(69, 15), PADDING, null);
+							this.plugin.highlightWidget(graphics, found, this.client.getWidget(69, 15), PADDING, (String) null);
+							return null;
 						}
-						return null;
 					}
 					else if (hasScrolled != 0)
 					{
@@ -146,8 +165,11 @@ class HighlightOverlay extends Overlay
 					}
 					else
 					{
-						for (Widget track : worldList.getDynamicChildren())
+						Widget[] var8 = worldList.getDynamicChildren();
+						int var9 = var8.length;
+						for (int var10 = 0; var10 < var9; ++var10)
 						{
+							Widget track = var8[var10];
 							if (track.getName().contains("" + world))
 							{
 								found = track;
@@ -155,16 +177,20 @@ class HighlightOverlay extends Overlay
 							}
 						}
 
-						if (found != null)
+						if (found == null)
+						{
+							return null;
+						}
+						else
 						{
 							if (this.hasScrolled != world)
 							{
 								this.hasScrolled = world;
-								this.plugin.scrollToWidget(this.client.getWidget(69, 15), this.client.getWidget(69, 18), found);
+								this.plugin.scrollToWidget(this.client.getWidget(69, 15), this.client.getWidget(69, 18), new Widget[]{found});
 							}
-							this.plugin.highlightWidget(graphics, found, this.client.getWidget(69, 15), PADDING, null);
+							this.plugin.highlightWidget(graphics, found, this.client.getWidget(69, 15), PADDING, (String) null);
+							return null;
 						}
-						return null;
 					}
 				}
 				else if (hasScrolled != 0)

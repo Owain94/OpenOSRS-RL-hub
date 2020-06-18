@@ -85,17 +85,21 @@ public class WorldFlagsPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		loadRegionIcons();
-		clientThread.invoke(() -> toggleWorldsToFlags(config.showClanFlags(), true));
-		clientThread.invoke(() -> toggleWorldsToFlags(config.showFriendsFlags(), false));
+		clientThread.invoke(() -> {
+			loadRegionIcons();
+			toggleWorldsToFlags(config.showClanFlags(), true);
+			toggleWorldsToFlags(config.showFriendsFlags(), false);
+		});
 	}
 
 	@Override
 	protected void shutDown()
 	{
-		unloadRegionIcons();
-		clientThread.invoke(() -> toggleWorldsToFlags(false, true));
-		clientThread.invoke(() -> toggleWorldsToFlags(false, false));
+		clientThread.invoke(() -> {
+			unloadRegionIcons();
+			toggleWorldsToFlags(false, true);
+			toggleWorldsToFlags(false, false);
+		});
 	}
 
 	@Subscribe
@@ -103,7 +107,7 @@ public class WorldFlagsPlugin extends Plugin
 	{
 		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
 		{
-			loadRegionIcons();
+			clientThread.invoke(this::loadRegionIcons);
 		}
 	}
 
@@ -254,15 +258,19 @@ public class WorldFlagsPlugin extends Plugin
 		for (int i = flagMode ? 1 : 2; i < containerWidget.getChildren().length; i += 3)
 		{
 			final Widget listWidget = containerWidget.getChild(i);
-			final String worldString = listWidget.getText();
+			final String worldString = removeColorTags(listWidget.getText());
 			// In case the string already has been changed back to World
-			if (!worldString.matches("^.*\\s?<img=\\d+>$"))
+			if (!worldString.matches("^\\d+\\s?<img=\\d+>$") || !listWidget.getName().equals(""))
 			{
 				continue;
 			}
-
 			final String worldNum = listWidget.getText().replaceAll("\\s?<img=\\d+>$", "");
 			listWidget.setText("World " + worldNum);
 		}
+	}
+
+	private String removeColorTags(String text)
+	{
+		return text.replaceAll("<(/)?col(=([0-9]|[a-z]){6})*>", "");
 	}
 }

@@ -4,12 +4,18 @@ import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameObjectDespawned;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.crowdsourcing.cooking.CrowdsourcingCooking;
+import net.runelite.client.plugins.crowdsourcing.dialogue.CrowdsourcingDialogue;
+import net.runelite.client.plugins.crowdsourcing.movement.CrowdsourcingMovement;
+import net.runelite.client.plugins.crowdsourcing.music.CrowdsourcingMusic;
+import net.runelite.client.plugins.crowdsourcing.woodcutting.CrowdsourcingWoodcutting;
 import net.runelite.client.task.Schedule;
 import org.pf4j.Extension;
 
@@ -29,7 +35,7 @@ public class CrowdsourcingPlugin extends Plugin
 	// I will either completely change the approach (stop using @Schedule) or
 	// massively raise the time (~300 or 600 seconds) before making it widely
 	// available. The current low value is for further testing from wiki editors.
-	private static final int SECONDS_BETWEEN_UPLOADS = 10;
+	private static final int SECONDS_BETWEEN_UPLOADS = 60;
 
 	@Inject
 	private EventBus eventBus;
@@ -40,12 +46,35 @@ public class CrowdsourcingPlugin extends Plugin
 	@Inject
 	private CrowdsourcingCooking cooking;
 
+	@Inject
+	private CrowdsourcingDialogue dialogue;
+
+	@Inject
+	private CrowdsourcingMovement movement;
+
+	@Inject
+	private CrowdsourcingMusic music;
+
+	@Inject
+	private CrowdsourcingWoodcutting woodcutting;
+
 	@Override
 	protected void startUp()
 	{
-		manager.storeEvent("hello!");
 		eventBus.subscribe(ChatMessage.class, this, cooking::onChatMessage);
 		eventBus.subscribe(MenuOptionClicked.class, this, cooking::onMenuOptionClicked);
+
+		eventBus.subscribe(GameTick.class, this, dialogue::onGameTick);
+
+		eventBus.subscribe(GameTick.class, this, movement::onGameTick);
+
+		eventBus.subscribe(ChatMessage.class, this, music::onChatMessage);
+
+		eventBus.subscribe(ChatMessage.class, this, woodcutting::onChatMessage);
+		eventBus.subscribe(GameTick.class, this, woodcutting::onGameTick);
+		eventBus.subscribe(MenuOptionClicked.class, this, woodcutting::onMenuOptionClicked);
+		eventBus.subscribe(GameObjectDespawned.class, this, woodcutting::onGameObjectDespawned);
+
 	}
 
 	@Override

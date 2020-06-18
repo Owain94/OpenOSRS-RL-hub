@@ -353,6 +353,7 @@ public class SnipPanel extends PluginPanel
 					if (url > 10)
 					{
 						url -= (friendChatManager.getIconNumber(FriendsChatRank.OWNER) - 27);
+
 					}
 					URL path = getClass().getResource(url + ".png");
 					String path2;

@@ -64,10 +64,9 @@ public class CrowdsourcingManager
 			return;
 		}
 
-		RequestBody body = RequestBody.Companion.create(GSON.toJson(this.data), JSON);
 		Request r = new Request.Builder()
 			.url(CROWDSOURCING_BASE)
-			.post(body)
+			.post(RequestBody.create(JSON, GSON.toJson(this.data)))
 			.build();
 
 		data.clear();

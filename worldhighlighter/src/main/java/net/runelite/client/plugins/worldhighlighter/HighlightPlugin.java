@@ -44,25 +44,21 @@ import org.pf4j.Extension;
 public class HighlightPlugin extends Plugin
 {
 	private static final List<String> AFTER_OPTIONS = List.of("Message", "Add ignore", "Remove friend", "Kick");
-	private static final TextComponent textComponent = new TextComponent();
+	private final net.runelite.client.ui.overlay.components.TextComponent textComponent = new TextComponent();
 	private static final Color HIGHLIGHT_BORDER_COLOR;
 	private static final Color HIGHLIGHT_HOVER_BORDER_COLOR;
 	private static final Color HIGHLIGHT_FILL_COLOR;
-
-	@Inject
-	private Client client;
-
-	@Inject
-	private OverlayManager overlayManager;
-
-	@Inject
-	private HighlightOverlay HighlightOverlay;
-
-	@Inject
-	private HighlightConfig config;
 	private int world;
 	private String player;
 	private boolean clan;
+	@Inject
+	private Client client;
+	@Inject
+	private OverlayManager overlayManager;
+	@Inject
+	private HighlightOverlay HighlightOverlay;
+	@Inject
+	private HighlightConfig config;
 
 	@Override
 	protected void startUp()
@@ -81,28 +77,32 @@ public class HighlightPlugin extends Plugin
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
-		int groupId = WidgetInfo.TO_GROUP(event.getParam1());
-		String option = event.getOption();
-		if (groupId == WidgetInfo.CHATBOX.getGroupId() && !"Kick".equals(option) || groupId == WidgetInfo.PRIVATE_CHAT_MESSAGE.getGroupId())
+		//If you or someone you love is able to figure out how to only have this enabled for clan and private chat, hit a Turtle up.
+		if (true)
 		{
-			if (!AFTER_OPTIONS.contains(option))
+			int groupId = WidgetInfo.TO_GROUP(event.getParam1());
+			String option = event.getOption();
+			if (groupId == WidgetInfo.CHATBOX.getGroupId() && !"Kick".equals(option) || groupId == WidgetInfo.PRIVATE_CHAT_MESSAGE.getGroupId())
 			{
-				return;
+				if (!AFTER_OPTIONS.contains(option))
+				{
+					return;
+				}
+				MenuEntry high = new MenuEntry();
+				high.setOption("Highlight World");
+				high.setTarget(event.getTarget());
+				high.setOpcode(MenuOpcode.RUNELITE.getId());
+				high.setParam0(event.getParam0());
+				high.setParam1(event.getParam1());
+				high.setIdentifier(event.getIdentifier());
+				this.insertMenuEntry(high, this.client.getMenuEntries());
 			}
-			MenuEntry high = new MenuEntry();
-			high.setOption("Highlight World");
-			high.setTarget(event.getTarget());
-			high.setOpcode(MenuOpcode.RUNELITE.getId());
-			high.setParam0(event.getParam0());
-			high.setParam1(event.getParam1());
-			high.setIdentifier(event.getIdentifier());
-			this.insertMenuEntry(high, this.client.getMenuEntries());
 		}
 	}
 
 	private void insertMenuEntry(MenuEntry newEntry, MenuEntry[] entries)
 	{
-		MenuEntry[] newMenu = ObjectArrays.concat(entries, newEntry);
+		MenuEntry[] newMenu = (MenuEntry[]) ObjectArrays.concat(entries, newEntry);
 		int menuEntryCount = newMenu.length;
 		ArrayUtils.swap(newMenu, menuEntryCount - 1, menuEntryCount - 2);
 		this.client.setMenuEntries(newMenu);
@@ -127,7 +127,14 @@ public class HighlightPlugin extends Plugin
 					}
 					else
 					{
-						sendNotification(4);
+						if (config.clanFirst())
+						{
+							sendNotification(4);
+						}
+						else
+						{
+							sendNotification(1);
+						}
 					}
 					break;
 				}
@@ -170,7 +177,7 @@ public class HighlightPlugin extends Plugin
 
 	void highlightWidget(Graphics2D graphics, Widget toHighlight, Widget container, Rectangle padding, String text)
 	{
-		padding = MoreObjects.firstNonNull(padding, new Rectangle());
+		padding = (Rectangle) MoreObjects.firstNonNull(padding, new Rectangle());
 		Point canvasLocation = toHighlight.getCanvasLocation();
 		if (canvasLocation != null && container != null)
 		{
@@ -182,9 +189,9 @@ public class HighlightPlugin extends Plugin
 				if (text != null)
 				{
 					FontMetrics fontMetrics = graphics.getFontMetrics();
-					textComponent.setPosition(new java.awt.Point(canvasLocation.getX() + toHighlight.getWidth() / 2 - fontMetrics.stringWidth(text) / 2, canvasLocation.getY() + fontMetrics.getHeight()));
-					textComponent.setText(text);
-					textComponent.render(graphics);
+					this.textComponent.setPosition(new java.awt.Point(canvasLocation.getX() + toHighlight.getWidth() / 2 - fontMetrics.stringWidth(text) / 2, canvasLocation.getY() + fontMetrics.getHeight()));
+					this.textComponent.setText(text);
+					this.textComponent.render(graphics);
 				}
 			}
 		}
@@ -192,10 +199,14 @@ public class HighlightPlugin extends Plugin
 
 	void scrollToWidget(Widget list, Widget scrollbar, Widget... toHighlight)
 	{
+		Widget parent = list;
 		int averageCentralY = 0;
 		int nonnullCount = 0;
-		for (Widget widget : toHighlight)
+		Widget[] var7 = toHighlight;
+		int var8 = toHighlight.length;
+		for (int var9 = 0; var9 < var8; ++var9)
 		{
+			Widget widget = var7[var9];
 			if (widget != null)
 			{
 				averageCentralY += widget.getRelativeY() + widget.getHeight() / 2;
@@ -205,15 +216,15 @@ public class HighlightPlugin extends Plugin
 		if (nonnullCount != 0)
 		{
 			averageCentralY /= nonnullCount;
-			int newScroll = Math.max(0, Math.min(list.getScrollHeight(), averageCentralY - list.getHeight() / 2));
-			this.client.runScript(72, scrollbar.getId(), list.getId(), newScroll);
+			int newScroll = Math.max(0, Math.min(parent.getScrollHeight(), averageCentralY - parent.getHeight() / 4));
+			this.client.runScript(new Object[]{72, scrollbar.getId(), parent.getId(), newScroll});
 		}
 	}
 
 	private void sendNotification(int type)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		if (!this.config.message())
+		if (this.config.message() == false)
 		{
 			return;
 		}
@@ -231,13 +242,13 @@ public class HighlightPlugin extends Plugin
 		}
 		else if (type == 3)
 		{
-			stringBuilder.append("Unable to find world, player is neither in clan chat nor on friends list.");
+			stringBuilder.append("Unable to find world, player is neither in friends chat nor on friends list.");
 			String notification = stringBuilder.toString();
 			this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", notification, "");
 		}
 		else
 		{
-			stringBuilder.append("Highlighting ").append(player).append(" in clan chat.");
+			stringBuilder.append("Highlighting " + player + " in friends chat.");
 			String notification = stringBuilder.toString();
 			this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", notification, "");
 		}

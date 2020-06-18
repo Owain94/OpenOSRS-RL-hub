@@ -2,8 +2,6 @@ package net.runelite.client.plugins.runecafecashflow;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Consumer;
 import net.runelite.api.GrandExchangeOffer;
@@ -47,8 +45,7 @@ public class RuneCafeAPI
 									Consumer<Exception> onError)
 	{
 		String urlString;
-		urlString = getBaseUrl() + URLEncoder.encode(osrsName, StandardCharsets.UTF_8) + "/snapshot";
-		;
+		urlString = getBaseUrl() + encodeOSRSName(osrsName) + "/snapshot";
 
 		this.post(urlString, records, onResponse, onError);
 	}
@@ -58,9 +55,7 @@ public class RuneCafeAPI
 							Consumer<Response> onResponse,
 							Consumer<Exception> onError)
 	{
-		String urlString;
-		urlString = getBaseUrl() + URLEncoder.encode(osrsName, StandardCharsets.UTF_8) + "/trade";
-		;
+		String urlString = getBaseUrl() + encodeOSRSName(osrsName) + "/trade";
 
 		this.post(urlString, new GEHistoryRecord(o), onResponse, onError);
 
@@ -96,5 +91,10 @@ public class RuneCafeAPI
 				response.close();
 			}
 		});
+	}
+
+	public static String encodeOSRSName(String n)
+	{
+		return n.replaceAll(" ", "%20");
 	}
 }

@@ -20,7 +20,7 @@ public enum LineLeads
 		return this.name;
 	}
 
-	LineLeads(String name)
+	private LineLeads(String name)
 	{
 		this.name = name;
 	}

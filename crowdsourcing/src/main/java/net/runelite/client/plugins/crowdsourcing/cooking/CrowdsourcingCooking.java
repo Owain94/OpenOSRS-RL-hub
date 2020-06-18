@@ -18,7 +18,6 @@ import net.runelite.client.plugins.crowdsourcing.CrowdsourcingManager;
 
 public class CrowdsourcingCooking
 {
-
 	private static final int HOSIDIUS_KITCHEN_REGION = 6712;
 
 	@Inject
@@ -40,7 +39,7 @@ public class CrowdsourcingCooking
 		Item[] items = equipmentContainer.getItems();
 		int idx = EquipmentInventorySlot.GLOVES.getSlotIdx();
 
-		if (items == null || idx >= items.length)
+		if (idx >= items.length)
 		{
 			return false;
 		}
@@ -76,7 +75,7 @@ public class CrowdsourcingCooking
 			int cookingLevel = client.getBoostedSkillLevel(Skill.COOKING);
 			boolean hasCookingGauntlets = hasCookingGauntlets();
 			boolean kourendElite = client.getVar(Varbits.DIARY_KOUREND_ELITE) == 1;
-			CrowdsourcingCookingData data = new CrowdsourcingCookingData(message, hasCookingGauntlets, inHosidiusKitchen, kourendElite, lastGameObjectClicked, cookingLevel);
+			CookingData data = new CookingData(message, hasCookingGauntlets, inHosidiusKitchen, kourendElite, lastGameObjectClicked, cookingLevel);
 			manager.storeEvent(data);
 		}
 	}
