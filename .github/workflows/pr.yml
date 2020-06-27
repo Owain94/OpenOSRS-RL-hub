@@ -20,8 +20,8 @@ jobs:
     name: Validate gradle wrapper
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: gradle/wrapper-validation-action@v1
+      - uses: actions/checkout@v2.3.1
+      - uses: gradle/wrapper-validation-action@v1.0.3
 
   build:
     name: Build
@@ -30,23 +30,27 @@ jobs:
 
     steps:
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v1.3.0
         with:
           java-version: 11
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
+        with:
+          path: Owain94-RL-hub
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
         with:
           repository: open-osrs/runelite
           ref: master
+          path: OpenOSRS
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
         with:
           repository: open-osrs/plugins
           ref: master
+          path: OpenOSRS-plugins
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2.0.0
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
@@ -55,44 +59,47 @@ jobs:
 
       - name: Make gradlew executable (client)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Assembling client
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Building client
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Upload client artifacts to local maven
         run: ./gradlew :http-api:publishToMavenLocal :runelite-api:publishToMavenLocal :runelite-client:publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Make gradlew executable (plugins)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Assembling plugins
         run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Building plugins
         run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Upload plugins artifacts to local maven
         run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+        working-directory: Owain94-RL-hub
 
       - name: Assembling plugins
         run: ./gradlew assemble --console=plain
+        working-directory: Owain94-RL-hub
 
       - name: Building plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
+        working-directory: Owain94-RL-hub
 
 
   checkstyleMain:
@@ -102,23 +109,27 @@ jobs:
 
     steps:
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v1.3.0
         with:
           java-version: 11
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
+        with:
+          path: Owain94-RL-hub
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
         with:
           repository: open-osrs/runelite
           ref: master
+          path: OpenOSRS
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
         with:
           repository: open-osrs/plugins
           ref: master
+          path: OpenOSRS-plugins
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2.0.0
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
@@ -127,44 +138,47 @@ jobs:
 
       - name: Make gradlew executable (client)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Assembling client
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Building client
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Upload client artifacts to local maven
         run: ./gradlew :http-api:publishToMavenLocal :runelite-api:publishToMavenLocal :runelite-client:publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Make gradlew executable (plugins)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Assembling plugins
         run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Building plugins
         run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Upload plugins artifacts to local maven
         run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+        working-directory: Owain94-RL-hub
 
       - name: Assembling plugins
         run: ./gradlew assemble --console=plain
+        working-directory: Owain94-RL-hub
 
       - name: Checking plugins code conventions (Main)
         run: ./gradlew checkstyleMain --console=plain
+        working-directory: Owain94-RL-hub
 
   checkstyleTest:
     name: Checkstyle test
@@ -173,23 +187,27 @@ jobs:
 
     steps:
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v1.3.0
         with:
           java-version: 11
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
+        with:
+          path: Owain94-RL-hub
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
         with:
           repository: open-osrs/runelite
           ref: master
+          path: OpenOSRS
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
         with:
           repository: open-osrs/plugins
           ref: master
+          path: OpenOSRS-plugins
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2.0.0
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
@@ -198,44 +216,47 @@ jobs:
 
       - name: Make gradlew executable (client)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Assembling client
         run: ./gradlew assemble --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Building client
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Upload client artifacts to local maven
         run: ./gradlew :http-api:publishToMavenLocal :runelite-api:publishToMavenLocal :runelite-client:publishToMavenLocal --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/runelite
+        working-directory: OpenOSRS
 
       - name: Make gradlew executable (plugins)
         run: chmod +x ./gradlew
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Assembling plugins
         run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Building plugins
         run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Upload plugins artifacts to local maven
         run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
+        working-directory: OpenOSRS-plugins
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+        working-directory: Owain94-RL-hub
 
       - name: Assembling plugins
         run: ./gradlew assemble --console=plain
+        working-directory: Owain94-RL-hub
 
       - name: Checking plugins code conventions (Test)
         run: ./gradlew checkstyleTest --console=plain
+        working-directory: Owain94-RL-hub
 
   bump:
     name: Check version numbers
@@ -255,37 +276,43 @@ jobs:
 
       - id: changedFiles
         name: Changed files exporter
-        uses: futuratrepadeira/changed-files@v3.0.0
+        uses: futuratrepadeira/changed-files@v3.2.1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v1.3.0
         with:
           java-version: 11
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2.3.1
+        with:
+          path: Owain94-RL-hub
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+        working-directory: Owain94-RL-hub
 
       - name: Bump version numbers
         id: bumpNewChanged
         if: steps.changedFiles.outputs.files_created != '' && steps.changedFiles.outputs.files_updated != ''
         run: |
           ./gradlew bumpVersion --newFiles="${{ steps.changedFiles.outputs.files_created }}" --changedFiles="${{ steps.changedFiles.outputs.files_updated }}" --console=plain
+        working-directory: Owain94-RL-hub
 
       - name: Bump version numbers
         id: bumpChanged
         if: steps.changedFiles.outputs.files_created == '' && steps.changedFiles.outputs.files_updated != ''
         run: |
           ./gradlew bumpVersion --changedFiles="${{ steps.changedFiles.outputs.files_updated }}" --console=plain
+        working-directory: Owain94-RL-hub
 
       - name: Bump version numbers
         id: bumpNew
         if: steps.changedFiles.outputs.files_created != '' && steps.changedFiles.outputs.files_updated == ''
         run: |
           ./gradlew bumpVersion --newFiles="${{ steps.changedFiles.outputs.files_created }}" --console=plain
+        working-directory: Owain94-RL-hub
 
       - name: Detect changes
         id: detectChanges
@@ -297,6 +324,7 @@ jobs:
 
               exit 1
           fi
+        working-directory: Owain94-RL-hub
 
   approve:
     name: Approve
