@@ -2,8 +2,11 @@ package net.runelite.client.plugins.crowdsourcing.movement;
 
 import javax.inject.Inject;
 import net.runelite.api.Client;
+import net.runelite.api.MenuOpcode;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.plugins.crowdsourcing.CrowdsourcingManager;
 
 public class CrowdsourcingMovement
@@ -16,16 +19,29 @@ public class CrowdsourcingMovement
 
 	private WorldPoint lastPoint;
 	private int ticksStill;
+	private boolean lastIsInInstance;
+	private MenuOptionClicked lastClick;
+
+	public void onMenuOptionClicked(MenuOptionClicked menuOptionClicked)
+	{
+		if (menuOptionClicked.getMenuOpcode() != MenuOpcode.WALK
+			&& !menuOptionClicked.getOption().equals("Message"))
+		{
+			lastClick = menuOptionClicked;
+		}
+	}
 
 	public void onGameTick(GameTick tick)
 	{
-		WorldPoint nextPoint = client.getLocalPlayer().getWorldLocation();
+		LocalPoint local = LocalPoint.fromWorld(client, client.getLocalPlayer().getWorldLocation());
+		WorldPoint nextPoint = WorldPoint.fromLocalInstance(client, local);
+		boolean nextIsInInstance = client.isInInstancedRegion();
 		if (lastPoint != null)
 		{
 			int distance = nextPoint.distanceTo(lastPoint);
-			if (distance > 2)
+			if (distance > 2 || nextIsInInstance != lastIsInInstance)
 			{
-				MovementData data = new MovementData(lastPoint, nextPoint, ticksStill);
+				MovementData data = new MovementData(lastPoint, nextPoint, lastIsInInstance, nextIsInInstance, ticksStill, lastClick);
 				manager.storeEvent(data);
 			}
 			if (distance > 0)
@@ -35,5 +51,6 @@ public class CrowdsourcingMovement
 		}
 		ticksStill++;
 		lastPoint = nextPoint;
+		lastIsInInstance = nextIsInInstance;
 	}
 }

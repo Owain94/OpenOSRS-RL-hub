@@ -107,4 +107,114 @@ public interface NotificationMessagesConfig extends Config
 	{
 		return "Congratulations! You just received a pet, again...";
 	}
+
+	@ConfigItem(
+		keyName = "antifireNotification",
+		name = "Antifire expiration",
+		description = "Notifies you when your antifire expires",
+		position = 7
+	)
+	default boolean antifireNotification()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "antifireMessage",
+		name = "Antifire notification message",
+		description = "The message with which to notify you of an antifire's expiration",
+		position = 8
+	)
+	default String antifireMessage()
+	{
+		return "Your antifire protection has expired!";
+	}
+
+	@ConfigItem(
+		keyName = "antipoisonNotification",
+		name = "Antipoison expiration",
+		description = "Notifies you when your antipoison expires",
+		position = 9
+	)
+	default boolean antipoisonNotification()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "antipoisonMessage",
+		name = "Antipoison notification message",
+		description = "The message with which to notify you of an antipoison's expiration",
+		position = 10
+	)
+	default String antipoisonMessage()
+	{
+		return "Your poison protection has expired!";
+	}
+
+	@ConfigItem(
+		keyName = "divinePotionNotification",
+		name = "Divine Potion expiration",
+		description = "Notifies you when your divine potion expires",
+		position = 11
+	)
+	default boolean divinePotionNotification()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "divinePotionMessage",
+		name = "Divine Potion notification message",
+		description = "The message with which to notify you of a divine potion's expiration",
+		position = 12
+	)
+	default String divinePotionMessage()
+	{
+		return "Your Divine potion has expired!";
+	}
+
+	@ConfigItem(
+		keyName = "overloadNotification",
+		name = "Overload expiration",
+		description = "Notifies you when your Overload expires",
+		position = 13
+	)
+	default boolean overloadNotification()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "overloadMessage",
+		name = "Overload notification message",
+		description = "The message with which to notify you of an Overload's expiration",
+		position = 14
+	)
+	default String overloadMessage()
+	{
+		return "Your Overload has expired!";
+	}
+
+	@ConfigItem(
+		keyName = "staminaNotification",
+		name = "Stamina expiration",
+		description = "Notifies you when your stamina potion expires",
+		position = 15
+	)
+	default boolean staminaNotification()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "staminaMessage",
+		name = "Stamina notification message",
+		description = "The message with which to notify you of a stamina potion's expiration",
+		position = 16
+	)
+	default String staminaMessage()
+	{
+		return "Your Stamina potion has expired!";
+	}
 }

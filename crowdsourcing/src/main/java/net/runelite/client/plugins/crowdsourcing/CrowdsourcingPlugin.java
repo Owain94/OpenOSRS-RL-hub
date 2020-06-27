@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.StatChanged;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -16,6 +18,7 @@ import net.runelite.client.plugins.crowdsourcing.dialogue.CrowdsourcingDialogue;
 import net.runelite.client.plugins.crowdsourcing.movement.CrowdsourcingMovement;
 import net.runelite.client.plugins.crowdsourcing.music.CrowdsourcingMusic;
 import net.runelite.client.plugins.crowdsourcing.woodcutting.CrowdsourcingWoodcutting;
+import net.runelite.client.plugins.crowdsourcing.zmi.CrowdsourcingZMI;
 import net.runelite.client.task.Schedule;
 import org.pf4j.Extension;
 
@@ -35,7 +38,7 @@ public class CrowdsourcingPlugin extends Plugin
 	// I will either completely change the approach (stop using @Schedule) or
 	// massively raise the time (~300 or 600 seconds) before making it widely
 	// available. The current low value is for further testing from wiki editors.
-	private static final int SECONDS_BETWEEN_UPLOADS = 60;
+	private static final int SECONDS_BETWEEN_UPLOADS = 300;
 
 	@Inject
 	private EventBus eventBus;
@@ -58,6 +61,9 @@ public class CrowdsourcingPlugin extends Plugin
 	@Inject
 	private CrowdsourcingWoodcutting woodcutting;
 
+	@Inject
+	private CrowdsourcingZMI zmi;
+
 	@Override
 	protected void startUp()
 	{
@@ -67,6 +73,7 @@ public class CrowdsourcingPlugin extends Plugin
 		eventBus.subscribe(GameTick.class, this, dialogue::onGameTick);
 
 		eventBus.subscribe(GameTick.class, this, movement::onGameTick);
+		eventBus.subscribe(MenuOptionClicked.class, this, movement::onMenuOptionClicked);
 
 		eventBus.subscribe(ChatMessage.class, this, music::onChatMessage);
 
@@ -75,6 +82,10 @@ public class CrowdsourcingPlugin extends Plugin
 		eventBus.subscribe(MenuOptionClicked.class, this, woodcutting::onMenuOptionClicked);
 		eventBus.subscribe(GameObjectDespawned.class, this, woodcutting::onGameObjectDespawned);
 
+		eventBus.subscribe(MenuOptionClicked.class, this, zmi::onMenuOptionClicked);
+		eventBus.subscribe(ChatMessage.class, this, zmi::onChatMessage);
+		eventBus.subscribe(StatChanged.class, this, zmi::onStatChanged);
+		eventBus.subscribe(ItemContainerChanged.class, this, zmi::onItemContainerChanged);
 	}
 
 	@Override

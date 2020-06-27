@@ -118,9 +118,15 @@ public enum Pet
 
 	EEK(PetGroup.OTHER, NpcID.EEK, Pet.EEK_INFO),
 
+	ENRAGED_TEKTINY(PetGroup.OTHER, NpcID.ENRAGED_TEKTINY, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+	ENRAGED_TEKTINY_9513(PetGroup.OTHER, NpcID.ENRAGED_TEKTINY_9513, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+
 	FISHBOWL(PetGroup.OTHER, NpcID.FISHBOWL, Pet.FISHBOWL_INFO),    // Blue
 	FISHBOWL_6659(PetGroup.OTHER, NpcID.FISHBOWL_6659, Pet.FISHBOWL_INFO),    // Green
 	FISHBOWL_6660(PetGroup.OTHER, NpcID.FISHBOWL_6660, Pet.FISHBOWL_INFO),    // Gold
+
+	FLYING_VESPINA(PetGroup.OTHER, NpcID.FLYING_VESPINA, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+	FLYING_VESPINA_9514(PetGroup.OTHER, NpcID.FLYING_VESPINA_9514, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
 
 	GENERAL_GRAARDOR_JR(PetGroup.BOSS, NpcID.GENERAL_GRAARDOR_JR, Pet.GENERAL_GRAARDOR_JR_INFO),
 	GENERAL_GRAARDOR_JR_6644(PetGroup.BOSS, NpcID.GENERAL_GRAARDOR_JR_6644, Pet.GENERAL_GRAARDOR_JR_INFO),
@@ -244,6 +250,9 @@ public enum Pet
 	PRINCE_BLACK_DRAGON(PetGroup.BOSS, NpcID.PRINCE_BLACK_DRAGON, Pet.PRINCE_BLACK_DRAGON_INFO),
 	PRINCE_BLACK_DRAGON_6652(PetGroup.BOSS, NpcID.PRINCE_BLACK_DRAGON_6652, Pet.PRINCE_BLACK_DRAGON_INFO),
 
+	PUPPADILE(PetGroup.BOSS, NpcID.PUPPADILE, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+	PUPPADILE_8201(PetGroup.BOSS, NpcID.PUPPADILE_8201, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+
 	// The NpcID class does not yet have these ids so I ahd to hard code them
 	RED(PetGroup.SKILLING, 9850, Pet.ROCKY_INFO + " " + Pet.ROCKY_RED_PANDA),
 	RED_9852(PetGroup.SKILLING, 9852, Pet.ROCKY_INFO + " " + Pet.ROCKY_RED_PANDA),
@@ -358,6 +367,9 @@ public enum Pet
 	TANGLEROOT_9500(PetGroup.SKILLING, NpcID.TANGLEROOT_9500, Pet.TANGLEROOT_INFO + " This is the White Lily variant."),    // White Lily Variant, other player
 	TANGLEROOT_9501(PetGroup.SKILLING, NpcID.TANGLEROOT_9501, Pet.TANGLEROOT_INFO + " This is the Redwood variant."),    // Redwood Variant, other player
 
+	TEKTINY(PetGroup.BOSS, NpcID.TEKTINY, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+	TEKTINY_8202(PetGroup.BOSS, NpcID.TEKTINY_8202, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+
 	TOY_DOLL(PetGroup.TOY, NpcID.TOY_DOLL, Pet.TOY_DOLL_INFO),
 	TOY_DOLL_9253(PetGroup.TOY, NpcID.TOY_DOLL_9253, Pet.TOY_DOLL_INFO),
 
@@ -373,8 +385,17 @@ public enum Pet
 	TZREKZUK(PetGroup.BOSS, NpcID.TZREKZUK, Pet.TZREKZUK_IHFO),
 	TZREKZUK_8011(PetGroup.BOSS, NpcID.TZREKZUK_8011, Pet.TZREKZUK_IHFO),
 
+	VANGUARD_8198(PetGroup.BOSS, NpcID.VANGUARD_8198, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+	VANGUARD_8203(PetGroup.BOSS, NpcID.VANGUARD_8203, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+
+	VASA_MINIRIO(PetGroup.BOSS, NpcID.VASA_MINIRIO, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+	VASA_MINIRIO_8204(PetGroup.BOSS, NpcID.VASA_MINIRIO_8204, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+
 	VENENATIS_SPIDERLING(PetGroup.BOSS, NpcID.VENENATIS_SPIDERLING, Pet.VENENATIS_SPIDERLING_INFO),
 	VENENATIS_SPIDERLING_5557(PetGroup.BOSS, NpcID.VENENATIS_SPIDERLING_5557, Pet.VENENATIS_SPIDERLING_INFO),
+
+	VESPINA(PetGroup.BOSS, NpcID.VESPINA, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
+	VESPINA_8205(PetGroup.BOSS, NpcID.VESPINA_8205, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
 
 	VETION_JR(PetGroup.BOSS, NpcID.VETION_JR, Pet.VETION_JR_INFO),    // Purple
 	VETION_JR_5537(PetGroup.BOSS, NpcID.VETION_JR_5537, Pet.VETION_JR_INFO),    // Orange
@@ -523,4 +544,6 @@ public enum Pet
 	private static final String ROCKY_RACCOON = " This is the Raccoon variant of Rocky, obtained by using Redberries on any variant of Rocky.";
 	private static final String ROCKY_RED_PANDA = " This is the Red Panda variant of Rocky, obtained by using Poison Ivy Berries on any variant of Rocky.";
 	private static final String ROCKY_TANUKI = " This is the Tanuki variant of Rocky, obtained by using Poison Ivy Berries on any variant of Rocky.";
+
+	private static final String OLMLET_CM_VARIANTS = " This is a COX Challenge Mode variant of the Olmlet. Obtained by causing any variant of the Olmlet to metamorphosize, after having used metamorphic dust on the Olmlet.";
 }
