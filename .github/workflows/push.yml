@@ -59,15 +59,15 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: OpenOSRS-plugins
 
-      - name: Assembling plugins
+      - name: Assembling OpenOSRS plugins
         run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Building plugins
+      - name: Building OpenOSRS plugins
         run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Upload plugins artifacts to local maven
+      - name: Upload OpenOSRS plugins artifacts to local maven
         run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
@@ -75,11 +75,11 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: Owain94-RL-hub
 
-      - name: Assembling plugins
+      - name: Assembling RL hub plugins
         run: ./gradlew assemble --console=plain
         working-directory: Owain94-RL-hub
 
-      - name: Building plugins
+      - name: Building RL hub plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: Owain94-RL-hub
 
@@ -136,15 +136,15 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: OpenOSRS-plugins
 
-      - name: Assembling plugins
+      - name: Assembling OpenOSRS plugins
         run: ./gradlew assemble --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Building plugins
+      - name: Building OpenOSRS plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Upload plugins artifacts to local maven
+      - name: Upload OpenOSRS plugins artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
         working-directory: OpenOSRS-plugins
 
@@ -152,11 +152,11 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: Owain94-RL-hub
 
-      - name: Assembling plugins
+      - name: Assembling RL hub plugins
         run: ./gradlew assemble --console=plain
         working-directory: Owain94-RL-hub
 
-      - name: Checking plugins code conventions (Main)
+      - name: Checking RL hub plugins code conventions (Main)
         run: ./gradlew checkstyleMain --console=plain
         working-directory: Owain94-RL-hub
 
@@ -213,15 +213,15 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: OpenOSRS-plugins
 
-      - name: Assembling plugins
+      - name: Assembling OpenOSRS plugins
         run: ./gradlew assemble --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Building plugins
+      - name: Building OpenOSRS plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Upload plugins artifacts to local maven
+      - name: Upload OpenOSRS plugins artifacts to local maven
         run: ./gradlew publishToMavenLocal --console=plain
         working-directory: OpenOSRS-plugins
 
@@ -229,11 +229,11 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: Owain94-RL-hub
 
-      - name: Assembling plugins
+      - name: Assembling RL hub plugins
         run: ./gradlew assemble --console=plain
         working-directory: Owain94-RL-hub
 
-      - name: Checking plugins code conventions (Test)
+      - name: Checking RL hub plugins code conventions (Test)
         run: ./gradlew checkstyleTest --console=plain
         working-directory: Owain94-RL-hub
 
@@ -300,15 +300,15 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: OpenOSRS-plugins
 
-      - name: Assembling plugins
+      - name: Assembling OpenOSRS plugins
         run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Building plugins
+      - name: Building OpenOSRS plugins
         run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
-      - name: Upload plugins artifacts to local maven
+      - name: Upload OpenOSRS plugins artifacts to local maven
         run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
@@ -316,15 +316,15 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: Owain94-RL-hub
 
-      - name: Assembling plugins
+      - name: Assembling RL hub plugins
         run: ./gradlew assemble --console=plain
         working-directory: Owain94-RL-hub
 
-      - name: Building plugins
+      - name: Building RL hub plugins
         run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: Owain94-RL-hub
 
-      - name: Bootstrapping plugins
+      - name: Bootstrapping RL hub plugins
         run: ./gradlew bootstrapPlugins --stacktrace --console=plain
         working-directory: Owain94-RL-hub
 
@@ -352,5 +352,5 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.Owain }}
-          directory: /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub-hosting
+          directory: /home/runner/work/OpenOSRS-RL-hub/OpenOSRS-RL-hub/Owain94-RL-hub-hosting
           repository: Owain94/OpenOSRS-RL-hub-hosting
