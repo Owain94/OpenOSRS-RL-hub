@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.Friend;
@@ -36,6 +37,7 @@ import org.pf4j.Extension;
 	type = PluginType.MISCELLANEOUS,
 	enabledByDefault = false
 )
+@Slf4j
 public class FriendsExporterPlugin extends Plugin
 {
 	private static final WidgetMenuOption FIXED_Friends_List;
@@ -77,30 +79,37 @@ public class FriendsExporterPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event) throws Exception
+	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event)
 	{
-		if (event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_CHAT_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_CHAT_TAB)
+		try
 		{
-			if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Friends List"))
+			if (event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_CHAT_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_CHAT_TAB)
 			{
-				exportFriendsList();
-			}
-			else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Ignore List"))
-			{
-				exportIgnoreList();
-			}
-			else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Rank List"))
-			{
-				if (clan)
+				if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Friends List"))
 				{
-					exportRankList();
+					exportFriendsList();
 				}
-				else
+				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Ignore List"))
 				{
-					this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Friends Chat tab to export this list.", "");
+					exportIgnoreList();
 				}
+				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Rank List"))
+				{
+					if (clan)
+					{
+						exportRankList();
+					}
+					else
+					{
+						this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Friends Chat tab to export this list.", "");
+					}
+				}
+				refreshShiftClickCustomizationMenus();
 			}
-			refreshShiftClickCustomizationMenus();
+		}
+		catch (Exception e)
+		{
+			log.error("oops", e);
 		}
 	}
 

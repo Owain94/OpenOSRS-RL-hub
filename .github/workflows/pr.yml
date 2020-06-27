@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: PR title lint
         if: github.event_name == 'pull_request'
-        uses: seferov/pr-lint-action@v1.0.3
+        uses: seferov/pr-lint-action@v1.1.1
         with:
           title-regex: '^([\w-/]+): \w+'
 
@@ -82,7 +82,7 @@ jobs:
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable
@@ -154,7 +154,7 @@ jobs:
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable
@@ -225,7 +225,7 @@ jobs:
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Upload plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: /home/runner/work/OpenOSRS-RL-hub/plugins
 
       - name: Make gradlew executable
