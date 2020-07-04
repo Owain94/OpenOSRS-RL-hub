@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
-project.extra["PluginName"] = "Weight Calculator"
-project.extra["PluginDescription"] = "Helps calculate weights"
+project.extra["PluginName"] = "Notification Messages"
+project.extra["PluginDescription"] = "Notifify you on certain messages"
 
 tasks {
     jar {
