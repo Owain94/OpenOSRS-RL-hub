@@ -7,7 +7,7 @@ buildscript {
 plugins {
     checkstyle
     java
-    id("com.simonharrer.modernizer") version "1.8.0-1" apply false
+    id("com.simonharrer.modernizer") version "2.1.0-1" apply false
     id("com.github.ben-manes.versions") version "0.28.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.14"
 }
@@ -70,7 +70,7 @@ subprojects {
         compileOnly(group = "com.squareup.okhttp3", name = "okhttp", version = "4.7.2")
         compileOnly(group = "org.pf4j", name = "pf4j", version = "3.3.1")
         compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.4")
-        compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "2.5.1")
+        compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "3.0.0")
     }
 
     checkstyle {
