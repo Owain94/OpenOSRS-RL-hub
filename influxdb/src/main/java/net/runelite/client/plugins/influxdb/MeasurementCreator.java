@@ -1,10 +1,13 @@
 package net.runelite.client.plugins.influxdb;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.Constants;
 import net.runelite.api.Experience;
@@ -16,10 +19,13 @@ import net.runelite.api.Player;
 import net.runelite.api.Skill;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.influxdb.activity.ActivityState;
 import net.runelite.client.plugins.influxdb.write.Measurement;
 import net.runelite.client.plugins.influxdb.write.Series;
 
+@Singleton
 public class MeasurementCreator
 {
 	public static final String SERIES_INVENTORY = "rs_inventory";
@@ -27,18 +33,21 @@ public class MeasurementCreator
 	public static final String SERIES_SELF = "rs_self";
 	public static final String SERIES_KILL_COUNT = "rs_killcount";
 	public static final String SERIES_SELF_LOC = "rs_self_loc";
+	public static final String SERIES_ACTIVITY = "rs_activity";
 	public static final String SELF_KEY_X = "locX";
 	public static final String SELF_KEY_Y = "locY";
 	public static final Set<String> SELF_POS_KEYS = Set.of(SELF_KEY_X, SELF_KEY_Y);
 
 	private final Client client;
 	private final ItemManager itemManager;
+	private final ConfigManager configManager;
 
 	@Inject
-	public MeasurementCreator(Client client, ItemManager itemManager)
+	public MeasurementCreator(Client client, ItemManager itemManager, ConfigManager configManager)
 	{
 		this.client = client;
 		this.itemManager = itemManager;
+		this.configManager = configManager;
 	}
 
 	private Series.SeriesBuilder createSeries()
@@ -54,9 +63,13 @@ public class MeasurementCreator
 		return createSeries().measurement(SERIES_SKILL).tag("skill", skill.name()).build();
 	}
 
-	public Measurement createXpMeasurement(Skill skill)
+	public Optional<Measurement> createXpMeasurement(Skill skill)
 	{
 		long xp = skill == Skill.OVERALL ? client.getOverallExperience() : client.getSkillExperience(skill);
+		if (xp == 0)
+		{
+			return Optional.empty();
+		}
 		int virtualLevel;
 		int realLevel;
 		if (skill == Skill.OVERALL)
@@ -72,12 +85,12 @@ public class MeasurementCreator
 			virtualLevel = Experience.getLevelForXp((int) xp);
 			realLevel = client.getRealSkillLevel(skill);
 		}
-		return Measurement.builder()
+		return Optional.of(Measurement.builder()
 			.series(createXpSeries(skill))
 			.numericValue("xp", xp)
 			.numericValue("realLevel", realLevel)
 			.numericValue("virtualLevel", virtualLevel)
-			.build();
+			.build());
 	}
 
 	public Series createItemSeries(InventoryID inventory, InvValueType type)
@@ -92,6 +105,7 @@ public class MeasurementCreator
 	{
 		Measurement.MeasurementBuilder geValue = Measurement.builder().series(createItemSeries(inventoryID, InvValueType.GE));
 		Measurement.MeasurementBuilder haValue = Measurement.builder().series(createItemSeries(inventoryID, InvValueType.HA));
+		Measurement.MeasurementBuilder countValue = Measurement.builder().series(createItemSeries(inventoryID, InvValueType.COUNT));
 
 		long totalGe = 0, totalAlch = 0;
 		long otherGe = 0, otherAlch = 0;
@@ -127,24 +141,19 @@ public class MeasurementCreator
 			if (highValue)
 			{
 				geValue.numericValue(data.getName(), ge);
+				haValue.numericValue(data.getName(), alch);
+				countValue.numericValue(data.getName(), item.getQuantity());
 			}
 			else
 			{
 				otherGe += ge;
-			}
-			if (highValue)
-			{
-				haValue.numericValue(data.getName(), alch);
-			}
-			else
-			{
 				otherAlch += alch;
 			}
 		}
 
 		geValue.numericValue("total", totalGe).numericValue("other", otherGe);
 		haValue.numericValue("total", totalAlch).numericValue("other", otherAlch);
-		return Stream.of(geValue.build(), haValue.build());
+		return Stream.of(geValue.build(), haValue.build(), countValue.build());
 	}
 
 	public Series createSelfLocSeries()
@@ -197,12 +206,30 @@ public class MeasurementCreator
 			.tag("boss", boss).build();
 	}
 
-	public Measurement createKillCountMeasurement(String boss, int value)
+	static final String KILL_COUNT_CFG_PREFIX = "killcount.";
+	static final String PERSONAL_BEST_CFG_PREFIX = "personalbest.";
+
+	public Optional<Measurement> createKillCountMeasurement(String bossMixed)
 	{
-		return Measurement.builder()
+		// Piggyback off of chat commands plugin
+		String user = client.getUsername().toLowerCase();
+		String boss = bossMixed.toLowerCase();
+		Integer killCount = configManager.getConfiguration(KILL_COUNT_CFG_PREFIX + user,
+			boss, int.class);
+		if (killCount == null)
+		{
+			return Optional.empty();
+		}
+		Integer personalBest = configManager.getConfiguration(PERSONAL_BEST_CFG_PREFIX + user,
+			boss, int.class);
+		Measurement.MeasurementBuilder measurement = Measurement.builder()
 			.series(createKillCountSeries(boss))
-			.numericValue("kc", value)
-			.build();
+			.numericValue("kc", killCount);
+		if (personalBest != null)
+		{
+			measurement.numericValue("pb", personalBest);
+		}
+		return Optional.of(measurement.build());
 	}
 
 	enum InvValueType
@@ -213,4 +240,42 @@ public class MeasurementCreator
 	}
 
 	private static final int THRESHOLD = 50_000;
+
+	public Optional<Series> createActivitySeries(ActivityState.State lastState)
+	{
+		Series series = createSeries().measurement(SERIES_ACTIVITY).build();
+		if (Strings.isNullOrEmpty(series.getTags().getOrDefault("user", null)))
+		{
+			return Optional.empty();
+		}
+		return Optional.of(series);
+	}
+
+	public Optional<Measurement> createActivityMeasurement(ActivityState.State lastState)
+	{
+		Optional<Series> series = createActivitySeries(lastState);
+		if (!series.isPresent())
+		{
+			return Optional.empty();
+		}
+		Measurement.MeasurementBuilder mb = Measurement.builder().series(series.get());
+		if (!Strings.isNullOrEmpty(lastState.getSkill()))
+		{
+			mb.stringValue("skill", lastState.getSkill());
+		}
+		if (!Strings.isNullOrEmpty(lastState.getLocationType()))
+		{
+			mb.stringValue("type", lastState.getLocationType());
+		}
+		if (!Strings.isNullOrEmpty(lastState.getLocation()))
+		{
+			mb.stringValue("location", lastState.getLocation());
+		}
+		Measurement measure = mb.build();
+		if (measure.getStringValues().isEmpty())
+		{
+			return Optional.empty();
+		}
+		return Optional.of(measure);
+	}
 }

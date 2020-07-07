@@ -32,7 +32,7 @@ public class EssenceRunningStatisticsOverlay extends Overlay
 	{
 		panelComponent.getChildren().clear();
 
-		if (config.sessionStatistics())
+		if (config.enableRunecrafterMode() && config.sessionStatistics())
 		{
 			final EssenceRunningSession session = plugin.getSession();
 

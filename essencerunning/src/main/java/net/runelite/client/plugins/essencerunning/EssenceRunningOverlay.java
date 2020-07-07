@@ -42,16 +42,19 @@ public class EssenceRunningOverlay extends Overlay
 
 		renderBindingNecklace(graphics);
 
-		final Widget chatbox = client.getWidget(WidgetInfo.CHATBOX);
-		if (config.highlightTradeSent() && chatbox != null && !chatbox.isHidden())
+		if (config.enableRunnerMode())
 		{
-			drawShape(graphics, chatbox.getBounds(), plugin.isTradeSent() ? Color.GREEN : Color.RED);
-		}
+			final Widget chatbox = client.getWidget(WidgetInfo.CHATBOX);
+			if (config.highlightTradeSent() && chatbox != null && !chatbox.isHidden())
+			{
+				drawShape(graphics, chatbox.getBounds(), plugin.isTradeSent() ? Color.GREEN : Color.RED);
+			}
 
-		if (config.highlightRingOfDueling() && !plugin.isRingEquipped())
-		{
-			drawWidgetChildren(graphics, client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER), ItemID.RING_OF_DUELING8);
-			drawWidgetChildren(graphics, client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER), ItemID.RING_OF_DUELING8);
+			if (config.highlightRingOfDueling() && !plugin.isRingEquipped())
+			{
+				drawWidgetChildren(graphics, client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER), ItemID.RING_OF_DUELING8);
+				drawWidgetChildren(graphics, client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER), ItemID.RING_OF_DUELING8);
+			}
 		}
 
 		return null;
@@ -59,9 +62,10 @@ public class EssenceRunningOverlay extends Overlay
 
 	private void renderBindingNecklace(final Graphics2D graphics)
 	{
-		switch (config.highlightBindingNecklace())
+		if (config.enableRunecrafterMode())
 		{
-			case EQUIP:
+			if (config.highlightEquipBindingNecklace() == EssenceRunningItemDropdown.HighlightEquipBindingNecklace.EQUIP)
+			{
 				if (!plugin.isAmuletEquipped())
 				{
 					final Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
@@ -81,23 +85,29 @@ public class EssenceRunningOverlay extends Overlay
 						drawWidgetChildren(graphics, client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER), ItemID.BINDING_NECKLACE);
 					}
 				}
-				break;
-			case TWENTY_FIVE:
-			case TWENTY_SIX:
-				if (matchFreeInventorySlots())
-				{
-					// Widget that contains the inventory while inside a trade transaction
-					drawWidgetChildren(graphics, client.getWidget(WidgetID.PLAYER_TRADE_INVENTORY_GROUP_ID, 0), ItemID.BINDING_NECKLACE);
-				}
-				break;
-			default:
-				break;
+			}
+		}
+		if (config.enableRunnerMode())
+		{
+			switch (config.highlightTradeBindingNecklace())
+			{
+				case TWENTY_FIVE:
+				case TWENTY_SIX:
+					if (matchFreeInventorySlots())
+					{
+						// Widget that contains the inventory while inside a trade transaction
+						drawWidgetChildren(graphics, client.getWidget(WidgetID.PLAYER_TRADE_INVENTORY_GROUP_ID, 0), ItemID.BINDING_NECKLACE);
+					}
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
 	private void drawWidgetChildren(final Graphics2D graphics, final Widget widget, final int itemId)
 	{
-		if (widget != null)
+		if (widget != null && widget.getChildren() != null)
 		{
 			for (final Widget item : widget.getChildren())
 			{
@@ -121,6 +131,6 @@ public class EssenceRunningOverlay extends Overlay
 	{
 		// Widget that contains the trading partner's number of free inventory slots
 		final Widget freeSlots = client.getWidget(WidgetID.PLAYER_TRADE_SCREEN_GROUP_ID, 9);
-		return freeSlots != null && freeSlots.getText().endsWith(config.highlightBindingNecklace().getOption() + FREE_INVENTORY_SLOTS);
+		return freeSlots != null && freeSlots.getText().endsWith(config.highlightTradeBindingNecklace().getOption() + FREE_INVENTORY_SLOTS);
 	}
 }

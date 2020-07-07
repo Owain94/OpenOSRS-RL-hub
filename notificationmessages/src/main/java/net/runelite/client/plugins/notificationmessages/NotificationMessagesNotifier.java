@@ -155,10 +155,7 @@ public class NotificationMessagesNotifier
 				break;
 		}
 
-		if (runeLiteConfig.enableTrayNotifications() || !runeLiteConfig.enableTrayNotifications())
-		{
-			sendNotification(appName, message, type);
-		}
+		sendNotification(appName, message, type);
 
 		switch (runeLiteConfig.notificationSound())
 		{
@@ -170,8 +167,7 @@ public class NotificationMessagesNotifier
 				executorService.submit(this::playCustomSound);
 		}
 
-		if ((runeLiteConfig.enableGameMessageNotification() || !runeLiteConfig.enableGameMessageNotification())
-			&& client.getGameState() == GameState.LOGGED_IN)
+		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			final String formattedMessage = new ChatMessageBuilder()
 				.append(ChatColorType.HIGHLIGHT)

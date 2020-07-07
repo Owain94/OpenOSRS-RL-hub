@@ -226,6 +226,10 @@ public enum ExperienceItem
 	DRAGONSTONE(ItemID.DRAGONSTONE, Skill.CRAFTING, "Gems"),
 	ONYX(ItemID.ONYX, Skill.CRAFTING, "Gems"),
 	ZENYTE(ItemID.ZENYTE, Skill.CRAFTING, "Gems"),
+	// RNG
+	SEAWEED(ItemID.SEAWEED, Skill.CRAFTING, "Misc"),
+	SODA_ASH(ItemID.SODA_ASH, Skill.CRAFTING, "Misc"),
+	GIANT_SEAWEED(ItemID.GIANT_SEAWEED, Skill.CRAFTING, "Misc"),
 	/**
 	 * Smithing
 	 */
@@ -301,6 +305,7 @@ public enum ExperienceItem
 	F_MAPLE_LOGS(ItemID.MAPLE_LOGS, Skill.FLETCHING, "Logs"),
 	F_YEW_LOGS(ItemID.YEW_LOGS, Skill.FLETCHING, "Logs"),
 	F_MAGIC_LOGS(ItemID.MAGIC_LOGS, Skill.FLETCHING, "Logs"),
+	F_REDWOOD_LOGS(ItemID.REDWOOD_LOGS, Skill.FLETCHING, "Logs"),
 	// Unstrung
 	F_SHORTBOW_U(ItemID.SHORTBOW_U, Skill.FLETCHING, "Unstrung"),
 	F_LONGBOW_U(ItemID.LONGBOW_U, Skill.FLETCHING, "Unstrung"),
@@ -332,12 +337,24 @@ public enum ExperienceItem
 	F_RUNE_ARROWTIPS(ItemID.RUNE_ARROWTIPS, Skill.FLETCHING, "Arrow"),
 	F_AMETHYST_ARROWTIPS(ItemID.AMETHYST_ARROWTIPS, Skill.FLETCHING, "Arrow"),
 	F_DRAGON_ARROWTIPS(ItemID.DRAGON_ARROWTIPS, Skill.FLETCHING, "Arrow"),
+	/**
+	 * Hunter
+	 */
+	H_LOGS(ItemID.LOGS, Skill.HUNTER, "Bird houses"),
+	H_OAK_LOGS(ItemID.OAK_LOGS, Skill.HUNTER, "Bird houses"),
+	H_WILLOW_LOGS(ItemID.WILLOW_LOGS, Skill.HUNTER, "Bird houses"),
+	H_TEAK_LOGS(ItemID.TEAK_LOGS, Skill.HUNTER, "Bird houses"),
+	H_MAPLE_LOGS(ItemID.MAPLE_LOGS, Skill.HUNTER, "Bird houses"),
+	H_MAHOGANY_LOGS(ItemID.MAHOGANY_LOGS, Skill.HUNTER, "Bird houses"),
+	H_YEW_LOGS(ItemID.YEW_LOGS, Skill.HUNTER, "Bird houses"),
+	H_MAGIC_LOGS(ItemID.MAGIC_LOGS, Skill.HUNTER, "Bird houses"),
+	H_REDWOOD_LOGS(ItemID.REDWOOD_LOGS, Skill.HUNTER, "Bird houses"),
 	;
 
 	private final int itemID;
 	private final Skill skill;
 	private final String category;
-	private boolean ignoreBonus;
+	private final boolean ignoreBonus;
 
 	@Setter
 	// Stores the item composition info we use since we don't operate on the game thread
@@ -348,6 +365,7 @@ public enum ExperienceItem
 
 	private static final Multimap<Skill, ExperienceItem> SKILL_MAP = ArrayListMultimap.create();
 	private static final Map<Integer, ExperienceItem> ITEM_ID_MAP = new HashMap<>();
+
 	static
 	{
 		for (ExperienceItem i : values())
@@ -390,6 +408,7 @@ public enum ExperienceItem
 	/**
 	 * Attaches the Item Composition to each ExperienceItem on client initial load
 	 * May be a better way to do this
+	 *
 	 * @param m ItemManager
 	 */
 	public static void prepareItemCompositions(ItemManager m)

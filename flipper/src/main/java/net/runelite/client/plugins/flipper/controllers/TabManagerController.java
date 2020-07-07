@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.flipper.controllers;
 
+import net.runelite.client.plugins.flipper.FlipperPlugin;
 import net.runelite.client.plugins.flipper.helpers.UiUtilities;
 import net.runelite.client.plugins.flipper.views.TabManager;
 import net.runelite.client.plugins.flipper.views.buys.BuysPanel;
@@ -36,7 +37,7 @@ public class TabManagerController
 			.tooltip("Flipper")
 			.icon(
 				ImageUtil.getResourceStreamFromClass(
-					getClass(),
+					FlipperPlugin.class,
 					UiUtilities.flipperNavIcon
 				)
 			)

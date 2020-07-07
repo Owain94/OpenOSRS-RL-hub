@@ -33,6 +33,8 @@ import org.pf4j.Extension;
 )
 public class RCPlugin extends Plugin
 {
+	private final boolean QA = false;
+
 	@Inject
 	private Client client;
 
@@ -41,6 +43,8 @@ public class RCPlugin extends Plugin
 
 	@Inject
 	private RCPluginConfig config;
+
+	private final GEEventDebouncer debouncer = new GEEventDebouncer(this::_onGrandExchangeOfferChanged);
 
 	@Provides
 	RCPluginConfig getConfig(ConfigManager configManager)
@@ -51,7 +55,13 @@ public class RCPlugin extends Plugin
 	@Subscribe
 	public void onGrandExchangeOfferChanged(GrandExchangeOfferChanged offerEvent)
 	{
-		RuneCafeAPI apiClient = new RuneCafeAPI(config.apiKey(), false);
+		debouncer.accept(offerEvent);
+	}
+
+	private void _onGrandExchangeOfferChanged(GrandExchangeOfferChanged offerEvent)
+	{
+		System.out.println(offerEvent.getOffer().getState().name());
+		RuneCafeAPI apiClient = new RuneCafeAPI(config.apiKey(), QA);
 		GrandExchangeOffer offer = offerEvent.getOffer();
 
 		switch (offer.getState())
@@ -94,7 +104,7 @@ public class RCPlugin extends Plugin
 
 		Widget historyTitleWidget = optionalHistoryTitleWidget.get();
 		clientThread.invokeLater(() -> {
-			RuneCafeAPI apiClient = new RuneCafeAPI(config.apiKey(), false);
+			RuneCafeAPI apiClient = new RuneCafeAPI(config.apiKey(), QA);
 			Widget[] geHistoryData = historyTitleWidget.getParent().getParent().getStaticChildren()[2].getDynamicChildren();
 
 			List<GEHistoryRecord> records = new ArrayList<>();

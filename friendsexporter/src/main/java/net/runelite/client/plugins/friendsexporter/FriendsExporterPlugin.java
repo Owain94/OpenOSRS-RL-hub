@@ -345,7 +345,7 @@ public class FriendsExporterPlugin extends Plugin
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded widget)
 	{
-		if (widget.getGroupId() == 94 && !this.client.isInInstancedRegion())
+		if (widget.getGroupId() == 94)
 		{
 			wid = true;
 			clan = true;

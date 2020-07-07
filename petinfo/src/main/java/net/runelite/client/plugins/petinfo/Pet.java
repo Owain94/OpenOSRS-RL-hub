@@ -116,6 +116,9 @@ public enum Pet
 	DARK_CORE(PetGroup.BOSS, NpcID.DARK_CORE, Pet.DARK_CORE_INFO),    // Not sure this is the pet dark core, but it looks right
 	DARK_CORE_388(PetGroup.BOSS, NpcID.DARK_CORE_388, Pet.DARK_CORE_INFO),
 
+	DARK_SQUIRREL(PetGroup.BOSS, NpcID.DARK_SQUIRREL, Pet.GIANT_SQUIRREL_INFO + Pet.DARK_Giant_SQUIRREL),	// Thank you to Gamma91/Bram91 on gitHub for the info
+	DARK_SQUIRREL_9638(PetGroup.BOSS, NpcID.DARK_SQUIRREL_9638, Pet.GIANT_SQUIRREL_INFO + Pet.DARK_Giant_SQUIRREL),
+
 	EEK(PetGroup.OTHER, NpcID.EEK, Pet.EEK_INFO),
 
 	ENRAGED_TEKTINY(PetGroup.OTHER, NpcID.ENRAGED_TEKTINY, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
@@ -253,9 +256,8 @@ public enum Pet
 	PUPPADILE(PetGroup.BOSS, NpcID.PUPPADILE, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
 	PUPPADILE_8201(PetGroup.BOSS, NpcID.PUPPADILE_8201, Pet.OLMLET_INFO + Pet.OLMLET_CM_VARIANTS),
 
-	// The NpcID class does not yet have these ids so I ahd to hard code them
-	RED(PetGroup.SKILLING, 9850, Pet.ROCKY_INFO + " " + Pet.ROCKY_RED_PANDA),
-	RED_9852(PetGroup.SKILLING, 9852, Pet.ROCKY_INFO + " " + Pet.ROCKY_RED_PANDA),
+	RED(PetGroup.SKILLING, NpcID.RED, Pet.ROCKY_INFO + " " + Pet.ROCKY_RED_PANDA),
+	RED_9852(PetGroup.SKILLING, NpcID.RED_9852, Pet.ROCKY_INFO + " " + Pet.ROCKY_RED_PANDA),
 
 	RIFT_GUARDIAN(PetGroup.SKILLING, NpcID.RIFT_GUARDIAN, Pet.RIFT_GUARDIAN_INFO + " This is the Fire variant."),    // Fire
 	RIFT_GUARDIAN_7338(PetGroup.SKILLING, NpcID.RIFT_GUARDIAN_7338, Pet.RIFT_GUARDIAN_INFO + " This is the Air variant."),    // Air
@@ -424,9 +426,8 @@ public enum Pet
 	YOUNGLLEF(PetGroup.BOSS, NpcID.YOUNGLLEF, Pet.YOUNGLLEF_INFO),
 	YOUNGLLEF_8737(PetGroup.BOSS, NpcID.YOUNGLLEF_8737, Pet.YOUNGLLEF_INFO),
 
-	// The NpcID class does not yet have the ids, so I ahd to hard code them
-	ZIGGY(PetGroup.SKILLING, 9851, Pet.ROCKY_INFO + " " + Pet.ROCKY_TANUKI),
-	ZIGGY_9853(PetGroup.SKILLING, 9853, Pet.ROCKY_INFO + " " + Pet.ROCKY_TANUKI),
+	ZIGGY(PetGroup.SKILLING, NpcID.ZIGGY, Pet.ROCKY_INFO + " " + Pet.ROCKY_TANUKI),
+	ZIGGY_9853(PetGroup.SKILLING, NpcID.ZIGGY_9853, Pet.ROCKY_INFO + " " + Pet.ROCKY_TANUKI),
 
 	ZILYANA_JR(PetGroup.BOSS, NpcID.ZILYANA_JR, Pet.ZILYANA_JR_INFO),
 	ZILYANA_JR_6646(PetGroup.BOSS, NpcID.ZILYANA_JR_6646, Pet.ZILYANA_JR_INFO);
@@ -540,6 +541,8 @@ public enum Pet
 	 *	Variant text
 	 */
 	private static final String BABY_CHINCHOMPA_GOLD = "The gold variant is obtained by causing a Baby Chinchompa to metamorphosize at a rate of 1/10000.";
+
+	private static final String DARK_Giant_SQUIRREL = " This is a variant which is is unlocked buying the dark acorn in the hallowed sepulchre for 5000 hallowed marks and using it on a Giant Squirrel.";
 
 	private static final String ROCKY_RACCOON = " This is the Raccoon variant of Rocky, obtained by using Redberries on any variant of Rocky.";
 	private static final String ROCKY_RED_PANDA = " This is the Red Panda variant of Rocky, obtained by using Poison Ivy Berries on any variant of Rocky.";

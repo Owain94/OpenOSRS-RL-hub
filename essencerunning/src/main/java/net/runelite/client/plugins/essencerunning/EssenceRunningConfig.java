@@ -3,78 +3,26 @@ package net.runelite.client.plugins.essencerunning;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigTitleSection;
+import net.runelite.client.config.Title;
 
 @ConfigGroup("essencerunning")
 public interface EssenceRunningConfig extends Config
 {
+
 	@ConfigItem(
 		position = 0,
-		keyName = "sessionStatistics",
-		name = "Session Statistics",
-		description = "Displays statistics such as Pure essence/Binding necklace traded per runner and Fire runes crafted"
+		keyName = "clanChatOverlayHeight",
+		name = "Clan Chat Overlay Height",
+		description = "Displays messages in the clan chat as an overlay on top of the chat box"
 	)
-	default boolean sessionStatistics()
+	default EssenceRunningItemDropdown.ClanChatOverlayHeight clanChatOverlayHeight()
 	{
-		return false;
+		return EssenceRunningItemDropdown.ClanChatOverlayHeight.ZERO;
 	}
 
 	@ConfigItem(
 		position = 1,
-		keyName = "preventFireRunes",
-		name = "Prevent Fire runes",
-		description = "Forces menu to open when you click the Fire Altar if you would accidentally craft Fire runes"
-	)
-	default boolean preventFireRunes()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		position = 2,
-		keyName = "highlightBindingNecklace",
-		name = "Highlight Binding necklace",
-		description = "Highlights Binding necklace if you have no amulet equipped or the Runecrafter has 25/26 slots available in trade"
-	)
-	default EssenceRunningItemDropdown.HighlightBindingNecklace highlightBindingNecklace()
-	{
-		return EssenceRunningItemDropdown.HighlightBindingNecklace.OFF;
-	}
-
-	@ConfigItem(
-		position = 3,
-		keyName = "highlightRingOfDueling",
-		name = "Highlight Ring of dueling",
-		description = "Highlights Ring of dueling(8) if you have no ring equipped"
-	)
-	default boolean highlightRingOfDueling()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		position = 4,
-		keyName = "highlightTradeSent",
-		name = "Highlight Trade Sent",
-		description = "Highlights chat box to green if trade offer has been successfully sent"
-	)
-	default boolean highlightTradeSent()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		position = 5,
-		keyName = "clanChatOverlay",
-		name = "Clan Chat Overlay",
-		description = "Displays messages in the clan chat as an overlay on top of the chat box"
-	)
-	default boolean clanChatOverlay()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		position = 6,
 		keyName = "filterTradeMessages",
 		name = "Filter Trade Messages",
 		description = "Filters out all messages in trade chat except for 'wishes to trade with you'"
@@ -84,11 +32,153 @@ public interface EssenceRunningConfig extends Config
 		return false;
 	}
 
+	@ConfigTitleSection(
+		keyName = "runecrafterSettings",
+		name = "Runecrafter Settings",
+		description = "",
+		position = 100
+	)
+	default Title runecrafterSettings()
+	{
+		return new Title();
+	}
+
 	@ConfigItem(
-		position = 10,
+		position = 0,
+		keyName = "enableRunecraftingMode",
+		name = "Enable Runecrafting Mode",
+		description = "Must be enabled for any features in this section to work",
+		titleSection = "runecrafterSettings"
+	)
+	default boolean enableRunecrafterMode()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 1,
+		keyName = "sessionStatistics",
+		name = "Session Statistics",
+		description = "Displays statistics such as Pure essence/Binding necklace traded per runner and Fire runes crafted",
+		titleSection = "runecrafterSettings"
+	)
+	default boolean sessionStatistics()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		position = 2,
+		keyName = "preventFireRunes",
+		name = "Prevent Fire runes",
+		description = "Forces menu to open when you click the Fire Altar if you would accidentally craft Fire runes",
+		titleSection = "runecrafterSettings"
+	)
+	default boolean preventFireRunes()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		position = 3,
+		keyName = "highlightEquipBindingNecklace",
+		name = "Highlight Equip Binding necklace",
+		description = "Highlights Binding necklace if you have no amulet equipped",
+		titleSection = "runecrafterSettings"
+	)
+	default EssenceRunningItemDropdown.HighlightEquipBindingNecklace highlightEquipBindingNecklace()
+	{
+		return EssenceRunningItemDropdown.HighlightEquipBindingNecklace.EQUIP;
+	}
+
+	@ConfigTitleSection(
+		keyName = "runnerSettings",
+		name = "Runner Settings",
+		description = "",
+		position = 200
+	)
+	default Title runnerSettings()
+	{
+		return new Title();
+	}
+
+	@ConfigItem(
+		position = 0,
+		keyName = "enableRunnerMode",
+		name = "Enable Runner Mode",
+		description = "Must be enabled for any features in this section to work",
+		titleSection = "runnerSettings"
+	)
+	default boolean enableRunnerMode()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 1,
+		keyName = "highlightTradeBindingNecklace",
+		name = "Highlight Trade Binding necklace",
+		description = "Highlights Binding necklace if the Runecrafter has 25/26 slots available in trade",
+		titleSection = "runnerSettings"
+	)
+	default EssenceRunningItemDropdown.HighlightTradeBindingNecklace highlightTradeBindingNecklace()
+	{
+		return EssenceRunningItemDropdown.HighlightTradeBindingNecklace.TWENTY_FIVE;
+	}
+
+	@ConfigItem(
+		position = 2,
+		keyName = "highlightRingOfDueling",
+		name = "Highlight Ring of dueling",
+		description = "Highlights Ring of dueling(8) if you have no ring equipped",
+		titleSection = "runnerSettings"
+	)
+	default boolean highlightRingOfDueling()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		position = 3,
+		keyName = "highlightTradeSent",
+		name = "Highlight Trade Sent",
+		description = "Highlights chat box to green if trade offer has been successfully sent",
+		titleSection = "runnerSettings"
+	)
+	default boolean highlightTradeSent()
+	{
+		return true;
+	}
+
+	@ConfigTitleSection(
+		keyName = "shiftClickSection",
+		name = "Runner Shift-Click Settings",
+		description = "",
+		position = 300
+	)
+	default Title drawingTitle()
+	{
+		return new Title();
+	}
+
+	@ConfigItem(
+		position = 0,
+		keyName = "shiftClickCustomization",
+		name = "Enable Customizable Shift-Click",
+		description = "Allows customization of shift-clicks on items below that persist even when RuneLite loses focus",
+		titleSection = "shiftClickSection"
+	)
+	default boolean shiftClickCustomization()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 1,
 		keyName = "swapOfferAll",
 		name = "Swap Offer-All",
-		description = "Swaps the 'Offer' option to 'Offer-All' when holding shift"
+		description = "Swaps the 'Offer' option to 'Offer-All' when holding shift",
+		titleSection = "shiftClickSection"
 	)
 	default boolean swapOfferAll()
 	{
@@ -96,10 +186,11 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 11,
+		position = 2,
 		keyName = "swapBankOp",
 		name = "Swap Bank Op",
-		description = "Swaps the extra menu option in banks (Wield, Eat, etc.) when holding shift"
+		description = "Swaps the extra menu option in banks (Wield, Eat, etc.) when holding shift",
+		titleSection = "shiftClickSection"
 	)
 	default boolean swapBankOp()
 	{
@@ -107,10 +198,23 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 12,
+		position = 3,
+		keyName = "excludeBindingNecklaceOp",
+		name = "Exclude Binding necklace Op",
+		description = "Exclude swapping Binding necklace to 'Wear', should Disable this while soloing",
+		titleSection = "shiftClickSection"
+	)
+	default boolean excludeBindingNecklaceOp()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		position = 4,
 		keyName = "swapBankWithdrawOp",
 		name = "Swap Bank Withdraw Op",
-		description = "Swaps the Withdraw quantity of certain items (Ring of dueling, Binding necklace, etc.) when holding shift"
+		description = "Swaps the Withdraw quantity of certain items (Ring of dueling, Binding necklace, etc.) when holding shift",
+		titleSection = "shiftClickSection"
 	)
 	default boolean swapBankWithdrawOp()
 	{
@@ -118,32 +222,23 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 20,
-		keyName = "shiftClickCustomization",
-		name = "Customizable shift-click",
-		description = "Allows customization of shift-clicks on items below that persist even when RuneLite loses focus"
-	)
-	default boolean shiftClickCustomization()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		position = 21,
+		position = 5,
 		keyName = "pureEssence",
 		name = "Pure essence",
-		description = "Customize shift-click of 'Pure essence' in inventory"
+		description = "Customize shift-click of 'Pure essence' in inventory",
+		titleSection = "shiftClickSection"
 	)
-	default EssenceRunningItemDropdown.RingOfDueling pureEssence()
+	default EssenceRunningItemDropdown.PureEssence pureEssence()
 	{
-		return EssenceRunningItemDropdown.RingOfDueling.USE;
+		return EssenceRunningItemDropdown.PureEssence.USE;
 	}
 
 	@ConfigItem(
-		position = 22,
+		position = 6,
 		keyName = "essencePouch",
 		name = "Essence pouch",
-		description = "Customize shift-click of 'Essence pouch' in inventory"
+		description = "Customize shift-click of 'Essence pouch' in inventory",
+		titleSection = "shiftClickSection"
 	)
 	default EssenceRunningItemDropdown.EssencePouch essencePouch()
 	{
@@ -151,10 +246,11 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 23,
+		position = 7,
 		keyName = "bindingNecklace",
 		name = "Binding necklace",
-		description = "Customize shift-click of 'Binding necklace' in inventory"
+		description = "Customize shift-click of 'Binding necklace' in inventory",
+		titleSection = "shiftClickSection"
 	)
 	default EssenceRunningItemDropdown.BindingNecklace bindingNecklace()
 	{
@@ -162,10 +258,11 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 24,
+		position = 8,
 		keyName = "ringOfDueling",
 		name = "Ring of dueling",
-		description = "Customize shift-click of 'Ring of dueling' in inventory"
+		description = "Customize shift-click of 'Ring of dueling' in inventory",
+		titleSection = "shiftClickSection"
 	)
 	default EssenceRunningItemDropdown.RingOfDueling ringOfDueling()
 	{
@@ -173,10 +270,11 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 25,
+		position = 9,
 		keyName = "staminaPotion",
 		name = "Stamina potion",
-		description = "Customize shift-click of 'Stamina potion' and 'Energy potion' in inventory"
+		description = "Customize shift-click of 'Stamina potion' and 'Energy potion' in inventory",
+		titleSection = "shiftClickSection"
 	)
 	default EssenceRunningItemDropdown.StaminaPotion staminaPotion()
 	{
@@ -184,10 +282,11 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 26,
+		position = 10,
 		keyName = "earthTalisman",
 		name = "Earth talisman",
-		description = "Customize shift-click of 'Earth talisman' in inventory"
+		description = "Customize shift-click of 'Earth talisman' in inventory",
+		titleSection = "shiftClickSection"
 	)
 	default EssenceRunningItemDropdown.EarthTalisman earthTalisman()
 	{
@@ -195,10 +294,11 @@ public interface EssenceRunningConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 27,
+		position = 11,
 		keyName = "craftingCape",
 		name = "Crafting cape",
-		description = "Customize shift-click of 'Crafting cape' in inventory"
+		description = "Customize shift-click of 'Crafting cape' in inventory",
+		titleSection = "shiftClickSection"
 	)
 	default EssenceRunningItemDropdown.CraftingCape craftingCape()
 	{

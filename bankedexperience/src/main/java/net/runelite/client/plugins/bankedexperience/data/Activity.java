@@ -189,13 +189,13 @@ public enum Activity
 		ExperienceItem.GRIMY_TORSTOL, null, new ItemStack(ItemID.TORSTOL, 1)),
 	// Other
 	AMYLASE_CRYSTAL(ItemID.AMYLASE_CRYSTAL, "Convert to crystals", 0, 0,
-		ExperienceItem.MARK_OF_GRACE, null , new ItemStack(ItemID.AMYLASE_CRYSTAL, 10)),
+		ExperienceItem.MARK_OF_GRACE, null, new ItemStack(ItemID.AMYLASE_CRYSTAL, 10)),
 	STAMINA_POTION(ItemID.STAMINA_POTION1, "Stamina potion", 77, 25.5,
-		ExperienceItem.AMYLASE_CRYSTAL, Secondaries.STAMINA_POTION , new ItemStack(ItemID.STAMINA_POTION1, 1)),
+		ExperienceItem.AMYLASE_CRYSTAL, Secondaries.STAMINA_POTION, new ItemStack(ItemID.STAMINA_POTION1, 1)),
 	EXTENDED_ANTIFIRE(ItemID.EXTENDED_ANTIFIRE1, "Extended antifire", 77, 25.5,
-		ExperienceItem.LAVA_SCALE_SHARD, Secondaries.EXTENDED_ANTIFIRE , new ItemStack(ItemID.EXTENDED_ANTIFIRE1, 1)),
+		ExperienceItem.LAVA_SCALE_SHARD, Secondaries.EXTENDED_ANTIFIRE, new ItemStack(ItemID.EXTENDED_ANTIFIRE1, 1)),
 	EXTENDED_SUPER_ANTIFIRE(ItemID.EXTENDED_SUPER_ANTIFIRE1, "Extended super antifire", 77, 25.5,
-		ExperienceItem.LAVA_SCALE_SHARD, Secondaries.EXTENDED_SUPER_ANTIFIRE , new ItemStack(ItemID.EXTENDED_SUPER_ANTIFIRE1, 1)),
+		ExperienceItem.LAVA_SCALE_SHARD, Secondaries.EXTENDED_SUPER_ANTIFIRE, new ItemStack(ItemID.EXTENDED_SUPER_ANTIFIRE1, 1)),
 	/**
 	 * Construction
 	 */
@@ -211,7 +211,7 @@ public enum Activity
 		ExperienceItem.TEAK_LOGS, Secondaries.COINS_500, new ItemStack(ItemID.TEAK_PLANK, 1)),
 	TEAK_PLANKS(ItemID.TEAK_PLANK, "Teak products", 1, 90,
 		ExperienceItem.TEAK_PLANK, null, null),
-	MYTHICAL_CAPE(ItemID.MYTHICAL_CAPE, "Mythical cape rakes", 1, 123.33,
+	MYTHICAL_CAPE(ItemID.MYTHICAL_CAPE, "Mythical cape racks", 1, 123.33,
 		ExperienceItem.TEAK_PLANK, null, null),
 	MAHOGANY_PLANK(ItemID.MAHOGANY_PLANK, "Mahogany Plank", 1, 0,
 		ExperienceItem.MAHOGANY_LOGS, Secondaries.COINS_1500, new ItemStack(ItemID.MAHOGANY_PLANK, 1)),
@@ -423,86 +423,86 @@ public enum Activity
 	UNCUT_ZENYTE(ItemID.ZENYTE, "Cut zenyte", 89, 200.0,
 		ExperienceItem.UNCUT_ZENYTE, null, new ItemStack(ItemID.ZENYTE, 1)),
 	// Silver Jewelery
-	OPAL_RING(ItemID.OPAL_RING, "Opal ring", 1 , 10,
+	OPAL_RING(ItemID.OPAL_RING, "Opal ring", 1, 10,
 		ExperienceItem.OPAL, Secondaries.SILVER_BAR, new ItemStack(ItemID.OPAL_RING, 1)),
-	OPAL_NECKLACE(ItemID.OPAL_NECKLACE, "Opal necklace", 16 , 35,
+	OPAL_NECKLACE(ItemID.OPAL_NECKLACE, "Opal necklace", 16, 35,
 		ExperienceItem.OPAL, Secondaries.SILVER_BAR, new ItemStack(ItemID.OPAL_NECKLACE, 1)),
-	OPAL_BRACELET(ItemID.OPAL_BRACELET, "Opal bracelet", 22 , 45,
+	OPAL_BRACELET(ItemID.OPAL_BRACELET, "Opal bracelet", 22, 45,
 		ExperienceItem.OPAL, Secondaries.SILVER_BAR, new ItemStack(ItemID.OPAL_BRACELET, 1)),
-	OPAL_AMULET(ItemID.OPAL_AMULET, "Opal amulet", 27 , 55,
+	OPAL_AMULET(ItemID.OPAL_AMULET, "Opal amulet", 27, 55,
 		ExperienceItem.OPAL, Secondaries.SILVER_BAR, new ItemStack(ItemID.OPAL_AMULET, 1)),
-	JADE_RING(ItemID.JADE_RING, "Jade ring", 13 , 32,
+	JADE_RING(ItemID.JADE_RING, "Jade ring", 13, 32,
 		ExperienceItem.JADE, Secondaries.SILVER_BAR, new ItemStack(ItemID.JADE_RING, 1)),
-	JADE_NECKLACE(ItemID.JADE_NECKLACE, "Jade necklace", 25 , 54,
+	JADE_NECKLACE(ItemID.JADE_NECKLACE, "Jade necklace", 25, 54,
 		ExperienceItem.JADE, Secondaries.SILVER_BAR, new ItemStack(ItemID.JADE_NECKLACE, 1)),
-	JADE_BRACELET(ItemID.JADE_BRACELET, "Jade bracelet", 29 , 60,
+	JADE_BRACELET(ItemID.JADE_BRACELET, "Jade bracelet", 29, 60,
 		ExperienceItem.JADE, Secondaries.SILVER_BAR, new ItemStack(ItemID.JADE_BRACELET, 1)),
-	JADE_AMULET(ItemID.JADE_AMULET, "Jade amulet", 34 , 70,
+	JADE_AMULET(ItemID.JADE_AMULET, "Jade amulet", 34, 70,
 		ExperienceItem.JADE, Secondaries.SILVER_BAR, new ItemStack(ItemID.JADE_AMULET, 1)),
-	TOPAZ_RING(ItemID.TOPAZ_RING, "Topaz ring", 16 , 35,
+	TOPAZ_RING(ItemID.TOPAZ_RING, "Topaz ring", 16, 35,
 		ExperienceItem.RED_TOPAZ, Secondaries.SILVER_BAR, new ItemStack(ItemID.TOPAZ_RING, 1)),
-	TOPAZ_NECKLACE(ItemID.TOPAZ_NECKLACE, "Topaz necklace", 32 , 70,
+	TOPAZ_NECKLACE(ItemID.TOPAZ_NECKLACE, "Topaz necklace", 32, 70,
 		ExperienceItem.RED_TOPAZ, Secondaries.SILVER_BAR, new ItemStack(ItemID.TOPAZ_NECKLACE, 1)),
-	TOPAZ_BRACELET(ItemID.TOPAZ_BRACELET, "Topaz bracelet", 38 , 75,
+	TOPAZ_BRACELET(ItemID.TOPAZ_BRACELET, "Topaz bracelet", 38, 75,
 		ExperienceItem.RED_TOPAZ, Secondaries.SILVER_BAR, new ItemStack(ItemID.TOPAZ_BRACELET, 1)),
-	TOPAZ_AMULET(ItemID.TOPAZ_AMULET, "Topaz amulet", 45 , 80,
+	TOPAZ_AMULET(ItemID.TOPAZ_AMULET, "Topaz amulet", 45, 80,
 		ExperienceItem.RED_TOPAZ, Secondaries.SILVER_BAR, new ItemStack(ItemID.TOPAZ_AMULET, 1)),
 	// Gold Jewelery
-	SAPPHIRE_RING(ItemID.SAPPHIRE_RING, "Sapphire ring", 20 , 40,
+	SAPPHIRE_RING(ItemID.SAPPHIRE_RING, "Sapphire ring", 20, 40,
 		ExperienceItem.SAPPHIRE, Secondaries.GOLD_BAR, new ItemStack(ItemID.SAPPHIRE_RING, 1)),
-	SAPPHIRE_NECKLACE(ItemID.SAPPHIRE_NECKLACE, "Sapphire necklace", 22 , 55,
+	SAPPHIRE_NECKLACE(ItemID.SAPPHIRE_NECKLACE, "Sapphire necklace", 22, 55,
 		ExperienceItem.SAPPHIRE, Secondaries.GOLD_BAR, new ItemStack(ItemID.SAPPHIRE_NECKLACE, 1)),
-	SAPPHIRE_BRACELET(ItemID.SAPPHIRE_BRACELET, "Sapphire bracelet", 23 , 60,
+	SAPPHIRE_BRACELET(ItemID.SAPPHIRE_BRACELET, "Sapphire bracelet", 23, 60,
 		ExperienceItem.SAPPHIRE, Secondaries.GOLD_BAR, new ItemStack(ItemID.SAPPHIRE_BRACELET, 1)),
-	SAPPHIRE_AMULET(ItemID.SAPPHIRE_AMULET, "Sapphire amulet", 24 , 65,
+	SAPPHIRE_AMULET(ItemID.SAPPHIRE_AMULET, "Sapphire amulet", 24, 65,
 		ExperienceItem.SAPPHIRE, Secondaries.GOLD_BAR, new ItemStack(ItemID.SAPPHIRE_AMULET, 1)),
-	EMERALD_RING(ItemID.EMERALD_RING, "Emerald ring", 27 , 55,
+	EMERALD_RING(ItemID.EMERALD_RING, "Emerald ring", 27, 55,
 		ExperienceItem.EMERALD, Secondaries.GOLD_BAR, new ItemStack(ItemID.EMERALD_RING, 1)),
-	EMERALD_NECKLACE(ItemID.EMERALD_NECKLACE, "Emerald necklace", 29 , 60,
+	EMERALD_NECKLACE(ItemID.EMERALD_NECKLACE, "Emerald necklace", 29, 60,
 		ExperienceItem.EMERALD, Secondaries.GOLD_BAR, new ItemStack(ItemID.EMERALD_NECKLACE, 1)),
-	EMERALD_BRACELET(ItemID.EMERALD_BRACELET, "Emerald bracelet", 30 , 65,
+	EMERALD_BRACELET(ItemID.EMERALD_BRACELET, "Emerald bracelet", 30, 65,
 		ExperienceItem.EMERALD, Secondaries.GOLD_BAR, new ItemStack(ItemID.EMERALD_BRACELET, 1)),
-	EMERALD_AMULET(ItemID.EMERALD_AMULET, "Emerald amulet", 31 , 70,
+	EMERALD_AMULET(ItemID.EMERALD_AMULET, "Emerald amulet", 31, 70,
 		ExperienceItem.EMERALD, Secondaries.GOLD_BAR, new ItemStack(ItemID.EMERALD_AMULET, 1)),
-	RUBY_RING(ItemID.RUBY_RING, "Ruby ring", 34 , 70,
+	RUBY_RING(ItemID.RUBY_RING, "Ruby ring", 34, 70,
 		ExperienceItem.RUBY, Secondaries.GOLD_BAR, new ItemStack(ItemID.RUBY_RING, 1)),
-	RUBY_NECKLACE(ItemID.RUBY_NECKLACE, "Ruby necklace", 40 , 75,
+	RUBY_NECKLACE(ItemID.RUBY_NECKLACE, "Ruby necklace", 40, 75,
 		ExperienceItem.RUBY, Secondaries.GOLD_BAR, new ItemStack(ItemID.RUBY_NECKLACE, 1)),
-	RUBY_BRACELET(ItemID.RUBY_BRACELET, "Ruby bracelet", 42 , 80,
+	RUBY_BRACELET(ItemID.RUBY_BRACELET, "Ruby bracelet", 42, 80,
 		ExperienceItem.RUBY, Secondaries.GOLD_BAR, new ItemStack(ItemID.RUBY_BRACELET, 1)),
-	RUBY_AMULET(ItemID.RUBY_AMULET, "Ruby amulet", 50 , 85,
+	RUBY_AMULET(ItemID.RUBY_AMULET, "Ruby amulet", 50, 85,
 		ExperienceItem.RUBY, Secondaries.GOLD_BAR, new ItemStack(ItemID.RUBY_AMULET, 1)),
-	DIAMOND_RING(ItemID.DIAMOND_RING, "Diamond ring", 43 , 85,
+	DIAMOND_RING(ItemID.DIAMOND_RING, "Diamond ring", 43, 85,
 		ExperienceItem.DIAMOND, Secondaries.GOLD_BAR, new ItemStack(ItemID.DIAMOND_RING, 1)),
-	DIAMOND_NECKLACE(ItemID.DIAMOND_NECKLACE, "Diamond necklace", 56 , 90,
+	DIAMOND_NECKLACE(ItemID.DIAMOND_NECKLACE, "Diamond necklace", 56, 90,
 		ExperienceItem.DIAMOND, Secondaries.GOLD_BAR, new ItemStack(ItemID.DIAMOND_NECKLACE, 1)),
-	DIAMOND_BRACELET(ItemID.DIAMOND_BRACELET, "Diamond bracelet", 58 , 95,
+	DIAMOND_BRACELET(ItemID.DIAMOND_BRACELET, "Diamond bracelet", 58, 95,
 		ExperienceItem.DIAMOND, Secondaries.GOLD_BAR, new ItemStack(ItemID.DIAMOND_BRACELET, 1)),
-	DIAMOND_AMULET(ItemID.DIAMOND_AMULET, "Diamond amulet", 70 , 100,
+	DIAMOND_AMULET(ItemID.DIAMOND_AMULET, "Diamond amulet", 70, 100,
 		ExperienceItem.DIAMOND, Secondaries.GOLD_BAR, new ItemStack(ItemID.DIAMOND_AMULET, 1)),
-	DRAGONSTONE_RING(ItemID.DRAGONSTONE_RING, "Dragonstone ring", 55 , 100,
+	DRAGONSTONE_RING(ItemID.DRAGONSTONE_RING, "Dragonstone ring", 55, 100,
 		ExperienceItem.DRAGONSTONE, Secondaries.GOLD_BAR, new ItemStack(ItemID.DRAGONSTONE_RING, 1)),
-	DRAGON_NECKLACE(ItemID.DRAGON_NECKLACE, "Dragon necklace", 72 , 105,
+	DRAGON_NECKLACE(ItemID.DRAGON_NECKLACE, "Dragon necklace", 72, 105,
 		ExperienceItem.DRAGONSTONE, Secondaries.GOLD_BAR, new ItemStack(ItemID.DRAGON_NECKLACE, 1)),
-	DRAGONSTONE_BRACELET(ItemID.DRAGONSTONE_BRACELET, "Dragonstone bracelet", 74 , 110,
+	DRAGONSTONE_BRACELET(ItemID.DRAGONSTONE_BRACELET, "Dragonstone bracelet", 74, 110,
 		ExperienceItem.DRAGONSTONE, Secondaries.GOLD_BAR, new ItemStack(ItemID.DRAGONSTONE_BRACELET, 1)),
-	DRAGONSTONE_AMULET(ItemID.DRAGONSTONE_AMULET, "Dragonstone amulet", 80 , 150,
+	DRAGONSTONE_AMULET(ItemID.DRAGONSTONE_AMULET, "Dragonstone amulet", 80, 150,
 		ExperienceItem.DRAGONSTONE, Secondaries.GOLD_BAR, new ItemStack(ItemID.DRAGONSTONE_AMULET, 1)),
-	ONYX_RING(ItemID.ONYX_RING, "Onyx ring", 67 , 115,
+	ONYX_RING(ItemID.ONYX_RING, "Onyx ring", 67, 115,
 		ExperienceItem.ONYX, Secondaries.GOLD_BAR, new ItemStack(ItemID.ONYX_RING, 1)),
-	ONYX_NECKLACE(ItemID.ONYX_NECKLACE, "Onyx necklace", 82 , 120,
+	ONYX_NECKLACE(ItemID.ONYX_NECKLACE, "Onyx necklace", 82, 120,
 		ExperienceItem.ONYX, Secondaries.GOLD_BAR, new ItemStack(ItemID.ONYX_NECKLACE, 1)),
-	REGEN_BRACELET(ItemID.REGEN_BRACELET, "Regen bracelet", 84 , 125,
+	REGEN_BRACELET(ItemID.REGEN_BRACELET, "Regen bracelet", 84, 125,
 		ExperienceItem.ONYX, Secondaries.GOLD_BAR, new ItemStack(ItemID.REGEN_BRACELET, 1)),
-	ONYX_AMULET(ItemID.ONYX_AMULET, "Onyx amulet", 90 , 165,
+	ONYX_AMULET(ItemID.ONYX_AMULET, "Onyx amulet", 90, 165,
 		ExperienceItem.ONYX, Secondaries.GOLD_BAR, new ItemStack(ItemID.ONYX_AMULET, 1)),
-	ZENYTE_RING(ItemID.ZENYTE_RING, "Zenyte ring", 89 , 150,
+	ZENYTE_RING(ItemID.ZENYTE_RING, "Zenyte ring", 89, 150,
 		ExperienceItem.ZENYTE, Secondaries.GOLD_BAR, new ItemStack(ItemID.ZENYTE_RING, 1)),
-	ZENYTE_NECKLACE(ItemID.ZENYTE_NECKLACE, "Zenyte necklace", 92 , 165,
+	ZENYTE_NECKLACE(ItemID.ZENYTE_NECKLACE, "Zenyte necklace", 92, 165,
 		ExperienceItem.ZENYTE, Secondaries.GOLD_BAR, new ItemStack(ItemID.ZENYTE_NECKLACE, 1)),
-	ZENYTE_BRACELET(ItemID.ZENYTE_BRACELET, "Zenyte bracelet", 95 , 180,
+	ZENYTE_BRACELET(ItemID.ZENYTE_BRACELET, "Zenyte bracelet", 95, 180,
 		ExperienceItem.ZENYTE, Secondaries.GOLD_BAR, new ItemStack(ItemID.ZENYTE_BRACELET, 1)),
-	ZENYTE_AMULET(ItemID.ZENYTE_AMULET, "Zenyte amulet", 98 , 200 ,
+	ZENYTE_AMULET(ItemID.ZENYTE_AMULET, "Zenyte amulet", 98, 200,
 		ExperienceItem.ZENYTE, Secondaries.GOLD_BAR, new ItemStack(ItemID.ZENYTE_AMULET, 1)),
 	// Battle Staves
 	WATER_BATTLESTAFF(ItemID.WATER_BATTLESTAFF, "Water battlestaff", 54, 100,
@@ -522,6 +522,26 @@ public enum Activity
 		ExperienceItem.GOLD_BAR, null, new ItemStack(ItemID.GOLD_BRACELET, 1)),
 	GOLD_AMULET_U(ItemID.GOLD_AMULET_U, "Gold amulet (u)", 8, 30,
 		ExperienceItem.GOLD_BAR, null, new ItemStack(ItemID.GOLD_AMULET_U, 1)),
+	// RNG section
+	// Soda Ash
+	MOLTEN_GLASS(ItemID.MOLTEN_GLASS, "Furnace", 1, 10,
+		ExperienceItem.SODA_ASH, null, new ItemStack(ItemID.MOLTEN_GLASS, 1)),
+	MOLTEN_GLASS_SPELL(ItemID.MOLTEN_GLASS, "SGM [1.3x]", 1, 10, true,
+		ExperienceItem.SODA_ASH, Secondaries.BUCKET_OF_SAND, new ItemStack(ItemID.MOLTEN_GLASS, 1.3)),
+	// Seaweed
+	SODA_ASH(ItemID.SODA_ASH, "Soda Ash", 1, 0,
+		ExperienceItem.SEAWEED, null, new ItemStack(ItemID.SODA_ASH, 1)),
+	S_MOLTEN_GLASS_SPELL(ItemID.MOLTEN_GLASS, "SGM [1.3x]", 1, 10, true,
+		ExperienceItem.SEAWEED, Secondaries.BUCKET_OF_SAND, new ItemStack(ItemID.MOLTEN_GLASS, 1.3)),
+	// Giant Seaweed
+	G_SODA_ASH(ItemID.SODA_ASH, "Soda Ash", 1, 0,
+		ExperienceItem.GIANT_SEAWEED, null, new ItemStack(ItemID.SODA_ASH, 6)),
+	MOLTEN_GLASS_SPELL_18_PICKUP(ItemID.MOLTEN_GLASS, "SGM 18:3 Pickup [1.6x]", 1, 60, true, // XP per seaweed
+		ExperienceItem.GIANT_SEAWEED, Secondaries.BUCKET_OF_SAND_6, new ItemStack(ItemID.MOLTEN_GLASS, 9.6)),
+	MOLTEN_GLASS_SPELL_18(ItemID.MOLTEN_GLASS, "SGM 18:3 [1.488x]", 1, 60, true, // XP per seaweed
+		ExperienceItem.GIANT_SEAWEED, Secondaries.BUCKET_OF_SAND_6, new ItemStack(ItemID.MOLTEN_GLASS, 8.928)),
+	MOLTEN_GLASS_SPELL_12(ItemID.MOLTEN_GLASS, "SGM 12:2 [1.45x]", 1, 60, true, // XP per seaweed
+		ExperienceItem.GIANT_SEAWEED, Secondaries.BUCKET_OF_SAND_6, new ItemStack(ItemID.MOLTEN_GLASS, 8.7)),
 	/**
 	 * Smithing
 	 */
@@ -690,6 +710,9 @@ public enum Activity
 		ExperienceItem.F_MAGIC_LOGS, null, new ItemStack(ItemID.MAGIC_SHORTBOW_U, 1)),
 	F_MAGIC_LONGBOW_U(ItemID.MAGIC_LONGBOW_U, "Magic longbow (u)", 85, 91.5,
 		ExperienceItem.F_MAGIC_LOGS, null, new ItemStack(ItemID.MAGIC_LONGBOW_U, 1)),
+	// Redwood Logs
+	F_REDWOOD_ARROW_SHAFT(ItemID.ARROW_SHAFT, "Arrow shaft", 90, 35,
+		ExperienceItem.F_REDWOOD_LOGS, null, new ItemStack(ItemID.ARROW_SHAFT, 105)),
 	// Strung Bows
 	F_SHORTBOW(ItemID.SHORTBOW, "Shortbow", 5, 5,
 		ExperienceItem.F_SHORTBOW_U, Secondaries.BOW_STRING, new ItemStack(ItemID.SHORTBOW, 1)),
@@ -749,12 +772,25 @@ public enum Activity
 		ExperienceItem.F_AMETHYST_ARROWTIPS, Secondaries.HEADLESS_ARROW, new ItemStack(ItemID.AMETHYST_ARROW, 1)),
 	F_DRAGON_ARROW(ItemID.DRAGON_ARROW, "Dragon arrow", 90, 15,
 		ExperienceItem.F_DRAGON_ARROWTIPS, Secondaries.HEADLESS_ARROW, new ItemStack(ItemID.DRAGON_ARROW, 1)),
+	/**
+	 * Hunter
+	 */
+	BIRD_HOUSE(ItemID.BIRD_HOUSE, "Bird house", 5, 280, ExperienceItem.H_LOGS, null, null),
+	OAK_BIRD_HOUSE(ItemID.OAK_BIRD_HOUSE, "Oak bird house", 14, 420, ExperienceItem.H_OAK_LOGS, null, null),
+	WILLOW_BIRD_HOUSE(ItemID.WILLOW_BIRD_HOUSE, "Willow bird house", 24, 560, ExperienceItem.H_WILLOW_LOGS, null, null),
+	TEAK_BIRD_HOUSE(ItemID.TEAK_BIRD_HOUSE, "Teak bird house", 34, 700, ExperienceItem.H_TEAK_LOGS, null, null),
+	MAPLE_BIRD_HOUSE(ItemID.MAPLE_BIRD_HOUSE, "Maple bird house", 44, 820, ExperienceItem.H_MAPLE_LOGS, null, null),
+	MAHOGANY_BIRD_HOUSE(ItemID.MAHOGANY_BIRD_HOUSE, "Mahogany bird house", 49, 960, ExperienceItem.H_MAHOGANY_LOGS, null, null),
+	YEW_BIRD_HOUSE(ItemID.YEW_BIRD_HOUSE, "Yew bird house", 59, 1020, ExperienceItem.H_YEW_LOGS, null, null),
+	MAGIC_BIRD_HOUSE(ItemID.MAGIC_BIRD_HOUSE, "Magic bird house", 74, 1140, ExperienceItem.H_MAGIC_LOGS, null, null),
+	REDWOOD_BIRD_HOUSE(ItemID.REDWOOD_BIRD_HOUSE, "Redwood bird house", 89, 1200, ExperienceItem.H_REDWOOD_LOGS, null, null),
 	;
 
 	private final int icon;
 	private final String name;
 	private final int level;
 	private final double xp;
+	private final boolean rngActivity;
 	private final ExperienceItem experienceItem;
 	private final Skill skill;
 	@Nullable
@@ -767,6 +803,7 @@ public enum Activity
 
 	private static final ImmutableMultimap<ExperienceItem, Activity> ITEM_MAP;
 	public static final ImmutableSortedSet<Skill> BANKABLE_SKILLS;
+
 	static
 	{
 		final ImmutableMultimap.Builder<ExperienceItem, Activity> map = ImmutableMultimap.builder();
@@ -789,11 +826,25 @@ public enum Activity
 		@Nullable final Secondaries secondaries,
 		@Nullable final ItemStack output)
 	{
+		this(icon, name, level, xp, false, experienceItem, secondaries, output);
+	}
+
+	Activity(
+		final int icon,
+		final String name,
+		final int level,
+		final double xp,
+		final boolean rngActivity,
+		final ExperienceItem experienceItem,
+		@Nullable final Secondaries secondaries,
+		@Nullable final ItemStack output)
+	{
 		this.icon = icon;
 		this.name = name;
 		this.skill = experienceItem.getSkill();
 		this.level = level;
 		this.xp = xp;
+		this.rngActivity = rngActivity;
 		this.experienceItem = experienceItem;
 		this.secondaries = secondaries;
 		this.output = output;
@@ -802,6 +853,7 @@ public enum Activity
 
 	/**
 	 * Get all Activities for this ExperienceItem
+	 *
 	 * @param item ExperienceItem to check for
 	 * @return an empty Collection if no activities
 	 */
@@ -818,11 +870,13 @@ public enum Activity
 
 	/**
 	 * Get all Activities for this ExperienceItem limited to level
-	 * @param item ExperienceItem to check for
+	 *
+	 * @param item       ExperienceItem to check for
 	 * @param limitLevel Level to check Activitiy requirements against. -1/0 value disables limits
+	 * @param rng        boolean flag about whether to include RNG activities
 	 * @return an empty Collection if no activities
 	 */
-	public static List<Activity> getByExperienceItem(final ExperienceItem item, final int limitLevel)
+	public static List<Activity> getByExperienceItem(final ExperienceItem item, final int limitLevel, final boolean rng)
 	{
 		// Return as list to allow getting by index
 		final List<Activity> l = getByExperienceItem(item);
@@ -831,11 +885,20 @@ public enum Activity
 			return l;
 		}
 
-		return l.stream().filter(a -> a.getLevel() <= limitLevel).collect(Collectors.toList());
+		return l.stream().filter(a ->
+		{
+			if (!rng && a.isRngActivity())
+			{
+				return false;
+			}
+
+			return a.getLevel() <= limitLevel;
+		}).collect(Collectors.toList());
 	}
 
 	/**
 	 * Attaches the Item Composition to each ExperienceItem on client initial load
+	 *
 	 * @param m ItemManager
 	 */
 	public static void prepareItemCompositions(ItemManager m)
@@ -861,5 +924,33 @@ public enum Activity
 	public double getXpRate(final float modifier)
 	{
 		return experienceItem.isIgnoreBonus() ? xp : xp * modifier;
+	}
+
+	private static boolean isOneNull(final Object a, final Object b)
+	{
+		return (a == null && b != null) || (a != null && b == null);
+	}
+
+	public boolean shouldUpdateLinked(final Activity old)
+	{
+		if (old.getLinkedItem() != linkedItem)
+		{
+			return true;
+		}
+
+		final ItemStack oldOutput = old.getOutput();
+		// If both are null and the item hasn't change it shouldn't be updated
+		if (oldOutput == null && output == null)
+		{
+			return false;
+		}
+
+		// If one was null an update should happen
+		if (isOneNull(oldOutput, output))
+		{
+			return true;
+		}
+
+		return oldOutput.getQty() != output.getQty() || oldOutput.getId() != output.getId();
 	}
 }

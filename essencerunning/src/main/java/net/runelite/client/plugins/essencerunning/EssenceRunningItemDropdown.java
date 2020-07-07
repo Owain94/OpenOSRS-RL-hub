@@ -89,12 +89,10 @@ public class EssenceRunningItemDropdown
 
 	@Getter
 	@RequiredArgsConstructor
-	public enum HighlightBindingNecklace
+	public enum HighlightEquipBindingNecklace
 	{
 		OFF("Off"),
-		EQUIP("Equip"),
-		TWENTY_FIVE("25"),
-		TWENTY_SIX("26");
+		EQUIP("Equip");
 
 		private final String option;
 
@@ -102,6 +100,46 @@ public class EssenceRunningItemDropdown
 		public String toString()
 		{
 			return this.option;
+		}
+	}
+
+	@Getter
+	@RequiredArgsConstructor
+	public enum HighlightTradeBindingNecklace
+	{
+		OFF("Off"),
+		TWENTY_FIVE("25"),
+		TWENTY_SIX("26 (Pure)");
+
+		private final String option;
+
+		@Override
+		public String toString()
+		{
+			return this.option;
+		}
+	}
+
+	@Getter
+	@RequiredArgsConstructor
+	public enum ClanChatOverlayHeight
+	{
+		ZERO(0),
+		ONE(1),
+		TWO(2),
+		THREE(3),
+		FOUR(4),
+		FIVE(5),
+		SIX(6),
+		SEVEN(7),
+		EIGHT(8);
+
+		private final int option;
+
+		@Override
+		public String toString()
+		{
+			return Integer.toString(this.option);
 		}
 	}
 }

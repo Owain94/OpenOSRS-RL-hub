@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.0.4"
 
 project.extra["PluginName"] = "Notification Messages"
-project.extra["PluginDescription"] = "Notifify you on certain messages"
+project.extra["PluginDescription"] = "Custom notification messages for various triggers"
 
 tasks {
     jar {

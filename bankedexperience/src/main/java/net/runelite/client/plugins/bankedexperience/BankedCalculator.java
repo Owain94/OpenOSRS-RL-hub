@@ -79,14 +79,14 @@ public class BankedCalculator extends JPanel
 
 	private final Map<ExperienceItem, BankedItem> bankedItemMap = new LinkedHashMap<>();
 	private final JLabel totalXpLabel = new JLabel();
+	private final JLabel xpToNextLevelLabel = new JLabel();
 	private final ModifyPanel modifyPanel;
 	private SelectionGrid itemGrid;
 
 	// Store items from all sources in the same map
 	private final Map<Integer, Integer> currentMap = new HashMap<>();
 	// keep sources separate for recreating currentMap when one updates
-	private Map<Integer, Integer> bankMap = new HashMap<>();
-	private Map<Integer, Integer> vaultMap = new HashMap<>();
+	private Map<Integer, Map<Integer, Integer>> inventoryMap = new HashMap<>();
 
 	@Getter
 	private Skill currentSkill;
@@ -127,14 +127,14 @@ public class BankedCalculator extends JPanel
 
 		if (currentMap.size() <= 0)
 		{
-			add(new JLabel( "Please visit a bank!", JLabel.CENTER));
+			add(new JLabel("Please visit a bank!", JLabel.CENTER));
 			revalidate();
 			repaint();
 			return;
 		}
 
 		skillLevel = client.getRealSkillLevel(currentSkill);
-		skillExp =  client.getSkillExperience(currentSkill);
+		skillExp = client.getSkillExperience(currentSkill);
 		endLevel = skillLevel;
 		endExp = skillExp;
 
@@ -191,11 +191,12 @@ public class BankedCalculator extends JPanel
 		// This should only be null if there are no items in their bank for this skill
 		if (itemGrid.getSelectedItem() == null)
 		{
-			add(new JLabel( "Couldn't find any items for this skill.", JLabel.CENTER));
+			add(new JLabel("Couldn't find any items for this skill.", JLabel.CENTER));
 		}
 		else
 		{
 			add(totalXpLabel);
+			add(xpToNextLevelLabel);
 			add(modifyPanel);
 			add(itemGrid);
 		}
@@ -221,7 +222,7 @@ public class BankedCalculator extends JPanel
 			final int level = config.limitToCurrentLevel() ? skillLevel : -1;
 			if (a == null || (level > 0 && level < a.getLevel()))
 			{
-				final List<Activity> activities = Activity.getByExperienceItem(item, level);
+				final List<Activity> activities = Activity.getByExperienceItem(item, level, config.includeRngActivities());
 				if (activities.size() == 0)
 				{
 					item.setSelectedActivity(null);
@@ -285,6 +286,7 @@ public class BankedCalculator extends JPanel
 
 	/**
 	 * Calculates total item quantity accounting for backwards linked items
+	 *
 	 * @param item starting item
 	 * @return item qty including linked items
 	 */
@@ -302,7 +304,7 @@ public class BankedCalculator extends JPanel
 		{
 			// Account for activities that output multiple of a specific item per action
 			final ItemStack output = entry.getKey().getSelectedActivity().getOutput();
-			return entry.getValue() * (output != null ? output.getQty() : 1);
+			return (int) (entry.getValue() * (output != null ? output.getQty() : 1));
 		}).sum();
 
 		return qty + linkedQty;
@@ -322,12 +324,16 @@ public class BankedCalculator extends JPanel
 			total += getItemQty(bi) * getItemXpRate(bi);
 		}
 
-		endExp = (int) (skillExp + total);
+		endExp = Math.min(Experience.MAX_SKILL_XP, (int) (skillExp + total));
 		endLevel = Experience.getLevelForXp(endExp);
 
-		totalXpLabel.setText("Total Banked xp: " + XP_FORMAT_COMMA.format(total));
+		totalXpLabel.setText("Total Banked: " + XP_FORMAT_COMMA.format(total) + "xp");
 		uiInput.setTargetLevelInput(endLevel);
-		uiInput.setTargetXPInput(Math.min(Experience.MAX_SKILL_XP, endExp));
+		uiInput.setTargetXPInput(endExp);
+
+		final int nextLevel = Math.min(endLevel + 1, 126);
+		final int nextLevelXp = Experience.getXpForLevel(nextLevel) - endExp;
+		xpToNextLevelLabel.setText("Level " + nextLevel + " requires: " + XP_FORMAT_COMMA.format(nextLevelXp) + "xp");
 
 		revalidate();
 		repaint();
@@ -335,6 +341,7 @@ public class BankedCalculator extends JPanel
 
 	/**
 	 * Used to select an Activity for an item
+	 *
 	 * @param i BankedItem item the activity is tied to
 	 * @param a Activity the selected activity
 	 */
@@ -350,7 +357,7 @@ public class BankedCalculator extends JPanel
 		item.setSelectedActivity(a);
 
 		// Cascade activity changes if necessary.
-		if (config.cascadeBankedXp() && (old.getLinkedItem() != a.getLinkedItem()))
+		if (config.cascadeBankedXp() && a.shouldUpdateLinked(old))
 		{
 			// Update Linked Map
 			linkedMap.remove(old.getLinkedItem(), i);
@@ -370,6 +377,7 @@ public class BankedCalculator extends JPanel
 
 	/**
 	 * Updates the item quantities of all forward linked items
+	 *
 	 * @param activity the starting {@link Activity} to start the cascade from
 	 */
 	private void updateLinkedItems(final Activity activity)
@@ -397,7 +405,7 @@ public class BankedCalculator extends JPanel
 
 			final GridItem gridItem = itemGrid.getPanelMap().get(bi);
 			final int oldQty = gridItem.getAmount();
-			panelAmountChange = panelAmountChange || ( (oldQty == 0 && qty > 0) || (oldQty > 0 && qty == 0) );
+			panelAmountChange = panelAmountChange || ((oldQty == 0 && qty > 0) || (oldQty > 0 && qty == 0));
 			gridItem.updateIcon(img, qty);
 			gridItem.updateToolTip(xpFactor);
 
@@ -426,6 +434,7 @@ public class BankedCalculator extends JPanel
 
 	/**
 	 * Creates a Map of ExperienceItem to bank qty for all items that are being linked to this one
+	 *
 	 * @param item starting item
 	 * @return Map of ExperienceItem to bank qty
 	 */
@@ -477,25 +486,25 @@ public class BankedCalculator extends JPanel
 
 	public int getItemQtyFromBank(final int id)
 	{
-		return bankMap.getOrDefault(id, 0);
+		return currentMap.getOrDefault(id, 0);
 	}
 
-	void setBankMap(Map<Integer, Integer> bankMap)
+	void setInventoryMap(final int inventoryId, final Map<Integer, Integer> map)
 	{
-		this.bankMap = bankMap;
-		updateCurrentMap();
-	}
-
-	void setVaultMap(Map<Integer, Integer> vaultMap)
-	{
-		this.vaultMap = vaultMap;
+		inventoryMap.put(inventoryId, map);
 		updateCurrentMap();
 	}
 
 	private void updateCurrentMap()
 	{
 		currentMap.clear();
-		currentMap.putAll(bankMap);
-		currentMap.putAll(vaultMap);
+		for (final Map<Integer, Integer> map : inventoryMap.values())
+		{
+			for (final int id : map.keySet())
+			{
+				final int qty = map.get(id) + currentMap.getOrDefault(id, 0);
+				currentMap.put(id, qty);
+			}
+		}
 	}
 }

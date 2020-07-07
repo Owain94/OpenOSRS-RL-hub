@@ -15,21 +15,24 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "serverUrl",
 		name = "Server URL",
-		description = "URL of the influx DB api to write to"
+		description = "URL of the influx DB api to write to",
+		position = 0
 	)
 	String getServerUrl();
 
 	@ConfigItem(
 		keyName = "serverDatabase",
 		name = "Database",
-		description = "Database to write to"
+		description = "Database to write to",
+		position = 1
 	)
 	String getDatabase();
 
 	@ConfigItem(
 		keyName = "serverUsername",
 		name = "Server Username",
-		description = "Username to use for authentiation"
+		description = "Username to use for authentication",
+		position = 2
 	)
 	default String getServerUsername()
 	{
@@ -39,7 +42,9 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "serverPassword",
 		name = "Server Password",
-		description = "Password to use for authentiation"
+		description = "Password to use for authentication",
+		position = 3,
+		secret = true
 	)
 	default String getServerPassword()
 	{
@@ -49,7 +54,8 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "serverRetentionPolicy",
 		name = "Server Retention Policy",
-		description = "Retention policy to use for storing data"
+		description = "Retention policy to use for storing data",
+		position = 4
 	)
 	default String getServerRetentionPolicy()
 	{
@@ -59,7 +65,8 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "writeXp",
 		name = "Submit Experience",
-		description = "Submit experience amount"
+		description = "Submit experience amount",
+		position = 5
 	)
 	default boolean writeXp()
 	{
@@ -69,7 +76,8 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "writeBankValue",
 		name = "Submit Bank Value",
-		description = "Submit bank and seed vault items"
+		description = "Submit bank and seed vault items",
+		position = 6
 	)
 	default boolean writeBankValue()
 	{
@@ -79,7 +87,8 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "writeSelfLoc",
 		name = "Submit Player Location",
-		description = "Submit player location"
+		description = "Submit player location",
+		position = 7
 	)
 	default boolean writeSelfLoc()
 	{
@@ -89,7 +98,8 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "writeSelfMeta",
 		name = "Submit Player Metadata",
-		description = "Submit player combat level, quest points, and other minor stats"
+		description = "Submit player combat level, quest points, and other minor stats",
+		position = 8
 	)
 	default boolean writeSelfMeta()
 	{
@@ -99,7 +109,8 @@ public interface InfluxDbConfig extends Config
 	@ConfigItem(
 		keyName = "writeKillCount",
 		name = "Submit Kill Count",
-		description = "Submits boss kill counts (requires Chat Commands plugin)"
+		description = "Submits boss kill counts (requires Chat Commands plugin)",
+		position = 9
 	)
 	default boolean writeKillCount()
 	{
@@ -107,14 +118,38 @@ public interface InfluxDbConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "writeActivity",
+		name = "Submit Activity",
+		description = "Submit player activity such as location names, skill training, minigame, raid, or boss",
+		position = 10
+	)
+	default boolean writeActivity()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = WRITE_INTERVAL,
 		name = "Recording interval",
-		description = "Minimum interval between measurements"
+		description = "Minimum interval between measurements",
+		position = 11
 	)
 	@Units(Units.SECONDS)
 	@Range(min = 5, max = 5 * 60)
 	default int writeIntervalSeconds()
 	{
 		return 15;
+	}
+
+	@ConfigItem(
+		keyName = "activityTimeout",
+		name = "Activity timeout",
+		description = "Configures after how long of not updating activity will be reset (in minutes)",
+		position = 12
+	)
+	@Units(Units.MINUTES)
+	default int activityTimeout()
+	{
+		return 5;
 	}
 }

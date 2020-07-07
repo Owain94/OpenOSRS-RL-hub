@@ -105,6 +105,7 @@ public class EssenceRunningPlugin extends Plugin
 
 	@Getter
 	private Map<Integer, String> clanMessages;
+	private int MAX_ENTRIES = 0;
 
 	private int runecraftXp = 0;
 	private boolean craftedFireRunes = false;
@@ -118,7 +119,8 @@ public class EssenceRunningPlugin extends Plugin
 		overlayManager.add(statisticsOverlay);
 		overlayManager.add(clanChatOverlay);
 		session = new EssenceRunningSession();
-		clanMessages = EssenceRunningUtils.getClanMessagesMap(2);
+		MAX_ENTRIES = config.clanChatOverlayHeight().getOption();
+		clanMessages = EssenceRunningUtils.getClanMessagesMap(MAX_ENTRIES);
 	}
 
 	@Override
@@ -179,17 +181,20 @@ public class EssenceRunningPlugin extends Plugin
 	private void swapMenuEntry(final int index, final MenuEntry menuEntry)
 	{
 
-		final String option = Text.removeTags(menuEntry.getOption()).toLowerCase();
-		final String target = Text.removeTags(menuEntry.getTarget()).toLowerCase();
-
-		if (config.swapOfferAll() && shiftModifier && option.equals("offer"))
+		if (config.shiftClickCustomization() && shiftModifier)
 		{
-			EssenceRunningUtils.swap(client, optionIndexes, "offer-all", option, target, index, true);
-		}
+			final String option = Text.removeTags(menuEntry.getOption()).toLowerCase();
+			final String target = Text.removeTags(menuEntry.getTarget()).toLowerCase();
 
-		if (config.shiftClickCustomization() && shiftModifier && menuEntry.getOpcode() == MenuOpcode.EXAMINE_ITEM.getId())
-		{
-			shiftClickCustomization(target, index);
+			if (config.swapOfferAll() && option.equals("offer"))
+			{
+				EssenceRunningUtils.swap(client, optionIndexes, "offer-all", option, target, index, true);
+			}
+
+			if (menuEntry.getOpcode() == MenuOpcode.EXAMINE_ITEM.getId())
+			{
+				shiftClickCustomization(target, index);
+			}
 		}
 	}
 
@@ -240,21 +245,28 @@ public class EssenceRunningPlugin extends Plugin
 	@Subscribe
 	public void onMenuEntryAdded(final MenuEntryAdded menuEntryAdded)
 	{
-		// The client sorts the MenuEntries for priority after the ClientTick event so have to swap bank in MenuEntryAdded event
-		if (config.swapBankOp() && shiftModifier)
+		if (config.shiftClickCustomization() && shiftModifier)
 		{
-			EssenceRunningUtils.swapBankOp(client, menuEntryAdded);
-		}
-		if (config.swapBankWithdrawOp() && shiftModifier)
-		{
-			EssenceRunningUtils.swapBankWithdrawOp(client, menuEntryAdded);
+			// The client sorts the MenuEntries for priority after the ClientTick event so have to swap bank in MenuEntryAdded event
+			if (config.swapBankOp())
+			{
+				final String target = Text.removeTags(menuEntryAdded.getTarget()).toLowerCase();
+				if (!target.equals("binding necklace") || !config.excludeBindingNecklaceOp())
+				{
+					EssenceRunningUtils.swapBankOp(client, menuEntryAdded);
+				}
+			}
+			if (config.swapBankWithdrawOp())
+			{
+				EssenceRunningUtils.swapBankWithdrawOp(client, menuEntryAdded);
+			}
 		}
 	}
 
 	@Subscribe
 	public void onMenuShouldLeftClick(final MenuShouldLeftClick menuShouldLeftClick)
 	{
-		if (config.preventFireRunes())
+		if (config.enableRunecrafterMode() && config.preventFireRunes())
 		{
 			// Option is 'Craft-rune' on the Fire Altar
 			EssenceRunningUtils.forceRightClick(client, menuShouldLeftClick, ObjectID.ALTAR_34764);
@@ -298,7 +310,7 @@ public class EssenceRunningPlugin extends Plugin
 		}
 		else if (event.getMessage().equals(ACCEPTED_TRADE))
 		{
-			if (config.sessionStatistics())
+			if (config.enableRunecrafterMode() && config.sessionStatistics())
 			{
 				// Trade widgets are still available at this point
 				EssenceRunningUtils.computeItemsTraded(client, session);
@@ -340,9 +352,12 @@ public class EssenceRunningPlugin extends Plugin
 			{
 				session.reset();
 			}
-			if (!config.clanChatOverlay())
+			if (MAX_ENTRIES != config.clanChatOverlayHeight().getOption())
 			{
-				clanMessages.clear();
+				MAX_ENTRIES = config.clanChatOverlayHeight().getOption();
+				Map<Integer, String> temp = EssenceRunningUtils.getClanMessagesMap(MAX_ENTRIES);
+				temp.putAll(clanMessages);
+				clanMessages = temp;
 			}
 		}
 	}
@@ -352,7 +367,7 @@ public class EssenceRunningPlugin extends Plugin
 	{
 		if (statChanged.getSkill() == Skill.RUNECRAFT)
 		{
-			if (config.sessionStatistics())
+			if (config.enableRunecrafterMode() && config.sessionStatistics())
 			{
 				if (craftedFireRunes)
 				{
