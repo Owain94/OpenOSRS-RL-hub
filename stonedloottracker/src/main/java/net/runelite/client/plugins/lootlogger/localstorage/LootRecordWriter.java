@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -134,7 +135,7 @@ public class LootRecordWriter
 
 		StringBuilder sb = new StringBuilder();
 
-		try (final BufferedReader br = new BufferedReader(new FileReader(file)))
+		try (final BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8)))
 		{
 			// read line by line
 			String line;
@@ -183,7 +184,7 @@ public class LootRecordWriter
 		// Open File in append mode and write new data
 		try
 		{
-			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), true));
+			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), StandardCharsets.UTF_8, true));
 			file.append(dataAsString);
 			file.newLine();
 			file.close();
@@ -224,7 +225,7 @@ public class LootRecordWriter
 
 		try
 		{
-			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), false));
+			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), StandardCharsets.UTF_8, false));
 			for (final LTRecord rec : loots)
 			{
 				// Convert entry to JSON
@@ -322,7 +323,7 @@ public class LootRecordWriter
 				{
 					try
 					{
-						final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(outputFile), false));
+						final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(outputFile), StandardCharsets.UTF_8, false));
 						for (final LTRecord rec : recs)
 						{
 							// Convert entry to JSON

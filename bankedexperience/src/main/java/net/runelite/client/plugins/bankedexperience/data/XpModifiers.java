@@ -47,6 +47,7 @@ public enum XpModifiers
 	private final float modifier;
 
 	private final static Multimap<Skill, XpModifiers> MODIFIERS_MAP;
+
 	static
 	{
 		final ImmutableMultimap.Builder<Skill, XpModifiers> map = ImmutableMultimap.builder();

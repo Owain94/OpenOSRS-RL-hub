@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,7 +113,7 @@ public class BankValueHistoryTracker
 		if (valueHistory != null)
 		{
 			valueHistory.addPrice(bankValue);
-			try (FileWriter writer = new FileWriter(getFileForUser(username)))
+			try (FileWriter writer = new FileWriter(getFileForUser(username), StandardCharsets.UTF_8))
 			{
 				GSON.toJson(valueHistory, writer);
 			}
@@ -137,7 +138,7 @@ public class BankValueHistoryTracker
 		{
 			File playerHistoryFile = getFileForUser(username);
 
-			try (FileReader reader = new FileReader(getFileForUser(username)))
+			try (FileReader reader = new FileReader(getFileForUser(username), StandardCharsets.UTF_8))
 			{
 				log.debug("Creating bank history cache file at {}", playerHistoryFile.getAbsolutePath());
 				BankValueHistoryContainer container = GSON.fromJson(reader, BankValueHistoryContainer.class);

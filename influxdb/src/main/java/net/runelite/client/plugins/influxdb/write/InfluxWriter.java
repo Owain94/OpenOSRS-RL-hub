@@ -1,12 +1,14 @@
 package net.runelite.client.plugins.influxdb.write;
 
 import com.google.common.collect.Maps;
+import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.influxdb.InfluxDbConfig;
@@ -17,6 +19,7 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
 
 @Slf4j
+@Singleton
 public class InfluxWriter
 {
 	private final InfluxDbConfig config;
@@ -90,6 +93,10 @@ public class InfluxWriter
 			if (series.getMeasurement().equals(MeasurementCreator.SERIES_SELF_LOC))
 			{
 				return new Writer(new ThrottledWriter(), SELF_DEDUPE);
+			}
+			else if (series.getMeasurement().equals(MeasurementCreator.SERIES_ACTIVITY))
+			{
+				return new Writer(new AlwaysWriter(), (a, b) -> true);
 			}
 			return new Writer(new ThrottledWriter(), FULL_DEDUPE);
 		});
@@ -189,6 +196,38 @@ public class InfluxWriter
 			if (flush != null)
 			{
 				output.point(flush.toInflux());
+			}
+		}
+	}
+
+	private static class AlwaysWriter implements TerminalOp
+	{
+		private final ArrayDeque<Measurement> queued = new ArrayDeque<>();
+
+		@Override
+		public synchronized Measurement getLastWritten()
+		{
+			return queued.isEmpty() ? null : queued.peekLast();
+		}
+
+		@Override
+		public boolean isBlocked()
+		{
+			return false;
+		}
+
+		@Override
+		public synchronized void submit(Measurement m)
+		{
+			queued.add(m);
+		}
+
+		@Override
+		public synchronized void flush(BatchPoints.Builder output)
+		{
+			while (!queued.isEmpty())
+			{
+				output.point(queued.removeFirst().toInflux());
 			}
 		}
 	}

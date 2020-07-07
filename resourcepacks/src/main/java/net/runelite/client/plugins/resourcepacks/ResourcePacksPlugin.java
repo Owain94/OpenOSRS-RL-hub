@@ -3,14 +3,15 @@ package net.runelite.client.plugins.resourcepacks;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
+import lombok.Setter;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.client.RuneLite;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.SessionClose;
@@ -19,7 +20,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.resourcepacks.event.ResourcePacksChanged;
-import net.runelite.client.plugins.resourcepacks.hub.ResourcePacksClient;
 import net.runelite.client.plugins.resourcepacks.hub.ResourcePacksHubPanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
@@ -38,9 +38,14 @@ public class ResourcePacksPlugin extends Plugin
 {
 	public static final File RESOURCEPACKS_DIR = new File(RuneLite.RUNELITE_DIR.getPath() + File.separator + "resource-packs-repository");
 	public static final File NOTICE_FILE = new File(RESOURCEPACKS_DIR.getPath() + File.separator + "DO_NOT_EDIT_CHANGES_WILL_BE_OVERWRITTEN");
+	public static final String BRANCH = "github-actions";
+	public static final String OVERLAY_COLOR_CONFIG = "overlayBackgroundColor";
 	public static final HttpUrl GITHUB = HttpUrl.parse("https://github.com/melkypie/resource-packs");
 	public static final HttpUrl RAW_GITHUB = HttpUrl.parse("https://raw.githubusercontent.com/melkypie/resource-packs");
 	public static final HttpUrl API_GITHUB = HttpUrl.parse("https://api.github.com/repos/melkypie/resource-packs");
+
+	@Setter
+	private static boolean ignoreOverlayConfig = false;
 
 	@Inject
 	private ClientThread clientThread;
@@ -49,16 +54,18 @@ public class ResourcePacksPlugin extends Plugin
 	private ClientToolbar clientToolbar;
 
 	@Inject
-	private ResourcePacksManager resourcePacksManager;
+	private ResourcePacksConfig config;
 
 	@Inject
-	private ResourcePacksClient resourcePacksClient;
+	private ConfigManager configManager;
+
+	@Inject
+	private ResourcePacksManager resourcePacksManager;
 
 	@Inject
 	private ScheduledExecutorService executor;
 
 	private ResourcePacksHubPanel resourcePacksHubPanel;
-
 	private NavigationButton navButton;
 
 	@Provides
@@ -73,7 +80,7 @@ public class ResourcePacksPlugin extends Plugin
 		clientThread.invokeLater(resourcePacksManager::updateAllOverrides);
 
 		resourcePacksHubPanel = injector.getInstance(ResourcePacksHubPanel.class);
-		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "panel.png");
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "/panel.png");
 
 		navButton = NavigationButton.builder()
 			.tooltip("Resource packs hub")
@@ -95,22 +102,6 @@ public class ResourcePacksPlugin extends Plugin
 		}
 
 		executor.submit(resourcePacksManager::refreshPlugins);
-
-		String export = System.getProperty("pluginhub.resourcepacks.export");
-		if (export != null && export.equals("true"))
-		{
-			executor.execute(() -> {
-				try
-				{
-					resourcePacksClient.extractPacks();
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			});
-		}
-
 	}
 
 	@Override
@@ -121,6 +112,15 @@ public class ResourcePacksPlugin extends Plugin
 			resourcePacksManager.adjustWidgetDimensions(false);
 			resourcePacksManager.removeGameframe();
 		});
+		if (config.allowLoginScreen())
+		{
+			resourcePacksManager.resetLoginScreen();
+		}
+		if (config.allowOverlayColor())
+		{
+			resourcePacksManager.resetOverlayColor();
+		}
+
 		clientToolbar.removeNavigation(navButton);
 	}
 
@@ -133,13 +133,44 @@ public class ResourcePacksPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if (event.getGroup().equals(ResourcePacksConfig.GROUP_NAME) && event.getKey().equals("resourcePack"))
+		if (event.getGroup().equals(ResourcePacksConfig.GROUP_NAME))
 		{
-			clientThread.invokeLater(resourcePacksManager::updateAllOverrides);
+			if (event.getKey().equals("resourcePack"))
+			{
+				clientThread.invokeLater(resourcePacksManager::updateAllOverrides);
+			}
+			else if (event.getKey().equals("allowOverlayColor"))
+			{
+				if (config.allowOverlayColor())
+				{
+					clientThread.invokeLater(resourcePacksManager::updateAllOverrides);
+				}
+				else
+				{
+					resourcePacksManager.resetOverlayColor();
+				}
+			}
+			else if (event.getKey().equals("allowLoginScreen"))
+			{
+				if (config.allowLoginScreen())
+				{
+					clientThread.invokeLater(resourcePacksManager::updateAllOverrides);
+				}
+				else
+				{
+					resourcePacksManager.resetLoginScreen();
+				}
+			}
 		}
 		else if (event.getGroup().equals("banktags") && event.getKey().equals("useTabs"))
 		{
 			clientThread.invoke(resourcePacksManager::updateAllOverrides);
+		}
+		else if (config.allowOverlayColor() && !ignoreOverlayConfig &&
+			event.getGroup().equals(RuneLiteConfig.GROUP_NAME) && event.getKey().equals(OVERLAY_COLOR_CONFIG))
+		{
+			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR,
+				event.getNewValue());
 		}
 	}
 

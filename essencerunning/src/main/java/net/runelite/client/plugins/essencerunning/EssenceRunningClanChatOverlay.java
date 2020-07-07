@@ -38,7 +38,7 @@ public class EssenceRunningClanChatOverlay extends Overlay
 		panelComponent.getChildren().clear();
 
 		final Widget chatbox = client.getWidget(WidgetInfo.CHATBOX_TRANSPARENT_LINES);
-		if (config.clanChatOverlay() && chatbox != null && !chatbox.isHidden())
+		if (config.clanChatOverlayHeight().getOption() > 0 && chatbox != null && !chatbox.isHidden())
 		{
 			panelComponent.setPreferredSize(new Dimension(chatbox.getWidth(), 0));
 			plugin.getClanMessages().values().forEach(message -> panelComponent.getChildren().add(LineComponent.builder().left(message).build()));

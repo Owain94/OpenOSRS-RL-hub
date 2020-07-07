@@ -30,5 +30,6 @@ import net.runelite.client.plugins.bankedexperience.data.BankedItem;
 public interface SelectionListener extends EventListener
 {
 	boolean selected(final BankedItem item);
+
 	boolean ignored(final BankedItem item);
 }

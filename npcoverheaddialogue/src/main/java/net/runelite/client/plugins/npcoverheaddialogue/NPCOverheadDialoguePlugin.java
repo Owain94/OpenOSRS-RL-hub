@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.npcoverheaddialogue;
 
-import com.google.common.base.MoreObjects;
 import com.google.inject.Provides;
 import java.util.HashMap;
 import java.util.Map;
@@ -232,7 +231,7 @@ public class NPCOverheadDialoguePlugin extends Plugin
 	{
 		for (final NPC npc : client.getNpcs())
 		{
-			final DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(MoreObjects.firstNonNull(npc.getName(), ""));
+			final DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Objects.requireNonNullElse(npc.getName(), ""));
 			if (dialogNpc == null)
 			{
 				continue;
@@ -258,7 +257,7 @@ public class NPCOverheadDialoguePlugin extends Plugin
 
 	private void checkWalkingDialog(final NPC npc, final ActorDialogState state)
 	{
-		DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(MoreObjects.firstNonNull(npc.getName(), "")));
+		DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(Objects.requireNonNullElse(npc.getName(), "")));
 		if (dialogNpc == null)
 		{
 			return;
@@ -293,7 +292,7 @@ public class NPCOverheadDialoguePlugin extends Plugin
 
 	private void checkAmbientDialog(final NPC npc, final ActorDialogState state)
 	{
-		DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(MoreObjects.firstNonNull(npc.getName(), "")));
+		DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(Objects.requireNonNullElse(npc.getName(), "")));
 		if (dialogNpc == null)
 		{
 			return;

@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "NPC Overhead Dialog"
 project.extra["PluginDescription"] = "Displays NPC dialog over their head, includes custom ambient, walking, damage, and death dialog as well."

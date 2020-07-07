@@ -53,6 +53,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.Point;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.NpcDefinitionChanged;
 import net.runelite.api.events.NpcDespawned;
@@ -141,6 +142,31 @@ public class PetInfoPlugin extends Plugin
 			if (!pets.contains(npc))
 			{
 				pets.add(npc);
+			}
+		}
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		NPC[] cachedNPCs = client.getCachedNPCs();
+		List<NPC> validNPCs = client.getNpcs();
+		for (NPC pet : pets)
+		{
+			boolean isContained = validNPCs.contains(pet);
+			boolean isSameReference = false;
+			boolean isCached = pet == cachedNPCs[pet.getIndex()];
+			for (NPC npc : validNPCs)
+			{
+				if (npc == pet)
+				{
+					isSameReference = true;
+					break;
+				}
+			}
+			if (!isContained || !isCached || !isSameReference)
+			{
+				System.out.println("[" + System.currentTimeMillis() + "] " + pet.getName() + ": (" + pet.getId() + "):\tContained: " + isContained + "\t==: " + isSameReference + "\tIsCached: " + isCached + "\tHas Model: " + (pet.getModel() != null));
 			}
 		}
 	}

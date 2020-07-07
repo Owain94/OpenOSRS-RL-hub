@@ -5,20 +5,25 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
 import com.google.gson.stream.JsonReader;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
@@ -28,19 +33,23 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.api.Sprite;
-import net.runelite.api.SpriteID;
 import net.runelite.api.util.Text;
-import net.runelite.api.widgets.Widget;
-import net.runelite.client.callback.ClientThread;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.game.SpriteManager;
 import static net.runelite.client.plugins.resourcepacks.ResourcePacksPlugin.GITHUB;
+import static net.runelite.client.plugins.resourcepacks.ResourcePacksPlugin.OVERLAY_COLOR_CONFIG;
 import net.runelite.client.plugins.resourcepacks.event.ResourcePacksChanged;
 import net.runelite.client.plugins.resourcepacks.hub.ResourcePackManifest;
 import net.runelite.client.plugins.resourcepacks.hub.ResourcePacksClient;
+import net.runelite.api.Client;
+import net.runelite.api.SpriteID;
+import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.RuneLiteConfig;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.SpriteManager;
+import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.http.api.RuneLiteAPI;
 import okhttp3.HttpUrl;
@@ -51,6 +60,8 @@ import okhttp3.Response;
 @Slf4j
 public class ResourcePacksManager
 {
+	private final Properties colorProperties = new Properties();
+
 	@Inject
 	private Client client;
 
@@ -188,7 +199,7 @@ public class ResourcePacksManager
 					is.close();
 
 					File manifestFile = new File(ResourcePacksPlugin.RESOURCEPACKS_DIR.getPath() + File.separator + manifest.getInternalName() + File.separator + "manifest.js");
-					FileWriter manifestWriter = new FileWriter(manifestFile);
+					FileWriter manifestWriter = new FileWriter(manifestFile, StandardCharsets.UTF_8);
 					RuneLiteAPI.GSON.toJson(manifest, manifestWriter);
 					manifestWriter.close();
 					// In case of total resource folder nuke
@@ -232,7 +243,7 @@ public class ResourcePacksManager
 	private ResourcePackManifest getResourcePackManifest(File resourcePackDirectory) throws IOException
 	{
 		File manifest = new File(resourcePackDirectory.getPath() + File.separator + "manifest.js");
-		JsonReader reader = new JsonReader(new FileReader(manifest));
+		JsonReader reader = new JsonReader(new FileReader(manifest, StandardCharsets.UTF_8));
 		ResourcePackManifest packManifest = RuneLiteAPI.GSON.fromJson(reader, ResourcePackManifest.class);
 		reader.close();
 		return packManifest;
@@ -276,27 +287,122 @@ public class ResourcePacksManager
 		}
 	}
 
-	public Sprite getSpritePixels(SpriteOverride spriteOverride, String currentPackPath)
+	public List<String> getInstalledResourcePacks()
 	{
-		String folder = spriteOverride.getFolder().name().toLowerCase();
-		String name = spriteOverride.name().toLowerCase();
-		if (!folder.equals("other"))
-		{
-			name = name.replaceFirst(folder + "_", "");
-		}
+		String resourcePacksString = configManager.getConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.HUB_RESOURCEPACKS);
+		return Text.fromCSV(resourcePacksString == null ? "" : resourcePacksString);
+	}
 
+	public void install(String internalName)
+	{
+		Set<String> packs = new HashSet<>(getInstalledResourcePacks());
+		if (packs.add(internalName))
+		{
+			log.debug("Installing: " + internalName);
+			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.HUB_RESOURCEPACKS, Text.toCSV(packs));
+			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, "resourcePack", ResourcePacksConfig.ResourcePack.HUB);
 
-		String spritePath = currentPackPath + File.separator + folder + File.separator + name + ".png";
-		try
-		{
-			BufferedImage image = ImageIO.read(new File(spritePath));
-			return ImageUtil.getImageSprite(image, client);
+			executor.submit(() -> {
+				refreshPlugins();
+				setSelectedHubPack(internalName);
+			});
 		}
-		catch (RuntimeException | IOException ex)
+	}
+
+	public void remove(String internalName)
+	{
+		Set<String> packs = new HashSet<>(getInstalledResourcePacks());
+		if (packs.remove(internalName))
 		{
-			log.debug("Unable to find image (" + spritePath + "): ");
+			log.debug("Removing: " + internalName);
+			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.HUB_RESOURCEPACKS, Text.toCSV(packs));
+			if (config.selectedHubPack() != null && config.selectedHubPack().equals(internalName))
+			{
+				setSelectedHubPack("None");
+			}
+			executor.submit(this::refreshPlugins);
 		}
-		return null;
+	}
+
+	void updateAllOverrides()
+	{
+		if (!checkIfResourcePackPathIsNotEmpty())
+		{
+			return;
+		}
+		removeGameframe();
+		overrideSprites();
+		reloadColorProperties();
+		adjustWidgetDimensions(false);
+		adjustWidgetDimensions(true);
+	}
+
+	void removeGameframe()
+	{
+		restoreSprites();
+
+		BufferedImage compassImage = spriteManager.getSprite(SpriteID.COMPASS_TEXTURE, 0);
+
+		if (compassImage != null)
+		{
+			Sprite compass = ImageUtil.getImageSprite(compassImage, client);
+			client.setCompass(compass);
+		}
+	}
+
+	void adjustWidgetDimensions(boolean modify)
+	{
+		for (WidgetResize widgetResize : WidgetResize.values())
+		{
+			Widget widget = client.getWidget(widgetResize.getGroup(), widgetResize.getChild());
+
+			if (widget != null)
+			{
+				if (widgetResize.getOriginalX() != null)
+				{
+					widget.setOriginalX(modify ? widgetResize.getModifiedX() : widgetResize.getOriginalX());
+				}
+
+				if (widgetResize.getOriginalY() != null)
+				{
+					widget.setOriginalY(modify ? widgetResize.getModifiedY() : widgetResize.getOriginalY());
+				}
+
+				if (widgetResize.getOriginalWidth() != null)
+				{
+					widget.setOriginalWidth(modify ? widgetResize.getModifiedWidth() : widgetResize.getOriginalWidth());
+				}
+
+				if (widgetResize.getOriginalHeight() != null)
+				{
+					widget.setOriginalWidth(modify ? widgetResize.getModifiedHeight() : widgetResize.getOriginalHeight());
+				}
+			}
+			if (widget != null)
+			{
+				widget.revalidate();
+			}
+		}
+	}
+
+	void restoreSprites()
+	{
+		client.getWidgetSpriteCache().reset();
+
+		for (SpriteOverride spriteOverride : SpriteOverride.values())
+		{
+			if (spriteOverride.equals(SpriteOverride.LOGIN_SCREEN_BACKGROUND))
+			{
+				continue;
+			}
+			client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
+		}
+		for (TabSprites tabSprite : TabSprites.values())
+		{
+			BufferedImage image = ImageUtil.getResourceStreamFromClass(getClass(), tabSprite.getFileName());
+			Sprite sp = ImageUtil.getImageSprite(image, client);
+			client.getSpriteOverrides().put(tabSprite.getSpriteId(), sp);
+		}
 	}
 
 	public String getCurrentPackPath()
@@ -353,145 +459,32 @@ public class ResourcePacksManager
 		return true;
 	}
 
-	public List<String> getInstalledResourcePacks()
+	public Sprite getSpritePixels(SpriteOverride spriteOverride, String currentPackPath)
 	{
-		String resourcePacksString = configManager.getConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.HUB_RESOURCEPACKS);
-		return Text.fromCSV(resourcePacksString == null ? "" : resourcePacksString);
-	}
-
-	public void install(String internalName)
-	{
-		Set<String> packs = new HashSet<>(getInstalledResourcePacks());
-		if (packs.add(internalName))
+		String folder = spriteOverride.getFolder().name().toLowerCase();
+		String name = spriteOverride.name().toLowerCase();
+		if (!folder.equals("other"))
 		{
-			log.debug("Installing: " + internalName);
-			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.HUB_RESOURCEPACKS, Text.toCSV(packs));
-			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, "resourcePack", ResourcePacksConfig.ResourcePack.HUB);
-
-			executor.submit(() -> {
-				refreshPlugins();
-				setSelectedHubPack(internalName);
-			});
+			name = name.replaceFirst(folder + "_", "");
 		}
-	}
 
-	public void remove(String internalName)
-	{
-		Set<String> packs = new HashSet<>(getInstalledResourcePacks());
-		if (packs.remove(internalName))
+
+		File spriteFile = new File(currentPackPath + File.separator + folder + File.separator + name + ".png");
+		if (!spriteFile.exists())
 		{
-			log.debug("Removing: " + internalName);
-			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.HUB_RESOURCEPACKS, Text.toCSV(packs));
-			if (config.selectedHubPack() != null && config.selectedHubPack().equals(internalName))
-			{
-				setSelectedHubPack("None");
-			}
-			executor.submit(this::refreshPlugins);
+			log.debug("Sprite doesn't exist (" + spriteFile.getPath() + "): ");
+			return null;
 		}
-	}
-
-	void updateAllOverrides()
-	{
-		if (!checkIfResourcePackPathIsNotEmpty())
+		try
 		{
-			return;
+			BufferedImage image = ImageIO.read(spriteFile);
+			return ImageUtil.getImageSprite(image, client);
 		}
-		removeGameframe();
-		overrideSprites();
-		adjustWidgetDimensions(false);
-		adjustWidgetDimensions(true);
-	}
-
-	void removeGameframe()
-	{
-		restoreSprites();
-
-		BufferedImage compassImage = spriteManager.getSprite(SpriteID.COMPASS_TEXTURE, 0);
-
-		if (compassImage != null)
+		catch (RuntimeException | IOException ex)
 		{
-			Sprite compass = ImageUtil.getImageSprite(compassImage, client);
-			client.setCompass(compass);
+			log.debug("Unable to find image (" + spriteFile.getPath() + "): ");
 		}
-	}
-
-	void adjustWidgetDimensions(boolean modify)
-	{
-		for (WidgetResize widgetResize : WidgetResize.values())
-		{
-			Widget widget = client.getWidget(widgetResize.getGroup(), widgetResize.getChild());
-
-			if (widget != null)
-			{
-				if (widgetResize.getOriginalX() != null)
-				{
-					if (modify)
-					{
-						widget.setOriginalX(widgetResize.getModifiedX());
-					}
-					else
-					{
-						widget.setOriginalX(widgetResize.getOriginalX());
-					}
-				}
-
-				if (widgetResize.getOriginalY() != null)
-				{
-					if (modify)
-					{
-						widget.setOriginalY(widgetResize.getModifiedY());
-					}
-					else
-					{
-						widget.setOriginalY(widgetResize.getOriginalY());
-					}
-				}
-
-				if (widgetResize.getOriginalWidth() != null)
-				{
-					if (modify)
-					{
-						widget.setOriginalWidth(widgetResize.getModifiedWidth());
-					}
-					else
-					{
-						widget.setOriginalWidth(widgetResize.getOriginalWidth());
-					}
-				}
-
-				if (widgetResize.getOriginalHeight() != null)
-				{
-					if (modify)
-					{
-						widget.setOriginalWidth(widgetResize.getModifiedHeight());
-					}
-					else
-					{
-						widget.setOriginalWidth(widgetResize.getOriginalHeight());
-					}
-				}
-			}
-			if (widget != null)
-			{
-				widget.revalidate();
-			}
-		}
-	}
-
-	void restoreSprites()
-	{
-		client.getWidgetSpriteCache().reset();
-
-		for (SpriteOverride spriteOverride : SpriteOverride.values())
-		{
-			client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
-		}
-		for (TabSprites tabSprite : TabSprites.values())
-		{
-			BufferedImage image = ImageUtil.getResourceStreamFromClass(getClass(), tabSprite.getFileName());
-			Sprite sp = ImageUtil.getImageSprite(image, client);
-			client.getSpriteOverrides().put(tabSprite.getSpriteId(), sp);
-		}
+		return null;
 	}
 
 	void overrideSprites()
@@ -500,6 +493,17 @@ public class ResourcePacksManager
 		for (SpriteOverride spriteOverride : SpriteOverride.values())
 		{
 			Sprite spritePixels = getSpritePixels(spriteOverride, currentPackPath);
+			if (config.allowLoginScreen() && spriteOverride == SpriteOverride.LOGIN_SCREEN_BACKGROUND)
+			{
+				if (spritePixels != null)
+				{
+					client.setLoginScreen(spritePixels);
+				}
+				else
+				{
+					resetLoginScreen();
+				}
+			}
 			if (spritePixels == null)
 			{
 				continue;
@@ -517,6 +521,60 @@ public class ResourcePacksManager
 				}
 				client.getSpriteOverrides().put(spriteOverride.getSpriteID(), spritePixels);
 			}
+		}
+	}
+
+	void resetLoginScreen()
+	{
+		ConfigChanged loginScreenConfigChanged = new ConfigChanged();
+		loginScreenConfigChanged.setGroup("loginscreen");
+		loginScreenConfigChanged.setKey("loginScreen");
+		loginScreenConfigChanged.setOldValue(null);
+		loginScreenConfigChanged.setNewValue("");
+		eventBus.post(ConfigChanged.class, loginScreenConfigChanged);
+	}
+
+	void reloadColorProperties()
+	{
+		colorProperties.clear();
+		File colorPropertiesFile = new File(getCurrentPackPath() + "/color.properties");
+		try (InputStream in = new FileInputStream(colorPropertiesFile))
+		{
+			colorProperties.load(in);
+		}
+		catch (IOException e)
+		{
+			log.debug("Color properties not found");
+			resetOverlayColor();
+			return;
+		}
+		if (config.allowOverlayColor())
+		{
+			changeOverlayColor();
+		}
+		// Add more properties
+	}
+
+	void changeOverlayColor()
+	{
+		if (configManager.getConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR) == null)
+		{
+			configManager.setConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR,
+				configManager.getConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG));
+		}
+		ResourcePacksPlugin.setIgnoreOverlayConfig(true);
+		Color overlayColor = ColorUtil.fromHex(colorProperties.getProperty("overlay_color"));
+		configManager.setConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG, overlayColor);
+		ResourcePacksPlugin.setIgnoreOverlayConfig(false);
+	}
+
+	void resetOverlayColor()
+	{
+		if (configManager.getConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR) != null)
+		{
+			configManager.setConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG,
+				configManager.getConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR));
+			configManager.unsetConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR);
 		}
 	}
 }

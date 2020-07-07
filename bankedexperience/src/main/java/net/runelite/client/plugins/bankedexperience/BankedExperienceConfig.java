@@ -50,4 +50,37 @@ public interface BankedExperienceConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "grabFromInventory",
+		name = "Include player inventory",
+		description = "Toggles whether the items inside your inventory will be included in the calculations",
+		position = 5
+	)
+	default boolean grabFromInventory()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "grabFromLootingBag",
+		name = "Include looting bag",
+		description = "Toggles whether the items stored inside your Looting Bag will be included in the calculations",
+		position = 6
+	)
+	default boolean grabFromLootingBag()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "includeRngActivities",
+		name = "Include RNG activities",
+		description = "Toggles whether activities with exp values that are effected by RNG will be shown in the calculator",
+		position = 7
+	)
+	default boolean includeRngActivities()
+	{
+		return false;
+	}
 }

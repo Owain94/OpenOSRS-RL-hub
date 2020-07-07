@@ -25,7 +25,6 @@
 
 package net.runelite.client.plugins.wikibanktagintegration;
 
-import com.google.common.base.MoreObjects;
 import com.google.gson.Gson;
 import com.google.inject.Provides;
 import java.io.IOException;
@@ -33,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -171,7 +171,7 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	 */
 	List<String> getAllTabs()
 	{
-		return Text.fromCSV(MoreObjects.firstNonNull(configManager.getConfiguration(CONFIG_GROUP, TAG_TABS_CONFIG), ""));
+		return Text.fromCSV(Objects.requireNonNullElse(configManager.getConfiguration(CONFIG_GROUP, TAG_TABS_CONFIG), ""));
 	}
 
 	/**
