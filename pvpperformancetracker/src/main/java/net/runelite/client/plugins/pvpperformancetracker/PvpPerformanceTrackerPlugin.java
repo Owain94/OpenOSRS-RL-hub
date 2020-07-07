@@ -425,7 +425,7 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 		try
 		{
 			File fightHistoryData = new File(FIGHT_HISTORY_DATA_DIR, FIGHT_HISTORY_DATA_FNAME);
-			Writer writer = new FileWriter(fightHistoryData);
+			Writer writer = new FileWriter(fightHistoryData, StandardCharsets.UTF_8);
 			gson.toJson(fightHistory, writer);
 			writer.flush();
 			writer.close();
@@ -483,7 +483,7 @@ public class PvpPerformanceTrackerPlugin extends Plugin
 
 			// read the saved fights from the file
 			List<FightPerformance> savedFights = Arrays.asList(
-				gson.fromJson(new FileReader(fightHistoryData), FightPerformance[].class));
+				gson.fromJson(new FileReader(fightHistoryData, StandardCharsets.UTF_8), FightPerformance[].class));
 
 			fightHistory.clear();
 			fights(savedFights);

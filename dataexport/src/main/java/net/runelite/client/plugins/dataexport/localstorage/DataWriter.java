@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import static net.runelite.client.RuneLite.RUNELITE_DIR;
@@ -73,7 +74,7 @@ public class DataWriter
 
 		try
 		{
-			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), false));
+			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), StandardCharsets.UTF_8, false));
 			for (Map.Entry<Integer, DataExportItem> item : items.entrySet())
 			{
 				// Convert entry to JSON
@@ -99,7 +100,7 @@ public class DataWriter
 
 		try
 		{
-			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), false));
+			final BufferedWriter file = new BufferedWriter(new FileWriter(String.valueOf(lootFile), StandardCharsets.UTF_8, false));
 			for (Map.Entry<Integer, DataExportItem> item : items.entrySet())
 			{
 				// Convert entry to CSV

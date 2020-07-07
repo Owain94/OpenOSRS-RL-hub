@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -143,7 +144,7 @@ public class FriendsExporterPlugin extends Plugin
 		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Friends " + format(new Date()) + ".txt";
 		purgeList(fileName);
 		Friend array[] = this.client.getFriendContainer().getMembers();
-		FileWriter writer = new FileWriter(fileName, true);
+		FileWriter writer = new FileWriter(fileName, StandardCharsets.UTF_8, true);
 		for (int x = 0; x != this.client.getFriendContainer().getMembers().length; x++)
 		{
 			String friendName = array[x].getName();
@@ -174,7 +175,7 @@ public class FriendsExporterPlugin extends Plugin
 		Widget[] temp2 = null;
 		temp = this.client.getWidget(94, 28);
 		temp2 = temp.getChildren();
-		FileWriter writer = new FileWriter(fileName, true);
+		FileWriter writer = new FileWriter(fileName, StandardCharsets.UTF_8, true);
 		for (int x = 0; x < temp2.length / 4; x++)
 		{
 			String rank = temp2[(x * 4) + 1].getText();
@@ -220,7 +221,7 @@ public class FriendsExporterPlugin extends Plugin
 		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Ignore " + format(new Date()) + ".txt";
 		purgeList(fileName);
 		Ignore array[] = this.client.getIgnoreContainer().getMembers();
-		FileWriter writer = new FileWriter(fileName, true);
+		FileWriter writer = new FileWriter(fileName, StandardCharsets.UTF_8, true);
 		for (int x = 0; x != this.client.getIgnoreContainer().getMembers().length; x++)
 		{
 			String friendName = array[x].getName();

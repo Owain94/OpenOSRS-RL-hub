@@ -1,9 +1,9 @@
 package net.runelite.client.plugins.influxdb;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -195,7 +195,7 @@ public class MeasurementCreator
 			))
 			.numericValue("questPoints", client.getVar(VarPlayer.QUEST_POINTS))
 			.numericValue("skulled", local.getSkullIcon() != null ? 1 : 0)
-			.stringValue("name", MoreObjects.firstNonNull(local.getName(), "none"))
+			.stringValue("name", Objects.requireNonNullElse(local.getName(), "none"))
 			.stringValue("overhead", local.getOverheadIcon() != null ? local.getOverheadIcon().name() : "NONE")
 			.build();
 	}

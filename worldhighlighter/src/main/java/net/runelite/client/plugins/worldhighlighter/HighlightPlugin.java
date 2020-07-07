@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.worldhighlighter;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Provides;
 import java.awt.Color;
@@ -10,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.util.List;
+import java.util.Objects;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -177,7 +177,7 @@ public class HighlightPlugin extends Plugin
 
 	void highlightWidget(Graphics2D graphics, Widget toHighlight, Widget container, Rectangle padding, String text)
 	{
-		padding = (Rectangle) MoreObjects.firstNonNull(padding, new Rectangle());
+		padding = Objects.requireNonNullElse(padding, new Rectangle());
 		Point canvasLocation = toHighlight.getCanvasLocation();
 		if (canvasLocation != null && container != null)
 		{

@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.0.5"
 
 project.extra["PluginName"] = "Bank Tag Generation"
 project.extra["PluginDescription"] = "Allows the creation of bank tags from categories on the offical OSRS wiki"
