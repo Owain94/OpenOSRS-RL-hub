@@ -80,7 +80,7 @@ public class ResourcePacksPlugin extends Plugin
 		clientThread.invokeLater(resourcePacksManager::updateAllOverrides);
 
 		resourcePacksHubPanel = injector.getInstance(ResourcePacksHubPanel.class);
-		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "/panel.png");
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "panel.png");
 
 		navButton = NavigationButton.builder()
 			.tooltip("Resource packs hub")
