@@ -27,6 +27,8 @@
 package net.runelite.client.plugins.smartmetronome;
 
 import com.google.inject.Provides;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import net.runelite.api.Client;
@@ -66,90 +68,179 @@ public class SmartMetronomePlugin extends Plugin
 		return configManager.getConfig(SmartMetronomeConfig.class);
 	}
 
+	private int previousID;
+	private int previousPlane;
 	private int tickCounter = 0;
+	private boolean inventoryItems;
+	private boolean shouldTickTock;
 	private boolean shouldTock = false;
-	private boolean willTickManipulate;
 	private final int[] herbSet = {249, 255, 251, 253};
 	private final int[] vambSet = {1065, 2487, 2489, 2491};
+	private final Map<Integer, Integer> METRONOME_REGIONS = new HashMap<>();
 
-	private static final Set<Integer> BOSS_REGIONS = Set.of(
-		11851, 11850, 12363, 12362, // Abyssal Sire
+	@Override
+	protected void startUp()
+	{
+		setRegions();
+		previousID = -1;
+		previousPlane = -1;
+		inventoryItems = false;
+	}
+
+	@Override
+	protected void shutDown()
+	{
+		tickCounter = 0;
+		shouldTock = false;
+	}
+
+	public void setRegions()
+	{
+		//Abyssal Sire
+		METRONOME_REGIONS.put(11851, 0);
+		METRONOME_REGIONS.put(11850, 0);
+		METRONOME_REGIONS.put(12363, 0);
+		METRONOME_REGIONS.put(12362, 0);
+
+		// Blast Furnace
+		METRONOME_REGIONS.put(7757, 0);
+
+		// Brimhaven Agility
+		METRONOME_REGIONS.put(11157, 3);
+
+		// Cerberus
+		METRONOME_REGIONS.put(4883, 0);
+		METRONOME_REGIONS.put(5140, 0);
+		METRONOME_REGIONS.put(5395, 0);
+
+		// Commander Zilyana
+		METRONOME_REGIONS.put(11602, 0);
+
+		// Corp
+		METRONOME_REGIONS.put(11842, 2);
+		METRONOME_REGIONS.put(11844, 2);
+
+		// DKs
+		METRONOME_REGIONS.put(11588, 0);
+		METRONOME_REGIONS.put(11589, 0);
+
+		// General Graardor
+		METRONOME_REGIONS.put(11347, 2);
+
+		// Giant Mole
+		METRONOME_REGIONS.put(6993, 0);
+		METRONOME_REGIONS.put(6992, 0);
+
+		// K'ril Tsutsaroth
+		METRONOME_REGIONS.put(11603, 2);
+
+		// Kalphite Queen
+		METRONOME_REGIONS.put(13972, 0);
+
+		// Kree'arra
+		METRONOME_REGIONS.put(11346, 2);
+
+		// Pyramid Plunder
+		METRONOME_REGIONS.put(7749, 0);
+
+		// Sarachnis
+		METRONOME_REGIONS.put(7322, 0);
+
+		// Thermonuclear Smoke Devil
+		METRONOME_REGIONS.put(9363, 0);
+		METRONOME_REGIONS.put(9619, 0);
+
+		// Vorkath
+		METRONOME_REGIONS.put(9023, 0);
+
+		// Wintertodt
+		METRONOME_REGIONS.put(6462, 0);
+
+		// Zalcano
+		METRONOME_REGIONS.put(12126, 0);
+
+		// Zulrah
+		METRONOME_REGIONS.put(9007, 0);
+	}
+
+	private static final Set<Integer> INSTANCE_REGIONS = Set.of(
 		5536, // Alchemical Hydra
-		4883, 5140, 5395, // Cerberus
-		11602, // Commander Zilyana
-		11588, 11589, // Dagannoth Kings
-		11347, // General Graardor
-		6993, 6992, // Giant Mole
-		6727, // Grotesque Guardians
-		11603, // K'ril Tsutsaroth
-		13972, // Kalphite Queen
-		11346, // Kree'arra
-		15515, // Nightmare of Ashihama
-		7322, // Sarachnis
-		6810, // Skotizo
-		9363, 9619, // Thermonuclear smoke devil
-		9023, // Vorkath
-		6462, // Wintertodt
-		12126, // Zalcano
-		9007 // Zulrah
-	);
-
-	private static final Set<Integer> MINIGAME_REGIONS = Set.of(
-		10332, // Barbarian Assault
-		14131, 14231, // Barrows
-		7757, // Blast Furnace
-		11157, // Brimhaven agility
-		9520, // Castle Wars
+		14231, // Barrows
 		9551, // Fight Cave
 		7512, 7768, // Gauntlet
+		6727, // Grotesque Guardians
 		8797, 9051, 9052, 9053, 9054, 9309, 9563, 9821, 10074, 10075, 10077, // Hallowed Sepulchre
 		9043, // Inferno
-		13660, 13659, 13658, 13916, 13915, 13914, // Last Man Standing
+		15515, // Nightmare
 		10536, // Pest Control
-		7749, // Pyramid Plunder
-		6968, // Tithe Farm
-		15263, 15262 // Volcanic Mine
+		6810, // Skotizo
+		7222, // Tithe Farm
+		15263, 15262, // Volcanic Mine
+		9023 // Vorkath
 	);
 
-	private static final Set<Integer> MUTE_METRONOME_IDS = Set.of(
-		9565 // Sepulchre Lobby
+	private static final Set<Integer> MUTE_REGIONS = Set.of(
+		12106, 12107, // Abyss
+		11412, 11413, 11414, 10901, 10899, 10900, 10645, // Agility Arena
+		13619, 13874, 13875, 13876, 14130, 14488, 14232, 14487,  // Barrows
+		5139, // Cerberus lobby
+		11586, 11587, 11841, 11843, 11845, 12097, 12098, 12099, 12100, 12101, // Corp
+		9808, 9807, 9552, // Fight Cave
+		5535, 5280, 5279, 5023, 5278, // Hydra
+		14387, 14388, 14132, // Meyerditch/Darkmeyer
+		10537, // Pest Control
+		7492, 7748, // Pyramid Plunder
+		7323, // Sarachnis
+		9565, // Sepulchre Lobby
+		6710, 6711, 7224, 7478, 7479, 7223, 6965, 6967, 6966, 7221, // Tithe Farm
+		15008, 15264, 15519, 15775, // Volcanic Mine
+		6205, 6461, 6717 // Wintertodt
 	);
 
 	private boolean muteMetronomeIDs()
 	{
-		return MUTE_METRONOME_IDS.contains(client.getLocalPlayer().getWorldLocation().getRegionID());
+		return MUTE_REGIONS.contains(client.getLocalPlayer().getWorldLocation().getRegionID());
 	}
 
-	private boolean isInMinigame()
+	private boolean metronomeIDs()
 	{
-		for (int mapregion : client.getMapRegions())
+		if (METRONOME_REGIONS.containsKey(client.getLocalPlayer().getWorldLocation().getRegionID()))
 		{
-			if (MINIGAME_REGIONS.contains(mapregion))
+			if (METRONOME_REGIONS.get(client.getLocalPlayer().getWorldLocation().getRegionID()) == client.getLocalPlayer().getWorldLocation().getPlane())
 			{
 				return true;
 			}
+		}
+
+		muteMetronomeIDs();
+		return false;
+	}
+
+	private boolean isInInstance()
+	{
+		for (int mapregion : client.getMapRegions())
+		{
 			if (muteMetronomeIDs())
 			{
 				return false;
+			}
+
+			if (INSTANCE_REGIONS.contains(mapregion))
+			{
+				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean isInBoss()
+	private boolean varbits()
 	{
-		for (int mapregion : client.getMapRegions())
-		{
-			if (BOSS_REGIONS.contains(mapregion))
-			{
-				return true;
-			}
-			if (muteMetronomeIDs())
-			{
-				return false;
-			}
-		}
-		return false;
+		boolean inCoX = client.getVar(Varbits.IN_RAID) == 1;
+		boolean inBA = client.getVar(Varbits.IN_GAME_BA) == 1;
+		boolean inPvP = client.getVar(Varbits.PVP_SPEC_ORB) == 1;
+		boolean inToB = client.getVar(Varbits.THEATRE_OF_BLOOD) == 2;
+
+		return inCoX || inBA || inPvP || inToB;
 	}
 
 	public void tickTock()
@@ -175,19 +266,6 @@ public class SmartMetronomePlugin extends Plugin
 		}
 	}
 
-	@Override
-	protected void startUp()
-	{
-		willTickManipulate = false;
-	}
-
-	@Override
-	protected void shutDown()
-	{
-		tickCounter = 0;
-		shouldTock = false;
-	}
-
 	@Subscribe
 	public void onItemContainerChanged(final ItemContainerChanged event)
 	{
@@ -197,38 +275,53 @@ public class SmartMetronomePlugin extends Plugin
 		}
 
 		ItemContainer itemContainer = event.getItemContainer();
-		willTickManipulate = false;
+		inventoryItems = false;
 
 		for (int Herb : herbSet)
 		{
-			for (int Vamb : vambSet)
+			if (itemContainer.contains(Herb) && itemContainer.contains(ItemID.SWAMP_TAR) && itemContainer.contains(ItemID.PESTLE_AND_MORTAR))
 			{
-				if ((itemContainer.contains(Herb) && itemContainer.contains(ItemID.SWAMP_TAR))
-					|| (itemContainer.contains(Vamb) && itemContainer.contains(ItemID.KEBBIT_CLAWS))
-					|| (itemContainer.contains(ItemID.KNIFE) && itemContainer.contains(ItemID.TEAK_LOGS)))
-				{
-					willTickManipulate = true;
-					break;
-				}
+				inventoryItems = true;
+				break;
 			}
+		}
+
+		for (int Vamb : vambSet)
+		{
+			if (itemContainer.contains(Vamb) && itemContainer.contains(ItemID.KEBBIT_CLAWS))
+			{
+				inventoryItems = true;
+				break;
+			}
+		}
+
+		if (itemContainer.contains(ItemID.KNIFE) && itemContainer.contains(ItemID.TEAK_LOGS))
+		{
+			inventoryItems = true;
 		}
 	}
 
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
-		boolean inCoX = client.getVar(Varbits.IN_RAID) == 1;
-		boolean inToB = client.getVar(Varbits.THEATRE_OF_BLOOD) == 2;
-		boolean inPvP = client.getVar(Varbits.PVP_SPEC_ORB) == 1;
-
 		if (config.tickCount() == 0)
 		{
 			return;
 		}
-		if (config.smartMetronome() && (isInMinigame() || isInBoss() || inCoX || inToB || inPvP || willTickManipulate))
+
+		if (client.getLocalPlayer().getWorldLocation().getRegionID() != previousID
+			|| client.getLocalPlayer().getWorldLocation().getPlane() != previousPlane)
+		{
+			previousID = client.getLocalPlayer().getWorldLocation().getRegionID();
+			previousPlane = client.getLocalPlayer().getWorldLocation().getPlane();
+			shouldTickTock = (metronomeIDs() || isInInstance());
+		}
+
+		if (config.smartMetronome() && (shouldTickTock || inventoryItems || varbits()))
 		{
 			tickTock();
 		}
+
 		else if (!config.smartMetronome())
 		{
 			tickTock();
