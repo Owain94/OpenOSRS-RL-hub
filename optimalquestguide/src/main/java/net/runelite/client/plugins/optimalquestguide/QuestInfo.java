@@ -41,6 +41,10 @@ public class QuestInfo
 
 	@Getter
 	@Setter
+	private QuestRequirement[] reqs;
+
+	@Getter
+	@Setter
 	private QuestState questState;
 
 	@Getter

@@ -149,7 +149,7 @@ public class FriendsExporterPlugin extends Plugin
 		{
 			String friendName = array[x].getName();
 			String prevName = "";
-			if (!StringUtils.isEmpty(array[x].getPrevName()))
+			if (!StringUtils.isEmpty(array[x].getPrevName()) && this.config.prevName())
 			{
 				prevName = array[x].getPrevName();
 			}
@@ -187,7 +187,7 @@ public class FriendsExporterPlugin extends Plugin
 					String friendName = array[y].getName();
 					if (friendName.equals(temp2[(x * 4) + 2].getText()))
 					{
-						if (!StringUtils.isEmpty(array[y].getPrevName()))
+						if (!StringUtils.isEmpty(array[y].getPrevName()) && this.config.prevName())
 						{
 							prevName = array[y].getPrevName();
 						}
@@ -226,7 +226,7 @@ public class FriendsExporterPlugin extends Plugin
 		{
 			String friendName = array[x].getName();
 			String prevName = "";
-			if (!StringUtils.isEmpty(array[x].getPrevName()))
+			if (!StringUtils.isEmpty(array[x].getPrevName()) && this.config.prevName())
 			{
 				prevName = array[x].getPrevName();
 			}
@@ -251,18 +251,13 @@ public class FriendsExporterPlugin extends Plugin
 
 	private String toWrite(Integer Num, String firstName, String lastName, String rank)
 	{
+		firstName = firstName.replace('\u00A0', ' ');
+		lastName = lastName.replace('\u00A0', ' ');
+
 		String export = "";
-		String Separator = "";
 		String Role = "";
-		if (this.config.Separator() == "")
-		{
-			Separator = "-";
-		}
-		else
-		{
-			Separator = this.config.Separator();
-		}
-		if (this.config.newLine())
+		String Separator = this.config.Separator();
+		if (this.config.newLine() && this.config.prevName())
 		{
 			Separator = "\n" + Separator;
 		}

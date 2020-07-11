@@ -19,10 +19,21 @@ public interface FriendsExporterConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "prev",
+		name = "Show Previous Names",
+		description = "Shows the previous name if available.",
+		position = 2
+	)
+	default boolean prevName()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "separator",
 		name = "Name Separator",
 		description = "Separator between current and previous names.",
-		position = 2
+		position = 3
 	)
 	default String Separator()
 	{
@@ -33,7 +44,7 @@ public interface FriendsExporterConfig extends Config
 		keyName = "unrank",
 		name = "Show unranked players",
 		description = "Shows players that do not have a rank but are still friends in ranks export.",
-		position = 3
+		position = 4
 	)
 	default boolean showUnranked()
 	{
@@ -44,7 +55,7 @@ public interface FriendsExporterConfig extends Config
 		keyName = "line",
 		name = "Separate lines",
 		description = "Separates entrys with new lines.",
-		position = 4
+		position = 5
 	)
 	default boolean newLine()
 	{

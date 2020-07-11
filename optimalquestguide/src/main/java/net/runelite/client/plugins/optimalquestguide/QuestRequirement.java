@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020, Christopher Oswald <https://github.com/cesoun>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,22 +22,40 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.optimalquestguide;
 
-version = "0.0.14"
+import java.awt.image.BufferedImage;
+import lombok.Getter;
+import lombok.Setter;
+import net.runelite.api.Skill;
+import net.runelite.client.game.SkillIconManager;
+import net.runelite.client.util.ImageUtil;
 
-project.extra["PluginName"] = "Friends Exporter"
-project.extra["PluginDescription"] = "Adds a right click option to the friends tab that allows exporting of either friends or ignore list"
+public class QuestRequirement
+{
 
-tasks {
-    jar {
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+	@Setter
+	private String skill;
+
+	@Getter
+	@Setter
+	private int level;
+
+	@Getter
+	@Setter
+	private boolean boostable;
+
+	public BufferedImage getIcon()
+	{
+		if (this.skill.equalsIgnoreCase("quest points"))
+		{
+			return ImageUtil.getResourceStreamFromClass(GuidePlugin.class, "quest_point.png");
+		}
+		else if (this.skill.equalsIgnoreCase("combat level"))
+		{
+			return ImageUtil.getResourceStreamFromClass(GuidePlugin.class, "combat_level.png");
+		}
+
+		return new SkillIconManager().getSkillImage(Skill.valueOf(skill.toUpperCase()), true);
+	}
 }

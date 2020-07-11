@@ -78,7 +78,7 @@ public enum Rock
 	TRAHAEARN_1("PRIF1", "Trahaearn (Prifddinas mine)", new WorldPoint(3284, 12459, 0), ObjectID.ROCKS_36209, ObjectID.ROCKS_36202),
 	TRAHAEARN_2("PRIF2", "Trahaearn (Prifddinas mine)", new WorldPoint(3287, 12455, 0), ObjectID.ROCKS_36209, ObjectID.ROCKS_36202),
 	TRAHAEARN_3("PRIF3", "Trahaearn (Prifddinas mine)", new WorldPoint(3291, 12441, 0), ObjectID.ROCKS_36209, ObjectID.ROCKS_36202),
-	TRAHAEARN_4("PRIF4", "Trahaearn (Prifddinas mine)", new WorldPoint(3302, 12438, 0), ObjectID.ROCKS_36209, ObjectID.ROCKS_36202),
+	TRAHAEARN_4("PRIF4", "Trahaearn (Prifddinas mine)", new WorldPoint(3301, 12438, 0), ObjectID.ROCKS_36209, ObjectID.ROCKS_36202),
 	;
 
 	public static final Duration RESPAWN_TIME = Duration.ofMinutes(12);
