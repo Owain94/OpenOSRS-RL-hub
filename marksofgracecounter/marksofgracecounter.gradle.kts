@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.11"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Resource packs"
-project.extra["PluginDescription"] = "Allows you to change the look of the UI in runescape"
+project.extra["PluginName"] = "Marks of Grace Counter"
+project.extra["PluginDescription"] = "Counts Marks of Grace spawns"
 
 tasks {
     jar {

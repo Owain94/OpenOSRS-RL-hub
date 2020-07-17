@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.11"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Resource packs"
-project.extra["PluginDescription"] = "Allows you to change the look of the UI in runescape"
+project.extra["PluginName"] = "Gnome Restaurant"
+project.extra["PluginDescription"] = "Add quality-of-life features to the Gnome Restaurant minigame"
 
 tasks {
     jar {

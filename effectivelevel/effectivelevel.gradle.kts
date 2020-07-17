@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.11"
+version = "0.0.3"
 
-project.extra["PluginName"] = "Resource packs"
-project.extra["PluginDescription"] = "Allows you to change the look of the UI in runescape"
+project.extra["PluginName"] = "Effective Levels"
+project.extra["PluginDescription"] = "Shows the invisible effective boosted combat skill levels in the skills tab"
 
 tasks {
     jar {

@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.11"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Resource packs"
-project.extra["PluginDescription"] = "Allows you to change the look of the UI in runescape"
+project.extra["PluginName"] = "H.A.M Store Rooms"
+project.extra["PluginDescription"] = "Highlights chests which you have keys for in the H.A.M Store Rooms"
 
 tasks {
     jar {
