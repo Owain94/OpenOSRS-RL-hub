@@ -23,17 +23,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Death Indicator"
-project.extra["PluginDescription"] = "Show where you last died, and on what world"
+project.extra["PluginName"] = "Marks of Grace Counter"
+project.extra["PluginDescription"] = "Counts Marks of Grace spawns"
 
 tasks {
     jar {
         manifest {
             attributes(mapOf(
                     "Plugin-Version" to project.version,
-                    "Plugin-Id" to "hub-" + nameToId(project.extra["PluginName"] as String),
+                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
                     "Plugin-Description" to project.extra["PluginDescription"],
                     "Plugin-License" to project.extra["PluginLicense"]

@@ -150,17 +150,11 @@ public class SmartMetronomePlugin extends Plugin
 		METRONOME_REGIONS.put(9363, 0);
 		METRONOME_REGIONS.put(9619, 0);
 
-		// Vorkath
-		METRONOME_REGIONS.put(9023, 0);
-
 		// Wintertodt
 		METRONOME_REGIONS.put(6462, 0);
 
 		// Zalcano
 		METRONOME_REGIONS.put(12126, 0);
-
-		// Zulrah
-		METRONOME_REGIONS.put(9007, 0);
 	}
 
 	private static final Set<Integer> INSTANCE_REGIONS = Set.of(
@@ -176,7 +170,8 @@ public class SmartMetronomePlugin extends Plugin
 		6810, // Skotizo
 		7222, // Tithe Farm
 		15263, 15262, // Volcanic Mine
-		9023 // Vorkath
+		9023, // Vorkath
+		9007 // Zulrah
 	);
 
 	private static final Set<Integer> MUTE_REGIONS = Set.of(
@@ -194,7 +189,8 @@ public class SmartMetronomePlugin extends Plugin
 		9565, // Sepulchre Lobby
 		6710, 6711, 7224, 7478, 7479, 7223, 6965, 6967, 6966, 7221, // Tithe Farm
 		15008, 15264, 15519, 15775, // Volcanic Mine
-		6205, 6461, 6717 // Wintertodt
+		6205, 6461, 6717, // Wintertodt
+		8495, 8496, 8751, 8752, 9008, 9263, 9264, 9265 // Zulrah
 	);
 
 	private boolean muteMetronomeIDs()
