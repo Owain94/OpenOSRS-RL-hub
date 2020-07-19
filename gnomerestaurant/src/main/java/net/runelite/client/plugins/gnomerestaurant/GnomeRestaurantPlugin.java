@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
-import javax.inject.Named;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -168,9 +167,6 @@ public class GnomeRestaurantPlugin extends Plugin
 
 	// Order status
 
-	@Inject
-	@Named("developerMode")
-	boolean developerMode;
 	private boolean isDeliveryForTesting = false;
 
 	private boolean isTrackingDelivery = false;
@@ -956,9 +952,8 @@ public class GnomeRestaurantPlugin extends Plugin
 	@Subscribe
 	public void onCommandExecuted(CommandExecuted commandExecuted)
 	{
-		// Must be in developer mode to send command
 
-		if (!developerMode || !commandExecuted.getCommand().equals("gnome") || commandExecuted.getArguments().length < 1)
+		if (!commandExecuted.getCommand().equals("gnome") || commandExecuted.getArguments().length < 1)
 		{
 			return;
 		}
