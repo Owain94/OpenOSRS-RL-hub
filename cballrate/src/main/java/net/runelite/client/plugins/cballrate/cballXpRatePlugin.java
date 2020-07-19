@@ -20,6 +20,7 @@ import net.runelite.api.events.ProjectileMoved;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
@@ -28,7 +29,8 @@ import org.pf4j.Extension;
 	name = "cballxprate",
 	description = "Calculates Slayer and Ranged XP gained per cannonball used",
 	tags = {"experience", "levels", "cannon", "cannonballs", "slayer", "overlay"},
-	enabledByDefault = false
+	enabledByDefault = false,
+	type = PluginType.UTILITY
 )
 public class cballXpRatePlugin extends Plugin
 {
