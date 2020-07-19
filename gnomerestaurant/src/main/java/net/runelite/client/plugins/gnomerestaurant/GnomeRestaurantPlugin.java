@@ -168,9 +168,6 @@ public class GnomeRestaurantPlugin extends Plugin
 
 	// Order status
 
-	@Inject
-	@Named("developerMode")
-	boolean developerMode;
 	private boolean isDeliveryForTesting = false;
 
 	private boolean isTrackingDelivery = false;
@@ -956,9 +953,8 @@ public class GnomeRestaurantPlugin extends Plugin
 	@Subscribe
 	public void onCommandExecuted(CommandExecuted commandExecuted)
 	{
-		// Must be in developer mode to send command
 
-		if (!developerMode || !commandExecuted.getCommand().equals("gnome") || commandExecuted.getArguments().length < 1)
+		if (!commandExecuted.getCommand().equals("gnome") || commandExecuted.getArguments().length < 1)
 		{
 			return;
 		}
