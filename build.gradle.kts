@@ -55,7 +55,7 @@ subprojects {
 
     dependencies {
         annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
-        annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.3.1")
+        annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.4.0")
 
         compileOnly(group = "com.openosrs", name = "http-api", version = "3.4.0")
         compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.4.0")
@@ -68,9 +68,9 @@ subprojects {
         compileOnly(group = "net.sf.jopt-simple", name = "jopt-simple", version = "5.0.4")
         compileOnly(group = "org.projectlombok", name = "lombok", version = "1.18.12")
         compileOnly(group = "com.squareup.okhttp3", name = "okhttp", version = "4.8.0")
-        compileOnly(group = "org.pf4j", name = "pf4j", version = "3.3.1")
+        compileOnly(group = "org.pf4j", name = "pf4j", version = "3.4.0")
         compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.4")
-        compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "2.5.1")
+        compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "3.0.0")
     }
 
     checkstyle {
