@@ -5,7 +5,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
 import com.google.gson.stream.JsonReader;
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,7 +18,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +35,7 @@ import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Sprite;
 import net.runelite.api.util.Text;
@@ -42,6 +46,7 @@ import net.runelite.client.plugins.resourcepacks.hub.ResourcePackManifest;
 import net.runelite.client.plugins.resourcepacks.hub.ResourcePacksClient;
 import net.runelite.api.Client;
 import net.runelite.api.SpriteID;
+import net.runelite.api.IndexedSprite;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -60,6 +65,7 @@ import okhttp3.Response;
 @Slf4j
 public class ResourcePacksManager
 {
+	@Getter
 	private final Properties colorProperties = new Properties();
 
 	@Inject
@@ -199,7 +205,7 @@ public class ResourcePacksManager
 					is.close();
 
 					File manifestFile = new File(ResourcePacksPlugin.RESOURCEPACKS_DIR.getPath() + File.separator + manifest.getInternalName() + File.separator + "manifest.js");
-					FileWriter manifestWriter = new FileWriter(manifestFile, StandardCharsets.UTF_8);
+					FileWriter manifestWriter = new FileWriter(manifestFile);
 					RuneLiteAPI.GSON.toJson(manifest, manifestWriter);
 					manifestWriter.close();
 					// In case of total resource folder nuke
@@ -243,7 +249,7 @@ public class ResourcePacksManager
 	private ResourcePackManifest getResourcePackManifest(File resourcePackDirectory) throws IOException
 	{
 		File manifest = new File(resourcePackDirectory.getPath() + File.separator + "manifest.js");
-		JsonReader reader = new JsonReader(new FileReader(manifest, StandardCharsets.UTF_8));
+		JsonReader reader = new JsonReader(new FileReader(manifest));
 		ResourcePackManifest packManifest = RuneLiteAPI.GSON.fromJson(reader, ResourcePackManifest.class);
 		reader.close();
 		return packManifest;
@@ -333,6 +339,7 @@ public class ResourcePacksManager
 		removeGameframe();
 		overrideSprites();
 		reloadColorProperties();
+		applyWidgetOverrides();
 		adjustWidgetDimensions(false);
 		adjustWidgetDimensions(true);
 	}
@@ -478,6 +485,10 @@ public class ResourcePacksManager
 		try
 		{
 			BufferedImage image = ImageIO.read(spriteFile);
+			if (config.colorPack() != null)
+			{
+				image = dye(image, config.colorPack());
+			}
 			return ImageUtil.getImageSprite(image, client);
 		}
 		catch (RuntimeException | IOException ex)
@@ -490,38 +501,46 @@ public class ResourcePacksManager
 	void overrideSprites()
 	{
 		String currentPackPath = getCurrentPackPath();
-		for (SpriteOverride spriteOverride : SpriteOverride.values())
-		{
-			Sprite spritePixels = getSpritePixels(spriteOverride, currentPackPath);
-			if (config.allowLoginScreen() && spriteOverride == SpriteOverride.LOGIN_SCREEN_BACKGROUND)
+		SpriteOverride.getOverrides().asMap().forEach((key, collection) -> {
+			if (!Files.isDirectory(Paths.get(currentPackPath + File.separator + key.name().toLowerCase())) ||
+				(!config.allowSpellsPrayers() && (key.name().contains("SPELL") || key.equals(SpriteOverride.Folder.PRAYER))))
 			{
-				if (spritePixels != null)
+				return;
+			}
+
+			for (SpriteOverride spriteOverride : collection)
+			{
+				Sprite spritePixels = getSpritePixels(spriteOverride, currentPackPath);
+				if (config.allowLoginScreen() && spriteOverride == SpriteOverride.LOGIN_SCREEN_BACKGROUND)
 				{
-					client.setLoginScreen(spritePixels);
+					if (spritePixels != null)
+					{
+						client.setLoginScreen(spritePixels);
+					}
+					else
+					{
+						resetLoginScreen();
+					}
+				}
+				if (spritePixels == null)
+				{
+					continue;
+				}
+
+				if (spriteOverride.getSpriteID() == SpriteID.COMPASS_TEXTURE)
+				{
+					client.setCompass(spritePixels);
 				}
 				else
 				{
-					resetLoginScreen();
+					if (spriteOverride.getSpriteID() < -200)
+					{
+						client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
+					}
+					client.getSpriteOverrides().put(spriteOverride.getSpriteID(), spritePixels);
 				}
 			}
-			if (spritePixels == null)
-			{
-				continue;
-			}
-
-			if (spriteOverride.getSpriteID() == SpriteID.COMPASS_TEXTURE)
-			{
-				client.setCompass(spritePixels);
-			}
-			else
-			{
-				if (spriteOverride.getSpriteID() < -200)
-				{
-					client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
-				}
-				client.getSpriteOverrides().put(spriteOverride.getSpriteID(), spritePixels);
-			}
-		}
+		});
 	}
 
 	void resetLoginScreen()
@@ -563,7 +582,15 @@ public class ResourcePacksManager
 				configManager.getConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG));
 		}
 		ResourcePacksPlugin.setIgnoreOverlayConfig(true);
-		Color overlayColor = ColorUtil.fromHex(colorProperties.getProperty("overlay_color"));
+		Color overlayColor;
+		if (config.colorPack() != null && config.colorPack().getAlpha() != 0)
+		{
+			overlayColor = config.colorPack();
+		}
+		else
+		{
+			overlayColor = ColorUtil.fromHex(colorProperties.getProperty("overlay_color"));
+		}
 		configManager.setConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG, overlayColor);
 		ResourcePacksPlugin.setIgnoreOverlayConfig(false);
 	}
@@ -575,6 +602,83 @@ public class ResourcePacksManager
 			configManager.setConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG,
 				configManager.getConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR));
 			configManager.unsetConfiguration(ResourcePacksConfig.GROUP_NAME, ResourcePacksConfig.ORIGINAL_OVERLAY_COLOR);
+		}
+	}
+
+	private BufferedImage dye(BufferedImage image, Color color)
+	{
+		int w = image.getWidth();
+		int h = image.getHeight();
+		BufferedImage dyed = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = dyed.createGraphics();
+		g.drawImage(image, 0, 0, null);
+		g.setComposite(AlphaComposite.SrcAtop);
+		g.setColor(color);
+		g.fillRect(0, 0, w, h);
+		g.dispose();
+		return dyed;
+	}
+
+	private void applyWidgetOverrides()
+	{
+		if (colorProperties.isEmpty())
+		{
+			return;
+		}
+
+		for (WidgetOverride widgetOverride : WidgetOverride.values())
+		{
+			addPropertyToWidget(widgetOverride);
+		}
+	}
+
+	public void addPropertyToWidget(WidgetOverride widgetOverride)
+	{
+		int property;
+		if (colorProperties.containsKey(widgetOverride.name().toLowerCase()))
+		{
+			String widgetProperty = colorProperties.getProperty(widgetOverride.name().toLowerCase());
+			if (!widgetProperty.isEmpty())
+			{
+				property = Integer.decode(widgetProperty);
+			}
+			else
+			{
+				property = widgetOverride.getDefaultColor();
+			}
+		}
+		else
+		{
+			property = widgetOverride.getDefaultColor();
+		}
+
+		for (Integer childId : widgetOverride.getWidgetChildIds())
+		{
+			Widget widgetToOverride = client.getWidget(widgetOverride.getWidgetGroupId(), childId);
+			if (widgetToOverride == null)
+			{
+				continue;
+			}
+
+			if (widgetOverride.getWidgetArrayIds()[0] != -1)
+			{
+				for (int arrayId : widgetOverride.getWidgetArrayIds())
+				{
+					Widget arrayWidget = widgetToOverride.getChild(arrayId);
+					if (arrayWidget == null || arrayWidget.getTextColor() == -1)
+					{
+						continue;
+					}
+					arrayWidget.setTextColor(property);
+				}
+			}
+			else
+			{
+				if (widgetToOverride.getTextColor() != -1)
+				{
+					widgetToOverride.setTextColor(property);
+				}
+			}
 		}
 	}
 }
