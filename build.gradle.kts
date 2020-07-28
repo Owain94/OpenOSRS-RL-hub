@@ -57,9 +57,9 @@ subprojects {
         annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
         annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.3.1")
 
-        compileOnly(group = "com.openosrs", name = "http-api", version = "3.4.0")
-        compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.4.0")
-        compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.4.0")
+        compileOnly(group = "com.openosrs", name = "http-api", version = "3.4.1")
+        compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.4.1")
+        compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.4.1")
 
         compileOnly(group = "org.apache.commons", name = "commons-text", version = "1.8")
         compileOnly(group = "com.google.guava", name = "guava", version = "29.0-jre")
