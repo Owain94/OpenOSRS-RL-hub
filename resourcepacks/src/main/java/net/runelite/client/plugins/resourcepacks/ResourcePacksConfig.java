@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.resourcepacks;
 
+import java.awt.Color;
+import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -28,6 +30,17 @@ public interface ResourcePacksConfig extends Config
 		position = 0
 	)
 	default Title resourcePackPaths()
+	{
+		return new Title();
+	}
+
+	@ConfigTitleSection(
+		keyName = "advancedOptions",
+		name = "Advanced options",
+		description = "Do not touch if you don't know what you are doing",
+		position = 8
+	)
+	default Title advancedOptions()
 	{
 		return new Title();
 	}
@@ -100,6 +113,27 @@ public interface ResourcePacksConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "allowSpellsPrayers",
+		name = "Allow spells/prayers to be changed",
+		description = "Gives permissions for resource packs to change your spells and prayers icons",
+		position = 7
+	)
+	default boolean allowSpellsPrayers()
+	{
+		return true;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "colorPack",
+		name = "Color current pack",
+		description = "Allows you to apply a color overlay over the currently selected resource pack",
+		position = 8,
+		titleSection = "advancedOptions"
+	)
+	Color colorPack();
 
 	@ConfigItem(
 		keyName = "selectedHubPack",
