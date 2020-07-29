@@ -25,7 +25,6 @@
  */
 package net.runelite.client.plugins.resourcepacks;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

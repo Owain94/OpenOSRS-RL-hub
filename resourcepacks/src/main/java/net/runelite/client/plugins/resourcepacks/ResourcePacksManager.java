@@ -18,6 +18,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -46,7 +47,6 @@ import net.runelite.client.plugins.resourcepacks.hub.ResourcePackManifest;
 import net.runelite.client.plugins.resourcepacks.hub.ResourcePacksClient;
 import net.runelite.api.Client;
 import net.runelite.api.SpriteID;
-import net.runelite.api.IndexedSprite;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -205,7 +205,7 @@ public class ResourcePacksManager
 					is.close();
 
 					File manifestFile = new File(ResourcePacksPlugin.RESOURCEPACKS_DIR.getPath() + File.separator + manifest.getInternalName() + File.separator + "manifest.js");
-					FileWriter manifestWriter = new FileWriter(manifestFile);
+					FileWriter manifestWriter = new FileWriter(manifestFile, StandardCharsets.UTF_8);
 					RuneLiteAPI.GSON.toJson(manifest, manifestWriter);
 					manifestWriter.close();
 					// In case of total resource folder nuke
@@ -249,7 +249,7 @@ public class ResourcePacksManager
 	private ResourcePackManifest getResourcePackManifest(File resourcePackDirectory) throws IOException
 	{
 		File manifest = new File(resourcePackDirectory.getPath() + File.separator + "manifest.js");
-		JsonReader reader = new JsonReader(new FileReader(manifest));
+		JsonReader reader = new JsonReader(new FileReader(manifest, StandardCharsets.UTF_8));
 		ResourcePackManifest packManifest = RuneLiteAPI.GSON.fromJson(reader, ResourcePackManifest.class);
 		reader.close();
 		return packManifest;
