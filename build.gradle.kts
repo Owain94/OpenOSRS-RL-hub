@@ -69,7 +69,7 @@ subprojects {
         compileOnly(group = "org.projectlombok", name = "lombok", version = "1.18.12")
         compileOnly(group = "com.squareup.okhttp3", name = "okhttp", version = "4.8.0")
         compileOnly(group = "org.pf4j", name = "pf4j", version = "3.4.0")
-        compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.4")
+        compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.5")
         compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "3.0.0")
     }
 
