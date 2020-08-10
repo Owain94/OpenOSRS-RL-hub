@@ -116,7 +116,7 @@ public enum Pet
 	DARK_CORE(PetGroup.BOSS, NpcID.DARK_CORE, Pet.DARK_CORE_INFO),    // Not sure this is the pet dark core, but it looks right
 	DARK_CORE_388(PetGroup.BOSS, NpcID.DARK_CORE_388, Pet.DARK_CORE_INFO),
 
-	DARK_SQUIRREL(PetGroup.BOSS, NpcID.DARK_SQUIRREL, Pet.GIANT_SQUIRREL_INFO + Pet.DARK_Giant_SQUIRREL),	// Thank you to Gamma91/Bram91 on gitHub for the info
+	DARK_SQUIRREL(PetGroup.BOSS, NpcID.DARK_SQUIRREL, Pet.GIANT_SQUIRREL_INFO + Pet.DARK_Giant_SQUIRREL),    // Thank you to Gamma91/Bram91 on gitHub for the info
 	DARK_SQUIRREL_9638(PetGroup.BOSS, NpcID.DARK_SQUIRREL_9638, Pet.GIANT_SQUIRREL_INFO + Pet.DARK_Giant_SQUIRREL),
 
 	EEK(PetGroup.OTHER, NpcID.EEK, Pet.EEK_INFO),
@@ -494,7 +494,7 @@ public enum Pet
 	private static final String HELLPUPPY_INFO = "is dropped by Cerberus, at a rate of 1/3000.";
 	private static final String HERBI_INFO = "is obtained by harvesting Herbiboars, at a rate of 1/6500.";
 	private static final String HERON_INFO = "is obtained while training Fishing.";
-	private static final String IKKLE_HYDRA_INFO = "is dropped by Alchemical Hydra, at a rate of 1/300.";
+	private static final String IKKLE_HYDRA_INFO = "is dropped by Alchemical Hydra, at a rate of 1/3000.";
 	private static final String JALNIBREK_INFO = "is obtained by completing the inferno, at a rate of 1/100 (or 1/75 while on a TzKal-Zuk tast).";
 	private static final String KALPHITE_PRINCESS_INFO = "is dropped by Kalphite Queen, at a rate of 1/3000.";
 	private static final String KITTEN_INFO = "can be bought from Gertrude for 100gp, after completing the Gertrude's Cat quest.";
@@ -518,7 +518,7 @@ public enum Pet
 	private static final String ROCK_GOLEM_INFO = "is obtained while training Mining.";
 	private static final String ROCKY_INFO = "is obtained while training Thieving.";
 	private static final String SCORPIAS_OFFSPRING_INFO = "is dropped by Scorpia, at a rate of 1/2,015.75";
-	private static final String SKOTOS_INFO = "is ropped by Skotizo, at a rate of 1/65.";
+	private static final String SKOTOS_INFO = "is dropped by Skotizo, at a rate of 1/65.";
 	private static final String SMOKE_DEVIL_INFO = "is dropped by the Thermonuclear smoke devil, at a rate of 1/3000.";
 	private static final String SMOLCANO_INFO = "is dropped by Zalcano, at a rate of 1/2250.";
 	private static final String SNAKELING_INFO = "is dropped by Zulrah, at a rate of 1/4000.";

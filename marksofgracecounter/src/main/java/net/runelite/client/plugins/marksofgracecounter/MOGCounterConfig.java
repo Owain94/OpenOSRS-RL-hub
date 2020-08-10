@@ -28,6 +28,7 @@ package net.runelite.client.plugins.marksofgracecounter;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 
 @ConfigGroup("mogcounter")
@@ -44,10 +45,14 @@ public interface MOGCounterConfig extends Config
 		return true;
 	}
 
+	@Range(
+		min = 1,
+		max = 60
+	)
 	@ConfigItem(
 		keyName = "markTimeout",
 		name = "Hide Overlay",
-		description = "Time until the Marks of Grace Counter hides/resets (Uses 'Last Mark Time')",
+		description = "Time until the Marks of Grace Counter hides/resets (Uses 'Last Spawn Time')",
 		position = 2
 	)
 	@Units(Units.MINUTES)

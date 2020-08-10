@@ -33,7 +33,6 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -83,7 +82,6 @@ import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.banktags.tabs.BankSearch;
 import net.runelite.client.plugins.inventorysetups.ui.InventorySetupPluginPanel;
 import net.runelite.client.plugins.inventorysetups.ui.InventorySetupSlot;
 import net.runelite.client.plugins.runepouch.Runes;
@@ -111,6 +109,7 @@ public class InventorySetupPlugin extends Plugin
 	public static final String CONFIG_GROUP = "inventorysetups";
 	public static final String CONFIG_KEY = "setups";
 	public static final String CONFIG_KEY_COMPACT_MODE = "compactMode";
+	public static final String CONFIG_KEY_SORTING_MODE = "sortingMode";
 	public static final String CONFIG_KEY_HIDE_BUTTON = "hideHelpButton";
 	public static final String INV_SEARCH = "inv:";
 	public static final String LABEL_SEARCH = "Inv. Setup";
@@ -160,7 +159,7 @@ public class InventorySetupPlugin extends Plugin
 	private NavigationButton navButton;
 
 	@Inject
-	private BankSearch bankSearch;
+	private InventorySetupBankSearch bankSearch;
 
 	@Inject
 	private KeyManager keyManager;
@@ -189,7 +188,7 @@ public class InventorySetupPlugin extends Plugin
 		@Override
 		public void hotkeyPressed()
 		{
-			panel.returnToOverviewPanel();
+			panel.returnToOverviewPanel(false);
 		}
 	};
 
@@ -211,7 +210,7 @@ public class InventorySetupPlugin extends Plugin
 					return false;
 				}
 
-				doBankSearch(InputType.SEARCH, false);
+				doBankSearch(InputType.SEARCH);
 				return true;
 			});
 		}
@@ -228,9 +227,10 @@ public class InventorySetupPlugin extends Plugin
 	{
 		if (event.getGroup().equals(CONFIG_GROUP))
 		{
-			if (event.getKey().equals(CONFIG_KEY_COMPACT_MODE) || event.getKey().equals(CONFIG_KEY_HIDE_BUTTON))
+			if (event.getKey().equals(CONFIG_KEY_COMPACT_MODE) || event.getKey().equals(CONFIG_KEY_HIDE_BUTTON) ||
+				event.getKey().equals(CONFIG_KEY_SORTING_MODE))
 			{
-				panel.rebuild();
+				panel.rebuild(true);
 			}
 		}
 	}
@@ -250,6 +250,7 @@ public class InventorySetupPlugin extends Plugin
 			return;
 		}
 
+		// Adds menu entries to show worn items button
 		if (event.getOption().equals("Show worn items"))
 		{
 			MenuEntry[] menuEntries = client.getMenuEntries();
@@ -283,6 +284,11 @@ public class InventorySetupPlugin extends Plugin
 		configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY_COMPACT_MODE, compactMode);
 	}
 
+	public void toggleAlphabeticalMode(InventorySetupSorting mode)
+	{
+		configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY_SORTING_MODE, mode);
+	}
+
 	@Override
 	public void startUp()
 	{
@@ -314,7 +320,7 @@ public class InventorySetupPlugin extends Plugin
 			loadConfig();
 
 			SwingUtilities.invokeLater(() ->
-				panel.rebuild());
+				panel.rebuild(true));
 
 			return true;
 		});
@@ -347,7 +353,7 @@ public class InventorySetupPlugin extends Plugin
 
 			int spellbook = getCurrentSpellbook();
 
-			final InventorySetup invSetup = new InventorySetup(inv, eqp, runePouchData, name,
+			final InventorySetup invSetup = new InventorySetup(inv, eqp, runePouchData, name, "",
 				config.highlightColor(),
 				config.highlightStackDifference(),
 				config.highlightVariationDifference(),
@@ -359,35 +365,17 @@ public class InventorySetupPlugin extends Plugin
 		});
 	}
 
-	public void moveSetupDown(final InventorySetup setup)
+	public void moveSetup(int invIndex, int newPosition)
 	{
-		int invIndex = inventorySetups.indexOf(setup);
-		assert invIndex >= 0 && invIndex < inventorySetups.size();
-
-		// return if this is setup is at the bottom. It cant be moved further
-		if (invIndex == inventorySetups.size() - 1)
+		// Setup is already in the specified position or is out of position
+		if (invIndex == newPosition || newPosition < 0 || newPosition >= inventorySetups.size())
 		{
 			return;
 		}
 
-		Collections.swap(inventorySetups, invIndex, invIndex + 1);
-		panel.rebuild();
-		updateConfig();
-	}
-
-	public void moveSetupUp(final InventorySetup setup)
-	{
-		int invIndex = inventorySetups.indexOf(setup);
-		assert invIndex >= 0 && invIndex < inventorySetups.size();
-
-		// return if this is setup is at the top. It cant be moved further
-		if (invIndex == 0)
-		{
-			return;
-		}
-
-		Collections.swap(inventorySetups, invIndex, invIndex - 1);
-		panel.rebuild();
+		InventorySetup setup = inventorySetups.remove(invIndex);
+		inventorySetups.add(newPosition, setup);
+		panel.rebuild(false);
 		updateConfig();
 	}
 
@@ -399,19 +387,19 @@ public class InventorySetupPlugin extends Plugin
 			.collect(Collectors.toList());
 	}
 
-	public void doBankSearch(InputType type, boolean ignoreFilter)
+	public void doBankSearch(InputType type)
 	{
 		final InventorySetup currentSelectedSetup = panel.getCurrentSelectedSetup();
 
-		if (currentSelectedSetup != null && (ignoreFilter || currentSelectedSetup.isFilterBank()))
+		if (currentSelectedSetup != null && currentSelectedSetup.isFilterBank())
 		{
-			client.setVarbit(Varbits.CURRENT_BANK_TAB, 0);
-			bankSearch.search(type, INV_SEARCH + currentSelectedSetup.getName(), true);
-
 			// When tab is selected with search window open, the search window closes but the search button
 			// stays highlighted, this solves that issue
 			clientThread.invoke(() ->
 			{
+				client.setVarbit(Varbits.CURRENT_BANK_TAB, 0);
+				bankSearch.search(type, INV_SEARCH + currentSelectedSetup.getName(), true);
+
 				Widget bankContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
 				if (bankContainer != null && !bankContainer.isHidden())
 				{
@@ -432,7 +420,7 @@ public class InventorySetupPlugin extends Plugin
 			&& client.getVar(VarClientInt.INPUT_TYPE) == InputType.NONE.getType()
 			&& !bankIsFiltered())
 		{
-			doBankSearch(InputType.NONE, false);
+			doBankSearch(InputType.NONE);
 			doBankSearchOnNextGameTick = false;
 		}
 	}
@@ -445,7 +433,7 @@ public class InventorySetupPlugin extends Plugin
 			if (event.getParam1() == WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND.getId()
 				&& event.getOption().equals(LABEL_SEARCH))
 			{
-				doBankSearch(InputType.SEARCH, true);
+				doBankSearch(InputType.SEARCH);
 				return;
 			}
 
@@ -460,12 +448,21 @@ public class InventorySetupPlugin extends Plugin
 
 			if (event.getOption().equals(RETURN_TO_OVERVIEW_ENTRY))
 			{
-				panel.returnToOverviewPanel();
+				panel.returnToOverviewPanel(false);
 			}
 		}
 
 		if (panel.getCurrentSelectedSetup() == null)
 		{
+			return;
+		}
+
+		if (event.getParam1() == WidgetInfo.BANK_ITEM_CONTAINER.getId() && event.getOption().startsWith("View tab"))
+		{
+			if (config.disableBankTabBar())
+			{
+				event.consume();
+			}
 			return;
 		}
 
@@ -518,7 +515,7 @@ public class InventorySetupPlugin extends Plugin
 				int value = client.getVarcIntValue(386);
 				if (value == 0)
 				{
-					doBankSearch(InputType.SEARCH, false);
+					doBankSearch(InputType.SEARCH);
 				}
 			});
 		}
@@ -782,6 +779,15 @@ public class InventorySetupPlugin extends Plugin
 
 	}
 
+	public void updateNotesInSetup(final InventorySetup setup, final String text)
+	{
+		clientThread.invokeLater(() ->
+		{
+			setup.updateNotes(text);
+			updateConfig();
+		});
+	}
+
 	public void removeInventorySetup(final InventorySetup setup)
 	{
 		int confirm = JOptionPane.showConfirmDialog(panel,
@@ -794,7 +800,7 @@ public class InventorySetupPlugin extends Plugin
 		}
 
 		inventorySetups.remove(setup);
-		panel.rebuild();
+		panel.rebuild(false);
 		updateConfig();
 	}
 
@@ -816,7 +822,7 @@ public class InventorySetupPlugin extends Plugin
 			{
 				loadConfig();
 				SwingUtilities.invokeLater(() ->
-					panel.rebuild());
+					panel.rebuild(true));
 
 				return true;
 			});
@@ -831,7 +837,7 @@ public class InventorySetupPlugin extends Plugin
 		{
 			loadConfig();
 			SwingUtilities.invokeLater(() ->
-				panel.rebuild());
+				panel.rebuild(true));
 
 			return true;
 		});
@@ -876,6 +882,8 @@ public class InventorySetupPlugin extends Plugin
 				return getNormalizedContainer(InventoryID.INVENTORY);
 			case EQUIPMENT:
 				return getNormalizedContainer(InventoryID.EQUIPMENT);
+			case RUNE_POUCH:
+				return getRunePouchData();
 			default:
 				assert false : "Wrong slot ID!";
 				return null;
@@ -964,6 +972,10 @@ public class InventorySetupPlugin extends Plugin
 				{
 					newSetup.updateRunePouch(getRunePouchData());
 				}
+				if (newSetup.getNotes() == null)
+				{
+					newSetup.updateNotes("");
+				}
 				addInventorySetupClientThread(newSetup);
 			});
 		}
@@ -995,6 +1007,10 @@ public class InventorySetupPlugin extends Plugin
 		if (slot.getSlotID() == InventorySetupSlotID.EQUIPMENT)
 		{
 			container = slot.getParentSetup().getEquipment();
+		}
+		else if (slot.getSlotID() == InventorySetupSlotID.RUNE_POUCH)
+		{
+			container = slot.getParentSetup().getRune_pouch();
 		}
 
 		assert slot.getParentSetup() == panel.getCurrentSelectedSetup() : "Setup Mismatch";
@@ -1029,6 +1045,10 @@ public class InventorySetupPlugin extends Plugin
 						{
 							setup.updateRunePouch(getRunePouchData());
 						}
+						if (setup.getNotes() == null)
+						{
+							setup.updateNotes("");
+						}
 					}
 				});
 			}
@@ -1044,7 +1064,7 @@ public class InventorySetupPlugin extends Plugin
 		SwingUtilities.invokeLater(() ->
 		{
 			inventorySetups.add(newSetup);
-			panel.rebuild();
+			panel.rebuild(true);
 
 			updateConfig();
 		});

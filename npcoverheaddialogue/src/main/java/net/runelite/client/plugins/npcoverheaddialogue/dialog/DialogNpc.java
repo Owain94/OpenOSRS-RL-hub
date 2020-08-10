@@ -9,48 +9,50 @@ import org.apache.commons.lang3.ArrayUtils;
 @Getter
 public enum DialogNpc
 {
-	CLEANER("Cleaner", DialogCategories.CLEANER),
+	CLEANER("Cleaner", -1, DialogCategories.CLEANER),
 
-	DRAKE("Drake", DialogCategories.DUCKS),
-	DUCK("Duck", DialogCategories.DUCKS),
-	DUCKLING("Duckling", DialogCategories.DUCKS),
+	DRAKE("Drake", 2004, DialogCategories.DUCKS),
+	DUCK("Duck", -1, DialogCategories.DUCKS),
+	DUCKLING("Duckling", -1, DialogCategories.DUCKS),
 
-	FISHING_SPOT("Fishing spot", DialogCategories.FISHING_SPOT),
-	ROD_FISHING_SPOT("Rod Fishing spot", DialogCategories.FISHING_SPOT),
+	FISHING_SPOT("Fishing spot", -1, DialogCategories.FISHING_SPOT),
+	ROD_FISHING_SPOT("Rod Fishing spot", -1, DialogCategories.FISHING_SPOT),
 
-	BLACK_SWAN("Black swan", DialogCategories.HONKING_BIRDS),
-	CORMORANT("Cormorant", DialogCategories.HONKING_BIRDS),
-	GOOSE("Goose", DialogCategories.HONKING_BIRDS),
-	SWAN("Swan", DialogCategories.HONKING_BIRDS),
+	BLACK_SWAN("Black swan", -1, DialogCategories.HONKING_BIRDS),
+	CORMORANT("Cormorant", -1, DialogCategories.HONKING_BIRDS),
+	GOOSE("Goose", -1, DialogCategories.HONKING_BIRDS),
+	SWAN("Swan", -1, DialogCategories.HONKING_BIRDS),
 
-	RELDO("Reldo", DialogCategories.LIBRARIAN),
+	RELDO("Reldo", -1, DialogCategories.LIBRARIAN),
 
-	LENNY("Lenny", DialogCategories.LENNY),
+	LENNY("Lenny", -1, DialogCategories.LENNY),
 
-	BABY_MOLE("Baby Mole", DialogCategories.MID_SIZED_RODENTS),
-	RABBIT("Rabbit", DialogCategories.MID_SIZED_RODENTS),
-	RED_PANDA("Red Panda", DialogCategories.MID_SIZED_RODENTS),
-	SQUIRREL("Squirrel", DialogCategories.MID_SIZED_RODENTS),
+	BABY_MOLE("Baby Mole", -1, DialogCategories.MID_SIZED_RODENTS),
+	RABBIT("Rabbit", -1, DialogCategories.MID_SIZED_RODENTS),
+	RED_PANDA("Red Panda", -1, DialogCategories.MID_SIZED_RODENTS),
+	SQUIRREL("Squirrel", -1, DialogCategories.MID_SIZED_RODENTS),
 
-	PIG("Pig", DialogCategories.PIGS),
-	PIGLET("Piglet", DialogCategories.PIGS),
+	PIG("Pig", -1, DialogCategories.PIGS),
+	PIGLET("Piglet", -1, DialogCategories.PIGS),
 
-	GIANT_RAT("Giant rat", DialogCategories.RATS),
-	RAT("Rat", DialogCategories.RATS),
+	GIANT_RAT("Giant rat", -1, DialogCategories.RATS),
+	RAT("Rat", -1, DialogCategories.RATS),
 
-	GULLS("Gull", DialogCategories.SEAGULLS),
-	PELICAN("Pelican", DialogCategories.SEAGULLS),
-	SEAGULL("Seagull", DialogCategories.SEAGULLS),
+	GULLS("Gull", -1, DialogCategories.SEAGULLS),
+	PELICAN("Pelican", -1, DialogCategories.SEAGULLS),
+	SEAGULL("Seagull", -1, DialogCategories.SEAGULLS),
 
-	GARGOYLE("Gargoyle", DialogCategories.SKELETONS),
-	SKELETON("Skeleton", DialogCategories.SKELETONS);
+	GARGOYLE("Gargoyle", -1, DialogCategories.SKELETONS),
+	SKELETON("Skeleton", -1, DialogCategories.SKELETONS);
 
 	private final String npcName;
+	private final int npcID;
 	private final DialogCategories[] dialogCategories;
 
-	DialogNpc(final String npcName, DialogCategories... dialogCategories)
+	DialogNpc(final String npcName, final int npcID, DialogCategories... dialogCategories)
 	{
 		this.npcName = npcName;
+		this.npcID = npcID;
 		this.dialogCategories = dialogCategories;
 	}
 
@@ -61,7 +63,16 @@ public enum DialogNpc
 		ImmutableMap.Builder<String, DialogNpc> builder = new ImmutableMap.Builder<>();
 		for (final DialogNpc n : values())
 		{
-			builder.put(n.getNpcName().toUpperCase(), n);
+			String d;
+			if (n.getNpcID() != -1)
+			{
+				d = Integer.toString(n.getNpcID());
+			}
+			else
+			{
+				d = n.getNpcName().toUpperCase();
+			}
+			builder.put(d, n);
 		}
 		NAME_MAP = builder.build();
 	}
@@ -75,6 +86,12 @@ public enum DialogNpc
 	public static DialogNpc getDialogNpcsByNpcName(final String npcName)
 	{
 		return NAME_MAP.get(npcName.toUpperCase());
+	}
+
+	@Nullable
+	public static DialogNpc getDialogNpcsByNpcID(final int npcID)
+	{
+		return NAME_MAP.get(npcID);
 	}
 
 	@Nullable

@@ -53,7 +53,7 @@ class MOGSession
 	private final Map<WorldPoint, Integer> markTiles = new HashMap<>();
 	private final Set<WorldPoint> ignoreTiles = new HashSet<>();
 	private boolean isDirty;
-	private EvictingQueue<Duration> markSpawnTimes = EvictingQueue.create(10);
+	private EvictingQueue<Duration> markSpawnTimes = EvictingQueue.create(20);
 
 	void addMarkTile(WorldPoint point, int markCount)
 	{
@@ -80,7 +80,7 @@ class MOGSession
 		ignoreTiles.remove(point);
 	}
 
-	void checkMarkSpawned()
+	synchronized void checkMarkSpawned()
 	{
 		if (!isDirty)
 		{

@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.resourcepacks;
 
+import java.awt.Color;
+import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -79,11 +81,23 @@ public interface ResourcePacksConfig extends Config
 		return "";
 	}
 
+	@ConfigTitleSection(
+		keyName = "overritesTitle",
+		name = "Overrites",
+		description = "",
+		position = 5
+	)
+	default Title overritesTitle()
+	{
+		return new Title();
+	}
+
 	@ConfigItem(
 		keyName = "allowLoginScreen",
 		name = "Allow login screen to be changed",
 		description = "Gives permissions for resource packs to change your login screen",
-		position = 5
+		position = 6,
+		titleSection = "overritesTitle"
 	)
 	default boolean allowLoginScreen()
 	{
@@ -94,12 +108,46 @@ public interface ResourcePacksConfig extends Config
 		keyName = "allowOverlayColor",
 		name = "Allow overlay color to be changed",
 		description = "Gives permissions for resource packs to change your overlays color",
-		position = 6
+		position = 7,
+		titleSection = "overritesTitle"
 	)
 	default boolean allowOverlayColor()
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "allowSpellsPrayers",
+		name = "Allow spells/prayers to be changed",
+		description = "Gives permissions for resource packs to change your spells and prayers icons",
+		position = 8,
+		titleSection = "overritesTitle"
+	)
+	default boolean allowSpellsPrayers()
+	{
+		return true;
+	}
+
+	@ConfigTitleSection(
+		keyName = "advancedTitle",
+		name = "Advanced options",
+		description = "",
+		position = 9
+	)
+	default Title advancedTitle()
+	{
+		return new Title();
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "colorPack",
+		name = "Color current pack",
+		description = "Allows you to apply a color overlay over the currently selected resource pack",
+		position = 10,
+		titleSection = "advancedTitle"
+	)
+	Color colorPack();
 
 	@ConfigItem(
 		keyName = "selectedHubPack",
