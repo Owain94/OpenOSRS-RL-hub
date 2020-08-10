@@ -23,21 +23,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    `kotlin-dsl`
-}
+version = "0.0.1"
 
-repositories {
-    jcenter()
-}
+project.extra["PluginName"] = "Cox Light Colors"
+project.extra["PluginDescription"] = "change the cox loot light color"
 
-dependencies {
-    implementation(gradleApi())
-    implementation(group = "org.json", name = "json", version = "20190722")
-    implementation(group = "com.savvasdalkitsis", name = "json-merge", version = "0.0.4")
-    implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.8.1")
-}
-
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
+tasks {
+    jar {
+        manifest {
+            attributes(mapOf(
+                    "Plugin-Version" to project.version,
+                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
+                    "Plugin-Provider" to project.extra["PluginProvider"],
+                    "Plugin-Description" to project.extra["PluginDescription"],
+                    "Plugin-License" to project.extra["PluginLicense"]
+            ))
+        }
+    }
 }

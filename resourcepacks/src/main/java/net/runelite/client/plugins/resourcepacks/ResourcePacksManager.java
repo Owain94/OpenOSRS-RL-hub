@@ -18,7 +18,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -36,6 +35,7 @@ import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Sprite;
@@ -64,6 +64,7 @@ import okhttp3.Response;
 @Slf4j
 public class ResourcePacksManager
 {
+	@Getter
 	private final Properties colorProperties = new Properties();
 
 	@Inject
@@ -203,7 +204,7 @@ public class ResourcePacksManager
 					is.close();
 
 					File manifestFile = new File(ResourcePacksPlugin.RESOURCEPACKS_DIR.getPath() + File.separator + manifest.getInternalName() + File.separator + "manifest.js");
-					FileWriter manifestWriter = new FileWriter(manifestFile, StandardCharsets.UTF_8);
+					FileWriter manifestWriter = new FileWriter(manifestFile);
 					RuneLiteAPI.GSON.toJson(manifest, manifestWriter);
 					manifestWriter.close();
 					// In case of total resource folder nuke
@@ -247,7 +248,7 @@ public class ResourcePacksManager
 	private ResourcePackManifest getResourcePackManifest(File resourcePackDirectory) throws IOException
 	{
 		File manifest = new File(resourcePackDirectory.getPath() + File.separator + "manifest.js");
-		JsonReader reader = new JsonReader(new FileReader(manifest, StandardCharsets.UTF_8));
+		JsonReader reader = new JsonReader(new FileReader(manifest));
 		ResourcePackManifest packManifest = RuneLiteAPI.GSON.fromJson(reader, ResourcePackManifest.class);
 		reader.close();
 		return packManifest;
@@ -337,6 +338,7 @@ public class ResourcePacksManager
 		removeGameframe();
 		overrideSprites();
 		reloadColorProperties();
+		applyWidgetOverrides();
 		adjustWidgetDimensions(false);
 		adjustWidgetDimensions(true);
 	}
@@ -463,7 +465,7 @@ public class ResourcePacksManager
 		return true;
 	}
 
-	public Sprite getSpritePixels(SpriteOverride spriteOverride, String currentPackPath)
+	public Sprite getSprite(SpriteOverride spriteOverride, String currentPackPath)
 	{
 		String folder = spriteOverride.getFolder().name().toLowerCase();
 		String name = spriteOverride.name().toLowerCase();
@@ -507,26 +509,26 @@ public class ResourcePacksManager
 
 			for (SpriteOverride spriteOverride : collection)
 			{
-				Sprite spritePixels = getSpritePixels(spriteOverride, currentPackPath);
+				Sprite Sprite = getSprite(spriteOverride, currentPackPath);
 				if (config.allowLoginScreen() && spriteOverride == SpriteOverride.LOGIN_SCREEN_BACKGROUND)
 				{
-					if (spritePixels != null)
+					if (Sprite != null)
 					{
-						client.setLoginScreen(spritePixels);
+						client.setLoginScreen(Sprite);
 					}
 					else
 					{
 						resetLoginScreen();
 					}
 				}
-				if (spritePixels == null)
+				if (Sprite == null)
 				{
 					continue;
 				}
 
 				if (spriteOverride.getSpriteID() == SpriteID.COMPASS_TEXTURE)
 				{
-					client.setCompass(spritePixels);
+					client.setCompass(Sprite);
 				}
 				else
 				{
@@ -534,7 +536,7 @@ public class ResourcePacksManager
 					{
 						client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
 					}
-					client.getSpriteOverrides().put(spriteOverride.getSpriteID(), spritePixels);
+					client.getSpriteOverrides().put(spriteOverride.getSpriteID(), Sprite);
 				}
 			}
 		});
@@ -588,6 +590,7 @@ public class ResourcePacksManager
 		{
 			overlayColor = ColorUtil.fromHex(colorProperties.getProperty("overlay_color"));
 		}
+
 		configManager.setConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG, overlayColor);
 		ResourcePacksPlugin.setIgnoreOverlayConfig(false);
 	}
@@ -614,5 +617,68 @@ public class ResourcePacksManager
 		g.fillRect(0, 0, w, h);
 		g.dispose();
 		return dyed;
+	}
+
+	private void applyWidgetOverrides()
+	{
+		if (colorProperties.isEmpty())
+		{
+			return;
+		}
+
+		for (WidgetOverride widgetOverride : WidgetOverride.values())
+		{
+			addPropertyToWidget(widgetOverride);
+		}
+	}
+
+	public void addPropertyToWidget(WidgetOverride widgetOverride)
+	{
+		int property;
+		if (colorProperties.containsKey(widgetOverride.name().toLowerCase()))
+		{
+			String widgetProperty = colorProperties.getProperty(widgetOverride.name().toLowerCase());
+			if (!widgetProperty.isEmpty())
+			{
+				property = Integer.decode(widgetProperty);
+			}
+			else
+			{
+				property = widgetOverride.getDefaultColor();
+			}
+		}
+		else
+		{
+			property = widgetOverride.getDefaultColor();
+		}
+
+		for (Integer childId : widgetOverride.getWidgetChildIds())
+		{
+			Widget widgetToOverride = client.getWidget(widgetOverride.getWidgetGroupId(), childId);
+			if (widgetToOverride == null)
+			{
+				continue;
+			}
+
+			if (widgetOverride.getWidgetArrayIds()[0] != -1)
+			{
+				for (int arrayId : widgetOverride.getWidgetArrayIds())
+				{
+					Widget arrayWidget = widgetToOverride.getChild(arrayId);
+					if (arrayWidget == null || arrayWidget.getTextColor() == -1)
+					{
+						continue;
+					}
+					arrayWidget.setTextColor(property);
+				}
+			}
+			else
+			{
+				if (widgetToOverride.getTextColor() != -1)
+				{
+					widgetToOverride.setTextColor(property);
+				}
+			}
+		}
 	}
 }
