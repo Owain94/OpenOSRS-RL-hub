@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Christopher Oswald <https://github.com/cesoun>
+ * Copyright (c) 2020, TheStonedTurtle <https://github.com/TheStonedTurtle>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,45 +22,44 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.optimalquestguide.panels;
+package net.runelite.client.plugins.bankedexperience.data;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
-import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.components.shadowlabel.JShadowedLabel;
+import javax.annotation.Nullable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-public class ErrorPanel extends JPanel
+@AllArgsConstructor
+@Getter
+public enum WidgetInventoryInfo
 {
+	FOSSIL_CHEST(605, 11),
+	;
 
-	private final JLabel title = new JShadowedLabel();
-	private final JLabel description = new JShadowedLabel();
+	private final int groupId;
+	private final int childId;
 
-	public ErrorPanel()
+	/**
+	 * Gets the ID of the group-child pairing.
+	 *
+	 * @return the ID
+	 */
+	public int getId()
 	{
-		setBorder(new EmptyBorder(5, 10, 10, 10));
-		setLayout(new BorderLayout());
-
-		title.setForeground(Color.WHITE);
-		title.setHorizontalAlignment(SwingConstants.CENTER);
-
-		description.setFont(FontManager.getRunescapeSmallFont());
-		description.setForeground(Color.GRAY);
-		description.setHorizontalAlignment(SwingConstants.CENTER);
-
-		add(title, BorderLayout.NORTH);
-		add(description, BorderLayout.CENTER);
-
-		setVisible(false);
+		final int id = groupId << 16 | childId;
+		return id < 0 ? id : id * -1;
 	}
 
-	public void setContent(String title, String description)
+	@Nullable
+	public static WidgetInventoryInfo getByGroupId(final int id)
 	{
-		this.title.setText(title);
-		this.description.setText(description);
-		setVisible(true);
+		for (final WidgetInventoryInfo o : values())
+		{
+			if (o.getGroupId() == id)
+			{
+				return o;
+			}
+		}
+
+		return null;
 	}
 }

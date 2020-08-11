@@ -42,8 +42,8 @@ public enum Rock
 	LAVA_MINE_1("LM1", "Lava Maze Mine (46 wildy)", new WorldPoint(3059, 3885, 0), ObjectID.ROCKS_11376, ObjectID.ROCKS_11390),
 	LAVA_MINE_2("LM2", "Lava Maze Mine (46 wildy)", new WorldPoint(3060, 3884, 0), ObjectID.ROCKS_11377, ObjectID.ROCKS_11391),
 
-	MINING_GUILD_1("MG1", "Mining Guild", new WorldPoint(3054, 9725, 0), ObjectID.ROCKS_11376, ObjectID.ROCKS_11390, 0.5),
-	MINING_GUILD_2("MG2", "Mining Guild", new WorldPoint(3056, 9721, 0), ObjectID.ROCKS_11377, ObjectID.ROCKS_11391, 0.5),
+	MINING_GUILD_1("MG1", "Mining Guild", new WorldPoint(3056, 9721, 0), ObjectID.ROCKS_11376, ObjectID.ROCKS_11390, 0.5),
+	MINING_GUILD_2("MG2", "Mining Guild", new WorldPoint(3054, 9725, 0), ObjectID.ROCKS_11377, ObjectID.ROCKS_11391, 0.5),
 
 	// Outside llyeta
 	ISAFDAR_1("ELF1", "Isafdar (Outside Llyeta)", new WorldPoint(2280, 3160, 0), ObjectID.ROCKS_11376, ObjectID.ROCKS_11390),

@@ -25,18 +25,19 @@
 package net.runelite.client.plugins.optimalquestguide;
 
 import com.google.gson.Gson;
+import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Quest;
-import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.WidgetID;
+import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.SkillIconManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -55,12 +56,14 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )
-@Slf4j
 public class GuidePlugin extends Plugin
 {
 
 	@Inject
 	private Client client;
+
+	@Inject
+	private GuideConfig config;
 
 	@Inject
 	private ClientThread clientThread;
@@ -82,7 +85,7 @@ public class GuidePlugin extends Plugin
 		InputStream questDataFile = GuidePlugin.class.getResourceAsStream("quests.json");
 		questInfos = new Gson().fromJson(new InputStreamReader(questDataFile), QuestInfo[].class);
 
-		guidePanel = new GuidePanel(questInfos);
+		guidePanel = new GuidePanel(client, config, questInfos);
 
 		// Setup the icon.
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "panel_icon.png");
@@ -97,13 +100,6 @@ public class GuidePlugin extends Plugin
 
 		// Add the button to the sidebar.
 		clientToolbar.addNavigation(navigationButton);
-
-
-		// Update the quest list if we are logged in.
-		if (client.getGameState().equals(GameState.LOGGED_IN))
-		{
-			clientThread.invoke(this::updateQuestList);
-		}
 	}
 
 	@Override
@@ -112,13 +108,32 @@ public class GuidePlugin extends Plugin
 		clientToolbar.removeNavigation(navigationButton);
 	}
 
-	@Subscribe
-	public void onWidgetLoaded(WidgetLoaded e)
+	@Provides
+	GuideConfig provideConfig(ConfigManager configManager)
 	{
-		if (e.getGroupId() == WidgetID.MINIMAP_GROUP_ID || e.getGroupId() == WidgetID.QUEST_COMPLETED_GROUP_ID)
+		return configManager.getConfig(GuideConfig.class);
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged e)
+	{
+		// Check the group firing the event & if we are logged in.
+		if (!e.getGroup().equalsIgnoreCase("optimal-quest-guide"))
 		{
-			updateQuestList();
+			return;
 		}
+		if (!client.getGameState().equals(GameState.LOGGED_IN))
+		{
+			return;
+		}
+
+		clientThread.invokeLater(this::updateQuestList);
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick e)
+	{
+		updateQuestList();
 	}
 
 	private void updateQuestList()

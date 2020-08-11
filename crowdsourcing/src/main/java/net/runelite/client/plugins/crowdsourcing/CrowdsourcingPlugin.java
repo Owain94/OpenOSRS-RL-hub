@@ -17,6 +17,7 @@ import net.runelite.client.plugins.crowdsourcing.cooking.CrowdsourcingCooking;
 import net.runelite.client.plugins.crowdsourcing.dialogue.CrowdsourcingDialogue;
 import net.runelite.client.plugins.crowdsourcing.movement.CrowdsourcingMovement;
 import net.runelite.client.plugins.crowdsourcing.music.CrowdsourcingMusic;
+import net.runelite.client.plugins.crowdsourcing.thieving.CrowdsourcingThieving;
 import net.runelite.client.plugins.crowdsourcing.woodcutting.CrowdsourcingWoodcutting;
 import net.runelite.client.plugins.crowdsourcing.zmi.CrowdsourcingZMI;
 import net.runelite.client.task.Schedule;
@@ -59,6 +60,9 @@ public class CrowdsourcingPlugin extends Plugin
 	private CrowdsourcingMusic music;
 
 	@Inject
+	private CrowdsourcingThieving thieving;
+
+	@Inject
 	private CrowdsourcingWoodcutting woodcutting;
 
 	@Inject
@@ -86,6 +90,9 @@ public class CrowdsourcingPlugin extends Plugin
 		eventBus.subscribe(ChatMessage.class, this, zmi::onChatMessage);
 		eventBus.subscribe(StatChanged.class, this, zmi::onStatChanged);
 		eventBus.subscribe(ItemContainerChanged.class, this, zmi::onItemContainerChanged);
+
+		eventBus.subscribe(ChatMessage.class, this, thieving::onChatMessage);
+		eventBus.subscribe(MenuOptionClicked.class, this, thieving::onMenuOptionClicked);
 	}
 
 	@Override

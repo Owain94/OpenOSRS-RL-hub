@@ -48,7 +48,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import net.runelite.api.InventoryID;
-import net.runelite.api.vars.InputType;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupItem;
@@ -581,10 +580,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 		if (resetScrollBar)
 		{
 			// reset scrollbar back to top
-			this.contentWrapperPane.getVerticalScrollBar().setValue(0);
+			setScrollBarPosition(0);
 		}
 
-		plugin.doBankSearch(InputType.SEARCH);
+		plugin.doBankSearch();
 
 		validate();
 		repaint();
@@ -652,16 +651,6 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 	public void returnToOverviewPanel(boolean resetScrollBar)
 	{
-		if (resetScrollBar)
-		{
-			overviewPanelScrollPosition = 0;
-			contentWrapperPane.getVerticalScrollBar().setValue(overviewPanelScrollPosition);
-		}
-		else if (currentSelectedSetup != null)
-		{
-			contentWrapperPane.getVerticalScrollBar().setValue(overviewPanelScrollPosition);
-		}
-
 		noSetupsPanel.setVisible(plugin.getInventorySetups().size() == 0);
 		invEqPanel.setVisible(false);
 		overviewPanel.setVisible(plugin.getInventorySetups().size() > 0);
@@ -669,8 +658,19 @@ public class InventorySetupPluginPanel extends PluginPanel
 		setupTopRightButtonsPanel.setVisible(false);
 		title.setText(MAIN_TITLE);
 		helpButton.setVisible(!plugin.getConfig().hideButton());
-		currentSelectedSetup = null;
 		searchBar.setVisible(true);
+
+		if (resetScrollBar)
+		{
+			overviewPanelScrollPosition = 0;
+			setScrollBarPosition(overviewPanelScrollPosition);
+		}
+		else if (currentSelectedSetup != null)
+		{
+			setScrollBarPosition(overviewPanelScrollPosition);
+		}
+
+		currentSelectedSetup = null;
 		plugin.resetBankSearch();
 	}
 
@@ -685,5 +685,12 @@ public class InventorySetupPluginPanel extends PluginPanel
 		boolean isAlphabeticalMode = plugin.getConfig().sortingMode() == InventorySetupSorting.ALPHABETICAL;
 		sortingMarker.setIcon(isAlphabeticalMode ? ALPHABETICAL_ICON : NO_ALPHABETICAL_ICON);
 		sortingMarker.setToolTipText(isAlphabeticalMode ? "Remove alphabetical sorting" : "Alphabetically sort setups");
+	}
+
+	private void setScrollBarPosition(int scrollbarValue)
+	{
+		validate();
+		repaint();
+		contentWrapperPane.getVerticalScrollBar().setValue(scrollbarValue);
 	}
 }
