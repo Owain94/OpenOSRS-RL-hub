@@ -44,7 +44,7 @@ subprojects {
     group = "com.owain.externals"
 
     project.extra["PluginProvider"] = "Owain94"
-    project.extra["ProjectUrl"] = "https://discord.gg/HVjnT6R"
+    project.extra["ProjectUrl"] = "https://discord.gg/OpenOSRS"
     project.extra["PluginLicense"] = "3-Clause BSD License"
 
     apply<JavaPlugin>()
