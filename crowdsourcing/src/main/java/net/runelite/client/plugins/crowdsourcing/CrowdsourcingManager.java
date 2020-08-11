@@ -29,9 +29,11 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -46,46 +48,54 @@ public class CrowdsourcingManager
 	private static final String CROWDSOURCING_BASE = "https://crowdsource.runescape.wiki/runelite";
 	private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 	private static final Gson GSON = new Gson();
-	private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
-		.pingInterval(30, TimeUnit.SECONDS)
-		.build();
+
+	@Inject
+	private OkHttpClient okHttpClient;
 
 	private List<Object> data = new ArrayList<>();
 
 	public void storeEvent(Object event)
 	{
-		data.add(event);
+		synchronized (this)
+		{
+			data.add(event);
+		}
 	}
 
 	protected void submitToAPI()
 	{
-		if (data.isEmpty())
+		List<Object> temp;
+		synchronized (this)
 		{
-			return;
+
+			if (data.isEmpty())
+			{
+				return;
+			}
+			temp = data;
+			data = new ArrayList<>();
 		}
 
 		Request r = new Request.Builder()
 			.url(CROWDSOURCING_BASE)
-			.post(RequestBody.create(JSON, GSON.toJson(this.data)))
+			.post(RequestBody.create(JSON, GSON.toJson(temp)))
 			.build();
 
-		data.clear();
 
-		try (Response response = CLIENT.newCall(r).execute())
+		okHttpClient.newCall(r).enqueue(new Callback()
 		{
-			if (response.isSuccessful())
+			@Override
+			public void onFailure(Call call, IOException e)
 			{
-				log.info("Successfully sent crowdsourcing data");
+				log.debug("Error sending crowdsourcing data", e);
 			}
-			else
+
+			@Override
+			public void onResponse(Call call, Response response)
 			{
-				log.debug("Error sending crowdsourcing data");
-				log.debug(response.body().toString());
+				log.debug("Successfully sent crowdsourcing data");
+				response.close();
 			}
-		}
-		catch (IOException e)
-		{
-			log.debug("IOException: {}", e.getMessage());
-		}
+		});
 	}
 }

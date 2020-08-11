@@ -27,72 +27,69 @@ package net.runelite.client.plugins.emojiscape;
 
 import com.google.common.collect.ImmutableMap;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
+import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.RuneLite;
 import net.runelite.client.util.ImageUtil;
+import org.apache.commons.io.FileUtils;
 
 @Slf4j
 enum RSEmoji
 {
-	AGILITY("agility", "agi"),
-	ATTACK("attack", "att"),
-	COMBAT("combat", "cmb"),
-	MELEE("melee", "melee"),
-	CONSTRUCTION("construction", "con"),
-	COOKING("cooking", "cook"),
-	CRAFTING("crafting", "craft"),
-	DEFENCE("defence", "def"),
-	FARMING("farming", "farm"),
-	FIREMAKING("firemaking", "fm"),
-	FISHING("fishing", "fish"),
-	FLETCHING("fletching", "fletch"),
-	HERBLORE("herblore", "herb"),
-	HITPOINTS("hitpoints", "hp"),
-	HUNTER("hunter", "hunt"),
-	MAGIC("magic", "mage"),
-	MINING("mining", "mine"),
-	PRAYER("prayer", "pray"),
-	RANGED("ranged", "range"),
-	RUNECRAFT("runecraft", "rc"),
-	SLAYER("slayer", "slay"),
-	SMITHING("smithing", "smith"),
-	STRENGTH("strength", "str"),
-	THIEVING("thieving", "thief"),
-	WOODCUTTING("woodcutting", "wc"),
-	AUGURY("augury", "augury"),
-	CHIVALRY("chivalry", "chivalry"),
-	PIETY("piety", "piety"),
-	PRESERVE("preserve", "preserve"),
-	REDEMPTION("redemption", "redemption"),
-	RETRIBUTION("retribution", "retribution"),
-	RIGOUR("rigour", "rigour"),
-	SMITE("smite", "smite"),
-	BANK("bank", "bank"),
-	ALTAR("altar", "altar"),
-	SHORTCUT("shortcut", "shortcut"),
-	QUEST("quest", "qp"),
-	DIARY("diary", "diary"),
-	MINIGAME("minigame", "minigame"),
-	FAVOUR("favour", "favour"),
-	ARCEUUS("arceuus", "arc"),
-	HOSIDIUS("hosidius", "hosi"),
-	LOVAKENGJ("lovakengj", "lova"),
-	PISCARILIUS("piscarilius", "pisc"),
-	SHAYZIEN("shayzien", "shayz"),
-	COINS("coins", "gp"),
-	EXCHANGE("exchange", "ge"),
-	IRONMAN("ironman", "im"),
-	HARDCORE("hardcore", "hcim"),
-	ULTIMATE("ultimate", "uim"),
-	JMOD("jmod", "jmod"),
-	PMOD("pmod", "pmod"),
+	AGILITY, ATTACK, COMBAT, MELEE, CONSTRUCTION, COOKING, CRAFTING, DEFENCE, FARMING, FIREMAKING, FISHING, FLETCHING, HERBLORE,
+	HITPOINTS, HUNTER, MAGIC, MINING, PRAYER, RANGED, RUNECRAFT, SLAYER, SMITHING, STRENGTH, THIEVING, WOODCUTTING,
+
+	RETRIBUTION, REDEMPTION, SMITE, PRESERVE, CHIVALRY, PIETY, RIGOUR, AUGURY,
+
+	BANK, ALTAR, SHORTCUT, QUEST, DIARY, MINIGAME, FAVOUR, ARCEUUS, HOSIDIUS, LOVAKENGJ, PISCARILIUS, SHAYZIEN, COINS, EXCHANGE,
+	IRONMAN, HARDCORE, ULTIMATE, JMOD, PMOD,
 	;
+
+	public String getProperty(String LongorShort) throws IOException
+	{
+		int failCount = 0;
+		int maxFails = 3;
+		Properties prop = new Properties();
+		while (true)
+		{
+			try
+			{
+				prop.load(new FileInputStream(RuneLite.RUNELITE_DIR + "/emojiscape.properties"));
+				break;
+			}
+			catch (Exception e)
+			{
+				URL inputURL = getClass().getResource("emojiscape.properties");
+				File dest = new File(RuneLite.RUNELITE_DIR + "/emojiscape.properties");
+				log.error("Could not find emojiscape.properties so creating it at: " + dest.getAbsolutePath());
+
+				FileUtils.copyURLToFile(inputURL, dest);
+				if (++failCount == maxFails)
+				{
+					throw e;
+				}
+			}
+		}
+		return prop.getProperty(this.name() + "." + LongorShort);
+	}
+
+	public String longTrigger() throws IOException
+	{
+		return getProperty("LongTrigger");
+	}
+
+	public String shortTrigger() throws IOException
+	{
+		return getProperty("ShortTrigger");
+	}
 
 	private static final Map<String, RSEmoji> skillLongEmojiMap;
 	private static final Map<String, RSEmoji> skillShortEmojiMap;
-
-	private final String longTrigger;
-	private final String shortTrigger;
 
 	static
 	{
@@ -100,7 +97,14 @@ enum RSEmoji
 
 		for (final RSEmoji RSEmoji : values())
 		{
-			builder.put(RSEmoji.longTrigger, RSEmoji);
+			try
+			{
+				builder.put(RSEmoji.longTrigger(), RSEmoji);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 
 		skillLongEmojiMap = builder.build();
@@ -112,16 +116,17 @@ enum RSEmoji
 
 		for (final RSEmoji RSEmoji : values())
 		{
-			builder.put(RSEmoji.shortTrigger, RSEmoji);
+			try
+			{
+				builder.put(RSEmoji.shortTrigger(), RSEmoji);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 
 		skillShortEmojiMap = builder.build();
-	}
-
-	RSEmoji(String longTrigger, String shortTrigger)
-	{
-		this.longTrigger = longTrigger;
-		this.shortTrigger = shortTrigger;
 	}
 
 	BufferedImage loadImage()

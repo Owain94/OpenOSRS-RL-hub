@@ -40,6 +40,7 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -290,26 +291,24 @@ public class PetInfoPlugin extends Plugin
 	 * Finds which pets are under the users cursor.
 	 * This consults the {@link #pets} array.
 	 */
-	private List<NPC> getPetsUnderCursor()
+	private List<NPC> getPetsUnderCursor(Point mouseCanvasPosition)
 	{
-		ArrayList<NPC> underCursor = new ArrayList<>();
-		for (NPC npc : pets)
+		return pets.stream().filter(p -> {
+			return isClickable(p, mouseCanvasPosition);
+		}).collect(Collectors.toList());
+	}
+
+	private boolean isClickable(NPC npc, Point mouseCanvasPosition)
+	{
+		Shape npcHull = npc.getConvexHull();    // Gets a Shape representing an outline of the npc
+
+		if (npcHull != null)
 		{
-			Shape npcHull = npc.getConvexHull();    // Gets a Shape representing an outline of the npc
-
-			if (npcHull != null)
-			{
-				Point mouseCanvasPosition = client.getMouseCanvasPosition();
-
-				// Determine if the cursor is inside of the outline of the pet
-				if (npcHull.contains(mouseCanvasPosition.getX(), mouseCanvasPosition.getY()))
-				{
-					underCursor.add(npc);
-				}
-			}
+			// Determine if the cursor is inside of the outline of the pet
+			return npcHull.contains(mouseCanvasPosition.getX(), mouseCanvasPosition.getY());
 		}
 
-		return underCursor;
+		return false;
 	}
 
 	/**
@@ -317,7 +316,9 @@ public class PetInfoPlugin extends Plugin
 	 */
 	private void addMenus()
 	{
-		List<NPC> petsUnderCursor = getPetsUnderCursor();
+		Point mouseCanvasPosition = client.getMouseCanvasPosition();
+
+		List<NPC> petsUnderCursor = getPetsUnderCursor(mouseCanvasPosition);
 		if (!petsUnderCursor.isEmpty())
 		{
 			owners.clear();    //Clear the owners array of old owners

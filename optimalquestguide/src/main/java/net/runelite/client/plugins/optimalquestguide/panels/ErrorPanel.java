@@ -35,8 +35,9 @@ import net.runelite.client.ui.components.shadowlabel.JShadowedLabel;
 
 public class ErrorPanel extends JPanel
 {
-	private JLabel title = new JShadowedLabel();
-	private JLabel description = new JShadowedLabel();
+
+	private final JLabel title = new JShadowedLabel();
+	private final JLabel description = new JShadowedLabel();
 
 	public ErrorPanel()
 	{

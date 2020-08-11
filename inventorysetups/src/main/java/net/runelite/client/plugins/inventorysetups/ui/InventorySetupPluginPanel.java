@@ -36,6 +36,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -47,11 +48,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import net.runelite.api.InventoryID;
-import net.runelite.api.vars.InputType;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.inventorysetups.InventorySetup;
 import net.runelite.client.plugins.inventorysetups.InventorySetupItem;
 import net.runelite.client.plugins.inventorysetups.InventorySetupPlugin;
+import net.runelite.client.plugins.inventorysetups.InventorySetupSorting;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
@@ -67,6 +68,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 	private static final ImageIcon COMPACT_VIEW_HOVER_ICON;
 	private static final ImageIcon NO_COMPACT_VIEW_ICON;
 	private static final ImageIcon NO_COMPACT_VIEW_HOVER_ICON;
+	private static final ImageIcon ALPHABETICAL_ICON;
+	private static final ImageIcon ALPHABETICAL_HOVER_ICON;
+	private static final ImageIcon NO_ALPHABETICAL_ICON;
+	private static final ImageIcon NO_ALPHABETICAL_HOVER_ICON;
 	private static final ImageIcon ADD_ICON;
 	private static final ImageIcon ADD_HOVER_ICON;
 	private static final ImageIcon BACK_ICON;
@@ -89,6 +94,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 	private final JLabel title;
 	private final JLabel helpButton;
 	private final JLabel compactViewMarker;
+	private final JLabel sortingMarker;
 	private final JLabel addMarker;
 	private final JLabel addImportMarker;
 	private final JLabel updateMarker;
@@ -100,9 +106,12 @@ public class InventorySetupPluginPanel extends PluginPanel
 	private final InventorySetupEquipmentPanel eqpPanel;
 	private final InventorySetupRunePouchPanel rpPanel;
 	private final InventorySetupSpellbookPanel sbPanel;
+	private final InventorySetupNotesPanel notesPanel;
 
 	@Getter
 	private InventorySetup currentSelectedSetup;
+
+	private int overviewPanelScrollPosition;
 
 	private final InventorySetupPlugin plugin;
 
@@ -119,6 +128,14 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 		NO_COMPACT_VIEW_ICON = new ImageIcon(compactIconHover);
 		NO_COMPACT_VIEW_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(compactIconHover, -100));
+
+		final BufferedImage alphabeticalIcon = ImageUtil.getResourceStreamFromClass(InventorySetupPlugin.class, "alphabetical_icon.png");
+		final BufferedImage alphabeticalIconHover = ImageUtil.luminanceOffset(alphabeticalIcon, -150);
+		ALPHABETICAL_ICON = new ImageIcon(alphabeticalIcon);
+		ALPHABETICAL_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(alphabeticalIcon, 0.53f));
+
+		NO_ALPHABETICAL_ICON = new ImageIcon(alphabeticalIconHover);
+		NO_ALPHABETICAL_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(alphabeticalIconHover, -100));
 
 		final BufferedImage addIcon = ImageUtil.getResourceStreamFromClass(InventorySetupPlugin.class, "add_icon.png");
 		ADD_ICON = new ImageIcon(addIcon);
@@ -148,9 +165,11 @@ public class InventorySetupPluginPanel extends PluginPanel
 		this.invPanel = new InventorySetupInventoryPanel(itemManager, plugin, rpPanel);
 		this.eqpPanel = new InventorySetupEquipmentPanel(itemManager, plugin);
 		this.sbPanel = new InventorySetupSpellbookPanel(itemManager, plugin);
+		this.notesPanel = new InventorySetupNotesPanel(itemManager, plugin);
 		this.noSetupsPanel = new JPanel();
 		this.invEqPanel = new JPanel();
 		this.overviewPanel = new JPanel();
+		this.overviewPanelScrollPosition = 0;
 
 		// setup the title
 		this.title = new JLabel();
@@ -180,6 +199,35 @@ public class InventorySetupPluginPanel extends PluginPanel
 			public void mouseExited(MouseEvent e)
 			{
 				helpButton.setIcon(HELP_ICON);
+			}
+		});
+
+		this.sortingMarker = new JLabel(ALPHABETICAL_ICON);
+		sortingMarker.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mousePressed(MouseEvent e)
+			{
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					boolean isAlphabeticalMode = plugin.getConfig().sortingMode() == InventorySetupSorting.ALPHABETICAL;
+					plugin.toggleAlphabeticalMode(isAlphabeticalMode ? InventorySetupSorting.DEFAULT : InventorySetupSorting.ALPHABETICAL);
+					updateSortingMarker();
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e)
+			{
+				boolean isAlphabeticalMode = plugin.getConfig().sortingMode() == InventorySetupSorting.ALPHABETICAL;
+				sortingMarker.setIcon(isAlphabeticalMode ? ALPHABETICAL_HOVER_ICON : NO_ALPHABETICAL_HOVER_ICON);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e)
+			{
+				boolean isAlphabeticalMode = plugin.getConfig().sortingMode() == InventorySetupSorting.ALPHABETICAL;
+				sortingMarker.setIcon(isAlphabeticalMode ? ALPHABETICAL_ICON : NO_ALPHABETICAL_ICON);
 			}
 		});
 
@@ -297,7 +345,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 			{
 				if (SwingUtilities.isLeftMouseButton(e))
 				{
-					returnToOverviewPanel();
+					returnToOverviewPanel(false);
 				}
 			}
 
@@ -315,9 +363,11 @@ public class InventorySetupPluginPanel extends PluginPanel
 		});
 
 		this.overviewTopRightButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		overviewTopRightButtonsPanel.add(sortingMarker);
 		overviewTopRightButtonsPanel.add(compactViewMarker);
 		overviewTopRightButtonsPanel.add(addImportMarker);
 		overviewTopRightButtonsPanel.add(addMarker);
+		compactViewMarker.setBorder(new EmptyBorder(0, 8, 0, 0));
 		addImportMarker.setBorder(new EmptyBorder(0, 8, 0, 0));
 		addMarker.setBorder(new EmptyBorder(0, 8, 0, 0));
 
@@ -367,10 +417,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 			@Override
 			public void keyReleased(KeyEvent e)
 			{
-				rebuild();
+				rebuild(true);
 			}
 		});
-		searchBar.addClearListener(this::rebuild);
+		searchBar.addClearListener(() -> rebuild(true));
 
 		// the panel that stays at the top and doesn't scroll
 		// contains the title and buttons
@@ -391,6 +441,8 @@ public class InventorySetupPluginPanel extends PluginPanel
 		invEqPanel.add(eqpPanel);
 		invEqPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		invEqPanel.add(sbPanel);
+		invEqPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		invEqPanel.add(notesPanel);
 
 		// setup the error panel. It's wrapped around a normal panel
 		// so it doesn't stretch to fill the parent panel
@@ -422,6 +474,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 		invEqPanel.setVisible(false);
 		helpButton.setVisible(!plugin.getConfig().hideButton());
 		updateCompactViewMarker();
+		updateSortingMarker();
 	}
 
 	public void init(List<InventorySetup> setups)
@@ -429,6 +482,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 		overviewPanel.setLayout(new GridBagLayout());
 		overviewPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		updateCompactViewMarker();
+		updateSortingMarker();
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -461,13 +515,26 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 	}
 
-	public void rebuild()
+	public void rebuild(boolean resetScrollBar)
 	{
-		returnToOverviewPanel();
+		returnToOverviewPanel(resetScrollBar);
 		overviewPanel.removeAll();
 
 		final String text = searchBar.getText();
-		List<InventorySetup> setupsToAdd = searchBar.getText().isEmpty() ? plugin.getInventorySetups() : plugin.filterSetups(searchBar.getText());
+		List<InventorySetup> setupsToAdd = null;
+		if (!searchBar.getText().isEmpty())
+		{
+			setupsToAdd = plugin.filterSetups(searchBar.getText());
+		}
+		else
+		{
+			setupsToAdd = new ArrayList<>(plugin.getInventorySetups());
+		}
+
+		if (plugin.getConfig().sortingMode() == InventorySetupSorting.ALPHABETICAL)
+		{
+			setupsToAdd.sort(Comparator.comparing(InventorySetup::getName));
+		}
 		init(setupsToAdd);
 
 		revalidate();
@@ -484,11 +551,13 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 	public void setCurrentInventorySetup(final InventorySetup inventorySetup, boolean resetScrollBar)
 	{
+		overviewPanelScrollPosition = contentWrapperPane.getVerticalScrollBar().getValue();
 		currentSelectedSetup = inventorySetup;
 		invPanel.setSlots(inventorySetup);
 		rpPanel.setSlots(inventorySetup);
 		eqpPanel.setSlots(inventorySetup);
 		sbPanel.setSlots(inventorySetup);
+		notesPanel.setSlots(inventorySetup);
 
 		overviewTopRightButtonsPanel.setVisible(false);
 		setupTopRightButtonsPanel.setVisible(true);
@@ -511,10 +580,10 @@ public class InventorySetupPluginPanel extends PluginPanel
 		if (resetScrollBar)
 		{
 			// reset scrollbar back to top
-			this.contentWrapperPane.getVerticalScrollBar().setValue(0);
+			setScrollBarPosition(0);
 		}
 
-		plugin.doBankSearch(InputType.SEARCH, false);
+		plugin.doBankSearch();
 
 		validate();
 		repaint();
@@ -580,7 +649,7 @@ public class InventorySetupPluginPanel extends PluginPanel
 
 	}
 
-	public void returnToOverviewPanel()
+	public void returnToOverviewPanel(boolean resetScrollBar)
 	{
 		noSetupsPanel.setVisible(plugin.getInventorySetups().size() == 0);
 		invEqPanel.setVisible(false);
@@ -589,8 +658,19 @@ public class InventorySetupPluginPanel extends PluginPanel
 		setupTopRightButtonsPanel.setVisible(false);
 		title.setText(MAIN_TITLE);
 		helpButton.setVisible(!plugin.getConfig().hideButton());
-		currentSelectedSetup = null;
 		searchBar.setVisible(true);
+
+		if (resetScrollBar)
+		{
+			overviewPanelScrollPosition = 0;
+			setScrollBarPosition(overviewPanelScrollPosition);
+		}
+		else if (currentSelectedSetup != null)
+		{
+			setScrollBarPosition(overviewPanelScrollPosition);
+		}
+
+		currentSelectedSetup = null;
 		plugin.resetBankSearch();
 	}
 
@@ -598,5 +678,19 @@ public class InventorySetupPluginPanel extends PluginPanel
 	{
 		compactViewMarker.setIcon(plugin.getConfig().compactMode() ? COMPACT_VIEW_ICON : NO_COMPACT_VIEW_ICON);
 		compactViewMarker.setToolTipText("Switch to " + (plugin.getConfig().compactMode() ? "standard mode" : "compact mode"));
+	}
+
+	private void updateSortingMarker()
+	{
+		boolean isAlphabeticalMode = plugin.getConfig().sortingMode() == InventorySetupSorting.ALPHABETICAL;
+		sortingMarker.setIcon(isAlphabeticalMode ? ALPHABETICAL_ICON : NO_ALPHABETICAL_ICON);
+		sortingMarker.setToolTipText(isAlphabeticalMode ? "Remove alphabetical sorting" : "Alphabetically sort setups");
+	}
+
+	private void setScrollBarPosition(int scrollbarValue)
+	{
+		validate();
+		repaint();
+		contentWrapperPane.getVerticalScrollBar().setValue(scrollbarValue);
 	}
 }

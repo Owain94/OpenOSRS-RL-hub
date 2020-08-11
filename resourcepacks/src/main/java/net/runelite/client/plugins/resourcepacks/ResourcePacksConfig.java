@@ -34,17 +34,6 @@ public interface ResourcePacksConfig extends Config
 		return new Title();
 	}
 
-	@ConfigTitleSection(
-		keyName = "advancedOptions",
-		name = "Advanced options",
-		description = "Do not touch if you don't know what you are doing",
-		position = 8
-	)
-	default Title advancedOptions()
-	{
-		return new Title();
-	}
-
 	@ConfigItem(
 		keyName = "resourcePack",
 		name = "Use resource pack",
@@ -92,11 +81,23 @@ public interface ResourcePacksConfig extends Config
 		return "";
 	}
 
+	@ConfigTitleSection(
+		keyName = "overritesTitle",
+		name = "Overrites",
+		description = "",
+		position = 5
+	)
+	default Title overritesTitle()
+	{
+		return new Title();
+	}
+
 	@ConfigItem(
 		keyName = "allowLoginScreen",
 		name = "Allow login screen to be changed",
 		description = "Gives permissions for resource packs to change your login screen",
-		position = 5
+		position = 6,
+		titleSection = "overritesTitle"
 	)
 	default boolean allowLoginScreen()
 	{
@@ -107,7 +108,8 @@ public interface ResourcePacksConfig extends Config
 		keyName = "allowOverlayColor",
 		name = "Allow overlay color to be changed",
 		description = "Gives permissions for resource packs to change your overlays color",
-		position = 6
+		position = 7,
+		titleSection = "overritesTitle"
 	)
 	default boolean allowOverlayColor()
 	{
@@ -118,11 +120,23 @@ public interface ResourcePacksConfig extends Config
 		keyName = "allowSpellsPrayers",
 		name = "Allow spells/prayers to be changed",
 		description = "Gives permissions for resource packs to change your spells and prayers icons",
-		position = 7
+		position = 8,
+		titleSection = "overritesTitle"
 	)
 	default boolean allowSpellsPrayers()
 	{
 		return true;
+	}
+
+	@ConfigTitleSection(
+		keyName = "advancedTitle",
+		name = "Advanced options",
+		description = "",
+		position = 9
+	)
+	default Title advancedTitle()
+	{
+		return new Title();
 	}
 
 	@Alpha
@@ -130,8 +144,8 @@ public interface ResourcePacksConfig extends Config
 		keyName = "colorPack",
 		name = "Color current pack",
 		description = "Allows you to apply a color overlay over the currently selected resource pack",
-		position = 8,
-		titleSection = "advancedOptions"
+		position = 10,
+		titleSection = "advancedTitle"
 	)
 	Color colorPack();
 

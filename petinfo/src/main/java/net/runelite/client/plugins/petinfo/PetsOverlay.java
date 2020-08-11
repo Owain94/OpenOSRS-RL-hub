@@ -34,7 +34,9 @@ import java.awt.Polygon;
 import java.util.List;
 import javax.inject.Inject;
 import net.runelite.api.Actor;
+import net.runelite.api.Client;
 import net.runelite.api.NPC;
+import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -44,15 +46,17 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 public class PetsOverlay extends Overlay
 {
 
+	private final Client client;
 	private final PetsConfig config;
 	private final PetInfoPlugin plugin;
 
 	@Inject
-	private PetsOverlay(PetsConfig config, PetInfoPlugin plugin)
+	private PetsOverlay(Client client, PetsConfig config, PetInfoPlugin plugin)
 	{
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 		this.config = config;
+		this.client = client;
 		this.plugin = plugin;
 	}
 
@@ -64,48 +68,55 @@ public class PetsOverlay extends Overlay
 	{
 		List<NPC> pets = plugin.getPets();
 
-		if (pets.isEmpty())
+		if (config.highlight() == PetsConfig.HighlightMode.OFF || pets.isEmpty())
 		{
 			return null;
 		}
-
-		for (NPC pet : pets)
+		if (config.highlight() == PetsConfig.HighlightMode.ALL)
 		{
-			// There were some overlays being drawn where there weren't any pets, hopefully this'll fix it.
-			// But to be honest I don't know what the cause was. Perhaps pets morphing?
-			// THIS DID NOT RESOLVE THE ISSUE.
-			if (pet.getConvexHull() == null)
+			pets.forEach(pet -> {
+				drawPet(graphics, pet);
+			});
+		}
+		if (config.highlight() == PetsConfig.HighlightMode.OWN)
+		{
+			final Player localPlayer = client.getLocalPlayer();
+			pets.forEach(pet ->
 			{
-				continue;
-			}
-
-			String petName = pet.getName();
-			if (config.getShowNpcId())
-			{
-				petName += " - (id: " + pet.getId() + ")";
-			}
-
-			Color color = plugin.npcToColor(pet);
-			// Determine if we are drawing the box and the name or just the name
-			if (plugin.showNpc(pet) == PetsConfig.PetMode.HIGHLIGHT && color != null)
-			{
-				drawPet(graphics, pet, petName, color);
-			}
-			else if (plugin.showNpc(pet) == PetsConfig.PetMode.NAME_ONLY && color != null)
-			{
-				drawPetName(graphics, pet, petName, color);
-			}
-
-
+				if (pet.getInteracting() == localPlayer)
+				{
+					drawPet(graphics, pet);
+				}
+			});
 		}
 
 		return null;
 	}
 
+	private void drawPet(Graphics2D graphics, NPC pet)
+	{
+		String petName = pet.getName();
+		if (config.getShowNpcId())
+		{
+			petName += " - (id: " + pet.getId() + ")";
+		}
+
+		Color color = plugin.npcToColor(pet);
+		// Determine if we are drawing the box and the name or just the name
+		if (plugin.showNpc(pet) == PetsConfig.PetMode.HIGHLIGHT && color != null)
+		{
+			drawHighlightedPet(graphics, pet, petName, color);
+		}
+		else if (plugin.showNpc(pet) == PetsConfig.PetMode.NAME_ONLY && color != null)
+		{
+			drawOnlyNamePet(graphics, pet, petName, color);
+		}
+	}
+
 	/**
 	 * Draws a square around the pet and the pet's name overhead, both in the color of the pet's group.
 	 */
-	private void drawPet(Graphics2D graphics, Actor actor, String text, Color color)
+	private void drawHighlightedPet(Graphics2D graphics, Actor actor, String text, Color color)
 	{
 		Polygon poly = actor.getCanvasTilePoly();
 		if (poly != null)
@@ -123,7 +134,7 @@ public class PetsOverlay extends Overlay
 	/**
 	 * Just draws the pet's name overhead, in the color of the pet's group.
 	 */
-	private void drawPetName(Graphics2D graphics, Actor actor, String text, Color color)
+	private void drawOnlyNamePet(Graphics2D graphics, Actor actor, String text, Color color)
 	{
 		Point textLocation = actor.getCanvasTextLocation(graphics, text, actor.getLogicalHeight());
 		if (textLocation != null)

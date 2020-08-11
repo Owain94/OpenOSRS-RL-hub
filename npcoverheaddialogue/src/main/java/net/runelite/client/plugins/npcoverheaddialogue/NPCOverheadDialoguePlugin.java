@@ -107,7 +107,13 @@ public class NPCOverheadDialoguePlugin extends Plugin
 		if (config.showDeathDialog() && npc.isDead() && npc.getName() != null)
 		{
 			//for death text, best option for slayer item killed monsters
-			final DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(npc.getName()));
+			//final DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(npc.getName()));
+			DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcID(npc.getId());
+
+			if (dialogNpc == null)
+			{
+				dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(Objects.requireNonNullElse(npc.getName(), "")));
+			}
 			if (dialogNpc == null)
 			{
 				return;
@@ -137,7 +143,13 @@ public class NPCOverheadDialoguePlugin extends Plugin
 			return;
 		}
 
-		final DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(event.getActor().getName()));
+		//final DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(event.getActor().getName()));
+		DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcID(((NPC) event.getActor()).getId());
+
+		if (dialogNpc == null)
+		{
+			dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(Objects.requireNonNullElse(event.getActor().getName(), "")));
+		}
 		if (dialogNpc == null)
 		{
 			return;
@@ -231,7 +243,12 @@ public class NPCOverheadDialoguePlugin extends Plugin
 	{
 		for (final NPC npc : client.getNpcs())
 		{
-			final DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Objects.requireNonNullElse(npc.getName(), ""));
+			DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcID(npc.getId());
+
+			if (dialogNpc == null)
+			{
+				dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(Objects.requireNonNullElse(npc.getName(), "")));
+			}
 			if (dialogNpc == null)
 			{
 				continue;
@@ -257,7 +274,12 @@ public class NPCOverheadDialoguePlugin extends Plugin
 
 	private void checkWalkingDialog(final NPC npc, final ActorDialogState state)
 	{
-		DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(Objects.requireNonNullElse(npc.getName(), "")));
+		DialogNpc dialogNpc = DialogNpc.getDialogNpcsByNpcID(npc.getId());
+
+		if (dialogNpc == null)
+		{
+			dialogNpc = DialogNpc.getDialogNpcsByNpcName(Text.escapeJagex(Objects.requireNonNullElse(npc.getName(), "")));
+		}
 		if (dialogNpc == null)
 		{
 			return;

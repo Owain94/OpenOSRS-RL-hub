@@ -31,10 +31,23 @@ import java.awt.Color;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigTitleSection;
+import net.runelite.client.config.Title;
 
 @ConfigGroup("pets")
 public interface PetsConfig extends Config
 {
+	@ConfigTitleSection(
+		keyName = "groupTitle",
+		name = "Pet group highlight",
+		description = "Choose how and what color pet groups (i.e. bossing, skilling) should be highlighted.",
+		position = 99
+	)
+	default Title groupTitle()
+	{
+		return new Title();
+	}
+
 	enum PetMode
 	{
 		OFF,
@@ -42,96 +55,15 @@ public interface PetsConfig extends Config
 		NAME_ONLY
 	}
 
+	enum HighlightMode
+	{
+		OFF,
+		ALL,
+		OWN
+	}
+
 	@ConfigItem(
 		position = 1,
-		keyName = "showBoss",
-		name = "Highlight Bossing Pets",
-		description = "Toggles highlighting for bossing pets"
-	)
-	default PetMode showBoss()
-	{
-		return PetMode.HIGHLIGHT;
-	}
-
-	@ConfigItem(
-		position = 2,
-		keyName = "bossColor",
-		name = "Boss Pet color",
-		description = "Highlight color for boss pets"
-	)
-	default Color getBossColor()
-	{
-		return new Color(193, 18, 18);
-	}
-
-	@ConfigItem(
-		position = 3,
-		keyName = "showSkilling",
-		name = "Highlight Skilling Pets",
-		description = "Toggles highlighting for skilling pets"
-	)
-	default PetMode showSkilling()
-	{
-		return PetMode.HIGHLIGHT;
-	}
-
-	@ConfigItem(
-		position = 4,
-		keyName = "skillingColor",
-		name = "Skilling Pet color",
-		description = "Highlight color for skilling pets"
-	)
-	default Color getSkillingColor()
-	{
-		return new Color(106, 232, 38);
-	}
-
-	@ConfigItem(
-		position = 5,
-		keyName = "showToy",
-		name = "Highlight Toys",
-		description = "Toggles highlighting for clockwork toys"
-	)
-	default PetMode showToy()
-	{
-		return PetMode.OFF;
-	}
-
-	@ConfigItem(
-		position = 6,
-		keyName = "toyColor",
-		name = "Toy color",
-		description = "Highlight color for clockwork toys"
-	)
-	default Color getToyColor()
-	{
-		return new Color(139, 120, 69);
-	}
-
-	@ConfigItem(
-		position = 7,
-		keyName = "showOther",
-		name = "Show Other Pets",
-		description = "Toggles highlighting for other pets (like cats)"
-	)
-	default PetMode showOther()
-	{
-		return PetMode.NAME_ONLY;
-	}
-
-	@ConfigItem(
-		position = 8,
-		keyName = "otherColor",
-		name = "Other Pet color",
-		description = "Highlight color for other pets"
-	)
-	default Color getOtherColor()
-	{
-		return new Color(18, 47, 193);
-	}
-
-	@ConfigItem(
-		position = 9,
 		keyName = "petInfo",
 		name = "Right click menu",
 		description = "Show pet Info and Owner option on right click"
@@ -142,10 +74,118 @@ public interface PetsConfig extends Config
 	}
 
 	@ConfigItem(
+		position = 2,
+		keyName = "toggleHighlight",
+		name = "Highlight toggle",
+		description = "Select if no, all, or only your own pets are highlighted"
+	)
+	default HighlightMode highlight()
+	{
+		return HighlightMode.OFF;
+	}
+
+	@ConfigItem(
+		position = 3,
+		keyName = "showBoss",
+		name = "Highlight Bossing Pets",
+		description = "Toggles highlighting for bossing pets",
+		titleSection = "groupTitle"
+	)
+	default PetMode showBoss()
+	{
+		return PetMode.HIGHLIGHT;
+	}
+
+	@ConfigItem(
+		position = 4,
+		keyName = "bossColor",
+		name = "Boss Pet color",
+		description = "Highlight color for boss pets",
+		titleSection = "groupTitle"
+	)
+	default Color getBossColor()
+	{
+		return new Color(193, 18, 18);
+	}
+
+	@ConfigItem(
+		position = 5,
+		keyName = "showSkilling",
+		name = "Highlight Skilling Pets",
+		description = "Toggles highlighting for skilling pets",
+		titleSection = "groupTitle"
+	)
+	default PetMode showSkilling()
+	{
+		return PetMode.HIGHLIGHT;
+	}
+
+	@ConfigItem(
+		position = 6,
+		keyName = "skillingColor",
+		name = "Skilling Pet color",
+		description = "Highlight color for skilling pets",
+		titleSection = "groupTitle"
+	)
+	default Color getSkillingColor()
+	{
+		return new Color(106, 232, 38);
+	}
+
+	@ConfigItem(
+		position = 7,
+		keyName = "showToy",
+		name = "Highlight Toys",
+		description = "Toggles highlighting for clockwork toys",
+		titleSection = "groupTitle"
+	)
+	default PetMode showToy()
+	{
+		return PetMode.OFF;
+	}
+
+	@ConfigItem(
+		position = 8,
+		keyName = "toyColor",
+		name = "Toy color",
+		description = "Highlight color for clockwork toys",
+		titleSection = "groupTitle"
+	)
+	default Color getToyColor()
+	{
+		return new Color(139, 120, 69);
+	}
+
+	@ConfigItem(
+		position = 9,
+		keyName = "showOther",
+		name = "Show Other Pets",
+		description = "Toggles highlighting for other pets (like cats)",
+		titleSection = "groupTitle"
+	)
+	default PetMode showOther()
+	{
+		return PetMode.NAME_ONLY;
+	}
+
+	@ConfigItem(
 		position = 10,
+		keyName = "otherColor",
+		name = "Other Pet color",
+		description = "Highlight color for other pets",
+		titleSection = "groupTitle"
+	)
+	default Color getOtherColor()
+	{
+		return new Color(18, 47, 193);
+	}
+
+	@ConfigItem(
+		position = 11,
 		keyName = "showNpcId",
 		name = "Show NPC ID",
-		description = "Show the pets NPC id next to its overhead name"
+		description = "Show the pets NPC id next to its overhead name",
+		titleSection = "groupTitle"
 	)
 	default boolean getShowNpcId()
 	{

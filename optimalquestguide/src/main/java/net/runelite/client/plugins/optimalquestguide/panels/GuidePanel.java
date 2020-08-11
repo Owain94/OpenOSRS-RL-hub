@@ -24,72 +24,148 @@
  */
 package net.runelite.client.plugins.optimalquestguide.panels;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.util.HashMap;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.QuestState;
+import net.runelite.client.plugins.optimalquestguide.GuideConfig;
 import net.runelite.client.plugins.optimalquestguide.QuestInfo;
+import net.runelite.client.plugins.optimalquestguide.layouts.CollapsingGridLayout;
+import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.ui.components.IconTextField;
 
 @Slf4j
 public class GuidePanel extends PluginPanel
 {
 
-	private ErrorPanel ePanel = new ErrorPanel();
-	private HashMap<String, QuestPanel> qMap = new HashMap<>();
+	private final Client c;
+	private final GuideConfig config;
+
+	private final ErrorPanel ePanel = new ErrorPanel();
+	private final IconTextField searchBar = new IconTextField();
+	private final HashMap<String, QuestPanel> qMap = new HashMap<>();
+	private final HashMap<String, QuestPanel> searchMap = new HashMap<>();
 
 	@Inject
-	public GuidePanel(QuestInfo[] infos)
+	public GuidePanel(Client c, GuideConfig config, QuestInfo[] infos)
 	{
 		super();
+
+		this.c = c;
+		this.config = config;
+
+		setLayout(new CollapsingGridLayout(infos.length + 2, 1, 0, 2));
 
 		ePanel.setContent("Optimal Quest Guide", "Quests will adjust after login.");
 		add(ePanel);
 
+		// Search Bar for filtering quests.
+		searchBar.setIcon(IconTextField.Icon.SEARCH);
+		searchBar.setPreferredSize(new Dimension(PluginPanel.WIDTH - 10, 30));
+		searchBar.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		searchBar.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
+		searchBar.addClearListener(this::onSearch);
+		searchBar.addKeyListener(e -> onSearch());
+
+		add(searchBar);
 
 		// Save the object to a HashMap because we want need to build all panels.
 		for (QuestInfo info : infos)
 		{
-			QuestPanel qPanel = new QuestPanel(info);
+			QuestPanel qPanel = new QuestPanel(c, config, info);
 			qMap.put(info.getName(), qPanel);
 			add(qPanel);
 		}
 	}
 
+	private void onSearch()
+	{
+		if (config.searchCompletedQuests() || searchMap.isEmpty())
+		{
+			qMap.forEach((quest, panel) -> {
+				panel.setVisible(quest.toLowerCase().contains(searchBar.getText().toLowerCase()));
+				revalidate();
+			});
+		}
+		else
+		{
+			searchMap.forEach((quest, panel) -> {
+				panel.setVisible(quest.toLowerCase().contains(searchBar.getText().toLowerCase()));
+				revalidate();
+			});
+		}
+	}
+
 	public void updateQuests(QuestInfo[] infos)
 	{
-		removeAll();
+		// Prevent updates while the search bar contains text.
+		if (!searchBar.getText().isEmpty())
+		{
+			return;
+		}
 
-		// Set the header.
-		ePanel.setContent("Optimal Quest Guide", "Happy questing.");
-		add(ePanel);
-
-		// Update the panels.
-		int pCount = 0;
+		// Update panels.
 		for (QuestInfo info : infos)
 		{
 			QuestPanel qPanel = qMap.get(info.getName());
 			if (qPanel == null)
 			{
-				return;
+				continue;
 			}
 
 			qPanel.update(info);
 
-			if (info.getQuestState() == QuestState.NOT_STARTED || info.getQuestState() == QuestState.IN_PROGRESS)
-			{
-				add(qPanel);
-				++pCount;
+			if (config.showCompletedQuests())
+			{ // Display all.
+				if (qPanel.isVisible())
+				{
+					continue;
+				}
+
+				qPanel.setVisible(true);
+			}
+			else if (info.getQuestState() == QuestState.NOT_STARTED || info.getQuestState() == QuestState.IN_PROGRESS)
+			{ // Display only not completed.
+				if (qPanel.isVisible())
+				{
+					continue;
+				}
+
+				qPanel.setVisible(true);
+			}
+			else
+			{ // Remove from the panel if it's not showing all and its finished.
+				if (!qPanel.isVisible())
+				{
+					continue;
+				}
+
+				qPanel.setVisible(false);
 			}
 		}
 
-		// If there were no quests then just show the message.
-		if (pCount == 0)
+		// Clear the search map before updating.
+		searchMap.clear();
+
+		for (Component c : this.getComponents())
 		{
-			remove(ePanel);
-			ePanel.setContent("Optimal Quest Guide", "Optimal Quest Guide completed!");
-			add(ePanel);
+			if (!c.isVisible())
+			{
+				continue;
+			}
+
+			if (c instanceof QuestPanel)
+			{
+				QuestPanel qPanel = (QuestPanel) c;
+				searchMap.put(qPanel.getQuest().getName(), qPanel);
+			}
 		}
+
+		ePanel.setContent("Optimal Quest Guide", "Happy questing.");
 
 		revalidate();
 	}

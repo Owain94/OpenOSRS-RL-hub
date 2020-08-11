@@ -38,15 +38,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Sprite;
-import net.runelite.api.util.Text;
-import static net.runelite.client.plugins.resourcepacks.ResourcePacksPlugin.GITHUB;
-import static net.runelite.client.plugins.resourcepacks.ResourcePacksPlugin.OVERLAY_COLOR_CONFIG;
-import net.runelite.client.plugins.resourcepacks.event.ResourcePacksChanged;
-import net.runelite.client.plugins.resourcepacks.hub.ResourcePackManifest;
-import net.runelite.client.plugins.resourcepacks.hub.ResourcePacksClient;
 import net.runelite.api.Client;
+import net.runelite.api.Sprite;
 import net.runelite.api.SpriteID;
+import net.runelite.api.util.Text;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -54,6 +49,11 @@ import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.SpriteManager;
+import static net.runelite.client.plugins.resourcepacks.ResourcePacksPlugin.GITHUB;
+import static net.runelite.client.plugins.resourcepacks.ResourcePacksPlugin.OVERLAY_COLOR_CONFIG;
+import net.runelite.client.plugins.resourcepacks.event.ResourcePacksChanged;
+import net.runelite.client.plugins.resourcepacks.hub.ResourcePackManifest;
+import net.runelite.client.plugins.resourcepacks.hub.ResourcePacksClient;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.http.api.RuneLiteAPI;
@@ -466,7 +466,7 @@ public class ResourcePacksManager
 		return true;
 	}
 
-	public Sprite getSpritePixels(SpriteOverride spriteOverride, String currentPackPath)
+	public Sprite getSprite(SpriteOverride spriteOverride, String currentPackPath)
 	{
 		String folder = spriteOverride.getFolder().name().toLowerCase();
 		String name = spriteOverride.name().toLowerCase();
@@ -510,26 +510,26 @@ public class ResourcePacksManager
 
 			for (SpriteOverride spriteOverride : collection)
 			{
-				Sprite spritePixels = getSpritePixels(spriteOverride, currentPackPath);
+				Sprite Sprite = getSprite(spriteOverride, currentPackPath);
 				if (config.allowLoginScreen() && spriteOverride == SpriteOverride.LOGIN_SCREEN_BACKGROUND)
 				{
-					if (spritePixels != null)
+					if (Sprite != null)
 					{
-						client.setLoginScreen(spritePixels);
+						client.setLoginScreen(Sprite);
 					}
 					else
 					{
 						resetLoginScreen();
 					}
 				}
-				if (spritePixels == null)
+				if (Sprite == null)
 				{
 					continue;
 				}
 
 				if (spriteOverride.getSpriteID() == SpriteID.COMPASS_TEXTURE)
 				{
-					client.setCompass(spritePixels);
+					client.setCompass(Sprite);
 				}
 				else
 				{
@@ -537,7 +537,7 @@ public class ResourcePacksManager
 					{
 						client.getSpriteOverrides().remove(spriteOverride.getSpriteID());
 					}
-					client.getSpriteOverrides().put(spriteOverride.getSpriteID(), spritePixels);
+					client.getSpriteOverrides().put(spriteOverride.getSpriteID(), Sprite);
 				}
 			}
 		});
@@ -591,6 +591,7 @@ public class ResourcePacksManager
 		{
 			overlayColor = ColorUtil.fromHex(colorProperties.getProperty("overlay_color"));
 		}
+
 		configManager.setConfiguration(RuneLiteConfig.GROUP_NAME, OVERLAY_COLOR_CONFIG, overlayColor);
 		ResourcePacksPlugin.setIgnoreOverlayConfig(false);
 	}

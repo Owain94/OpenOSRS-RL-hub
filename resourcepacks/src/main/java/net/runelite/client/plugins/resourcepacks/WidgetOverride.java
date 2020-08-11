@@ -3,8 +3,8 @@ package net.runelite.client.plugins.resourcepacks;
 import com.google.common.collect.ImmutableMultimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import static net.runelite.client.plugins.resourcepacks.WidgetOverride.Script.*;
 import net.runelite.api.widgets.WidgetID;
+import static net.runelite.client.plugins.resourcepacks.WidgetOverride.Script.*;
 
 @Getter
 @RequiredArgsConstructor

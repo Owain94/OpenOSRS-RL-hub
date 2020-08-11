@@ -1119,7 +1119,7 @@ enum SpriteOverride
 	IMPLING_ESSENCE(SpriteID.PURO_PURO_ESSENCE_IMPLING, Folder.IMPLING),
 	IMPLING_EARTH(SpriteID.PURO_PURO_EARTH_IMPLING, Folder.IMPLING),
 	IMPLING_NINJA(SpriteID.PURO_PURO_NINJA_IMPLING, Folder.IMPLING),
-	IMPLING_LUCKY(SpriteID.PURO_PURO_LUCKY_IMPLING, Folder.IMPLING)
+	IMPLING_LUCKY(SpriteID.PURO_PURO_LUCKY_IMPLING, Folder.IMPLING),
 	;
 
 	private final int spriteID;
@@ -1136,7 +1136,6 @@ enum SpriteOverride
 		}
 		overrides = builder.build();
 	}
-
 
 	enum Folder
 	{

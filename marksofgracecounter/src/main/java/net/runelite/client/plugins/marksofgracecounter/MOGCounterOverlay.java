@@ -102,7 +102,7 @@ class MOGCounterOverlay extends OverlayPanel
 			long s = sinceMark.getSeconds();
 			panelComponent.getChildren().add(LineComponent.builder()
 				.left("Last Spawn:")
-				.right(String.format("%02d:%02d", (s % 3600) / 60, (s % 60)))
+				.right(String.format("%d:%02d", (s % 3600) / 60, (s % 60)))
 				.build());
 		}
 

@@ -33,7 +33,7 @@ import net.runelite.client.util.ImageUtil;
 
 public class QuestRequirement
 {
-
+	@Getter
 	@Setter
 	private String skill;
 

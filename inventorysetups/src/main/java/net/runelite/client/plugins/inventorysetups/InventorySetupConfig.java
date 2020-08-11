@@ -32,6 +32,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Keybind;
 import static net.runelite.client.plugins.inventorysetups.InventorySetupPlugin.CONFIG_KEY_COMPACT_MODE;
 import static net.runelite.client.plugins.inventorysetups.InventorySetupPlugin.CONFIG_KEY_HIDE_BUTTON;
+import static net.runelite.client.plugins.inventorysetups.InventorySetupPlugin.CONFIG_KEY_SORTING_MODE;
 
 @ConfigGroup(InventorySetupPlugin.CONFIG_GROUP)
 public interface InventorySetupConfig extends Config
@@ -137,12 +138,34 @@ public interface InventorySetupConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = CONFIG_KEY_SORTING_MODE,
+		name = "Sorting Mode",
+		description = "Configures the sorting of setups",
+		position = 9
+	)
+	default InventorySetupSorting sortingMode()
+	{
+		return InventorySetupSorting.DEFAULT;
+	}
+
+	@ConfigItem(
 		keyName = CONFIG_KEY_HIDE_BUTTON,
 		name = "Hide Help Button",
 		description = "Hide the help button",
-		position = 9
+		position = 10
 	)
 	default boolean hideButton()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "disableBankTabBar",
+		name = "Disable Bank Tab Bar",
+		description = "Stops the thin bank tab bar from removing the bank filter when clicked",
+		position = 11
+	)
+	default boolean disableBankTabBar()
 	{
 		return false;
 	}
