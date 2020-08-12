@@ -1,8 +1,12 @@
 package net.runelite.client.plugins.influxdb;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import com.google.inject.Inject;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -21,9 +25,12 @@ import net.runelite.api.VarPlayer;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.ItemStack;
 import net.runelite.client.plugins.influxdb.activity.ActivityState;
 import net.runelite.client.plugins.influxdb.write.Measurement;
 import net.runelite.client.plugins.influxdb.write.Series;
+import net.runelite.client.plugins.loottracker.LootReceived;
+import net.runelite.http.api.loottracker.LootRecordType;
 
 @Singleton
 public class MeasurementCreator
@@ -34,6 +41,7 @@ public class MeasurementCreator
 	public static final String SERIES_KILL_COUNT = "rs_killcount";
 	public static final String SERIES_SELF_LOC = "rs_self_loc";
 	public static final String SERIES_ACTIVITY = "rs_activity";
+	public static final String SERIES_LOOT = "rs_loot";
 	public static final String SELF_KEY_X = "locX";
 	public static final String SELF_KEY_Y = "locY";
 	public static final Set<String> SELF_POS_KEYS = Set.of(SELF_KEY_X, SELF_KEY_Y);
@@ -101,11 +109,21 @@ public class MeasurementCreator
 			.build();
 	}
 
+	private static String itemToKey(ItemDefinition itemDefinition)
+	{
+		return itemDefinition.getName() + "@" + itemDefinition.getId();
+	}
+
+	private static void addToMap(Map<String, Long> map, String key, long value)
+	{
+		map.compute(key, (_key, oldValue) -> (oldValue != null ? oldValue : 0) + value);
+	}
+
 	public Stream<Measurement> createItemMeasurements(InventoryID inventoryID, Item[] items)
 	{
-		Measurement.MeasurementBuilder geValue = Measurement.builder().series(createItemSeries(inventoryID, InvValueType.GE));
-		Measurement.MeasurementBuilder haValue = Measurement.builder().series(createItemSeries(inventoryID, InvValueType.HA));
-		Measurement.MeasurementBuilder countValue = Measurement.builder().series(createItemSeries(inventoryID, InvValueType.COUNT));
+		Map<String, Long> gePrice = new HashMap<>(items.length / 2);
+		Map<String, Long> haPrice = new HashMap<>(items.length / 2);
+		Map<String, Long> count = new HashMap<>(items.length / 2);
 
 		long totalGe = 0, totalAlch = 0;
 		long otherGe = 0, otherAlch = 0;
@@ -140,9 +158,10 @@ public class MeasurementCreator
 			boolean highValue = ge > THRESHOLD || alch > THRESHOLD;
 			if (highValue)
 			{
-				geValue.numericValue(data.getName(), ge);
-				haValue.numericValue(data.getName(), alch);
-				countValue.numericValue(data.getName(), item.getQuantity());
+				String key = itemToKey(data);
+				addToMap(gePrice, key, ge);
+				addToMap(haPrice, key, alch);
+				addToMap(count, key, item.getQuantity());
 			}
 			else
 			{
@@ -151,9 +170,19 @@ public class MeasurementCreator
 			}
 		}
 
-		geValue.numericValue("total", totalGe).numericValue("other", otherGe);
-		haValue.numericValue("total", totalAlch).numericValue("other", otherAlch);
-		return Stream.of(geValue.build(), haValue.build(), countValue.build());
+		return Stream.of(Measurement.builder().series(createItemSeries(inventoryID, InvValueType.GE))
+				.numericValues(gePrice)
+				.numericValue("total", totalGe)
+				.numericValue("other", otherGe)
+				.build(),
+			Measurement.builder().series(createItemSeries(inventoryID, InvValueType.HA))
+				.numericValues(haPrice)
+				.numericValue("total", totalAlch)
+				.numericValue("other", otherAlch)
+				.build(),
+			Measurement.builder().series(createItemSeries(inventoryID, InvValueType.COUNT))
+				.numericValues(count)
+				.build());
 	}
 
 	public Series createSelfLocSeries()
@@ -241,7 +270,7 @@ public class MeasurementCreator
 
 	private static final int THRESHOLD = 50_000;
 
-	public Optional<Series> createActivitySeries(ActivityState.State lastState)
+	public Optional<Series> createActivitySeries()
 	{
 		Series series = createSeries().measurement(SERIES_ACTIVITY).build();
 		if (Strings.isNullOrEmpty(series.getTags().getOrDefault("user", null)))
@@ -253,7 +282,7 @@ public class MeasurementCreator
 
 	public Optional<Measurement> createActivityMeasurement(ActivityState.State lastState)
 	{
-		Optional<Series> series = createActivitySeries(lastState);
+		Optional<Series> series = createActivitySeries();
 		if (!series.isPresent())
 		{
 			return Optional.empty();
@@ -277,5 +306,55 @@ public class MeasurementCreator
 			return Optional.empty();
 		}
 		return Optional.of(measure);
+	}
+
+	public Series createLootSeries(LootRecordType type, String source, int combatLevel)
+	{
+		return createSeries()
+			.measurement(SERIES_LOOT)
+			.tag("type", type.name())
+			.tag("source", source)
+			.tag("combat", Integer.toString(combatLevel))
+			.build();
+	}
+
+	public Optional<Measurement> createLootMeasurement(LootReceived event)
+	{
+		Measurement.MeasurementBuilder measurement = Measurement.builder().series(createLootSeries(event.getType(), event.getName(), event.getCombatLevel()));
+		Optional<WorldPoint> worldPoint = event.getItems().stream()
+			.filter(Objects::nonNull)
+			.map(stack -> WorldPoint.fromLocalInstance(client, stack.getLocation()))
+			.findAny();
+		if (!worldPoint.isPresent())
+		{
+			return Optional.empty();
+		}
+
+		WorldPoint location = worldPoint.get();
+		measurement.numericValue(SELF_KEY_X, location.getX())
+			.numericValue(SELF_KEY_Y, location.getY())
+			.numericValue("plane", location.getPlane())
+			.numericValue("killcount", 1);
+
+		Multiset<String> counts = HashMultiset.create(event.getItems().size());
+		for (ItemStack stack : event.getItems())
+		{
+			if (stack.getQuantity() <= 0)
+			{
+				continue;
+			}
+			int canonId = itemManager.canonicalize(stack.getId());
+			ItemDefinition data = itemManager.getItemDefinition(canonId);
+			counts.add(itemToKey(data), stack.getQuantity());
+		}
+		if (counts.isEmpty())
+		{
+			return Optional.empty();
+		}
+		for (Multiset.Entry<String> count : counts.entrySet())
+		{
+			measurement.numericValue(count.getElement(), count.getCount());
+		}
+		return Optional.of(measurement.build());
 	}
 }

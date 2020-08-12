@@ -34,6 +34,7 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.influxdb.activity.ActivityState;
 import net.runelite.client.plugins.influxdb.activity.GameEvent;
 import net.runelite.client.plugins.influxdb.write.InfluxWriter;
+import net.runelite.client.plugins.loottracker.LootReceived;
 import net.runelite.client.task.Schedule;
 import net.runelite.client.util.ExecutorServiceExceptionLogger;
 import org.pf4j.Extension;
@@ -278,6 +279,15 @@ public class InfluxDbPlugin extends Plugin
 		{
 			flushTask.cancel(false);
 			flushTask = null;
+		}
+	}
+
+	@Subscribe
+	public void onLootReceived(LootReceived event)
+	{
+		if (config.writeLoot())
+		{
+			measurer.createLootMeasurement(event).ifPresent(writer::submit);
 		}
 	}
 
