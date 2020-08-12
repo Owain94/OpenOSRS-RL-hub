@@ -94,7 +94,8 @@ public class InfluxWriter
 			{
 				return new Writer(new ThrottledWriter(), SELF_DEDUPE);
 			}
-			else if (series.getMeasurement().equals(MeasurementCreator.SERIES_ACTIVITY))
+			else if (series.getMeasurement().equals(MeasurementCreator.SERIES_ACTIVITY)
+				|| series.getMeasurement().equals(MeasurementCreator.SERIES_LOOT))
 			{
 				return new Writer(new AlwaysWriter(), (a, b) -> true);
 			}

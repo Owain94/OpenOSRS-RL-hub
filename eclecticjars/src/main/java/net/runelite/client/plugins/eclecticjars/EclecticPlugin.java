@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Item;
@@ -35,6 +36,7 @@ import org.pf4j.Extension;
 	type = PluginType.SKILLING,
 	enabledByDefault = false
 )
+@Slf4j
 public class EclecticPlugin extends Plugin
 {
 	private int jarsOpened;
@@ -99,7 +101,7 @@ public class EclecticPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged) throws IOException
+	public void onGameStateChanged(GameStateChanged gameStateChanged)
 	{
 		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
 		{
@@ -134,7 +136,7 @@ public class EclecticPlugin extends Plugin
 		}
 	}
 
-	public static void setUp() throws IOException
+	public static void setUp()
 	{
 		directory = PARENT_DIRECTORY;
 		createDirectory(PARENT_DIRECTORY);
@@ -165,7 +167,7 @@ public class EclecticPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onItemContainerChanged(ItemContainerChanged event) throws IOException
+	public void onItemContainerChanged(ItemContainerChanged event)
 	{
 		if (event.getContainerId() == 93 && looting)
 		{
@@ -221,19 +223,26 @@ public class EclecticPlugin extends Plugin
 		}
 	}
 
-	private static void createRequiredFiles() throws IOException
+	private static void createRequiredFiles()
 	{
 		File file = new File(directory, "eclectic-data.json");
 		if (!file.exists())
 		{
-			if (!file.createNewFile())
+			try
 			{
-				System.out.println("Failed to generate file " + file.getPath());
+				if (!file.createNewFile())
+				{
+					log.error("Failed to generate file " + file.getPath());
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
 			}
 		}
 	}
 
-	private static void createDirectory(File directory) throws IOException
+	private static void createDirectory(File directory)
 	{
 		if (!directory.exists())
 		{
@@ -241,28 +250,41 @@ public class EclecticPlugin extends Plugin
 			System.out.println("Creating eclectic directory");
 			if (!directory.mkdir())
 			{
-				throw new IOException("unable to create parent directory!");
+				log.error("unable to create parent directory!");
 			}
 		}
 	}
 
-	private static String getFileContent(String filename) throws IOException
+	private static String getFileContent(String filename)
 	{
 		Path filePath = Paths.get(directory + "\\" + filename);
-		byte[] fileBytes = Files.readAllBytes(filePath);
+		byte[] fileBytes = new byte[0];
+		try
+		{
+			fileBytes = Files.readAllBytes(filePath);
+		}
+		catch (IOException ignored)
+		{
+		}
 		return new String(fileBytes);
 	}
 
-	public static void saveJson(List<?> list) throws IOException
+	public static void saveJson(List<?> list)
 	{
 		System.out.println("Saving JSON file");
 		final Gson gson = new Gson();
 		File file = new File(directory, "eclectic-data.json");
 		final String json = gson.toJson(list);
-		Files.write(file.toPath(), json.getBytes());
+		try
+		{
+			Files.write(file.toPath(), json.getBytes());
+		}
+		catch (IOException ignored)
+		{
+		}
 	}
 
-	public static List<Double> loadJson() throws IOException
+	public static List<Double> loadJson()
 	{
 		Gson gson = new Gson();
 		String jsonString = getFileContent("eclectic-data.json");
@@ -272,7 +294,7 @@ public class EclecticPlugin extends Plugin
 		List<Double> dat = gson.fromJson(jsonString, type);
 		if (dat == null)
 		{
-			return new ArrayList<Double>();
+			return new ArrayList<>();
 		}
 		return dat;
 	}

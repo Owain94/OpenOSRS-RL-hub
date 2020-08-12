@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,7 +22,6 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ItemDefinition;
-import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -41,6 +41,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.lootlogger.data.BossTab;
 import net.runelite.client.plugins.lootlogger.data.LootLog;
+import net.runelite.client.plugins.lootlogger.data.Pet;
 import net.runelite.client.plugins.lootlogger.data.UniqueItem;
 import net.runelite.client.plugins.lootlogger.localstorage.LTItemEntry;
 import net.runelite.client.plugins.lootlogger.localstorage.LTRecord;
@@ -67,11 +68,16 @@ public class LootLoggerPlugin extends Plugin
 	private static final String SIRE_FONT_TEXT = "you place the unsired into the font of consumption...";
 	private static final String SIRE_REWARD_TEXT = "the font consumes the unsired";
 	private static final int MAX_TEXT_CHECK = 25;
+	private static final int MAX_PET_TICKS = 5;
 
 	// Kill count handling
 	private static final Pattern CLUE_SCROLL_PATTERN = Pattern.compile("You have completed ([0-9]+) ([a-z]+) Treasure Trails.");
 	private static final Pattern BOSS_NAME_NUMBER_PATTERN = Pattern.compile("Your (.*) kill count is:? ([0-9]*).");
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("([0-9]+)");
+
+	private static final Set<String> PET_MESSAGES = Set.of("You have a funny feeling like you're being followed.",
+		"You feel something weird sneaking into your backpack.",
+		"You have a funny feeling like you would have been followed...");
 
 	private static final int NMZ_MAP_REGION = 9033;
 
@@ -103,8 +109,11 @@ public class LootLoggerPlugin extends Plugin
 	private boolean unsiredReclaiming = false;
 	private boolean fetchingUsername = false;
 	private int unsiredCheckCount = 0;
+	// Some pets aren't handled (skilling pets) so reset gotPet after a few ticks
+	private int petTicks = 0;
+	private boolean gotPet = false;
 
-	private Map<String, Integer> killCountMap = new HashMap<>();
+	private final Map<String, Integer> killCountMap = new HashMap<>();
 
 	@Provides
 	LootLoggerConfig provideConfig(ConfigManager configManager)
@@ -162,6 +171,9 @@ public class LootLoggerPlugin extends Plugin
 		{
 			clientToolbar.removeNavigation(navButton);
 		}
+
+		gotPet = false;
+		petTicks = 0;
 	}
 
 	@Subscribe
@@ -199,60 +211,8 @@ public class LootLoggerPlugin extends Plugin
 
 	private void updateWriterUsername()
 	{
-		final String username = client.getUsername();
-		final boolean alreadyMigrated = Text.fromCSV(config.getMigratedUsers()).stream().anyMatch(username::equalsIgnoreCase);
-		// TODO: Remove this check once the deprecated migrateData call has been remove
-		if (alreadyMigrated)
-		{
-			writer.setPlayerUsername(client.getUsername());
-			localPlayerNameChanged();
-		}
-		else
-		{
-			migrateData();
-		}
-	}
-
-	// TODO: Remove in a future release
-	@Deprecated
-	private void migrateData()
-	{
-		if (fetchingUsername)
-		{
-			return;
-		}
-
-		fetchingUsername = true;
-		clientThread.invokeLater(() ->
-		{
-			switch (client.getGameState())
-			{
-				case LOGGED_IN:
-					final Player local = client.getLocalPlayer();
-					if (local != null && local.getName() != null)
-					{
-						final boolean migrated = writer.migrateDataFromDisplayNameToUsername(local.getName(), client.getUsername());
-						if (migrated)
-						{
-							// Must wrap in new List since Text.fromCSV is an unmodifiableCollection
-							final List<String> users = new ArrayList<>(Text.fromCSV(config.getMigratedUsers()));
-							users.add(client.getUsername());
-							config.setMigratedUsers(String.join(",", users));
-						}
-						writer.setPlayerUsername(client.getUsername());
-						localPlayerNameChanged();
-						fetchingUsername = false;
-						return true;
-					}
-				case LOGGING_IN:
-				case LOADING:
-					return false;
-				default:
-					// Quit running if any other state
-					fetchingUsername = false;
-					return true;
-			}
-		});
+		writer.setPlayerUsername(client.getUsername());
+		localPlayerNameChanged();
 	}
 
 	private void localPlayerNameChanged()
@@ -266,19 +226,21 @@ public class LootLoggerPlugin extends Plugin
 
 	private Collection<LTItemEntry> convertToLTItemEntries(Collection<ItemStack> stacks)
 	{
-		return stacks.stream().map(i ->
-		{
-			final ItemDefinition itemDefinition = itemManager.getItemDefinition(i.getId());
-			final int id = itemDefinition.getNote() == -1 ? itemDefinition.getId() : itemDefinition.getLinkedNoteId();
-			final int price = itemManager.getItemPrice(id);
-			return new LTItemEntry(itemDefinition.getName(), i.getId(), i.getQuantity(), price);
-		}).collect(Collectors.toList());
+		return stacks.stream().map(i -> createLTItemEntry(i.getId(), i.getQuantity())).collect(Collectors.toList());
+	}
+
+	private LTItemEntry createLTItemEntry(final int id, final int qty)
+	{
+		final ItemDefinition c = itemManager.getItemDefinition(id);
+		final int realId = c.getNote() == -1 ? c.getId() : c.getLinkedNoteId();
+		final int price = itemManager.getItemPrice(realId);
+		return new LTItemEntry(c.getName(), id, qty, price);
 	}
 
 	private void addRecord(final LTRecord record)
 	{
 		writer.addLootTrackerRecord(record);
-		lootNames.put(record.getType(), record.getName());
+		lootNames.put(record.getType(), record.getName().toLowerCase());
 		if (config.enableUI())
 		{
 			SwingUtilities.invokeLater(() -> panel.addLog(record));
@@ -294,6 +256,18 @@ public class LootLoggerPlugin extends Plugin
 		}
 
 		final Collection<LTItemEntry> drops = convertToLTItemEntries(event.getItems());
+
+		if (gotPet)
+		{
+			final Pet p = Pet.getByBossName(event.getName());
+			if (p != null)
+			{
+				gotPet = false;
+				petTicks = 0;
+				drops.add(createLTItemEntry(p.getPetID(), 1));
+			}
+		}
+
 		final int kc = killCountMap.getOrDefault(event.getName().toUpperCase(), -1);
 		final LTRecord record = new LTRecord(event.getName(), event.getCombatLevel(), kc, event.getType(), drops);
 		addRecord(record);
@@ -350,6 +324,19 @@ public class LootLoggerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick t)
 	{
+		if (gotPet)
+		{
+			if (petTicks > MAX_PET_TICKS)
+			{
+				gotPet = false;
+				petTicks = 0;
+			}
+			else
+			{
+				petTicks++;
+			}
+		}
+
 		if (unsiredReclaiming)
 		{
 			if (hasUnsiredWidgetUpdated())
@@ -429,6 +416,11 @@ public class LootLoggerPlugin extends Plugin
 		}
 
 		final String chatMessage = Text.removeTags(event.getMessage());
+
+		if (PET_MESSAGES.contains(chatMessage))
+		{
+			gotPet = true;
+		}
 
 		// Check if message is for a clue scroll reward
 		final Matcher m = CLUE_SCROLL_PATTERN.matcher(chatMessage);

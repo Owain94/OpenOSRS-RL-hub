@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.14"
+version = "0.0.15"
 
 project.extra["PluginName"] = "Stoned Tracker"
 project.extra["PluginDescription"] = "Local data persistence and unique UI for the Loot Tracker"
