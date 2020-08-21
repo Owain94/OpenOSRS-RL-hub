@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.Friend;
+import net.runelite.api.FriendsChatMember;
 import net.runelite.api.Ignore;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.WidgetLoaded;
@@ -49,6 +50,8 @@ public class FriendsExporterPlugin extends Plugin
 	private static final WidgetMenuOption Bottom_Ignore_List;
 	private static final WidgetMenuOption Fixed_Clan_List;
 	private static final WidgetMenuOption Resizable_Clan_List;
+	private static final WidgetMenuOption Fixed_Clan_List_List;
+	private static final WidgetMenuOption Resizable_Clan_List_List;
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 	private boolean clan = false;
 	private boolean wid = false;
@@ -105,6 +108,18 @@ public class FriendsExporterPlugin extends Plugin
 						this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Friends Chat tab to export this list.", "");
 					}
 				}
+				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Current Members"))
+				{
+					if (this.client.getFriendsChatManager() != null)
+					{
+						exportClanList();
+					}
+					else
+					{
+						this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please join a Friends Chat to export this list.", "");
+					}
+				}
+
 				refreshShiftClickCustomizationMenus();
 			}
 		}
@@ -125,6 +140,8 @@ public class FriendsExporterPlugin extends Plugin
 		this.menuManager.addManagedCustomMenu(Bottom_Ignore_List);
 		this.menuManager.addManagedCustomMenu(Fixed_Clan_List);
 		this.menuManager.addManagedCustomMenu(Resizable_Clan_List);
+		this.menuManager.addManagedCustomMenu(Fixed_Clan_List_List);
+		this.menuManager.addManagedCustomMenu(Resizable_Clan_List_List);
 	}
 
 	private void removeShiftClickCustomizationMenus()
@@ -137,6 +154,8 @@ public class FriendsExporterPlugin extends Plugin
 		this.menuManager.removeManagedCustomMenu(Bottom_Ignore_List);
 		this.menuManager.removeManagedCustomMenu(Fixed_Clan_List);
 		this.menuManager.removeManagedCustomMenu(Resizable_Clan_List);
+		this.menuManager.removeManagedCustomMenu(Fixed_Clan_List_List);
+		this.menuManager.removeManagedCustomMenu(Resizable_Clan_List_List);
 	}
 
 	private void exportFriendsList() throws Exception
@@ -243,6 +262,30 @@ public class FriendsExporterPlugin extends Plugin
 		writer.close();
 	}
 
+	private void exportClanList() throws Exception
+	{
+		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Members " + format(new Date()) + ".txt";
+		purgeList(fileName);
+		FriendsChatMember[] array = this.client.getFriendsChatManager().getMembers();
+		System.out.println(array.length);
+		FileWriter writer = new FileWriter(fileName, StandardCharsets.UTF_8, true);
+		for (int x = 0; x != this.client.getFriendsChatManager().getMembers().length; x++)
+		{
+			String friendName = array[x].getName();
+			System.out.println(friendName);
+			String Writing = toWrite(x + 1, friendName, "", "");
+			try
+			{
+				writer.write(Writing + "\r\n");
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		writer.close();
+	}
+
 	private void purgeList(String fileName)
 	{
 		File purge = new File(fileName);
@@ -330,6 +373,8 @@ public class FriendsExporterPlugin extends Plugin
 		Bottom_Ignore_List = new WidgetMenuOption("Export", "Ignore List", WidgetInfo.RESIZABLE_VIEWPORT_BOTTOM_LINE_FRIEND_ICON);
 		Fixed_Clan_List = new WidgetMenuOption("Export", "Rank List", WidgetInfo.FIXED_VIEWPORT_FRIENDS_CHAT_TAB);
 		Resizable_Clan_List = new WidgetMenuOption("Export", "Rank List", WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_CHAT_TAB);
+		Fixed_Clan_List_List = new WidgetMenuOption("Export", "Current Members", WidgetInfo.FIXED_VIEWPORT_FRIENDS_CHAT_TAB);
+		Resizable_Clan_List_List = new WidgetMenuOption("Export", "Current Members", WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_CHAT_TAB);
 	}
 
 	@Provides

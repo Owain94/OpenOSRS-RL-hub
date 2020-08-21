@@ -52,12 +52,18 @@ import net.runelite.api.VarPlayer;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.util.Text;
+import net.runelite.api.widgets.JavaScriptCallback;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.menus.MenuManager;
@@ -234,7 +240,10 @@ public class EquipmentScreenshotPlugin extends Plugin
 		MENU_TARGET, WidgetInfo.FIXED_VIEWPORT_EQUIPMENT_TAB);
 	private static final WidgetMenuOption RESIZABLE_EQUIPMENT_TAB_SCREENSHOT = new WidgetMenuOption(TAKE_SCREENSHOT,
 		MENU_TARGET, WidgetInfo.RESIZABLE_VIEWPORT_EQUIPMENT_TAB);
+	private static final WidgetMenuOption BOTTOM_LINE_INVENTORY_SCREENSHOT = new WidgetMenuOption(TAKE_SCREENSHOT,
+		MENU_TARGET, WidgetInfo.RESIZABLE_VIEWPORT_BOTTOM_LINE_INVENTORY_TAB);
 
+	private Widget button = null;
 	private boolean useResourcePack = false;
 	private double preciseWeight;
 	private int weaponAmagic;
@@ -286,10 +295,12 @@ public class EquipmentScreenshotPlugin extends Plugin
 	}
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		menuManager.addManagedCustomMenu(FIXED_EQUIPMENT_TAB_SCREENSHOT);
 		menuManager.addManagedCustomMenu(RESIZABLE_EQUIPMENT_TAB_SCREENSHOT);
+		menuManager.addManagedCustomMenu(BOTTOM_LINE_INVENTORY_SCREENSHOT);
+		clientThread.invokeLater(this::createButton);
 		useResourcePack = false;
 		dartID = 0;
 		dartCount = 0;
@@ -298,10 +309,12 @@ public class EquipmentScreenshotPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		menuManager.removeManagedCustomMenu(FIXED_EQUIPMENT_TAB_SCREENSHOT);
 		menuManager.removeManagedCustomMenu(RESIZABLE_EQUIPMENT_TAB_SCREENSHOT);
+		menuManager.removeManagedCustomMenu(BOTTOM_LINE_INVENTORY_SCREENSHOT);
+		clientThread.invoke(this::hideButton);
 	}
 
 	@Subscribe
@@ -359,6 +372,33 @@ public class EquipmentScreenshotPlugin extends Plugin
 		{
 			attackStyleVarbit = currentAttackStyleVarbit;
 		}
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (event.getGroup().equals("equipmentscreenshot") && event.getKey().equals("button"))
+		{
+			if (config.button())
+			{
+				clientThread.invoke(this::createButton);
+			}
+			else
+			{
+				clientThread.invoke(this::hideButton);
+			}
+		}
+	}
+
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded event)
+	{
+		if (event.getGroupId() != WidgetID.EQUIPMENT_GROUP_ID)
+		{
+			return;
+		}
+
+		createButton();
 	}
 
 	private BufferedImage paintInventory(BufferedImage bi)
@@ -687,7 +727,7 @@ public class EquipmentScreenshotPlugin extends Plugin
 			{
 				int columnWidth = (config.columnBetween() ? COLUMN_WIDTH : 0);
 				frankensteinsMonster = new BufferedImage(2 * binv.getWidth() + columnWidth,
-					binv.getHeight(), binv.getType());
+					binv.getHeight(), 1);
 				Graphics2D g2d = frankensteinsMonster.createGraphics();
 				g2d.drawImage(binv, 0, 0, null);
 
@@ -763,5 +803,46 @@ public class EquipmentScreenshotPlugin extends Plugin
 				break;
 		}
 		return false;
+	}
+
+	private void hideButton()
+	{
+		if (button == null)
+		{
+			return;
+		}
+
+		button.setHidden(true);
+		button = null;
+	}
+
+	private void createButton()
+	{
+		if (!config.button())
+		{
+			return;
+		}
+
+		Widget parent = client.getWidget(WidgetInfo.EQUIPMENT);
+		if (parent == null)
+		{
+			return;
+		}
+
+		hideButton();
+
+		button = parent.createChild(-1, WidgetType.GRAPHIC);
+		button.setOriginalHeight(20);
+		button.setOriginalWidth(20);
+		button.setOriginalX(48);
+		button.setOriginalY(14);
+		button.setSpriteId(573);
+		button.setAction(0, "Screenshot");
+		button.setOnOpListener((JavaScriptCallback) (e) -> clientThread.invokeLater(this::screenshotEquipment));
+		button.setHasListener(true);
+		button.revalidate();
+
+		button.setOnMouseOverListener((JavaScriptCallback) (e) -> button.setSpriteId(570));
+		button.setOnMouseLeaveListener((JavaScriptCallback) (e) -> button.setSpriteId(573));
 	}
 }

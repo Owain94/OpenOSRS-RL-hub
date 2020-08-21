@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2"
 
 project.extra["PluginName"] = "Collection Log"
-project.extra["PluginDescription"] = "Display total collection log progress. Click through the collection log to update progress."
+project.extra["PluginDescription"] = "Add items obtained/total items to the top of the collection log"
 
 tasks {
     jar {

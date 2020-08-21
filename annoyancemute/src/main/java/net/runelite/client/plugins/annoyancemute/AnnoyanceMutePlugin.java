@@ -117,6 +117,14 @@ public class AnnoyanceMutePlugin extends Plugin
 		SoundEffectID.CHOP_CHOP
 	);
 
+	private static final Set<Integer> PLANK_MAKE_SOUNDS = Set.of(
+		SoundEffectID.PLANK_MAKE
+	);
+
+	private static final Set<Integer> NIGHTMARE_SOUNDS = Set.of(
+		SoundEffectID.NIGHTMARE_SOUND
+	);
+
 	@Inject
 	private Client client;
 
@@ -189,6 +197,10 @@ public class AnnoyanceMutePlugin extends Plugin
 			{
 				areaSoundEffectPlayed.consume();
 			}
+			else if (NIGHTMARE_SOUNDS.contains(soundId) && annoyanceMuteConfig.muteNightmare())
+			{
+				areaSoundEffectPlayed.consume();
+			}
 		}
 	}
 
@@ -213,6 +225,10 @@ public class AnnoyanceMutePlugin extends Plugin
 			soundEffectPlayed.consume();
 		}
 		else if (RANDOM_EVENT_SOUNDS.contains(soundId) && annoyanceMuteConfig.muteRandoms())
+		{
+			soundEffectPlayed.consume();
+		}
+		else if (PLANK_MAKE_SOUNDS.contains(soundId) && annoyanceMuteConfig.mutePlankMake())
 		{
 			soundEffectPlayed.consume();
 		}
