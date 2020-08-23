@@ -28,6 +28,7 @@ import java.awt.Color;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.ConfigTitleSection;
 import net.runelite.client.config.Title;
 
@@ -35,10 +36,10 @@ import net.runelite.client.config.Title;
 public interface CoxLightColorsConfig extends Config
 {
 	@ConfigTitleSection(
+		keyName = "colorsTitle",
 		name = "Light colors",
 		description = "Colors of the lights above the loot chest for different scenarios",
-		position = 0,
-		keyName = "colorsTitle"
+		position = 0
 	)
 	default Title colorsTitle()
 	{
@@ -46,33 +47,56 @@ public interface CoxLightColorsConfig extends Config
 	}
 
 	@ConfigTitleSection(
-		name = "Specific Uniques",
+		keyName = "uniquesTitle",
+		name = "Item groups",
 		description = "Uniques that, when obtained, will use the 'Specific Unique' color for the light",
-		position = 1,
-		keyName = "uniquesTitle"
+		position = 1
 	)
 	default Title uniquesTitle()
 	{
 		return new Title();
 	}
 
+	@ConfigSection(
+		keyName = "togglesTitle",
+		name = "Toggles",
+		description = "Toggle different recolors on or off",
+		position = 2
+	)
+	default Title togglesTitle()
+	{
+		return new Title();
+	}
+
 	@ConfigItem(
-		keyName = "noUnique",
-		name = "No Unique",
+		keyName = "standardLoot",
+		name = "Standard loot",
 		description = "Color of light when no unique item is obtained",
 		position = 0,
 		titleSection = "colorsTitle"
 	)
-	default Color noUnique()
+	default Color standardLoot()
 	{
 		return Color.WHITE;
+	}
+
+	@ConfigItem(
+		keyName = "enableStandardLoot",
+		name = "Recolor standard loot",
+		description = "Enable recoloring the light of the chest when no unique is obtained",
+		position = 1,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableStandardLoot()
+	{
+		return true;
 	}
 
 	@ConfigItem(
 		keyName = "unique",
 		name = "Unique",
 		description = "Color of light when a unique item is obtained (besides twisted kit or dust)",
-		position = 1,
+		position = 2,
 		titleSection = "colorsTitle"
 	)
 	default Color unique()
@@ -81,10 +105,22 @@ public interface CoxLightColorsConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "enableUnique",
+		name = "Recolor uniques",
+		description = "Enable recoloring the light of the chest when a unique is obtained",
+		position = 3,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableUnique()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "dust",
 		name = "Metamorphic Dust",
 		description = "Color of light when metamorphic dust is obtained",
-		position = 2,
+		position = 4,
 		titleSection = "colorsTitle"
 	)
 	default Color dust()
@@ -93,10 +129,22 @@ public interface CoxLightColorsConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "enableDust",
+		name = "Recolor dust",
+		description = "Enable recoloring the light of the chest when metamorphic dust is obtained",
+		position = 5,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableDust()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "twistedKit",
 		name = "Twisted Kit",
 		description = "Color of light when a twisted kit is obtained",
-		position = 3,
+		position = 6,
 		titleSection = "colorsTitle"
 	)
 	default Color twistedKit()
@@ -105,10 +153,22 @@ public interface CoxLightColorsConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "enableKit",
+		name = "Recolor Twisted kit",
+		description = "Enable recoloring the light of the chest when a twisted kit is obtained",
+		position = 7,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableKit()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "olmEntrance",
 		name = "Olm Entrance",
 		description = "Color of the barrier used to enter the Olm room",
-		position = 4,
+		position = 8,
 		titleSection = "colorsTitle"
 	)
 	default Color olmEntrance()
@@ -117,147 +177,220 @@ public interface CoxLightColorsConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "specificUniqueColor",
-		name = "Specific Unique",
-		description = "Color of the light when an item specified below is obtained",
-		position = 5,
+		keyName = "enableEntrance",
+		name = "Recolor entance",
+		description = "Enable recoloring the entrance barrier to Olm",
+		position = 9,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableEntrance()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "groupOneColor",
+		name = "Group 1",
+		description = "Color of the light when an item from group 1 is obtained",
+		position = 10,
 		titleSection = "colorsTitle"
 	)
-	default Color specificUniqueColor()
+	default Color groupOneColor()
 	{
 		return Color.RED;
 	}
 
 	@ConfigItem(
-		keyName = "specifyTwistedBow",
+		keyName = "enableGroupOne",
+		name = "Recolor group 1",
+		description = "Enable recoloring the light of the chest when a unique from group 1 is obtained",
+		position = 11,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableGroupOne()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "groupTwoColor",
+		name = "Group 2",
+		description = "Color of the light when an item from group 2 is obtained",
+		position = 12,
+		titleSection = "colorsTitle"
+	)
+	default Color groupTwoColor()
+	{
+		return Color.BLUE;
+	}
+
+	@ConfigItem(
+		keyName = "enableGroupTwo",
+		name = "Recolor group 2",
+		description = "Enable recoloring the light of the chest when a unique from group 2 is obtained",
+		position = 13,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableGroupTwo()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "groupThreeColor",
+		name = "Group 3",
+		description = "Color of the light when an item from group 3 is obtained",
+		position = 14,
+		titleSection = "colorsTitle"
+	)
+	default Color groupThreeColor()
+	{
+		return Color.YELLOW;
+	}
+
+	@ConfigItem(
+		keyName = "enableGroupThree",
+		name = "Recolor group 3",
+		description = "Enable recoloring the light of the chest when a unique from group 3 is obtained",
+		position = 15,
+		titleSection = "togglesTitle"
+	)
+	default boolean enableGroupThree()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "groupTwistedBow",
 		name = "Twisted bow",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
+		position = 16,
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyTwistedBow()
+	default ItemGroup groupTwistedBow()
 	{
-		return true;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyKodaiInsignia",
+		keyName = "groupKodai",
 		name = "Kodai insignia",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyKodaiInsignia()
+	default ItemGroup groupKodai()
 	{
-		return true;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyElderMaul",
+		keyName = "groupElderMaul",
 		name = "Elder maul",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyElderMaul()
+	default ItemGroup groupElderMaul()
 	{
-		return true;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyDragonClaws",
-		name = "Dragon Claws",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		keyName = "groupClaws",
+		name = "Dragon claws",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyDragonClaws()
+	default ItemGroup groupClaws()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyAncestralHat",
+		keyName = "groupAncestralHat",
 		name = "Ancestral hat",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyAncestralHat()
+	default ItemGroup groupAncestralHat()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
-
 	@ConfigItem(
-		keyName = "specifyAncestralRobeTop",
+		keyName = "groupAncestralTop",
 		name = "Ancestral robe top",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyAncestralRobeTop()
+	default ItemGroup groupAncestralTop()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyAncestralRobeBottom",
+		keyName = "groupAncestralBottom",
 		name = "Ancestral robe bottom",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyAncestralRobeBottom()
+	default ItemGroup groupAncestralBottom()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyDinhsBulwark",
+		keyName = "groupDinhs",
 		name = "Dinh's bulwark",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyDinhsBulwark()
+	default ItemGroup groupDinhs()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyDragonHunterCrossbow",
+		keyName = "groupDHCB",
 		name = "Dragon hunter crossbow",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyDragonHunterCrossbow()
+	default ItemGroup groupDHCB()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyTwistedBuckler",
+		keyName = "groupBuckler",
 		name = "Twisted buckler",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyTwistedBuckler()
+	default ItemGroup groupBuckler()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyArcanePrayerScroll",
+		keyName = "groupArcane",
 		name = "Arcane prayer scroll",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyArcanePrayerScroll()
+	default ItemGroup groupArcane()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
 
 	@ConfigItem(
-		keyName = "specifyDexPrayerScroll",
-		name = "Dexterous Prayer Scroll",
-		description = "Color the light according to the 'Specific Unique' color when this item is obtained",
+		keyName = "groupDex",
+		name = "Dexterous prayer scroll",
+		description = "Group color to use when this item is obtained. If no group is specified, the 'unique' color will be used",
 		titleSection = "uniquesTitle"
 	)
-	default boolean specifyDexPrayerScroll()
+	default ItemGroup groupDex()
 	{
-		return false;
+		return ItemGroup.NONE;
 	}
+
 }
