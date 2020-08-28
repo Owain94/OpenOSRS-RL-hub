@@ -33,18 +33,27 @@ public class HttpServerPlugin extends Plugin
 	private HttpServer server;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
-		server = HttpServer.create(new InetSocketAddress(8080), 0);
-		server.createContext("/stats", new StatsHandler());
-		server.setExecutor(Executors.newSingleThreadExecutor());
-		server.start();
+		try
+		{
+			server = HttpServer.create(new InetSocketAddress(8080), 0);
+			server.createContext("/stats", new StatsHandler());
+			server.setExecutor(Executors.newSingleThreadExecutor());
+			server.start();
+		}
+		catch (IOException e)
+		{
+		}
 	}
 
 	@Override
 	protected void shutDown()
 	{
-		server.stop(1);
+		if (server != null)
+		{
+			server.stop(1);
+		}
 	}
 
 	class StatsHandler implements HttpHandler
