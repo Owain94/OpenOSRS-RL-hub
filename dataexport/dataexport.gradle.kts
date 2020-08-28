@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Data Export"
 project.extra["PluginDescription"] = "Exports your bank to the clipboard, so you can paste all items as csv (useful for spreadsheets)"

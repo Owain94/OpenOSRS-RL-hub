@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Eight Ball Plugin"
 project.extra["PluginDescription"] = "Leave the hardest choices to the 8ball! Just do \"::8ball\" in the chat to use it!"
