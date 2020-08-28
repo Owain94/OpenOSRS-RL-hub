@@ -23,13 +23,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.0.1"
 
-project.extra["PluginName"] = "Organised crime"
-project.extra["PluginDescription"] = "Keeps track of organised crime locations across worlds"
+project.extra["PluginName"] = "Loot Table"
+project.extra["PluginDescription"] = "Shows loot table for monsters"
+
+dependencies {
+    implementation(group = "org.jsoup", name = "jsoup", version = "1.13.1")
+}
 
 tasks {
     jar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        from(configurations.runtimeClasspath.get()
+                .map { if (it.isDirectory) it else zipTree(it) })
+
         manifest {
             attributes(mapOf(
                     "Plugin-Version" to project.version,

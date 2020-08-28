@@ -2,12 +2,6 @@ package net.runelite.client.plugins.optimalnmzpoints;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -328,24 +322,55 @@ public class OptimalPointsPlugin extends Plugin
 
 	private void getBosses()
 	{
-		Path bossCsvPath = Paths.get("nmzbosses.csv").toAbsolutePath();
-		try (BufferedReader br = Files.newBufferedReader(bossCsvPath, StandardCharsets.UTF_8))
-		{
-			String currentLine = br.readLine();
-			while (currentLine != null)
-			{
-				String[] attributes = currentLine.split(",");
-				nmzBosses.add(new NMZBoss(attributes[0],
-					Integer.parseInt(attributes[1]),
-					Integer.parseInt(attributes[2])));
-				currentLine = br.readLine();
-			}
-		}
-		catch (IOException e)
-		{
-			log.error(bossCsvPath.toString());
-			log.error(e.getMessage());
-		}
+		nmzBosses.add(new NMZBoss("Trapped Soul", 34, 783));
+		nmzBosses.add(new NMZBoss("Count Draynor", 43, 1588));
+		nmzBosses.add(new NMZBoss("Corsair Traitor", 69, 845));
+		nmzBosses.add(new NMZBoss("Sand Snake", 61, 1178));
+		nmzBosses.add(new NMZBoss("Corrupt Lizardman", 425, 4827));
+		nmzBosses.add(new NMZBoss("King Roald", 86, 1792));
+		nmzBosses.add(new NMZBoss("Witch's experiment", 111, 513));
+		nmzBosses.add(new NMZBoss("The Kendal", 192, 2253));
+		nmzBosses.add(new NMZBoss("Me", 232, 8264));
+		nmzBosses.add(new NMZBoss("Elvarg", 1190, 3601));
+		nmzBosses.add(new NMZBoss("Moss Guardian", 1225, 6818));
+		nmzBosses.add(new NMZBoss("Slagilith", 1471, 8264));
+		nmzBosses.add(new NMZBoss("Nazastarool", 1506, 6611));
+		nmzBosses.add(new NMZBoss("Treus Dayth", 1576, 7644));
+		nmzBosses.add(new NMZBoss("Skeleton Hellhound", 369, 1995));
+		nmzBosses.add(new NMZBoss("Dagannoth mother", 1751, 8264));
+		nmzBosses.add(new NMZBoss("Agrith Naar", 1753, 7851));
+		nmzBosses.add(new NMZBoss("Tree spirit", 400, 2176));
+		nmzBosses.add(new NMZBoss("Dad", 1786, 8264));
+		nmzBosses.add(new NMZBoss("Tanglefoot", 2154, 8057));
+		nmzBosses.add(new NMZBoss("Khazard warlord", 373, 2003));
+		nmzBosses.add(new NMZBoss("Arrg", 2224, 9090));
+		nmzBosses.add(new NMZBoss("Black Knight Titan", 2521, 9090));
+		nmzBosses.add(new NMZBoss("Ice Troll King", 2591, 9297));
+		nmzBosses.add(new NMZBoss("Bouncer", 3274, 12190));
+		nmzBosses.add(new NMZBoss("Glod", 3327, 15702));
+		nmzBosses.add(new NMZBoss("Evil Chicken", 4413, 16735));
+		nmzBosses.add(new NMZBoss("Agrith-Na-Na", 3730, 11363));
+		nmzBosses.add(new NMZBoss("Flambeed", 3887, 11570));
+		nmzBosses.add(new NMZBoss("Karamel", 3222, 7024));
+		nmzBosses.add(new NMZBoss("Dessourt", 2556, 9710));
+		nmzBosses.add(new NMZBoss("Gelatinnoth Mother", 2959, 8264));
+		nmzBosses.add(new NMZBoss("Culinaromancer", 980, 8884));
+		nmzBosses.add(new NMZBoss("Chronozon", 5061, 18181));
+		nmzBosses.add(new NMZBoss("Black demon", 5166, 17561));
+		nmzBosses.add(new NMZBoss("Giant Roc", 5166, 13636));
+		nmzBosses.add(new NMZBoss("Dessous", 3380, 9710));
+		nmzBosses.add(new NMZBoss("Damis", 5288, 15082));
+		nmzBosses.add(new NMZBoss("Fareed", 4868, 18388));
+		nmzBosses.add(new NMZBoss("Kamil", 4150, 15289));
+		nmzBosses.add(new NMZBoss("Nezikchened", 6112, 17975));
+		nmzBosses.add(new NMZBoss("Barrelchest", 6322, 29752));
+		nmzBosses.add(new NMZBoss("Giant scarab", 6374, 20454));
+		nmzBosses.add(new NMZBoss("Jungle Demon", 6654, 21900));
+		nmzBosses.add(new NMZBoss("Arianwyn", 10000, 30651));
+		nmzBosses.add(new NMZBoss("Essyllt", 20000, 70836));
+		nmzBosses.add(new NMZBoss("The Untouchable", 13134, 39876));
+		nmzBosses.add(new NMZBoss("The Everlasting", 8704, 27479));
+		nmzBosses.add(new NMZBoss("The Inadequacy", 20595, 74380));
 	}
 
 	@VisibleForTesting

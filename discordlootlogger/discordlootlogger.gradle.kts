@@ -23,10 +23,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Discord Loot Logger"
 project.extra["PluginDescription"] = "Logs loot received to a Discord Webhook"
+
+dependencies {
+    compileOnly("com.openosrs.externals:loottracker:0.0.+")
+}
 
 tasks {
     jar {
