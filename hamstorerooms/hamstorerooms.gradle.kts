@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2"
 
 project.extra["PluginName"] = "H.A.M Store Rooms"
 project.extra["PluginDescription"] = "Highlights chests which you have keys for in the H.A.M Store Rooms"
