@@ -40,7 +40,7 @@ public class OrganisedCrimeLocations
 			return new OrganisedCrimeLocation[]{
 				new OrganisedCrimeLocation(
 					OrganisedCrimeLocation.Area.Arceeus,
-					"We've received reports of gang meeting in Arceuus, in a house south-east of the bank.",
+					"We've received reports of a gang meeting in Arceuus, in a house south-east of the bank.",
 					"The house exactly south-east of the bank, east of the walkway when walking into Arceuus. Ground floor.",
 					"arceeus1.png",
 					true

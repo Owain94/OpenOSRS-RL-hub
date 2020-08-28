@@ -24,6 +24,26 @@ public interface DiscordLootLoggerConfig extends Config
 	String lootNpcs();
 
 	@ConfigItem(
+		keyName = "includeLowValueItems",
+		name = "Include Low Value Items",
+		description = "Only log loot items worth more than the value set in loot value option."
+	)
+	default boolean includeLowValueItems()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "sendScreenshot",
+		name = "Send Screenshot",
+		description = "Includes a screenshot when receiving the loot"
+	)
+	default boolean sendScreenshot()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		keyName = "lootvalue",
 		name = "Loot Value",
 		description = "Only logs loot worth more then the given value. 0 to disable."
