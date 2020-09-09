@@ -87,10 +87,10 @@ enum Home
 		return WordUtils.capitalize(name().toLowerCase());
 	}
 
-	private static final ImmutableSet<Integer> LADDERS;
+	private static final Set.of<Integer> LADDERS;
 	static
 	{
-		final ImmutableSet.Builder<Integer> b = new ImmutableSet.Builder<>();
+		final Set.of.Builder<Integer> b = new Set.of.Builder<>();
 		for (final Home h : values())
 		{
 			b.add(h.getLadders());
