@@ -29,7 +29,7 @@ project.extra["PluginName"] = "EmojiScape"
 project.extra["PluginDescription"] = "Adds Runescape icons to chat"
 
 dependencies {
-    implementation(group = "commons-io", name = "commons-io", version = "2.7")
+    implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
 }
 
 tasks {
