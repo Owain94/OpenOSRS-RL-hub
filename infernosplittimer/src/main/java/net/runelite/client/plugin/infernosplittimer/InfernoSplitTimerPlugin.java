@@ -12,8 +12,10 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+import org.pf4j.Extension;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,10 +25,12 @@ import java.util.regex.Pattern;
 import static net.runelite.api.ItemID.INFERNAL_CAPE;
 
 @Slf4j
+@Extension
 @PluginDescriptor(
 		name = "Inferno Split Timer",
 		description = "Displays inferno wave split times in chatbox",
-		enabledByDefault = true,
+		enabledByDefault = false,
+		type = PluginType.PVM,
 		tags = {"inferno", "timer", "split"}
 )
 public class InfernoSplitTimerPlugin extends Plugin
