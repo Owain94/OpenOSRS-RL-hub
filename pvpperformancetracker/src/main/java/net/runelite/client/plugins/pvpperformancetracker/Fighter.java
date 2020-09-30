@@ -56,19 +56,22 @@ class Fighter
 	private int attackCount; // total number of attacks
 	@Expose
 	@SerializedName("s")
-	private int successCount; // total number of successful attacks
+	private int offPraySuccessCount; // total number of successful off-pray attacks
 	@Expose
 	@SerializedName("d")
 	private double deservedDamage; // total deserved damage based on gear & opponent's pray
 	@Expose
 	@SerializedName("h") // h for "hitsplats", real hits
-	private int damageDealt;
+	private int damageDealt; // actual damage dealt based on opponent's hitsplats
 	@Expose
 	@SerializedName("m")
-	private int magicHitCount;
+	private int magicHitCount; // count of 'successful' magic hits (where you don't splash)
 	@Expose
 	@SerializedName("M")
-	private double magicHitCountDeserved;
+	private double magicHitCountDeserved; // cumulative magic accuracy percentage for each attack
+	@Expose
+	@SerializedName("p")
+	private int offensivePraySuccessCount;
 	@Expose
 	@SerializedName("x") // x for X_X
 	private boolean dead; // will be true if the fighter died in the fight
@@ -85,11 +88,12 @@ class Fighter
 		this.player = player;
 		name = player.getName();
 		attackCount = 0;
-		successCount = 0;
+		offPraySuccessCount = 0;
 		deservedDamage = 0;
 		damageDealt = 0;
 		magicHitCount = 0;
 		magicHitCountDeserved = 0;
+		offensivePraySuccessCount = 0;
 		dead = false;
 		pvpDamageCalc = new PvpDamageCalc(itemManager);
 		fightLogEntries = new ArrayList<>();
@@ -101,7 +105,7 @@ class Fighter
 		player = null;
 		this.name = name;
 		attackCount = 0;
-		successCount = 0;
+		offPraySuccessCount = 0;
 		deservedDamage = 0;
 		damageDealt = 0;
 		magicHitCount = 0;
@@ -117,7 +121,7 @@ class Fighter
 		player = null;
 		this.name = name;
 		attackCount = 0;
-		successCount = 0;
+		offPraySuccessCount = 0;
 		deservedDamage = 0;
 		damageDealt = 0;
 		magicHitCount = 0;
@@ -127,12 +131,16 @@ class Fighter
 
 	// add an attack to the counters depending if it is successful or not.
 	// also update the success rate with the new counts.
-	void addAttack(boolean successful, Player opponent, AnimationData animationData)
+	void addAttack(boolean successful, Player opponent, AnimationData animationData, int offensivePray)
 	{
 		attackCount++;
 		if (successful)
 		{
-			successCount++;
+			offPraySuccessCount++;
+		}
+		if (animationData.attackStyle.isUsingSuccessfulOffensivePray(offensivePray))
+		{
+			offensivePraySuccessCount++;
 		}
 
 		pvpDamageCalc.updateDamageStats(player, opponent, successful, animationData);
@@ -148,7 +156,7 @@ class Fighter
 			}
 		}
 
-		FightLogEntry fightLogEntry = new FightLogEntry(player, opponent, pvpDamageCalc);
+		FightLogEntry fightLogEntry = new FightLogEntry(player, opponent, pvpDamageCalc, offensivePray);
 		if (PvpPerformanceTrackerPlugin.CONFIG.fightLogInChat())
 		{
 			PvpPerformanceTrackerPlugin.PLUGIN.sendChatMessage(fightLogEntry.toChatMessage());
@@ -157,14 +165,15 @@ class Fighter
 	}
 
 	// this is to be used from the TotalStatsPanel which saves a total of multiple fights.
-	void addAttacks(int success, int total, double deservedDamage, int damageDealt, int magicHitCount, double magicHitCountDeserved)
+	void addAttacks(int success, int total, double deservedDamage, int damageDealt, int magicHitCount, double magicHitCountDeserved, int offensivePraySuccessCount)
 	{
-		successCount += success;
+		offPraySuccessCount += success;
 		attackCount += total;
 		this.deservedDamage += deservedDamage;
 		this.damageDealt += damageDealt;
 		this.magicHitCount += magicHitCount;
 		this.magicHitCountDeserved += magicHitCountDeserved;
+		this.offensivePraySuccessCount += offensivePraySuccessCount;
 	}
 
 	void addDamageDealt(int damage)
@@ -189,8 +198,8 @@ class Fighter
 	{
 		nf.setMaximumFractionDigits(0);
 		return shortString ?
-			successCount + "/" + attackCount :
-			nf.format(successCount) + "/" + nf.format(attackCount) + " (" + Math.round(calculateSuccessPercentage()) + "%)";
+			offPraySuccessCount + "/" + attackCount :
+			nf.format(offPraySuccessCount) + "/" + nf.format(attackCount) + " (" + Math.round(calculateOffPraySuccessPercentage()) + "%)";
 	}
 
 	String getOffPrayStats()
@@ -233,9 +242,31 @@ class Fighter
 		return getDmgDealtString(opponent, false);
 	}
 
-	double calculateSuccessPercentage()
+	double calculateOffPraySuccessPercentage()
 	{
 		return attackCount == 0 ? 0 :
-			(double) successCount / attackCount * 100.0;
+			(double) offPraySuccessCount / attackCount * 100.0;
+	}
+
+	double calculateOffensivePraySuccessPercentage()
+	{
+		return attackCount == 0 ? 0 :
+			(double) offensivePraySuccessCount / attackCount * 100.0;
+	}
+
+	// Return a simple string to display the current player's offensive prayer success rate.
+	// ex. "42/59 (71%)". The name is not included as it will be in a separate view.
+	// if shortString is true, the percentage is omitted, it only returns the fraction.
+	String getOffensivePrayStats(boolean shortString)
+	{
+		nf.setMaximumFractionDigits(0);
+		return shortString ?
+			offensivePraySuccessCount + "/" + attackCount :
+			nf.format(offensivePraySuccessCount) + "/" + nf.format(attackCount) + " (" + Math.round(calculateOffensivePraySuccessPercentage()) + "%)";
+	}
+
+	String getOffensivePrayStats()
+	{
+		return getOffensivePrayStats(false);
 	}
 }

@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -47,7 +45,6 @@ import lombok.Setter;
  * of a panel which is then displayed.
  */
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class FlippingItem
 {
 	@SerializedName("id")
@@ -56,12 +53,12 @@ public class FlippingItem
 
 	@SerializedName("name")
 	@Getter
-	@NonNull
 	private final String itemName;
 
 	@SerializedName("tGL")
 	@Getter
-	private final int totalGELimit;
+	@Setter
+	private int totalGELimit;
 
 	@SerializedName("mCBP")
 	@Getter
@@ -90,17 +87,8 @@ public class FlippingItem
 	//An activity is described as a completed offer event.
 	@SerializedName("lAT")
 	@Getter
-	private Instant latestActivityTime = Instant.now();
-
-	@SerializedName("sESI")
-	@Getter
 	@Setter
-	private boolean shouldExpandStatItem = false;
-
-	@SerializedName("sEH")
-	@Getter
-	@Setter
-	private boolean shouldExpandHistory = false;
+	private Instant latestActivityTime;
 
 	@SerializedName("h")
 	@Getter
@@ -109,8 +97,29 @@ public class FlippingItem
 
 	@SerializedName("fB")
 	@Getter
-	@NonNull
 	private String flippedBy;
+
+	//whether the item should be on the flipping panel or not.
+	@SerializedName("vFPI")
+	@Getter
+	@Setter
+	private Boolean validFlippingPanelItem;
+
+	@Getter
+	@Setter
+	private boolean favorite;
+
+	@Getter
+	@Setter
+	private transient Boolean expand;
+
+	public FlippingItem(int itemId, String itemName, int totalGeLimit, String flippedBy)
+	{
+		this.itemId = itemId;
+		this.itemName = itemName;
+		this.totalGELimit = totalGeLimit;
+		this.flippedBy = flippedBy;
+	}
 
 	//utility for cloning an instant...
 	private Instant ci(Instant i)
@@ -126,7 +135,7 @@ public class FlippingItem
 	{
 		return new FlippingItem(itemId, itemName, totalGELimit, marginCheckBuyPrice, marginCheckSellPrice,
 			ci(marginCheckBuyTime), ci(marginCheckSellTime), ci(latestBuyTime), ci(latestSellTime), ci(latestActivityTime),
-			shouldExpandStatItem, shouldExpandHistory, history.clone(), flippedBy);
+			history.clone(), flippedBy, validFlippingPanelItem, favorite, expand);
 	}
 
 	/**
@@ -135,7 +144,7 @@ public class FlippingItem
 	 *
 	 * @param newOffer the new offer that just came in
 	 */
-	public void updateHistory(OfferInfo newOffer)
+	public void updateHistory(OfferEvent newOffer)
 	{
 		history.updateHistory(newOffer);
 	}
@@ -146,7 +155,7 @@ public class FlippingItem
 	 *
 	 * @param newOffer new offer just received
 	 */
-	public void updateLatestTimes(OfferInfo newOffer)
+	public void updateLatestTimes(OfferEvent newOffer)
 	{
 		if (newOffer.isBuy())
 		{
@@ -157,10 +166,7 @@ public class FlippingItem
 			latestSellTime = newOffer.getTime();
 		}
 
-		if (newOffer.isComplete())
-		{
-			latestActivityTime = newOffer.getTime();
-		}
+		latestActivityTime = newOffer.getTime();
 	}
 
 	/**
@@ -170,23 +176,20 @@ public class FlippingItem
 	 *
 	 * @param newOffer the new offer just received.
 	 */
-	public void updateMargin(OfferInfo newOffer)
+	public void updateMargin(OfferEvent newOffer)
 	{
 		int tradePrice = newOffer.getPrice();
 		Instant tradeTime = newOffer.getTime();
 
-		if (newOffer.isValidFlippingOffer())
+		if (newOffer.isBuy())
 		{
-			if (newOffer.isBuy())
-			{
-				marginCheckSellPrice = tradePrice;
-				marginCheckSellTime = tradeTime;
-			}
-			else
-			{
-				marginCheckBuyPrice = tradePrice;
-				marginCheckBuyTime = tradeTime;
-			}
+			marginCheckSellPrice = tradePrice;
+			marginCheckSellTime = tradeTime;
+		}
+		else
+		{
+			marginCheckBuyPrice = tradePrice;
+			marginCheckBuyTime = tradeTime;
 		}
 	}
 
@@ -205,39 +208,44 @@ public class FlippingItem
 
 		if (item1.getLatestActivityTime().compareTo(item2.getLatestActivityTime()) >= 0)
 		{
-			item1.getHistory().getStandardizedOffers().addAll(item2.getHistory().getStandardizedOffers());
+			item1.getHistory().getCompressedOfferEvents().addAll(item2.getHistory().getCompressedOfferEvents());
+			item1.setFavorite(item1.isFavorite() || item2.isFavorite());
 			return item1;
 		}
 		else
 		{
-			item2.getHistory().getStandardizedOffers().addAll(item1.getHistory().getStandardizedOffers());
+			item2.getHistory().getCompressedOfferEvents().addAll(item1.getHistory().getCompressedOfferEvents());
+			item2.setFavorite(item2.isFavorite() || item1.isFavorite());
 			return item2;
 		}
-
-
 	}
 
-	public long currentProfit(List<OfferInfo> tradeList)
+	public long currentProfit(List<OfferEvent> tradeList)
 	{
 		return history.currentProfit(tradeList);
 	}
 
-	public long getCashflow(List<OfferInfo> tradeList, boolean getExpense)
+	public long getFlippedCashFlow(List<OfferEvent> tradeList, boolean getExpense)
 	{
-		return history.getCashflow(tradeList, getExpense);
+		return history.getFlippedCashFlow(tradeList, getExpense);
 	}
 
-	public long getCashflow(Instant earliestTime, boolean getExpense)
+	public long getFlippedCashFlow(Instant earliestTime, boolean getExpense)
 	{
-		return history.getCashflow(getIntervalHistory(earliestTime), getExpense);
+		return history.getFlippedCashFlow(getIntervalHistory(earliestTime), getExpense);
 	}
 
-	public int countItemsFlipped(List<OfferInfo> tradeList)
+	public long getTotalCashFlow(List<OfferEvent> tradeList, boolean getExpense)
+	{
+		return history.getTotalCashFlow(tradeList, getExpense);
+	}
+
+	public int countItemsFlipped(List<OfferEvent> tradeList)
 	{
 		return history.countItemsFlipped(tradeList);
 	}
 
-	public ArrayList<OfferInfo> getIntervalHistory(Instant earliestTime)
+	public ArrayList<OfferEvent> getIntervalHistory(Instant earliestTime)
 	{
 		return history.getIntervalsHistory(earliestTime);
 	}
@@ -262,27 +270,26 @@ public class FlippingItem
 		return history.getFlips(earliestTime);
 	}
 
-	public boolean hasValidOffers(HistoryManager.PanelSelection panelSelection)
+	public boolean hasValidOffers()
 	{
-		return history.hasValidOffers(panelSelection);
+		return history.hasValidOffers();
 	}
 
-	public void invalidateOffers(HistoryManager.PanelSelection panelSelection)
+	public void invalidateOffers(ArrayList<OfferEvent> offerList)
 	{
-		if (panelSelection == HistoryManager.PanelSelection.FLIPPING)
+		history.invalidateOffers(offerList);
+	}
+
+	public void setValidFlippingPanelItem(boolean isValid)
+	{
+		validFlippingPanelItem = isValid;
+		if (!isValid)
 		{
 			marginCheckSellPrice = 0;
 			marginCheckSellTime = null;
-
 			marginCheckBuyPrice = 0;
 			marginCheckBuyTime = null;
 		}
-		history.invalidateOffers(panelSelection);
-	}
-
-	public void invalidateOffers(HistoryManager.PanelSelection panelSelection, ArrayList<OfferInfo> offerList)
-	{
-		history.invalidateOffers(panelSelection, offerList);
 	}
 
 	//generated to string from intellij. I made it not create a representation of the history cause it would be too
@@ -301,10 +308,24 @@ public class FlippingItem
 		sb.append(", latestBuyTime=").append(latestBuyTime);
 		sb.append(", latestSellTime=").append(latestSellTime);
 		sb.append(", latestActivityTime=").append(latestActivityTime);
-		sb.append(", shouldExpandStatItem=").append(shouldExpandStatItem);
-		sb.append(", shouldExpandHistory=").append(shouldExpandHistory);
 		sb.append(", madeBy='").append(flippedBy).append('\'');
 		sb.append('}');
 		return sb.toString();
+	}
+
+	public int getPotentialProfit(boolean includeMarginCheck, boolean currentGeLimit)
+	{
+		int profitEach = marginCheckSellPrice - marginCheckBuyPrice;
+		if (remainingGeLimit() == 0)
+		{
+			return 0;
+		}
+		int geLimit = currentGeLimit ? remainingGeLimit() : totalGELimit;
+		int profitTotal = geLimit * profitEach;
+		if (includeMarginCheck)
+		{
+			profitTotal -= profitEach;
+		}
+		return profitTotal;
 	}
 }

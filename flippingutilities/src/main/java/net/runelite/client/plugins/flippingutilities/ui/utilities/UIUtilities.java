@@ -26,9 +26,13 @@
 
 package net.runelite.client.plugins.flippingutilities.ui.utilities;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -39,6 +43,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
@@ -66,11 +71,12 @@ public class UIUtilities
 	public static final Color OUTDATED_COLOR = new Color(250, 74, 75);
 	public static final Color PROFIT_COLOR = new Color(255, 175, 55);
 	public static final Color DARK_GRAY_ALT_ROW_COLOR = new Color(35, 35, 35);
+	public static final Color VIBRANT_YELLOW = new Color(230, 220, 6);
 
 	private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
 	private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
 
-	private static final String[] PARENTHESIS_EXCLUDED_WORDS = {"empty", "sk", "lg", "dark", "dusk", "light", "unf"};
+	private static final String[] PARENTHESIS_EXCLUDED_WORDS = {"empty", "sk", "lg", "dark", "dusk", "light", "unf", "uncharged", "wound", "full", "inactive"};
 	private static final NumberFormat PRECISE_DECIMAL_FORMATTER = new DecimalFormat(
 		"#,###.###",
 		DecimalFormatSymbols.getInstance(Locale.ENGLISH)
@@ -81,6 +87,7 @@ public class UIUtilities
 	);
 
 	public static final Dimension ICON_SIZE = new Dimension(32, 32);
+	public static final int TOOLBAR_BUTTON_SIZE = 20;
 
 	public static final ImageIcon OPEN_ICON;
 	public static final ImageIcon CLOSE_ICON;
@@ -97,6 +104,30 @@ public class UIUtilities
 	public static final ImageIcon DELETE_BUTTON;
 
 	public static final ImageIcon HIGHLIGHT_DELETE_BUTTON;
+
+	public static final ImageIcon STAR_ON_ICON;
+	public static final ImageIcon STAR_HALF_ON_ICON;
+	public static final ImageIcon STAR_OFF_ICON;
+
+
+	public static final ImageIcon SORT_BY_RECENT_OFF_ICON;
+	public static final ImageIcon SORT_BY_RECENT_ON_ICON;
+	public static final ImageIcon SORT_BY_RECENT_HALF_ON_ICON;
+
+
+	public static final ImageIcon SORT_BY_ROI_OFF_ICON;
+	public static final ImageIcon SORT_BY_ROI_ON_ICON;
+	public static final ImageIcon SORT_BY_ROI_HALF_ON_ICON;
+
+	public static final ImageIcon SORT_BY_PROFIT_OFF_ICON;
+	public static final ImageIcon SORT_BY_PROFIT_ON_ICON;
+	public static final ImageIcon SORT_BY_PROFIT_HALF_ON_ICON;
+
+	public static final ImageIcon ARROW_LEFT;
+	public static final ImageIcon ARROW_RIGHT;
+	public static final ImageIcon ARROW_LEFT_HOVER;
+	public static final ImageIcon ARROW_RIGHT_HOVER;
+
 
 	static
 	{
@@ -125,18 +156,74 @@ public class UIUtilities
 
 		final BufferedImage highlightDeleteButton = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "highlightDeleteButton.png");
 		HIGHLIGHT_DELETE_BUTTON = new ImageIcon(highlightDeleteButton);
+
+
+		final BufferedImage starOn = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/star-gold.png");
+		final BufferedImage sortByRecentOn = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/clock-gold.png");
+		final BufferedImage sortByRoiOn = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/roi-gold.png");
+		final BufferedImage sortByProfitOn = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/profit-gold.png");
+		final BufferedImage starOff = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/star_off_white.png");
+		final BufferedImage sortByRecentOff = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/clock_white.png");
+		final BufferedImage sortByRoiOff = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/thick_roi_white.png");
+		final BufferedImage sortByProfitOff = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "toolbar-icons/potential_profit_white.png");
+
+		STAR_ON_ICON = new ImageIcon(starOn.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_RECENT_ON_ICON = new ImageIcon(sortByRecentOn.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_ROI_ON_ICON = new ImageIcon(sortByRoiOn.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_PROFIT_ON_ICON = new ImageIcon(sortByProfitOn.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+
+		STAR_HALF_ON_ICON = new ImageIcon(starOff.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_PROFIT_HALF_ON_ICON = new ImageIcon(sortByProfitOff.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_RECENT_HALF_ON_ICON = new ImageIcon(sortByRecentOff.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_ROI_HALF_ON_ICON = new ImageIcon(sortByRoiOff.getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+
+		STAR_OFF_ICON = new ImageIcon(ImageUtil.alphaOffset(starOff, 0.53f).getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_RECENT_OFF_ICON = new ImageIcon(ImageUtil.alphaOffset(sortByRecentOff, 0.53f).getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_ROI_OFF_ICON = new ImageIcon(ImageUtil.alphaOffset(sortByRoiOff, 0.53f).getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+		SORT_BY_PROFIT_OFF_ICON = new ImageIcon(ImageUtil.alphaOffset(sortByProfitOff, 0.53f).getScaledInstance(TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE, Image.SCALE_SMOOTH));
+
+		final BufferedImage arrowLeft = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "left-arrow.png");
+		ARROW_LEFT = new ImageIcon(ImageUtil.alphaOffset(arrowLeft, 0.70f));
+
+		final BufferedImage arrowRight = ImageUtil.getResourceStreamFromClass(FlippingPlugin.class, "right-arrow.png");
+		ARROW_RIGHT = new ImageIcon(ImageUtil.alphaOffset(arrowRight, 0.70f));
+
+		ARROW_LEFT_HOVER = new ImageIcon(arrowLeft);
+		ARROW_RIGHT_HOVER = new ImageIcon(arrowRight);
 	}
 
 	/**
 	 * Formats a duration into HH:MM:SS
 	 *
 	 * @param duration
-	 * @return a string in the format HH:MM:SS
+	 * @return Formatted (HH:MM:SS) string
 	 */
 	public static String formatDuration(Duration duration)
 	{
 		long seconds = duration.toMillis() / 1000;
 		return String.format("%02d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
+	}
+
+	/**
+	 * Formats an instant into a duration between the parameter and now.
+	 *
+	 * @return Formatted (HH:MM:SS) string
+	 */
+	public static String formatDuration(Instant instant)
+	{
+		return formatDuration(Duration.between(instant, Instant.now()));
+	}
+
+	/**
+	 * Formats the duration between one instant to an end instant.
+	 *
+	 * @param startInstant Start of duration
+	 * @param endInstant   End of duration
+	 * @return Formatted (HH:MM:SS) string
+	 */
+	public static String formatDuration(Instant startInstant, Instant endInstant)
+	{
+		return formatDuration(Duration.between(startInstant, endInstant));
 	}
 
 	/**
@@ -218,7 +305,7 @@ public class UIUtilities
 	}
 
 	/**
-	 * This method calculates the color based on a red-yellow-green gradient.
+	 * This method calculates the red-yellow-green gradient factored by the percentage or max gradient.
 	 *
 	 * @param percentage  The percentage representing the value that needs to be gradiated.
 	 * @param gradientMax The max value representation before the gradient tops out on green.
@@ -228,13 +315,13 @@ public class UIUtilities
 	{
 		if (percentage < gradientMax * 0.5)
 		{
-			return (percentage <= 0) ? Color.RED :
-				ColorUtil.colorLerp(Color.RED, Color.YELLOW, percentage / gradientMax * 2);
+			return (percentage <= 0) ? Color.RED
+				: ColorUtil.colorLerp(Color.RED, Color.YELLOW, percentage / gradientMax * 2);
 		}
 		else
 		{
-			return (percentage >= gradientMax) ? Color.GREEN :
-				ColorUtil.colorLerp(Color.YELLOW, Color.GREEN, percentage / gradientMax * 0.5);
+			return (percentage >= gradientMax) ? Color.GREEN
+				: ColorUtil.colorLerp(Color.YELLOW, Color.GREEN, percentage / gradientMax * 0.5);
 		}
 	}
 
@@ -374,5 +461,41 @@ public class UIUtilities
 		modal.add(panel);
 		modal.setLocationRelativeTo(parent);
 		return modal;
+	}
+
+	public static JPanel stackPanelsVertically(List<JPanel> panels)
+	{
+		JPanel mainPanel = new JPanel();
+		stackPanelsVertically(panels, mainPanel);
+		return mainPanel;
+	}
+
+
+	public static void stackPanelsVertically(List<JPanel> panels, JPanel mainPanel)
+	{
+		GridBagConstraints constraints = new GridBagConstraints();
+		mainPanel.setLayout(new GridBagLayout());
+
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1;
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+
+		int index = 0;
+		for (JPanel panel : panels)
+		{
+			if (index++ > 0)
+			{
+				JPanel marginWrapper = new JPanel(new BorderLayout());
+				marginWrapper.add(panel, BorderLayout.NORTH);
+				mainPanel.add(marginWrapper, constraints);
+			}
+			else
+			{
+				mainPanel.add(panel, constraints);
+			}
+
+			constraints.gridy++;
+		}
 	}
 }

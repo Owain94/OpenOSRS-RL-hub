@@ -103,4 +103,46 @@ public interface FlippingConfig extends Config
 		return Fonts.SMALL_FONT;
 	}
 
+	@ConfigItem(
+		keyName = "tradeStagnationTime",
+		name = "Set trade stagnation time",
+		description = "Set how long before the offer slot activity timer indicates that a trade has become stagnant"
+	)
+	@Units(Units.MINUTES)
+	default int tradeStagnationTime()
+	{
+		return 15;
+	}
+
+	@ConfigItem(
+		keyName = "slotTimersEnabled",
+		name = "toggle slot timers",
+		description = "Have a timer on active GE slots that will show the last time an offer came for the slot. This is useful" +
+			"for knowing whether you should change your offer's price"
+	)
+	default boolean slotTimersEnabled()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "verboseView",
+		name = "toggle verbose view",
+		description = "show items in the flipping tab with all their tracked info like buy/sell price, roi, potential" +
+			"profit, etc"
+	)
+	default boolean verboseViewEnabled()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "favoriteSearchCode",
+		name = "favorite items quick search",
+		description = "What you can type in the ge search bar to automatically populate it with your favorite items"
+	)
+	default String favoriteSearchCode()
+	{
+		return "1";
+	}
 }
