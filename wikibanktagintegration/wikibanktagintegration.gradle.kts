@@ -30,7 +30,7 @@ project.extra["PluginDescription"] = "Allows the creation of bank tags from cate
 
 dependencies {
     compileOnly("com.openosrs.externals:banktags:0.0.+")
-    compileOnly("com.openosrs.externals:cluescroll:0.0.+")
+    compileOnly("com.openosrs.externals:cluescroll:0.+")
 }
 
 tasks {
