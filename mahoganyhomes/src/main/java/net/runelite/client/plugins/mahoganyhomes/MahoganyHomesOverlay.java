@@ -22,14 +22,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package thestonedturtle.mahoganyhomes;
+package net.runelite.client.plugins.mahoganyhomes;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import javax.inject.Inject;
-import static net.runelite.api.MenuAction.RUNELITE_OVERLAY;
-import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
+import static net.runelite.api.MenuOpcode.RUNELITE_OVERLAY;
+import static net.runelite.api.MenuOpcode.RUNELITE_OVERLAY_CONFIG;
 import net.runelite.api.Player;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
@@ -42,6 +42,7 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 class MahoganyHomesOverlay extends OverlayPanel
 {
 	static final String CLEAR_OPTION = "Clear";
+	static final String TIMEOUT_OPTION = "Timeout";
 
 	private final MahoganyHomesPlugin plugin;
 	private final MahoganyHomesConfig config;
@@ -56,7 +57,8 @@ class MahoganyHomesOverlay extends OverlayPanel
 		this.plugin = plugin;
 		this.config = config;
 
-		getMenuEntries().add(new OverlayMenuEntry(RUNELITE_OVERLAY_CONFIG, OPTION_CONFIGURE, "Mahogany Homes overlay"));
+		getMenuEntries().add(new OverlayMenuEntry(RUNELITE_OVERLAY_CONFIG, OPTION_CONFIGURE, "Mahogany Homes Overlay"));
+		getMenuEntries().add(new OverlayMenuEntry(RUNELITE_OVERLAY, TIMEOUT_OPTION, "Mahogany Homes Plugin"));
 		getMenuEntries().add(new OverlayMenuEntry(RUNELITE_OVERLAY, CLEAR_OPTION, "Contract"));
 	}
 
@@ -66,7 +68,7 @@ class MahoganyHomesOverlay extends OverlayPanel
 	{
 		final Home home = plugin.getCurrentHome();
 		final Player player = plugin.getClient().getLocalPlayer();
-		if (home == null || !config.textOverlay() || player == null)
+		if (plugin.isPluginTimedOut() || home == null || !config.textOverlay() || player == null)
 		{
 			return null;
 		}
