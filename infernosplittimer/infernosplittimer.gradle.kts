@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020 Andrew Terra <https://github.com/andrewterra>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,22 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.8"
+version = "0.0.1"
 
-project.extra["PluginName"] = "EmojiScape"
-project.extra["PluginDescription"] = "Adds Runescape icons to chat"
-
-dependencies {
-    implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
-}
+project.extra["PluginName"] = "InfernoSplitTimer"
+project.extra["PluginDescription"] = "Inferno Split Timers"
 
 tasks {
     jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-        from(configurations.runtimeClasspath.get()
-                .map { if (it.isDirectory) it else zipTree(it) })
-
         manifest {
             attributes(mapOf(
                     "Plugin-Version" to project.version,

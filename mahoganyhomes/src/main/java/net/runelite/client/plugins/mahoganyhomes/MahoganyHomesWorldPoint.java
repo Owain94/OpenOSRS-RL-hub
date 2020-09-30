@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020, TheStonedTurtle <https://github.com/TheStonedTurtle>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,31 +22,43 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package thestonedturtle.mahoganyhomes;
 
-version = "0.0.8"
+import java.awt.image.BufferedImage;
+import net.runelite.api.Point;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
-project.extra["PluginName"] = "EmojiScape"
-project.extra["PluginDescription"] = "Adds Runescape icons to chat"
+class MahoganyHomesWorldPoint extends WorldMapPoint
+{
+	private final MahoganyHomesPlugin plugin;
+	private final Point point;
 
-dependencies {
-    implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
-}
+	MahoganyHomesWorldPoint(final WorldPoint worldPoint, final MahoganyHomesPlugin plugin)
+	{
+		super(worldPoint, null);
+		this.plugin = plugin;
 
-tasks {
-    jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+		final BufferedImage image = plugin.getMapArrow();
+		point = new Point(image.getWidth() / 2, image.getHeight());
 
-        from(configurations.runtimeClasspath.get()
-                .map { if (it.isDirectory) it else zipTree(it) })
+		this.setSnapToEdge(true);
+		this.setJumpOnClick(true);
+		this.setImage(image);
+		this.setImagePoint(point);
+	}
 
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+	@Override
+	public void onEdgeSnap()
+	{
+		this.setImage(plugin.getMapIcon());
+		this.setImagePoint(null);
+	}
+
+	@Override
+	public void onEdgeUnsnap()
+	{
+		this.setImage(plugin.getMapArrow());
+		this.setImagePoint(point);
+	}
 }
