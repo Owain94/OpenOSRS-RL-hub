@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package thestonedturtle.mahoganyhomes;
+package net.runelite.client.plugins.mahoganyhomes;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
@@ -87,10 +87,10 @@ enum Home
 		return WordUtils.capitalize(name().toLowerCase());
 	}
 
-	private static final Set<Integer> LADDERS;
+	private static final ImmutableSet<Integer> LADDERS;
 	static
 	{
-		final Set.Builder<Integer> b = new Set.Builder<>();
+		final ImmutableSet.Builder<Integer> b = new ImmutableSet.Builder<>();
 		for (final Home h : values())
 		{
 			b.add(h.getLadders());

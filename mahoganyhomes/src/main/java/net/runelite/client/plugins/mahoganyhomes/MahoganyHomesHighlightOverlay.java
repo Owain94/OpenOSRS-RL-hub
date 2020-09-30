@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package thestonedturtle.mahoganyhomes;
+package net.runelite.client.plugins.mahoganyhomes;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -60,7 +60,7 @@ class MahoganyHomesHighlightOverlay extends Overlay
 	{
 		final Home home = plugin.getCurrentHome();
 		final Player player = plugin.getClient().getLocalPlayer();
-		if (home == null || player == null)
+		if (plugin.isPluginTimedOut() || home == null || player == null)
 		{
 			return null;
 		}

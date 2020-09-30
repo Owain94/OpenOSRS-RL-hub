@@ -143,11 +143,6 @@ public class DiscordLootLoggerPlugin extends Plugin
 			return;
 		}
 
-		if (!lootReceived.getName().equals("Theatre of Blood") && !lootReceived.getName().equals("Chambers of Xeric"))
-		{
-			return;
-		}
-
 		processLoot(lootReceived.getName(), lootReceived.getItems());
 	}
 

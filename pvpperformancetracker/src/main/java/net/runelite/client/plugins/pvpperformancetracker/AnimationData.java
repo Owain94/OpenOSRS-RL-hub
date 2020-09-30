@@ -30,6 +30,8 @@ import java.security.InvalidParameterException;
 import java.util.Map;
 import lombok.Getter;
 import net.runelite.api.HeadIcon;
+import net.runelite.api.SpriteID;
+import org.apache.commons.lang3.ArrayUtils;
 
 public enum AnimationData
 {
@@ -201,6 +203,26 @@ public enum AnimationData
 		AttackStyle(HeadIcon protection)
 		{
 			this.protection = protection;
+		}
+
+		public boolean isMelee()
+		{
+			return ArrayUtils.contains(AttackStyle.MELEE_STYLES, this);
+		}
+
+		public boolean isUsingSuccessfulOffensivePray(int pray)
+		{
+			return (pray > 0 &&
+				((isMelee() &&
+					(pray == SpriteID.PRAYER_PIETY ||
+						pray == SpriteID.PRAYER_ULTIMATE_STRENGTH)) ||
+					(this == RANGED &&
+						(pray == SpriteID.PRAYER_RIGOUR ||
+							pray == SpriteID.PRAYER_EAGLE_EYE)) ||
+					(this == MAGIC &&
+						(pray == SpriteID.PRAYER_AUGURY ||
+							pray == SpriteID.PRAYER_MYSTIC_MIGHT)))
+			);
 		}
 	}
 }

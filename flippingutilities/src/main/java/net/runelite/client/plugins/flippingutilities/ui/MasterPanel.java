@@ -38,9 +38,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.flippingutilities.FlippingPlugin;
 import net.runelite.client.plugins.flippingutilities.ui.flipping.FlippingPanel;
 import net.runelite.client.plugins.flippingutilities.ui.statistics.StatsPanel;
+import net.runelite.client.plugins.flippingutilities.ui.utilities.FastTabGroup;
 import net.runelite.client.plugins.flippingutilities.ui.utilities.UIUtilities;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
@@ -48,6 +50,7 @@ import net.runelite.client.ui.components.ComboBoxListRenderer;
 import net.runelite.client.ui.components.materialtabs.MaterialTab;
 import net.runelite.client.ui.components.materialtabs.MaterialTabGroup;
 
+@Slf4j
 public class MasterPanel extends PluginPanel
 {
 	@Getter
@@ -176,7 +179,7 @@ public class MasterPanel extends PluginPanel
 	 */
 	private MaterialTabGroup tabSelector(JPanel mainDisplay, JPanel flippingPanel, JPanel statsPanel)
 	{
-		MaterialTabGroup tabGroup = new MaterialTabGroup(mainDisplay);
+		MaterialTabGroup tabGroup = new FastTabGroup(mainDisplay);
 		MaterialTab flippingTab = new MaterialTab("Flipping", tabGroup, flippingPanel);
 		MaterialTab statTab = new MaterialTab("Statistics", tabGroup, statsPanel);
 
