@@ -25,6 +25,7 @@
 
 rootProject.name = "OpenOSRS RL hub"
 
+/*
 include(":advancednotifications")
 include(":analoguetimestamps")
 include(":annoyancemute")
@@ -87,7 +88,6 @@ include(":hubtickcounter")
 include(":hubzalcano")
 include(":influxdb")
 include(":inventoryscrabble")
-include(":inventorysetups")
 include(":inventorysummary")
 include(":loottable")
 include(":lowercaseusernames")
@@ -139,6 +139,8 @@ include(":worldhider")
 include(":worldhighlighter")
 include(":xpgrapher")
 include(":zoom")
+ */
+include(":inventorysetups")
 
 for (project in rootProject.children) {
     project.apply {
