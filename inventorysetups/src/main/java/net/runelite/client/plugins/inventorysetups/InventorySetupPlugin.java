@@ -34,6 +34,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
@@ -481,8 +482,8 @@ public class InventorySetupPlugin extends Plugin
 			return;
 		}
 
-		if (event.getOption().equals("Search")
-			&& client.getWidget(WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND).getSpriteId() != SpriteID.EQUIPMENT_SLOT_SELECTED)
+		if (event.getOption() != null && event.getOption().equals("Search")
+				&& Optional.ofNullable(client.getWidget(WidgetInfo.BANK_SEARCH_BUTTON_BACKGROUND)).map(x -> x.getSpriteId() != SpriteID.EQUIPMENT_SLOT_SELECTED).orElse(false))
 		{
 			// This ensures that when clicking Search when tab is selected, the search input is opened rather
 			// than client trying to close it first
