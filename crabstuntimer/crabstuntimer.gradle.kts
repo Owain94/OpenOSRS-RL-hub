@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "0.0.8"
 
 project.extra["PluginName"] = "Crab Stun Timers"
 project.extra["PluginDescription"] = "Timers for when crabs in CoX get unstunned."

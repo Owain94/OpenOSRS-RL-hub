@@ -25,7 +25,7 @@ jobs:
 
   build:
     name: Build
-    needs: [pr-lint, validate]
+    needs: [validate]
     runs-on: ubuntu-latest
 
     steps:
@@ -66,7 +66,7 @@ jobs:
         working-directory: OpenOSRS
 
       - name: Building client
-        run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew build --stacktrace -x test --console=plain
         working-directory: OpenOSRS
 
       - name: Upload client artifacts to local maven
@@ -78,15 +78,15 @@ jobs:
         working-directory: OpenOSRS-plugins
 
       - name: Assembling OpenOSRS plugins
-        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
+        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble :wiki:assemble :slayer:assemble :raids:assemble --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Building OpenOSRS plugins
-        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build :wiki:build :slayer:build :raids:build --stacktrace -x test --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Upload OpenOSRS plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal :raids:publishToMavenLocal --stacktrace -x test --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Make gradlew executable
@@ -98,169 +98,12 @@ jobs:
         working-directory: Owain94-RL-hub
 
       - name: Building RL hub plugins
-        run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: Owain94-RL-hub
-
-
-  checkstyleMain:
-    name: Checkstyle main
-    needs: [pr-lint, validate]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1.4.2
-        with:
-          java-version: 11
-
-      - uses: actions/checkout@v2.3.2
-        with:
-          path: Owain94-RL-hub
-
-      - uses: actions/checkout@v2.3.2
-        with:
-          repository: open-osrs/runelite
-          ref: master
-          path: OpenOSRS
-
-      - uses: actions/checkout@v2.3.2
-        with:
-          repository: open-osrs/plugins
-          ref: master
-          path: OpenOSRS-plugins
-
-      - uses: actions/cache@v2.1.1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Make gradlew executable (client)
-        run: chmod +x ./gradlew
-        working-directory: OpenOSRS
-
-      - name: Assembling client
-        run: ./gradlew assemble --console=plain
-        working-directory: OpenOSRS
-
-      - name: Building client
-        run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: OpenOSRS
-
-      - name: Upload client artifacts to local maven
-        run: ./gradlew :http-api:publishToMavenLocal :runelite-api:publishToMavenLocal :runelite-client:publishToMavenLocal --console=plain
-        working-directory: OpenOSRS
-
-      - name: Make gradlew executable (plugins)
-        run: chmod +x ./gradlew
-        working-directory: OpenOSRS-plugins
-
-      - name: Assembling OpenOSRS plugins
-        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
-        working-directory: OpenOSRS-plugins
-
-      - name: Building OpenOSRS plugins
-        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: OpenOSRS-plugins
-
-      - name: Upload OpenOSRS plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: OpenOSRS-plugins
-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-        working-directory: Owain94-RL-hub
-
-      - name: Assembling RL hub plugins
-        run: ./gradlew assemble --console=plain
-        working-directory: Owain94-RL-hub
-
-      - name: Checking RL hub plugins code conventions (Main)
-        run: ./gradlew checkstyleMain --console=plain
-        working-directory: Owain94-RL-hub
-
-  checkstyleTest:
-    name: Checkstyle test
-    needs: [pr-lint, validate]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1.4.2
-        with:
-          java-version: 11
-
-      - uses: actions/checkout@v2.3.2
-        with:
-          path: Owain94-RL-hub
-
-      - uses: actions/checkout@v2.3.2
-        with:
-          repository: open-osrs/runelite
-          ref: master
-          path: OpenOSRS
-
-      - uses: actions/checkout@v2.3.2
-        with:
-          repository: open-osrs/plugins
-          ref: master
-          path: OpenOSRS-plugins
-
-      - uses: actions/cache@v2.1.1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Make gradlew executable (client)
-        run: chmod +x ./gradlew
-        working-directory: OpenOSRS
-
-      - name: Assembling client
-        run: ./gradlew assemble --console=plain
-        working-directory: OpenOSRS
-
-      - name: Building client
-        run: ./gradlew build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: OpenOSRS
-
-      - name: Upload client artifacts to local maven
-        run: ./gradlew :http-api:publishToMavenLocal :runelite-api:publishToMavenLocal :runelite-client:publishToMavenLocal --console=plain
-        working-directory: OpenOSRS
-
-      - name: Make gradlew executable (plugins)
-        run: chmod +x ./gradlew
-        working-directory: OpenOSRS-plugins
-
-      - name: Assembling OpenOSRS plugins
-        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
-        working-directory: OpenOSRS-plugins
-
-      - name: Building OpenOSRS plugins
-        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: OpenOSRS-plugins
-
-      - name: Upload OpenOSRS plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
-        working-directory: OpenOSRS-plugins
-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-        working-directory: Owain94-RL-hub
-
-      - name: Assembling RL hub plugins
-        run: ./gradlew assemble --console=plain
-        working-directory: Owain94-RL-hub
-
-      - name: Checking RL hub plugins code conventions (Test)
-        run: ./gradlew checkstyleTest --console=plain
+        run: ./gradlew build --stacktrace -x test --console=plain
         working-directory: Owain94-RL-hub
 
   bump:
     name: Check version numbers
-    needs: [pr-lint, validate]
+    needs: [validate]
     runs-on: ubuntu-latest
 
     steps:
@@ -328,7 +171,7 @@ jobs:
 
   approve:
     name: Approve
-    needs: [build, checkstyleMain, checkstyleTest, bump]
+    needs: [build, bump]
     runs-on: ubuntu-latest
 
     steps:

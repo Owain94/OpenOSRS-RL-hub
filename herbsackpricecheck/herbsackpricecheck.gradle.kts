@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Herb Sack Price Check"
 project.extra["PluginDescription"] = "Tells you the price of the herbs in your herb sack"

@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.0.4"
 
 project.extra["PluginName"] = "Equipment Screenshot"
 project.extra["PluginDescription"] = "Takes screenshots of inventory and equipt items"
