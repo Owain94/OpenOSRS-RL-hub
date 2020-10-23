@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.0.5"
 
 project.extra["PluginName"] = "Discord Loot Logger"
 project.extra["PluginDescription"] = "Logs loot received to a Discord Webhook"

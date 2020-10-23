@@ -27,14 +27,61 @@ package net.runelite.client.plugins.annoyancemute;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigTitleSection;
+import net.runelite.client.config.Title;
 
 @ConfigGroup("annoyancemute")
 public interface AnnoyanceMuteConfig extends Config
 {
+	@ConfigTitleSection(
+		keyName = "combatTitle",
+		name = "Combat",
+		description = "Combat sounds to mute",
+		position = 0
+	)
+	default Title combatTitle()
+	{
+		return new Title();
+	}
+
+	@ConfigTitleSection(
+		keyName = "npcsTitle",
+		name = "NPCs",
+		description = "NPC sounds to mute",
+		position = 1
+	)
+	default Title npcsTitle()
+	{
+		return new Title();
+	}
+
+	@ConfigTitleSection(
+		keyName = "skillingTitle",
+		name = "Skilling",
+		description = "Skilling sounds to mute",
+		position = 2
+	)
+	default Title skillingTitle()
+	{
+		return new Title();
+	}
+
+	@ConfigTitleSection(
+		keyName = "miscellaneousTitle",
+		name = "Miscellaneous",
+		description = "Miscellaneous sounds to mute",
+		position = 3
+	)
+	default Title miscellaneousTitle()
+	{
+		return new Title();
+	}
+
 	@ConfigItem(
 		keyName = "mutePetSounds",
-		name = "Pet sounds",
-		description = "Mutes the sounds of noise-making pets"
+		name = "Pets",
+		description = "Mutes the sounds of noise-making pets",
+		titleSection = "npcsTitle"
 	)
 	default boolean mutePetSounds()
 	{
@@ -44,7 +91,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteAreaOfEffectSpells",
 		name = "Humidify",
-		description = "Mutes humidify spell sound"
+		description = "Mutes humidify spell sound",
+		titleSection = "skillingTitle"
 	)
 	default boolean muteAOESounds()
 	{
@@ -54,7 +102,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteSnowballs",
 		name = "Snowballs",
-		description = "Mutes the sounds of snowballs being thrown"
+		description = "Mutes the sounds of snowballs being thrown",
+		titleSection = "miscellaneousTitle"
 	)
 	default boolean muteSnowballSounds()
 	{
@@ -64,7 +113,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteWhack",
 		name = "Whack",
-		description = "Mutes the Rubber chicken and Stale baguette whack sound"
+		description = "Mutes the Rubber chicken and Stale baguette whack sound",
+		titleSection = "miscellaneousTitle"
 	)
 	default boolean muteRubberChickenSounds()
 	{
@@ -74,7 +124,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteCrier",
 		name = "Town Crier",
-		description = "Mutes the sounds of the Town Crier"
+		description = "Mutes the sounds of the Town Crier",
+		titleSection = "npcsTitle"
 	)
 	default boolean muteTownCrierSounds()
 	{
@@ -84,7 +135,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteCannon",
 		name = "Cannon spin",
-		description = "Mutes the sounds of a cannon spinning"
+		description = "Mutes the sounds of a cannon spinning",
+		titleSection = "combatTitle"
 	)
 	default boolean muteCannon()
 	{
@@ -94,7 +146,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteREEEE",
 		name = "Armadyl Crossbow",
-		description = "Mutes the REEEEE of the ACB spec"
+		description = "Mutes the REEEEE of the ACB spec",
+		titleSection = "combatTitle"
 	)
 	default boolean muteREEEE()
 	{
@@ -104,7 +157,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteSire",
 		name = "Sire Spawns",
-		description = "Mutes the sounds of the Abyssal Sire's spawns"
+		description = "Mutes the sounds of the Abyssal Sire's spawns",
+		titleSection = "npcsTitle"
 	)
 	default boolean muteSire()
 	{
@@ -114,7 +168,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteObelisk",
 		name = "Wilderness Obelisk",
-		description = "Mutes the sounds of the Wilderness Obelisk"
+		description = "Mutes the sounds of the Wilderness Obelisk",
+		titleSection = "miscellaneousTitle"
 	)
 	default boolean muteObelisk()
 	{
@@ -124,7 +179,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteRandoms",
 		name = "Random Events",
-		description = "Mutes the sounds produced by random events"
+		description = "Mutes the sounds produced by random events",
+		titleSection = "npcsTitle"
 	)
 	default boolean muteRandoms()
 	{
@@ -134,7 +190,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteTekton",
 		name = "Tekton meteors",
-		description = "Mutes the sound of Tekton's meteor attack"
+		description = "Mutes the sound of Tekton's meteor attack",
+		titleSection = "npcsTitle"
 	)
 	default boolean muteTekton()
 	{
@@ -144,7 +201,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteDenseEssence",
 		name = "Dense Essence",
-		description = "Mutes the sound of chiseling Dense Essence"
+		description = "Mutes the sound of chiseling Dense Essence",
+		titleSection = "skillingTitle"
 	)
 	default boolean muteDenseEssence()
 	{
@@ -154,7 +212,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "muteChopChop",
 		name = "Chop Chop!",
-		description = "Mutes the sound of the Dragon axe special"
+		description = "Mutes the sound of the Dragon axe special",
+		titleSection = "skillingTitle"
 	)
 	default boolean muteChopChop()
 	{
@@ -164,7 +223,8 @@ public interface AnnoyanceMuteConfig extends Config
 	@ConfigItem(
 		keyName = "plankMake",
 		name = "Plank Make",
-		description = "Mutes the sound of Plank Make"
+		description = "Mutes the sound of Plank Make",
+		titleSection = "skillingTitle"
 	)
 	default boolean mutePlankMake()
 	{
@@ -172,9 +232,10 @@ public interface AnnoyanceMuteConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "nightmareParry",
+		keyName = "muteNightmare",
 		name = "Nightmare",
-		description = "Mutes the sound of the Nightmare's parry"
+		description = "Mutes the sound of the Nightmare's parry",
+		titleSection = "npcsTitle"
 	)
 	default boolean muteNightmare()
 	{
@@ -182,11 +243,34 @@ public interface AnnoyanceMuteConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "pyramidScarabs",
+		keyName = "muteScarabs",
 		name = "Scarab Swarm",
-		description = "Mutes the sound of the Scarab swarm in Pyramid Plunder"
+		description = "Mutes the sound of the Scarab swarm in Pyramid Plunder",
+		titleSection = "npcsTitle"
 	)
 	default boolean muteScarabs()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "muteFishing",
+		name = "Fishing",
+		description = "Mutes the sound of Fishing",
+		titleSection = "skillingTitle"
+	)
+	default boolean muteFishing()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "muteAlchemy",
+		name = "Alchemy",
+		description = "Mutes the sounds of Low and High Alchemy",
+		titleSection = "skillingTitle"
+	)
+	default boolean muteAlchemy()
 	{
 		return true;
 	}

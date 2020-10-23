@@ -23,14 +23,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.0.7"
 
 project.extra["PluginName"] = "Bank Tag Generation"
 project.extra["PluginDescription"] = "Allows the creation of bank tags from categories on the offical OSRS wiki"
 
 dependencies {
     compileOnly("com.openosrs.externals:banktags:0.0.+")
-    compileOnly("com.openosrs.externals:cluescroll:0.0.+")
+    compileOnly("com.openosrs.externals:cluescroll:0.+")
 }
 
 tasks {

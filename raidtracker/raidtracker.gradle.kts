@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.4"
 
 project.extra["PluginName"] = "Raid Data Tracker"
 project.extra["PluginDescription"] = "Tracks all loot received within the Chambers of Xeric, including splits. Also tracks the total, and personal points received, so that you can accurately determine your personal droprate, and dryness."

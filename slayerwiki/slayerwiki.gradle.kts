@@ -23,13 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Slayer Wiki"
 project.extra["PluginDescription"] = "Adds Wiki option to slayer equipment to lookup current task."
 
 dependencies {
-    compileOnly("com.openosrs.externals:slayer:0.0.+")
+    compileOnly("com.openosrs.externals:slayer:0.+")
 }
 
 tasks {

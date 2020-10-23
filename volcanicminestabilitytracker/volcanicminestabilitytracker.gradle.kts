@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.0.3"
 
 project.extra["PluginName"] = "Volcanic Mine Stability Tracker"
 project.extra["PluginDescription"] = "Tracks mine stability changes and draws them on the hud"

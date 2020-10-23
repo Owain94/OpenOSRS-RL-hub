@@ -23,13 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.8"
+version = "0.0.9"
 
 project.extra["PluginName"] = "EmojiScape"
 project.extra["PluginDescription"] = "Adds Runescape icons to chat"
 
 dependencies {
-    implementation(group = "commons-io", name = "commons-io", version = "2.7")
+    implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
 }
 
 tasks {
