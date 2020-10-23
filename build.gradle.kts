@@ -5,9 +5,7 @@ buildscript {
 }
 
 plugins {
-    checkstyle
     java
-    id("com.simonharrer.modernizer") version "2.1.0-1" apply false
     id("com.github.ben-manes.versions") version "0.33.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.15"
 }
@@ -48,18 +46,16 @@ subprojects {
     project.extra["PluginLicense"] = "3-Clause BSD License"
 
     apply<JavaPlugin>()
-    apply(plugin = "checkstyle")
     apply(plugin = "com.github.ben-manes.versions")
     apply(plugin = "se.patrikerdes.use-latest-versions")
-    apply(plugin = "com.simonharrer.modernizer")
 
     dependencies {
         annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
         annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.4.1")
 
-        compileOnly(group = "com.openosrs", name = "http-api", version = "3.4.5")
-        compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.4.5")
-        compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.4.5")
+        compileOnly(group = "com.openosrs", name = "http-api", version = "3.5.1")
+        compileOnly(group = "com.openosrs", name = "runelite-api", version = "3.5.1")
+        compileOnly(group = "com.openosrs", name = "runelite-client", version = "3.5.1")
 
         compileOnly(group = "org.apache.commons", name = "commons-text", version = "1.9")
         compileOnly(group = "com.google.guava", name = "guava", version = "29.0-jre")
@@ -71,13 +67,6 @@ subprojects {
         compileOnly(group = "org.pf4j", name = "pf4j", version = "3.4.1")
         compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.6")
         compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "3.0.0")
-    }
-
-    checkstyle {
-        maxWarnings = 0
-        toolVersion = "8.25"
-        isShowViolations = true
-        isIgnoreFailures = false
     }
 
     configure<JavaPluginConvention> {

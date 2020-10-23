@@ -78,15 +78,15 @@ jobs:
         working-directory: OpenOSRS-plugins
 
       - name: Assembling OpenOSRS plugins
-        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
+        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble :wiki:assemble :slayer:assemble :raids:assemble --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Building OpenOSRS plugins
-        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build :wiki:build :slayer:build :raids:build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Upload OpenOSRS plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal :raids:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Make gradlew executable
@@ -157,15 +157,15 @@ jobs:
         working-directory: OpenOSRS-plugins
 
       - name: Assembling OpenOSRS plugins
-        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
+        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble :wiki:assemble :slayer:assemble :raids:assemble --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Building OpenOSRS plugins
-        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build :wiki:build :slayer:build :raids:build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Upload OpenOSRS plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal :raids:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Make gradlew executable
@@ -235,15 +235,15 @@ jobs:
         working-directory: OpenOSRS-plugins
 
       - name: Assembling OpenOSRS plugins
-        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble --console=plain
+        run: ./gradlew :loottracker:assemble :banktags:assemble :runepouch:assemble :emojis:assemble :cluescroll:assemble :wiki:assemble :slayer:assemble :raids:assemble --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Building OpenOSRS plugins
-        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:build :banktags:build :runepouch:build :emojis:build :cluescroll:build :wiki:build :slayer:build :raids:build --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Upload OpenOSRS plugins artifacts to local maven
-        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
+        run: ./gradlew :loottracker:publishToMavenLocal :banktags:publishToMavenLocal :runepouch:publishToMavenLocal :emojis:publishToMavenLocal :cluescroll:publishToMavenLocal :wiki:publishToMavenLocal :slayer:publishToMavenLocal :raids:publishToMavenLocal --stacktrace -x test -x checkstyleMain --console=plain
         working-directory: OpenOSRS-plugins
 
       - name: Make gradlew executable

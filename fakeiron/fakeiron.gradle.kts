@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.0.5"
 
 project.extra["PluginName"] = "Fake Iron Icon"
 project.extra["PluginDescription"] = "Shows a fake ironman icon next to your name. Stripped down version of what Skiddler, Ron, Purpp and EVScape have"

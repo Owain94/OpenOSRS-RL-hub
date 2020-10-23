@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.15"
+version = "0.0.16"
 
 project.extra["PluginName"] = "Resource packs"
 project.extra["PluginDescription"] = "Allows you to change the look of the UI in runescape"
