@@ -25,7 +25,7 @@ jobs:
 
   build:
     name: Build
-    needs: [pr-lint, validate]
+    needs: [validate]
     runs-on: ubuntu-latest
 
     steps:
@@ -103,7 +103,7 @@ jobs:
 
   bump:
     name: Check version numbers
-    needs: [pr-lint, validate]
+    needs: [validate]
     runs-on: ubuntu-latest
 
     steps:
