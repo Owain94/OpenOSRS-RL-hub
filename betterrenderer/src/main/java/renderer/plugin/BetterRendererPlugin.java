@@ -116,7 +116,8 @@ import renderer.util.Util;
 @PluginDescriptor(
 	name = "Better Renderer",
 	description = "Optimized renderer providing nearly infinite view distance and minor graphical improvements",
-	type = PluginType.UTILITY
+	type = PluginType.UTILITY,
+	enabledByDefault = false
 )
 public class BetterRendererPlugin extends Plugin implements DrawCallbacks
 {
