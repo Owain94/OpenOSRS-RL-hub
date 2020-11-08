@@ -27,6 +27,7 @@ plugins{
 }
 version = "0.0.1"
 
+project.extra["PluginProvider"] = "Zeruth"
 project.extra["PluginName"] = "Better Renderer"
 project.extra["PluginDescription"] = "Optimized renderer providing nearly infinite view distance and minor graphical improvements"
 
