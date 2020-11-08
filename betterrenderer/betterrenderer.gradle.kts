@@ -34,10 +34,10 @@ project.extra["PluginDescription"] = "Optimized renderer providing nearly infini
 
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.4")
-    compileOnly("org.joml:joml:1.9.24")
 
     compileOnly("com.openosrs.externals:gpu:0.0.+")
 
+    implementation("org.joml:joml:1.9.24")
     implementation("org.lwjgl:lwjgl:3.2.3")
     implementation("org.lwjgl:lwjgl-opengl:3.2.3")
     implementation("org.lwjgl:lwjgl-glfw:3.2.3")

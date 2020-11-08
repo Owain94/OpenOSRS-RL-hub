@@ -116,7 +116,8 @@ import renderer.util.Util;
 @PluginDescriptor(
 	name = "Better Renderer",
 	description = "Optimized renderer providing nearly infinite view distance and minor graphical improvements",
-	type = PluginType.UTILITY)
+	type = PluginType.UTILITY
+)
 public class BetterRendererPlugin extends Plugin implements DrawCallbacks
 {
 	private static final String XTEA_LOCATION = "https://gist.githubusercontent.com/Runemoro/d68a388aeb35ad432adf8af027eae832/raw/xtea.json";
