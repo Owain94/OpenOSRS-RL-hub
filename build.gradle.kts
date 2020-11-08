@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     java
-    id("com.github.ben-manes.versions") version "0.33.0"
+    id("com.github.ben-manes.versions") version "0.35.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.15"
 }
 
