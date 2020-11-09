@@ -113,7 +113,7 @@ public class Renderer
 				int x = (int) (position.x + dx) / CHUNK_SIZE;
 				int y = (int) (position.y + dy) / CHUNK_SIZE;
 
-				if (!visible(x, y))
+				if (Math.sqrt(dx*dx + dy*dy) > 16 && !visible(x, y))
 				{
 					continue;
 				}

@@ -25,9 +25,9 @@
 plugins{
     id("com.github.johnrengelman.shadow") version "5.1.0"
 }
-version = "0.0.1"
+version = "0.0.2"
 
-project.extra["PluginProvider"] = "Zeruth"
+project.extra["PluginProvider"] = "RuneMoro"
 project.extra["PluginName"] = "Better Renderer"
 project.extra["PluginDescription"] = "Optimized renderer providing nearly infinite view distance and minor graphical improvements"
 
