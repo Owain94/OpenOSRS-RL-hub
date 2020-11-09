@@ -21,7 +21,6 @@ import net.runelite.api.Actor;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
 import net.runelite.api.Entity;
-import net.runelite.api.GameState;
 import net.runelite.api.Model;
 import net.runelite.api.Texture;
 import net.runelite.api.Tile;
@@ -29,12 +28,10 @@ import net.runelite.api.TileModel;
 import net.runelite.api.TilePaint;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.hooks.DrawCallbacks;
 import net.runelite.client.RuneLite;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
@@ -120,15 +117,23 @@ import renderer.util.Util;
 	type = PluginType.UTILITY,
 	enabledByDefault = false
 )
-public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
+public class BetterRendererPlugin extends Plugin implements DrawCallbacks
+{
 	private static final String XTEA_LOCATION = "https://gist.githubusercontent.com/Runemoro/d68a388aeb35ad432adf8af027eae832/raw/xtea.json";
-	@Inject public Client client;
-	@Inject public BetterRendererConfig config;
-	@Inject private DrawManager drawManager;
-	@Inject private ClientThread clientThread;
-	@Inject private PluginManager pluginManager;
-	@Inject private OverlayManager overlayManager;
-	@Inject private LoadingCacheOverlay loadingCacheOverlay;
+	@Inject
+	public Client client;
+	@Inject
+	public BetterRendererConfig config;
+	@Inject
+	private DrawManager drawManager;
+	@Inject
+	private ClientThread clientThread;
+	@Inject
+	private PluginManager pluginManager;
+	@Inject
+	private OverlayManager overlayManager;
+	@Inject
+	private LoadingCacheOverlay loadingCacheOverlay;
 
 	private JawtContext context;
 	public Renderer renderer;
@@ -155,34 +160,46 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 	private Thread initThread;
 
 	@Override
-	protected void startUp() {
+	protected void startUp()
+	{
 		// Stop the GPU plugin before starting up
-		for (Plugin plugin : pluginManager.getPlugins()) {
-			if (plugin.getName().equals("GPU") && pluginManager.isPluginEnabled(plugin)) {
-				try {
+		for (Plugin plugin : pluginManager.getPlugins())
+		{
+			if (plugin.getName().equals("GPU") && pluginManager.isPluginEnabled(plugin))
+			{
+				try
+				{
 					System.out.println("Stopping GPU plugin");
 					pluginManager.stopPlugin(plugin);
-				} catch (PluginInstantiationException e) {
+				}
+				catch (PluginInstantiationException e)
+				{
 					throw new RuntimeException(e);
 				}
 			}
 		}
 
 		// Remove off-heap memory limit (default is equal to Xmx)
-		try {
+		try
+		{
 			ByteBuffer.allocateDirect(0);
 			Class<?> bitsClass = Class.forName("java.nio.Bits");
 			Field maxMemoryField;
 
-			try {
+			try
+			{
 				maxMemoryField = bitsClass.getDeclaredField("MAX_MEMORY");
-			} catch (NoSuchFieldException e) {
+			}
+			catch (NoSuchFieldException e)
+			{
 				maxMemoryField = bitsClass.getDeclaredField("maxMemory"); // Java 8
 			}
 
 			maxMemoryField.setAccessible(true);
 			maxMemoryField.set(null, Long.MAX_VALUE);
-		} catch (ReflectiveOperationException e) {
+		}
+		catch (ReflectiveOperationException e)
+		{
 			throw new AssertionError(e);
 		}
 
@@ -191,12 +208,15 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		initThread = new Thread(() -> {
 			overlayManager.add(loadingCacheOverlay);
 
-			try {
+			try
+			{
 				Path xteaPath = RuneLite.RUNELITE_DIR.toPath().resolve("better-renderer/xtea.json");
 				Files.createDirectories(xteaPath.getParent());
 				Files.write(xteaPath, Util.readAllBytes(new URL(XTEA_LOCATION).openStream()));
 				CacheSystem.CACHE.init(client.getWorld(), client.getRevision());
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				throw new RuntimeException(e);
 			}
 
@@ -208,7 +228,8 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		initThread.start();
 	}
 
-	private void init() {
+	private void init()
+	{
 		client.setDrawCallbacks(this);
 		client.setGpu(true);
 		client.resizeCanvas();
@@ -227,23 +248,30 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 	}
 
 	@Override
-	protected void shutDown() {
+	protected void shutDown()
+	{
 		clientThread.invoke(() -> {
-			try {
+			try
+			{
 				overlayManager.remove(loadingCacheOverlay);
 				initThread.stop();
 				renderer.chunkScheduler.stopAllThreads();
-			} catch (Throwable ignored) {
+			}
+			catch (Throwable ignored)
+			{
 
 			}
 
 			client.setDrawCallbacks(null);
 			client.setGpu(false);
 
-			try {
+			try
+			{
 				glfwTerminate();
 				context.close();
-			} catch (Throwable ignored) {
+			}
+			catch (Throwable ignored)
+			{
 
 			}
 
@@ -271,16 +299,20 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 	}
 
 	@Provides
-	public BetterRendererConfig provideConfig(ConfigManager configManager) {
+	public BetterRendererConfig provideConfig(ConfigManager configManager)
+	{
 		return configManager.getConfig(BetterRendererConfig.class);
 	}
 
 	@Override
-	public void draw(Entity renderable, int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, long hash) {
-		try {
+	public void draw(Entity renderable, int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, long hash)
+	{
+		try
+		{
 			Model model = renderable instanceof Model ? (Model) renderable : renderable.getModel();
 
-			if (model == null) {
+			if (model == null)
+			{
 				return;
 			}
 
@@ -288,14 +320,16 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 			model.calculateExtreme(orientation);
 			client.checkClickbox(model, orientation, pitchSin, pitchCos, yawSin, yawCos, x, y, z, hash);
 
-			if (!(renderable instanceof Model)) {
+			if (!(renderable instanceof Model))
+			{
 				Vector3d pos = new Vector3d(
 					client.getBaseX() + (x + client.getCameraX2()) / 128.,
 					client.getBaseY() + (z + client.getCameraZ2()) / 128.,
 					-(y + client.getCameraY2()) / 128.
 				);
 
-				for (int faceIndex = 0; faceIndex < model.getTrianglesCount(); faceIndex++) {
+				for (int faceIndex = 0; faceIndex < model.getTrianglesCount(); faceIndex++)
+				{
 					int alpha = model.getTriangleTransparencies() == null ? 0xff : 0xff - model.getTriangleTransparencies()[faceIndex];
 					BufferBuilder buffer = alpha == 0xff ? dynamicBuffer.opaqueBuffer : dynamicBuffer.translucentBuffer;
 					byte priority = model.getFaceRenderPriorities() == null ? 0 : model.getFaceRenderPriorities()[faceIndex];
@@ -313,9 +347,12 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 					int color3 = model.getFaceColors3()[faceIndex];
 
 
-					if (color3 == -1) {
+					if (color3 == -1)
+					{
 						color2 = color3 = color1;
-					} else if (color3 == -2) {
+					}
+					else if (color3 == -2)
+					{
 						continue; // hidden
 					}
 
@@ -323,12 +360,17 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 					color2 = Colors.hsl(color2) & 0xffffff;
 					color3 = Colors.hsl(color3) & 0xffffff;
 
-					short textureId = model.getFaceTextures()==null?-1: model.getFaceTextures()[faceIndex];
+					short textureId = model.getFaceTextures() == null ? -1 : model.getFaceTextures()[faceIndex];
 
-					if (textureId != -1) {
-						if (true) continue;
+					if (textureId != -1)
+					{
+						if (true)
+						{
+							continue;
+						}
 						TextureDefinition texture = CacheSystem.getTextureDefinition(textureId);
-						if (texture != null) {
+						if (texture != null)
+						{
 							color1 = Colors.darken(texture.averageColor, (color1 & 0xff) / 255.);
 							color2 = Colors.darken(texture.averageColor, (color2 & 0xff) / 255.);
 							color3 = Colors.darken(texture.averageColor, (color3 & 0xff) / 255.);
@@ -340,50 +382,69 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 					buffer.vertex(c, alpha << 24 | color3, 40 + priority);
 				}
 			}
-		} catch (Throwable t) {
+		}
+		catch (Throwable t)
+		{
 			handleCrash(t);
 		}
 	}
 
 	@Override
-	public void drawScenePaint(int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, TilePaint paint, int tileZ, int tileX, int tileY, int zoom, int centerX, int centerY) {
+	public void drawScenePaint(int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, TilePaint paint, int tileZ, int tileX, int tileY, int zoom, int centerX, int centerY)
+	{
 
 	}
 
 	@Override
-	public void drawSceneModel(int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, TileModel model, int tileZ, int tileX, int tileY, int zoom, int centerX, int centerY) {
+	public void drawSceneModel(int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, TileModel model, int tileZ, int tileX, int tileY, int zoom, int centerX, int centerY)
+	{
 
 	}
 
 	@Override
-	public void draw() {
-		try {
-			if (hasFrame) {
+	public void draw()
+	{
+		try
+		{
+			if (hasFrame)
+			{
 				finishFrame();
 			}
 
 			startFrame();
 			hasFrame = true;
-		} catch (Throwable t) {
+		}
+		catch (Throwable t)
+		{
 			handleCrash(t);
 		}
 	}
 
-	private void finishFrame() {
-		if (config.offThreadRendering()) {
-			if (frameFuture != null) {
-				try {
+	private void finishFrame()
+	{
+		if (config.offThreadRendering())
+		{
+			if (frameFuture != null)
+			{
+				try
+				{
 					frameFuture.get();
-				} catch (InterruptedException | ExecutionException e) {
+				}
+				catch (InterruptedException | ExecutionException e)
+				{
 					throw new UncheckedExecutionException(e);
 				}
 
 				context.attach();
-			} else {
+			}
+			else
+			{
 				context.attach();
 				renderWorld(width, height, dynamicBuffer);
 			}
-		} else {
+		}
+		else
+		{
 			context.attach();
 			renderWorld(width, height, dynamicBuffer);
 		}
@@ -402,16 +463,19 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 
 		int err = glGetError();
 
-		if (err != 0) {
+		if (err != 0)
+		{
 			throw new IllegalStateException("0x" + Integer.toHexString(err));
 		}
 	}
 
-	private void startFrame() {
+	private void startFrame()
+	{
 		width = context.width();
 		height = context.height();
 
-		if (client.getLocalPlayer() != null && Math.abs(client.getBaseX() + client.getCameraX() / 128.) > 1) { // ???
+		if (client.getLocalPlayer() != null && Math.abs(client.getBaseX() + client.getCameraX() / 128.) > 1)
+		{ // ???
 			// Update renderer settings
 			double cameraX = client.getBaseX() + client.getCameraX() / 128.;
 			double cameraY = client.getBaseY() + client.getCameraY() / 128.;
@@ -426,11 +490,14 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 			renderer.rotation.rotateX(-cameraPitch);
 			renderer.rotation.rotateZ(cameraYaw);
 
-			if (config.improvedZoom() /*&& client.getOculusOrbFocalPointX() != client.getLocalPlayer().getLocalLocation().getX()*/) {
+			if (config.improvedZoom() /*&& client.getOculusOrbFocalPointX() != client.getLocalPlayer().getLocalLocation().getX()*/)
+			{
 				renderer.scale = 1;
 				double amount = (1 - 1 / zoom) * getActorPosition(client.getLocalPlayer()).distance(cameraPosition);
 				cameraPosition.add(renderer.rotation.transformInverse(new Vector3d(0, 0, -amount)));
-			} else {
+			}
+			else
+			{
 				renderer.scale = zoom;
 			}
 
@@ -440,12 +507,16 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 			renderer.fogColor = Colors.unpack(client.getSkyboxColor());
 
 			// Instance chunks
-			if (client.isInInstancedRegion()) {
+			if (client.isInInstancedRegion())
+			{
 				Map<Vector3i, Vector4i> chunks = new HashMap<>();
 
-				for (int x1 = 0; x1 < 13; x1++) {
-					for (int y1 = 0; y1 < 13; y1++) {
-						for (int z1 = 0; z1 < 4; z1++) {
+				for (int x1 = 0; x1 < 13; x1++)
+				{
+					for (int y1 = 0; y1 < 13; y1++)
+					{
+						for (int z1 = 0; z1 < 4; z1++)
+						{
 							int chunkData = client.getInstanceTemplateChunks()[z1][x1][y1];
 							int rotation = chunkData >> 1 & 0x3;
 							int x2 = (chunkData >> 14 & 0x3FF);
@@ -460,13 +531,17 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 					}
 				}
 
-				if (renderer.setInstanceChunks(chunks)) {
-					for (Map.Entry<Vector3i, Vector4i> chunk : chunks.entrySet()) {
+				if (renderer.setInstanceChunks(chunks))
+				{
+					for (Map.Entry<Vector3i, Vector4i> chunk : chunks.entrySet())
+					{
 						renderer.world.copyInstanceChunk(chunk.getKey(), new Vector3i(chunk.getValue().x, chunk.getValue().y, chunk.getValue().z), chunk.getValue().w);
 						renderer.chunkScheduler.render(chunk.getKey().x, chunk.getKey().y);
 					}
 				}
-			} else {
+			}
+			else
+			{
 				renderer.setInstanceChunks(null);
 				renderer.world.instanceRegions = null;
 			}
@@ -486,11 +561,13 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		WorldRenderer extra = dynamicBuffer;
 		dynamicBuffer = new WorldRenderer(renderer.world);
 
-		if (config.offThreadRendering()) {
+		if (config.offThreadRendering())
+		{
 			frameFuture = executor.submit(() -> {
 				context.attach();
 
-				if (!executorInitialized) {
+				if (!executorInitialized)
+				{
 					GL.createCapabilities();
 					executorInitialized = true;
 				}
@@ -501,34 +578,40 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		}
 	}
 
-	private void updateWindow() {
+	private void updateWindow()
+	{
 		context.update();
 	}
 
-	private void renderWorld(int width, int height, WorldRenderer dynamic) {
+	private void renderWorld(int width, int height, WorldRenderer dynamic)
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 		renderer.draw(width, height, dynamic);
 	}
 
-	private Vector3d getActorPosition(Actor player) {
+	private Vector3d getActorPosition(Actor player)
+	{
 		WorldPoint pos = WorldPoint.fromLocal(client, player.getLocalLocation());
 		Tile tile = client.getScene().getTiles()[pos.getPlane()][pos.getX() - client.getBaseX()][pos.getY() - client.getBaseY()];
 
-		if (tile == null) { // ??
+		if (tile == null)
+		{ // ??
 			return new Vector3d(0, 0, 0);
 		}
 
 		return convert((tile.getBridge() == null ? tile.getPlane() : tile.getPlane() + 1), player.getLocalLocation());
 	}
 
-	private Vector3d convert(int plane, LocalPoint local) {
+	private Vector3d convert(int plane, LocalPoint local)
+	{
 		return renderer.world.position(
 			client.getBaseX() + local.getX() / 128., client.getBaseY() + local.getY() / 128., plane
 		);
 	}
 
-	private void drawInterface() {
+	private void drawInterface()
+	{
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_TEXTURE_2D);
@@ -537,7 +620,8 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 
 		glBindTexture(GL_TEXTURE_2D, interfaceTexture);
 
-		if (canvasWidth != lastCanvasWidth || canvasHeight != lastCanvasHeight) {
+		if (canvasWidth != lastCanvasWidth || canvasHeight != lastCanvasHeight)
+		{
 			lastCanvasWidth = canvasWidth;
 			lastCanvasHeight = canvasHeight;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, canvasWidth, canvasHeight, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, 0);
@@ -566,21 +650,25 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 	}
 
 	@Override
-	public boolean drawFace(Model model, int face) {
+	public boolean drawFace(Model model, int face)
+	{
 		return false;
 	}
 
 	@Override
-	public void drawScene(int cameraX, int cameraY, int cameraZ, int cameraPitch, int cameraYaw, int plane) {
+	public void drawScene(int cameraX, int cameraY, int cameraZ, int cameraPitch, int cameraYaw, int plane)
+	{
 		client.getScene().setDrawDistance(90);
 	}
 
 	@Override
-	public void animate(Texture texture, int diff) {
+	public void animate(Texture texture, int diff)
+	{
 		// ignored
 	}
 
-	private BufferedImage screenshot() {
+	private BufferedImage screenshot()
+	{
 		int width = client.getCanvasWidth();
 		int height = client.getCanvasWidth();
 
@@ -593,8 +681,10 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y)
+		{
+			for (int x = 0; x < width; ++x)
+			{
 				int r = buffer.get() & 0xff;
 				int g = buffer.get() & 0xff;
 				int b = buffer.get() & 0xff;
@@ -607,7 +697,8 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		return image;
 	}
 
-	private void createInterfaceTexture() {
+	private void createInterfaceTexture()
+	{
 		interfaceTexture = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, interfaceTexture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -617,27 +708,33 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	private void updateFramebuffer() {
-		if (lastWidth == width && lastHeight == height && lastSamples == config.samples().getSamples()) {
+	private void updateFramebuffer()
+	{
+		if (lastWidth == width && lastHeight == height && lastSamples == config.samples().getSamples())
+		{
 			return;
 		}
 
-		if (framebufferTexture != -1) {
+		if (framebufferTexture != -1)
+		{
 			glDeleteTextures(framebufferTexture);
 			framebufferTexture = -1;
 		}
 
-		if (framebuffer != -1) {
+		if (framebuffer != -1)
+		{
 			glDeleteFramebuffers(framebuffer);
 			framebuffer = -1;
 		}
 
-		if (colorRenderbuffer != -1) {
+		if (colorRenderbuffer != -1)
+		{
 			glDeleteRenderbuffers(colorRenderbuffer);
 			colorRenderbuffer = -1;
 		}
 
-		if (depthRenderbuffer != -1) {
+		if (depthRenderbuffer != -1)
+		{
 			glDeleteRenderbuffers(depthRenderbuffer);
 			colorRenderbuffer = -1;
 		}
@@ -676,11 +773,15 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks {
 		lastSamples = config.samples().getSamples();
 	}
 
-	private void handleCrash(Throwable t) {
+	private void handleCrash(Throwable t)
+	{
 		t.printStackTrace();
-		try {
+		try
+		{
 			pluginManager.stopPlugin(this);
-		} catch (PluginInstantiationException e) {
+		}
+		catch (PluginInstantiationException e)
+		{
 			RuntimeException e2 = new RuntimeException(e);
 			e2.addSuppressed(t);
 			throw e2;

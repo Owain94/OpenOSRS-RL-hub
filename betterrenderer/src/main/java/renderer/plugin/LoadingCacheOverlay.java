@@ -28,7 +28,9 @@ public class LoadingCacheOverlay extends Overlay
 	public Dimension render(Graphics2D graphics)
 	{
 		if (client.getGameState() != GameState.LOGGED_IN)
+		{
 			return null;
+		}
 
 		graphics.setFont(FontManager.getRunescapeBoldFont());
 
