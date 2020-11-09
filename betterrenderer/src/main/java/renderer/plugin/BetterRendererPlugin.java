@@ -21,7 +21,6 @@ import net.runelite.api.Actor;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
 import net.runelite.api.Entity;
-import net.runelite.api.GameState;
 import net.runelite.api.Model;
 import net.runelite.api.Texture;
 import net.runelite.api.Tile;
@@ -29,12 +28,10 @@ import net.runelite.api.TileModel;
 import net.runelite.api.TilePaint;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.hooks.DrawCallbacks;
 import net.runelite.client.RuneLite;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
@@ -106,6 +103,7 @@ import static org.lwjgl.opengl.GL32.glVertex2d;
 import org.lwjgl.system.MemoryUtil;
 import org.pf4j.Extension;
 import renderer.cache.CacheSystem;
+import renderer.model.TextureDefinition;
 import renderer.renderer.BufferBuilder;
 import renderer.renderer.Renderer;
 import renderer.renderer.WorldRenderer;
@@ -164,6 +162,23 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks
 	@Override
 	protected void startUp()
 	{
+		// Stop the GPU plugin before starting up
+		for (Plugin plugin : pluginManager.getPlugins())
+		{
+			if (plugin.getName().equals("GPU") && pluginManager.isPluginEnabled(plugin))
+			{
+				try
+				{
+					System.out.println("Stopping GPU plugin");
+					pluginManager.stopPlugin(plugin);
+				}
+				catch (PluginInstantiationException e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}
+
 		// Remove off-heap memory limit (default is equal to Xmx)
 		try
 		{
@@ -283,30 +298,6 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks
 		});
 	}
 
-	@Subscribe
-	public void onGameStateChanged(GameStateChanged event)
-	{
-		if (event.getGameState() != GameState.LOADING)
-		{
-			// Stop the GPU plugin before starting up
-			for (Plugin plugin : pluginManager.getPlugins())
-			{
-				if (plugin.getName().equals("GPU") && pluginManager.isPluginEnabled(plugin))
-				{
-					try
-					{
-						System.out.println("Stopping GPU plugin");
-						pluginManager.stopPlugin(plugin);
-					}
-					catch (PluginInstantiationException e)
-					{
-						throw new RuntimeException(e);
-					}
-				}
-			}
-		}
-	}
-
 	@Provides
 	public BetterRendererConfig provideConfig(ConfigManager configManager)
 	{
@@ -314,58 +305,87 @@ public class BetterRendererPlugin extends Plugin implements DrawCallbacks
 	}
 
 	@Override
-	public void draw(Entity entity, int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, long hash)
+	public void draw(Entity renderable, int orientation, int pitchSin, int pitchCos, int yawSin, int yawCos, int x, int y, int z, long hash)
 	{
-		Model model = entity instanceof Model ? (Model) entity : entity.getModel();
-
-		if (model == null)
+		try
 		{
-			return;
-		}
+			Model model = renderable instanceof Model ? (Model) renderable : renderable.getModel();
 
-		model.calculateBoundsCylinder();
-		model.calculateExtreme(orientation);
-		client.checkClickbox(model, orientation, pitchSin, pitchCos, yawSin, yawCos, x, y, z, hash);
-
-		if (!(entity instanceof Model))
-		{
-			Vector3d pos = new Vector3d(
-				client.getBaseX() + (x + client.getCameraX2()) / 128.,
-				client.getBaseY() + (z + client.getCameraZ2()) / 128.,
-				-(y + client.getCameraY2()) / 128.
-			);
-
-			for (int faceIndex = 0; faceIndex < model.getTrianglesCount(); faceIndex++)
+			if (model == null)
 			{
-				int alpha = model.getTriangleTransparencies() == null ? 0xff : 0xff - model.getTriangleTransparencies()[faceIndex];
-				BufferBuilder buffer = alpha == 0xff ? dynamicBuffer.opaqueBuffer : dynamicBuffer.translucentBuffer;
-				byte priority = model.getFaceRenderPriorities() == null ? 0 : model.getFaceRenderPriorities()[faceIndex];
-
-				int i = model.getTrianglesX()[faceIndex];
-				int j = model.getTrianglesY()[faceIndex];
-				int k = model.getTrianglesZ()[faceIndex];
-
-				Vector3d a = new Vector3d(model.getVerticesX()[i] * WorldRenderer.SCALE, model.getVerticesZ()[i] * WorldRenderer.SCALE, -model.getVerticesY()[i] * WorldRenderer.SCALE).rotateZ(-(Math.PI * orientation / 1024.)).add(pos);
-				Vector3d b = new Vector3d(model.getVerticesX()[j] * WorldRenderer.SCALE, model.getVerticesZ()[j] * WorldRenderer.SCALE, -model.getVerticesY()[j] * WorldRenderer.SCALE).rotateZ(-(Math.PI * orientation / 1024.)).add(pos);
-				Vector3d c = new Vector3d(model.getVerticesX()[k] * WorldRenderer.SCALE, model.getVerticesZ()[k] * WorldRenderer.SCALE, -model.getVerticesY()[k] * WorldRenderer.SCALE).rotateZ(-(Math.PI * orientation / 1024.)).add(pos);
-
-				int color1 = model.getFaceColors1()[faceIndex];
-				int color2 = model.getFaceColors2()[faceIndex];
-				int color3 = model.getFaceColors3()[faceIndex];
-
-				if (color3 == -1)
-				{
-					color2 = color3 = color1;
-				}
-				else if (color3 == -2)
-				{
-					continue; // hidden
-				}
-
-				buffer.vertex(a, alpha << 24 | (Colors.hsl(color1) & 0xffffff), 20 + priority);
-				buffer.vertex(b, alpha << 24 | (Colors.hsl(color2) & 0xffffff), 20 + priority);
-				buffer.vertex(c, alpha << 24 | (Colors.hsl(color3) & 0xffffff), 20 + priority);
+				return;
 			}
+
+			model.calculateBoundsCylinder();
+			model.calculateExtreme(orientation);
+			client.checkClickbox(model, orientation, pitchSin, pitchCos, yawSin, yawCos, x, y, z, hash);
+
+			if (!(renderable instanceof Model))
+			{
+				Vector3d pos = new Vector3d(
+					client.getBaseX() + (x + client.getCameraX2()) / 128.,
+					client.getBaseY() + (z + client.getCameraZ2()) / 128.,
+					-(y + client.getCameraY2()) / 128.
+				);
+
+				for (int faceIndex = 0; faceIndex < model.getTrianglesCount(); faceIndex++)
+				{
+					int alpha = model.getTriangleTransparencies() == null ? 0xff : 0xff - model.getTriangleTransparencies()[faceIndex];
+					BufferBuilder buffer = alpha == 0xff ? dynamicBuffer.opaqueBuffer : dynamicBuffer.translucentBuffer;
+					byte priority = model.getFaceRenderPriorities() == null ? 0 : model.getFaceRenderPriorities()[faceIndex];
+
+					int i = model.getTrianglesX()[faceIndex];
+					int j = model.getTrianglesY()[faceIndex];
+					int k = model.getTrianglesZ()[faceIndex];
+
+					Vector3d a = new Vector3d(model.getVerticesX()[i] * WorldRenderer.SCALE, model.getVerticesZ()[i] * WorldRenderer.SCALE, -model.getVerticesY()[i] * WorldRenderer.SCALE).rotateZ(-(Math.PI * orientation / 1024.)).add(pos);
+					Vector3d b = new Vector3d(model.getVerticesX()[j] * WorldRenderer.SCALE, model.getVerticesZ()[j] * WorldRenderer.SCALE, -model.getVerticesY()[j] * WorldRenderer.SCALE).rotateZ(-(Math.PI * orientation / 1024.)).add(pos);
+					Vector3d c = new Vector3d(model.getVerticesX()[k] * WorldRenderer.SCALE, model.getVerticesZ()[k] * WorldRenderer.SCALE, -model.getVerticesY()[k] * WorldRenderer.SCALE).rotateZ(-(Math.PI * orientation / 1024.)).add(pos);
+
+					int color1 = model.getFaceColors1()[faceIndex];
+					int color2 = model.getFaceColors2()[faceIndex];
+					int color3 = model.getFaceColors3()[faceIndex];
+
+
+					if (color3 == -1)
+					{
+						color2 = color3 = color1;
+					}
+					else if (color3 == -2)
+					{
+						continue; // hidden
+					}
+
+					color1 = Colors.hsl(color1) & 0xffffff;
+					color2 = Colors.hsl(color2) & 0xffffff;
+					color3 = Colors.hsl(color3) & 0xffffff;
+
+					short textureId = model.getFaceTextures() == null ? -1 : model.getFaceTextures()[faceIndex];
+
+					if (textureId != -1)
+					{
+						if (true)
+						{
+							continue;
+						}
+						TextureDefinition texture = CacheSystem.getTextureDefinition(textureId);
+						if (texture != null)
+						{
+							color1 = Colors.darken(texture.averageColor, (color1 & 0xff) / 255.);
+							color2 = Colors.darken(texture.averageColor, (color2 & 0xff) / 255.);
+							color3 = Colors.darken(texture.averageColor, (color3 & 0xff) / 255.);
+						}
+					}
+
+					buffer.vertex(a, alpha << 24 | color1, 40 + priority);
+					buffer.vertex(b, alpha << 24 | color2, 40 + priority);
+					buffer.vertex(c, alpha << 24 | color3, 40 + priority);
+				}
+			}
+		}
+		catch (Throwable t)
+		{
+			handleCrash(t);
 		}
 	}
 

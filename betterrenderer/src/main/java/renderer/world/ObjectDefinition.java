@@ -29,7 +29,7 @@ public class ObjectDefinition
 	public int scaleY = 128;
 	public int scaleZ = 128;
 	public boolean mirror = false;
-	public boolean mergeNormals = false; // TODO: this field seems to be named wrong
+	public boolean flatShading = false; // TODO: ???
 	public Int2IntMap colorSubstitutions = new Int2IntArrayMap();
 	public Int2IntMap textureSubstitutions = new Int2IntArrayMap();
 	public int ambient = 0;

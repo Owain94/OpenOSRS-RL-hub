@@ -133,7 +133,7 @@ public class ObjectLoader
 				def.contouredGround = 0;
 				break;
 			case 22:
-				def.mergeNormals = true;
+				def.flatShading = true;
 				break;
 			case 23:
 				def.unknown1 = true;

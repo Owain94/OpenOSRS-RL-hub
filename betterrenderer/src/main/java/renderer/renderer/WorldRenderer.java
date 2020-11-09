@@ -200,6 +200,14 @@ public class WorldRenderer
 
 	public void object(ObjectDefinition object, LocationType type, int plane, int x, int y, int rotation)
 	{
+		if (BinarySearch.instance != null)
+		{
+			if (!BinarySearch.instance.test(object.id))
+			{
+				return;
+			}
+		}
+
 		if (object.animation != null)
 		{
 			return;
@@ -347,7 +355,7 @@ public class WorldRenderer
 
 			BufferBuilder buffer = 0xff - face.transparency == 0xff ? opaqueBuffer : translucentBuffer;
 
-			if (renderType == 0)
+			if (renderType == 0 && !object.flatShading)
 			{ // smooth shading
 				Vector3d na = normalMatrix.transform(new Vector3d(face.a.normal));
 				Vector3d nb = normalMatrix.transform(new Vector3d(face.b.normal));
@@ -358,7 +366,7 @@ public class WorldRenderer
 				buffer.vertex(c, nc, color, facePriority, ambient, diffuse);
 			}
 
-			if (renderType == 1)
+			if (renderType == 1 || (renderType == 0 && object.flatShading))
 			{ // flat shading
 				Vector3d normal = Util.normal(a, b, c);
 
