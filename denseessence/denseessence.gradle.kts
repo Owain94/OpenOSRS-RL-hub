@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.4"
 
 project.extra["PluginName"] = "Dense Runecrafting"
 project.extra["PluginDescription"] = "Draws an overlay on the Dense Runestone in Zeah"
