@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 plugins{
-    id("com.github.johnrengelman.shadow") version "5.1.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 version = "0.0.2"
 
@@ -37,13 +37,13 @@ dependencies {
 
     compileOnly("com.openosrs.externals:gpu:0.0.+")
 
-    implementation("org.joml:joml:1.9.24")
+    implementation("org.joml:joml:1.9.25")
     implementation("org.lwjgl:lwjgl:3.2.3")
     implementation("org.lwjgl:lwjgl-opengl:3.2.3")
     implementation("org.lwjgl:lwjgl-glfw:3.2.3")
     implementation("org.lwjgl:lwjgl-stb:3.2.3")
     implementation("org.lwjgl:lwjgl-jawt:3.2.3")
-    implementation("it.unimi.dsi:fastutil:8.3.0")
+    implementation("it.unimi.dsi:fastutil:8.4.3")
     implementation("org.apache.commons:commons-compress:1.20")
 
     runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-windows")
