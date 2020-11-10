@@ -24,11 +24,19 @@
  */
 package com.questhelper.quests.onesmallfavour;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
+import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -46,14 +54,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -67,7 +67,7 @@ public class OneSmallFavour extends BasicQuestHelper
 		weathervanePillar, directionals, weatherReport, unfiredPotLid, potLid, potWithLid, breathingSalts, chickenCages5, sharpenedAxe, redMahog;
 
 	ConditionForStep inSanfewRoom, inHamBase, inDwarvenMine, brianAskingQuestion, sanfewAskingQuestion, hasGuthixRest, inGoblinCave, lamp1Empty, lamp1Full, lamp2Empty, lamp2Full,
-		lamp3Empty, lamp3Full, lamp4Empty, lamp4Full, lamp5Empty, lamp5Full,lamp6Empty, lamp6Full, lamp7Empty, lamp7Full, lamp8Empty, lamp8Full, allEmpty, allFull, hasSapphire, hasOpal,
+		lamp3Empty, lamp3Full, lamp4Empty, lamp4Full, lamp5Empty, lamp5Full, lamp6Empty, lamp6Full, lamp7Empty, lamp7Full, lamp8Empty, lamp8Full, allEmpty, allFull, hasSapphire, hasOpal,
 		hasJade, hasRedTopaz, hasPigeonCages, inScrollSpot, slagilithNearby, petraNearby, inSeersVillageUpstairs, onRoof, hasOrnament, hasWeathervanePillar, hasDirectionals, hasPot,
 		addedOrnaments, addedDirectionals, addedWeathervanePillar, hasOrUsedOrnament, hasOrUsedDirectionals, hasOrUsedWeathervanePillar, hasPotWithLid, hasPotLid, hasUnfiredPotLid;
 
@@ -541,7 +541,7 @@ public class OneSmallFavour extends BasicQuestHelper
 		talkToTassie = new NpcStep(this, NpcID.TASSIE_SLIPCAST, new WorldPoint(3085, 3409, 0), "Talk to Tassie Slipcast in the Barbarian Village pottery building.");
 		talkToTassie.addDialogStep("Ok, I'll deal with Hammerspike!");
 
-		goDownToHammerspike = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450,0), "Go into the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
+		goDownToHammerspike = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0), "Go into the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
 		talkToHammerspike = new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Talk to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
 		talkToHammerspike.addDialogStep("Have you always been a gangster?");
 		talkToHammerspike.addDialogStep("Ok, another favour...I think I can manage that.");
@@ -690,7 +690,7 @@ public class OneSmallFavour extends BasicQuestHelper
 		goBackUpToRoof = new ObjectStep(this, ObjectID.LADDER_26118, new WorldPoint(2715, 3472, 1), "Go back up to the Seers' roof and fix the vane.");
 		useVane1 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the ornament on the weathervane.", ornament);
 		useVane2 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the directionals on the weathervane.", directionals);
-		useVane3 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the weathervane pillar on the weathervane.",weathervanePillar);
+		useVane3 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the weathervane pillar on the weathervane.", weathervanePillar);
 		goBackUpLadder.addSubSteps(goBackUpToRoof, useVane1, useVane2, useVane3);
 
 		goFromRoofToPhantuwti = new ObjectStep(this, ObjectID.TRAPDOOR_26119, new WorldPoint(2715, 3472, 3), "Return to Phantuwti.");
@@ -709,12 +709,12 @@ public class OneSmallFavour extends BasicQuestHelper
 		returnToSanfew = new NpcStep(this, NpcID.SANFEW, new WorldPoint(2899, 3429, 1), "Return to Sanfew upstairs in the Taverley herblore store.");
 		returnToSanfew.addDialogStep("Hi there, the Gnome Pilot has agreed to take you to see the ogres!");
 
-		goDownToHammerspikeAgain = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450,0), "Return to the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
+		goDownToHammerspikeAgain = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0), "Return to the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
 		returnToHammerspike = new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Return to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
 		returnToHammerspike.addSubSteps(goDownToHammerspike);
 
 		killGangMembers = new NpcStep(this, NpcID.DWARF_GANG_MEMBER, new WorldPoint(2968, 9811, 0), "Kill dwarf gang members until Hammerspike gives in.");
-		talkToHammerspikeFinal =  new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Return to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
+		talkToHammerspikeFinal = new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Return to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
 		returnToTassie = new NpcStep(this, NpcID.TASSIE_SLIPCAST, new WorldPoint(3085, 3409, 0), "Return to Tassie Slipcast in the Barbarian Village pottery building.");
 		spinPotLid = new ObjectStep(this, ObjectID.POTTERS_WHEEL_14887, new WorldPoint(3087, 3409, 0), "Spin the clay into a pot lid.", softClay);
 		pickUpPot = new ItemStep(this, "Get a pot to put your lid on. There's on in the Barbarian Village helmet shop.", pot);

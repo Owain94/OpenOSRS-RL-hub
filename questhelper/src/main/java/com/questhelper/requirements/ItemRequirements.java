@@ -26,7 +26,6 @@
 package com.questhelper.requirements;
 
 import com.questhelper.steps.conditional.LogicType;
-import com.questhelper.steps.conditional.Operation;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;

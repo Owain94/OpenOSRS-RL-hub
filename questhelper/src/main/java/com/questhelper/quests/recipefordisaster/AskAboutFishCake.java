@@ -39,7 +39,7 @@ public class AskAboutFishCake extends NpcStep
 	@Inject
 	EventBus eventBus;
 
-	private boolean hasSubscribed = false;
+	private final boolean hasSubscribed = false;
 
 	public AskAboutFishCake(QuestHelper questHelper)
 	{
@@ -56,7 +56,9 @@ public class AskAboutFishCake extends NpcStep
 	private void updateCorrectChoice()
 	{
 		if (!hasSubscribed)
-			eventBus.subscribe(GameTick .class, this, this::onGameTick);
+		{
+			eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		}
 
 		boolean askedAboutKelp = client.getVarbitValue(1873) == 1; // And 1874 = 1
 		boolean askedAboutCrab = client.getVarbitValue(1874) == 1;

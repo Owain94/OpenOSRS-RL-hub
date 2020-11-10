@@ -31,6 +31,8 @@ import com.google.inject.Module;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.OwnerStep;
+import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.inject.Inject;
@@ -39,8 +41,6 @@ import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.QuestState;
 import net.runelite.client.eventbus.EventBus;
-import com.questhelper.steps.OwnerStep;
-import com.questhelper.steps.QuestStep;
 
 public abstract class QuestHelper implements Module
 {
@@ -131,15 +131,18 @@ public abstract class QuestHelper implements Module
 		return quest.getVar(client);
 	}
 
-	public ArrayList<ItemRequirement> getItemRequirements() {
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
 		return null;
 	}
 
-	public ArrayList<ItemRequirement> getItemRecommended() {
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
 		return null;
 	}
 
-	public ArrayList<String> getCombatRequirements() {
+	public ArrayList<String> getCombatRequirements()
+	{
 		return null;
 	}
 

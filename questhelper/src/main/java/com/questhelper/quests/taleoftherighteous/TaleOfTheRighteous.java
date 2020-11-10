@@ -25,11 +25,22 @@
 package com.questhelper.quests.taleoftherighteous;
 
 import com.questhelper.ItemCollections;
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.NpcCondition;
 import com.questhelper.steps.conditional.ObjectCondition;
+import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,17 +51,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.TALE_OF_THE_RIGHTEOUS
@@ -60,11 +60,11 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 	ItemRequirement pickaxe, rangedWeapon, runesForCombat, rope, combatGear, xericTalisman, meleeWeapon, antiPoison;
 
 	ConditionForStep inArchive, inPuzzleRoom, strangeObjectEast, strangeObjectWest, isSouthWestWhite, isSouthEastWhite, isNorthWestWhite, isNorthEastWhite, inShiroRoom, inCavern, rockfallNearby, boulderBlockingPath,
-	corruptLizardmanNearby;
+		corruptLizardmanNearby;
 
 	QuestStep talkToPhileas, teleportToArchive, talkToPagida, pushStrangeDeviceWest, attackWithMagic, attackWithMelee, pushStrangeDeviceEast, attackWithRanged, investigateSkeleton,
 		talkToPhileasAgain, goUpToShiro, talkToShiro, talkToDuffy, useRopeOnCrevice, enterCrevice, mineRockfall, pushBoulder, tryToEnterBarrier, killLizardman, inspectUnstableAltar, leaveCave,
-	returnToDuffy, enterCreviceAgain, talkToDuffyInCrevice, talkToGnosi, returnUpToShiro, returnToShiro, returnToPhileasTent, goUpToShrioToFinish, finishQuest;
+		returnToDuffy, enterCreviceAgain, talkToDuffyInCrevice, talkToGnosi, returnUpToShiro, returnToShiro, returnToPhileasTent, goUpToShrioToFinish, finishQuest;
 
 	Zone archive, puzzleRoom, shiroRoom, cavern;
 
@@ -151,7 +151,8 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupItemRequirements() {
+	public void setupItemRequirements()
+	{
 		pickaxe = new ItemRequirement("A pickaxe", ItemCollections.getPickaxes());
 		rangedWeapon = new ItemRequirement("Any ranged weapon + ammo", -1, -1);
 		runesForCombat = new ItemRequirement("Runes for a few casts of a combat spell", -1, -1);
@@ -162,14 +163,16 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 		antiPoison = new ItemRequirement("Anti poison for lizardmen", ItemID.ANTIPOISON4, -1);
 	}
 
-	public void loadZones() {
+	public void loadZones()
+	{
 		archive = new Zone(new WorldPoint(1538, 10210, 0), new WorldPoint(1565, 10237, 0));
 		puzzleRoom = new Zone(new WorldPoint(1563, 10186, 0), new WorldPoint(1591, 10213, 0));
 		shiroRoom = new Zone(new WorldPoint(1539, 3525, 1), new WorldPoint(1563, 3541, 1));
 		cavern = new Zone(new WorldPoint(1157, 9928, 0), new WorldPoint(1205, 9977, 0));
 	}
 
-	public void setupConditions() {
+	public void setupConditions()
+	{
 		inArchive = new ZoneCondition(archive);
 		inPuzzleRoom = new ZoneCondition(puzzleRoom);
 		inShiroRoom = new ZoneCondition(shiroRoom);
@@ -180,7 +183,7 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 		isSouthEastWhite = new ObjectCondition(ObjectID.WHITE_CRYSTAL_31960, new WorldPoint(1581, 10196, 0));
 		isNorthWestWhite = new ObjectCondition(ObjectID.WHITE_CRYSTAL_31960, new WorldPoint(1574, 10203, 0));
 		isNorthEastWhite = new ObjectCondition(ObjectID.WHITE_CRYSTAL_31960, new WorldPoint(1581, 10203, 0));
-		rockfallNearby =  new ObjectCondition(ObjectID.ROCKFALL_32503, new WorldPoint(1182, 9974, 0));
+		rockfallNearby = new ObjectCondition(ObjectID.ROCKFALL_32503, new WorldPoint(1182, 9974, 0));
 		boulderBlockingPath = new ObjectCondition(ObjectID.BOULDER_32504, new WorldPoint(1201, 9960, 0));
 		corruptLizardmanNearby = new NpcCondition(NpcID.CORRUPT_LIZARDMAN_8000);
 	}
@@ -226,7 +229,7 @@ public class TaleOfTheRighteous extends BasicQuestHelper
 		enterCreviceAgain.addDialogStep("Yes.");
 		talkToDuffyInCrevice = new NpcStep(this, NpcID.HISTORIAN_DUFFY, new WorldPoint(1172, 9929, 0), "Talk to Historian Duffy near the Unstable Altar.");
 		talkToGnosi = new NpcStep(this, NpcID.GNOSI, new WorldPoint(1172, 9929, 0), "Talk to Gnosi near the Unstable Altar.");
-		returnUpToShiro =  new ObjectStep(this, ObjectID.STAIRS_27203, new WorldPoint(1545, 3537, 0), "Return to Shiro upstairs in the tent in the south east of Shayzien.");
+		returnUpToShiro = new ObjectStep(this, ObjectID.STAIRS_27203, new WorldPoint(1545, 3537, 0), "Return to Shiro upstairs in the tent in the south east of Shayzien.");
 		returnToShiro = new NpcStep(this, NpcID.LORD_SHIRO_SHAYZIEN, new WorldPoint(1560, 3534, 1), "Return to Shiro upstairs in the tent in the south east of Shayzien.");
 		returnToShiro.addSubSteps(returnUpToShiro);
 		returnToPhileasTent = new DetailedQuestStep(this, new WorldPoint(1513, 3631, 0), "Go to Phileas Rimor's tent in central Shayzien.");

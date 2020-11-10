@@ -1,7 +1,7 @@
 package com.questhelper.quests.myarmsbigadventure;
 
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ObjectStep;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +18,7 @@ public class AddDung extends ObjectStep
 	@Inject
 	EventBus eventBus;
 
-	private boolean hasSubscribed = false;
+	private final boolean hasSubscribed = false;
 
 	ItemRequirement dung = new ItemRequirement("Ugthanki dung", ItemID.UGTHANKI_DUNG, 3);
 
@@ -39,7 +39,9 @@ public class AddDung extends ObjectStep
 	protected void updateSteps()
 	{
 		if (!hasSubscribed)
-			eventBus.subscribe(GameTick .class, this, this::onGameTick);
+		{
+			eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		}
 
 		int numCompToAdd = 3 - client.getVarbitValue(2791);
 		dung.setQuantity(numCompToAdd);

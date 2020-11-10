@@ -24,8 +24,8 @@
  */
 package com.questhelper.quests.recipefordisaster;
 
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
@@ -131,7 +131,7 @@ public class QuizSteps extends DetailedOwnerStep
 		answerWeaponQuestion.addDialogStep("Three");
 		answerRuneQuestion = new NpcStep(getQuestHelper(), NpcID.TRAIBORN, new WorldPoint(3112, 3162, 1), "Talk to Traiborn.");
 		answerRuneQuestion.addDialogStep("Two");
-		eventBus.subscribe(GameTick .class, this, this::onGameTick);
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 
 	}
 

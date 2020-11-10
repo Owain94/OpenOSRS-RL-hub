@@ -26,10 +26,6 @@
 package com.questhelper;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import net.runelite.api.Point;
@@ -43,6 +39,7 @@ public class QuestHelperWorldMapPoint extends WorldMapPoint
 	private final Point questWorldImagePoint;
 	private final HashMap<Integer, BufferedImage> arrows = new HashMap<>();
 	private BufferedImage activeQuestArrow;
+
 	public QuestHelperWorldMapPoint(final WorldPoint worldPoint, BufferedImage image)
 	{
 		super(worldPoint, null);

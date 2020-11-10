@@ -14,7 +14,7 @@ public class KillTrolls extends NpcStep
 	@Inject
 	EventBus eventBus;
 
-	private boolean hasSubscribed = false;
+	private final boolean hasSubscribed = false;
 
 	public KillTrolls(QuestHelper questHelper)
 	{
@@ -31,9 +31,11 @@ public class KillTrolls extends NpcStep
 	protected void updateSteps()
 	{
 		if (!hasSubscribed)
+		{
 			eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		}
 
-		int numToKill =  client.getVarbitValue(3312);
+		int numToKill = client.getVarbitValue(3312);
 		this.setText("Kill " + numToKill + " trolls to continue.");
 	}
 }

@@ -230,7 +230,7 @@ public class ValveStep extends DetailedOwnerStep
 		}
 	}
 
-	protected  void setupRequirements()
+	protected void setupRequirements()
 	{
 		scentedTop = new ItemRequirement("Vyre noble top", ItemID.VYRE_NOBLE_TOP, 1, true);
 		scentedTop.setTip("You can get a replacement from a chest in Old Man Ral's basement.");
@@ -268,7 +268,7 @@ public class ValveStep extends DetailedOwnerStep
 		setNorthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37997, new WorldPoint(3621, 3364, 0), "Turn the northern valve to the highlighted value.");
 		setSouthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37998, new WorldPoint(3621, 3359, 0), "Turn the southern valve to the highlighted value.");
 
-		cutTree =  new ObjectStep(getQuestHelper(), ObjectID.BLISTERWOOD_TREE, new WorldPoint(3635, 3362, 0),
+		cutTree = new ObjectStep(getQuestHelper(), ObjectID.BLISTERWOOD_TREE, new WorldPoint(3635, 3362, 0),
 			"Gather 8 logs from the Blisterwood tree.", scentedTop, scentedLegs, scentedShoes);
 
 		eventBus.subscribe(GameTick.class, this, this::onGameTick);

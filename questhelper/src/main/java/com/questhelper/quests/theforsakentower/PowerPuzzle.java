@@ -43,9 +43,9 @@ public class PowerPuzzle extends QuestStep
 
 	private void updateSolvedPositionState()
 	{
-		for (int i=0; i < 36; i++)
+		for (int i = 0; i < 36; i++)
 		{
-			int currentPos = client.getVarbitValue(7811+i);
+			int currentPos = client.getVarbitValue(7811 + i);
 			if (solvedPositions[i] == 4)
 			{
 				currentPositionCorrect[i] = currentPos == 0 || currentPos == 2;
@@ -58,7 +58,8 @@ public class PowerPuzzle extends QuestStep
 	}
 
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 		Widget widgetWrapper = client.getWidget(624, 2);
 		if (widgetWrapper != null)

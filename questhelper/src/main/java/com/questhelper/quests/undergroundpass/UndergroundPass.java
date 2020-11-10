@@ -55,7 +55,7 @@ import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
 @QuestDescriptor(
-        quest = QuestHelperQuest.UNDERGROUND_PASS
+	quest = QuestHelperQuest.UNDERGROUND_PASS
 )
 public class UndergroundPass extends BasicQuestHelper
 {

@@ -24,10 +24,18 @@
  */
 package com.questhelper.quests.curseoftheemptylord;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.VarbitCondition;
 import com.questhelper.steps.conditional.ZoneCondition;
@@ -40,14 +48,6 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -220,7 +220,8 @@ public class CurseOfTheEmptyLord extends BasicQuestHelper
 
 			talkToViggora.setText("Talk to the Mysterious Ghost Viggora upstairs in the Rogues' Castle in 54 Wilderness.");
 			talkToViggora.setWorldPoint(3295, 3934, 1);
-		} else if (pathID == 2)
+		}
+		else if (pathID == 2)
 		{
 			talkToRennard.setText("Talk to the Mysterious Ghost in the Bandit Camp in the Wilderness.");
 			talkToRennard.setWorldPoint(3031, 3703, 0);
@@ -237,7 +238,8 @@ public class CurseOfTheEmptyLord extends BasicQuestHelper
 			talkToViggora.setText("Talk to the Mysterious Ghost upstairs in the Slayer Tower, near the Infernal Mages.");
 			talkToViggora.setWorldPoint(3447, 3547, 1);
 
-		} else if (pathID == 3)
+		}
+		else if (pathID == 3)
 		{
 			talkToRennard.setText("Talk to the Mysterious Ghost in the Bandit Camp in the desert.");
 			talkToRennard.setWorldPoint(3163, 2981, 0);
