@@ -106,7 +106,6 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		clickDiscHole3 = new WidgetStep(getQuestHelper(), "Insert the disc.", 447, 84);
 		clickDiscHole4 = new WidgetStep(getQuestHelper(), "Insert the disc.", 447, 86);
 		setupShapes();
-
 	}
 
 	@Override
@@ -119,6 +118,9 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		answer4 = client.getVarbitValue(2513); // 4 input
 
 		updateSteps();
+
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		eventBus.subscribe(ItemContainerChanged.class, this, this::onItemContainerChanged);
 	}
 
 	@Override

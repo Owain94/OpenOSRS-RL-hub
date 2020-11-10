@@ -34,16 +34,20 @@ import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class QuizSteps extends DetailedOwnerStep
 {
+	@Inject
+	EventBus eventBus;
 
 	DetailedQuestStep answerQuestions, answerWeaponQuestion, answerRuneQuestion;
 
@@ -127,6 +131,8 @@ public class QuizSteps extends DetailedOwnerStep
 		answerWeaponQuestion.addDialogStep("Three");
 		answerRuneQuestion = new NpcStep(getQuestHelper(), NpcID.TRAIBORN, new WorldPoint(3112, 3162, 1), "Talk to Traiborn.");
 		answerRuneQuestion.addDialogStep("Two");
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+
 	}
 
 	@Override

@@ -43,11 +43,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 @QuestDescriptor(
@@ -55,6 +57,9 @@ import net.runelite.client.eventbus.Subscribe;
 )
 public class CurseOfTheEmptyLord extends BasicQuestHelper
 {
+	@Inject
+	EventBus eventBus;
+
 	private final int PATH_VARBIT = 815;
 	private int currentPath = 0;
 
@@ -69,6 +74,11 @@ public class CurseOfTheEmptyLord extends BasicQuestHelper
 	ObjectStep goDownIntoEdgevilleDungeon;
 
 	Zone roguesCastleFirstFloor, edgevilleDungeon, slayerTowerFirstFloor, edgevilleMonastery, partyRoom;
+
+	public CurseOfTheEmptyLord()
+	{
+
+	}
 
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
@@ -101,6 +111,8 @@ public class CurseOfTheEmptyLord extends BasicQuestHelper
 		questSteps.addStep(talkedToValdez, talkToRennard);
 
 		steps.put(0, questSteps);
+
+		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 
 		return steps;
 	}

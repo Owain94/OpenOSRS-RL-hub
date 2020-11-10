@@ -66,6 +66,7 @@ import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.OverlayUtil;
@@ -76,6 +77,9 @@ import net.runelite.client.util.ImageUtil;
 
 public class DetailedQuestStep extends QuestStep
 {
+	@Inject
+	EventBus eventBus;
+
 	@Inject
 	ItemManager itemManager;
 
@@ -118,6 +122,13 @@ public class DetailedQuestStep extends QuestStep
 		this.requirements.addAll(Arrays.asList(requirements));
 	}
 
+	public void subscribe()
+	{
+		eventBus.subscribe(ItemSpawned.class, this, this::onItemSpawned);
+		eventBus.subscribe(ItemDespawned.class, this, this::onItemDespawned);
+		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
+	}
+
 	@Override
 	public void configure(Binder binder)
 	{
@@ -139,6 +150,7 @@ public class DetailedQuestStep extends QuestStep
 		}
 		addItemTiles();
 		started = true;
+		subscribe();
 	}
 
 	@Override

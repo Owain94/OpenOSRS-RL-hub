@@ -379,6 +379,8 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 		m15.addSubSteps(rebalanceE.get(9), rebalanceC.get(9));
 
 		restartStep = new DetailedQuestStep(getQuestHelper(), "Unknown state. Restart the puzzle to start again.");
+
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	public ArrayList<PanelDetails> panelDetails()

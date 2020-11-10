@@ -24,6 +24,7 @@
  */
 package com.questhelper.quests.watchtower;
 
+import com.google.inject.Inject;
 import com.questhelper.ItemCollections;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
@@ -55,12 +56,17 @@ import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.eventbus.EventBus;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.WATCHTOWER
 )
 public class Watchtower extends BasicQuestHelper
 {
+
+	@Inject
+	EventBus eventBus;
+
 	ItemRequirement coins20, goldBar, deathRune, pickaxe, dragonBones, rope2, guamUnf, fingernails, rope, tobansKey, goradsTooth, relic3, relic1, relic2, tobansGold,
 		crystal, ogreRelic, rockCake, skavidMap, lightSource, nightshade, nightshade2, crystal2, jangerberries, batBones, groundBatBones, pestleAndMortar, partialPotion, potion,
 		magicPotion, magicPotionHighlight, crystal3, crystal4, crystalHighlight, crystal2Highlight, crystal3Highlight, crystal4Highlight;
@@ -516,7 +522,7 @@ public class Watchtower extends BasicQuestHelper
 
 		enterInsaneSkavidCave = new ObjectStep(this, ObjectID.CAVE_ENTRANCE_2810, new WorldPoint(2528, 3013, 0), "Enter the mad skavid's cave.");
 
-		talkToInsaneSkavid = new SkavidChoice(this);
+		talkToInsaneSkavid = new SkavidChoice(this, eventBus);
 
 		pickUp2Nightshade = new DetailedQuestStep(this, new WorldPoint(2528, 9415, 0), "Pick up 2 cave nightshade. You can world hop to get a second one.", nightshade2);
 

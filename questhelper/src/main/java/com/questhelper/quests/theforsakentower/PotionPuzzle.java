@@ -80,6 +80,8 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 	public void startUp()
 	{
 		updateSteps();
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 	}
 
 	@Override

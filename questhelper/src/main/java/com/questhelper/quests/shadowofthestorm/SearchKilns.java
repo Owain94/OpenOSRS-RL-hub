@@ -30,13 +30,18 @@ import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.inject.Inject;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class SearchKilns extends DetailedOwnerStep
 {
+	@Inject
+	EventBus eventBus;
+
 	ObjectStep searchKiln1, searchKiln2, searchKiln3, searchKiln4;
 
 	public SearchKilns(QuestHelper questHelper)
@@ -79,6 +84,8 @@ public class SearchKilns extends DetailedOwnerStep
 		searchKiln2 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_10243, new WorldPoint(3479, 3083, 0), "Search the kilns in Uzer until you find a book.");
 		searchKiln3 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_10244, new WorldPoint(3473, 3093, 0), "Search the kilns in Uzer until you find a book.");
 		searchKiln4 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_10245, new WorldPoint(3501, 3085, 0), "Search the kilns in Uzer until you find a book.");
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+
 	}
 
 	@Override

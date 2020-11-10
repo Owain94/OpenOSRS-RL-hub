@@ -161,7 +161,6 @@ public class QuestHelperPlugin extends Plugin
 	@Override
 	protected void startUp() throws IOException
 	{
-		quests = scanAndInstantiate(getClass().getClassLoader());
 		overlayManager.add(questHelperOverlay);
 		overlayManager.add(questHelperWorldOverlay);
 		overlayManager.add(questHelperWidgetOverlay);
@@ -225,12 +224,13 @@ public class QuestHelperPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onGameStateChanged(final GameStateChanged event)
+	public void onGameStateChanged(final GameStateChanged event) throws IOException
 	{
 		final GameState state = event.getGameState();
 
 		if (state == GameState.LOGIN_SCREEN)
 		{
+			quests = scanAndInstantiate(getClass().getClassLoader());
 			panel.refresh(new ArrayList<>(), true);
 			if (selectedQuest != null && selectedQuest.getCurrentStep() != null)
 			{

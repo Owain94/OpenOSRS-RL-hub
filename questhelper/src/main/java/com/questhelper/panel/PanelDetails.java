@@ -36,7 +36,7 @@ public class PanelDetails
 	String header;
 
 	@Getter
-	private ArrayList<QuestStep> steps;
+	private final ArrayList<QuestStep> steps;
 
 	@Getter
 	private QuestStep lockingQuestSteps;

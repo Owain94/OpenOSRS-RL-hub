@@ -352,6 +352,8 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 		goDownToGroundFloor = new ObjectStep(getQuestHelper(), ObjectID.STAIRCASE_33552, new WorldPoint(1378, 3825, 1), "Go down to the ground floor.");
 		goUpToGroundFloor = new ObjectStep(getQuestHelper(), ObjectID.LADDER_33484, new WorldPoint(1382, 10229, 0), "Leave the tower's basement.");
 
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+
 	}
 
 	public ArrayList<PanelDetails> panelDetails()
