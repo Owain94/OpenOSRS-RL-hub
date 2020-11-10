@@ -25,18 +25,11 @@
 package com.questhelper.quests.thetouristtrap;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.Operation;
@@ -54,6 +47,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -249,7 +249,7 @@ public class TheTouristTrap extends BasicQuestHelper
 		slope = new Zone(new WorldPoint(3282, 3032, 0), new WorldPoint(3283, 3037, 0));
 		cliff = new Zone(new WorldPoint(3279, 3037, 0), new WorldPoint(3281, 3038, 0));
 		secondCliff = new Zone(new WorldPoint(3273, 3035, 0), new WorldPoint(3278, 3039, 0));
-		mine1 = new Zone(new WorldPoint(3266, 9410, 0), new WorldPoint(3282, 9466, 0));
+		mine1 = new Zone(new WorldPoint(3266,9410, 0), new WorldPoint(3282, 9466, 0));
 		deepMine = new Zone(new WorldPoint(3282, 9408, 0), new WorldPoint(3326, 9470, 0));
 		deepMineP1 = new Zone(new WorldPoint(3283, 9409, 0), new WorldPoint(3314, 9427, 0));
 		deepMineP2P1 = new Zone(new WorldPoint(3315, 9416, 0), new WorldPoint(3326, 9470, 0));

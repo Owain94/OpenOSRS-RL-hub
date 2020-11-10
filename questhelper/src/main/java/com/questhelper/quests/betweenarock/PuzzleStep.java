@@ -8,12 +8,18 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class PuzzleStep extends DetailedQuestStep
 {
+
+	@Inject
+	EventBus eventBus;
+
 	private final int DOWN_BUTTON = 34;
 	private final int LEFT_BUTTON = 33;
 	private final int RIGHT_BUTTON = 32;
@@ -85,6 +91,7 @@ public class PuzzleStep extends DetailedQuestStep
 	public void startUp()
 	{
 		updateSolvedPositionState();
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Subscribe

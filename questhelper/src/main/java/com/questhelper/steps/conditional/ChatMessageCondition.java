@@ -36,7 +36,7 @@ public class ChatMessageCondition extends ConditionForStep
 
 	private ConditionForStep condition;
 
-	private ArrayList<String> messages;
+	private final ArrayList<String> messages;
 
 	public ChatMessageCondition(String... message)
 	{

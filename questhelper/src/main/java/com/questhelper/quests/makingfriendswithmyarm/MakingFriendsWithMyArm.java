@@ -25,19 +25,12 @@
 package com.questhelper.quests.makingfriendswithmyarm;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.InInstanceCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -56,6 +49,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM
@@ -479,7 +479,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		goWestSneak3 = new DetailedQuestStep(this, new WorldPoint(2856, 3923, 0), "Wait a few seconds, then run west to the next point.");
 		goNorth = new DetailedQuestStep(this, new WorldPoint(2859, 3939, 0), "Wait a few seconds, then run north to the next point.");
 
-		enterHole = new ObjectStep(this, ObjectID.HOLE_33227, new WorldPoint(2854, 3944, 0), "Wait a few seconds, and run into the hole.");
+		enterHole = new ObjectStep(this, ObjectID.HOLE_33227, new WorldPoint(2854, 3944,0), "Wait a few seconds, and run into the hole.");
 		goSouthSneak.addSubSteps(goWestSneak1, goWestSneak2, goWestSneak3, goNorth, enterHole);
 		enterNarrowHole = new ObjectStep(this, ObjectID.NARROW_GAP, new WorldPoint(7248, 2978, 0), "Enter the narrow gap to the south quickly.");
 
@@ -489,7 +489,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		leaveWater1 = new ObjectStep(this, ObjectID.WATERS_EDGE, new WorldPoint(2730, 5781, 0), "Wait a few seconds, then swim to the east shore.");
 		waterSpot1.addSubSteps(enterWater, leaveWater1);
 
-		enterWater2 = new ObjectStep(this, NullObjectID.NULL_33331, new WorldPoint(2734, 5792, 0), "Enter the water.");
+		enterWater2 = new ObjectStep(this,  NullObjectID.NULL_33331, new WorldPoint(2734, 5792, 0), "Enter the water.");
 
 		mineCave = new ObjectStep(this, ObjectID.CAVE_EXIT_33247, new WorldPoint(2737, 5817, 0), "Mine the cave exit.", pickaxe);
 

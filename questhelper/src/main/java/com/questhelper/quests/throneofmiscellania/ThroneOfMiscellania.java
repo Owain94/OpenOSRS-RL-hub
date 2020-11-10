@@ -25,18 +25,11 @@
 package com.questhelper.quests.throneofmiscellania;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -48,6 +41,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -114,7 +114,7 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked2P1, talked2P2, talked2P3), giveCakeToBrand);
 		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P4), talkBrand2);
 		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P3, talked1P2, talked1P3, givenFlowers), clapForBrand);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P1, talked1P2, talked1P3), giveFlowersToBrand);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor,talked1P1, talked1P2, talked1P3), giveFlowersToBrand);
 		courtBrand.addStep(inMiscCastleFirstFloor, talkBrand1);
 		courtBrand.addStep(inIslands, goUpstairsToBrand);
 

@@ -25,18 +25,10 @@
 package com.questhelper.quests.deserttreasure;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -54,6 +46,14 @@ import net.runelite.api.NullItemID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DESERT_TREASURE
@@ -430,7 +430,7 @@ public class DesertTreasure extends BasicQuestHelper
 
 		talkToRasolo = new NpcStep(this, NpcID.RASOLO, new WorldPoint(2531, 3420, 0), "Talk to Rasolo south of Baxtorian Falls.");
 		talkToRasolo.addDialogStep("Ask about the Diamonds of Azzanadra");
-		talkToRasolo.addDialogStep("Yes");
+		talkToRasolo.addDialogStepWithExclusion("Yes.", "Ask about the Diamonds of Azzanadra");
 
 		getCross = new ObjectStep(this, ObjectID.SECURE_CHEST, new WorldPoint(3169, 2967, 0), "Bring antipoison, food, and as many picklocks as you can to the Bandit Camp, and try opening the chest in the south of the Bandit Camp. Keep trying until you succeed.", manyLockpicks, antipoison);
 

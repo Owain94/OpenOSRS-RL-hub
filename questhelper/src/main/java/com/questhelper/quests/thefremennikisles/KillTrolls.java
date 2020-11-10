@@ -1,14 +1,21 @@
 package com.questhelper.quests.thefremennikisles;
 
+import com.google.inject.Inject;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.NpcStep;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class KillTrolls extends NpcStep
 {
+	@Inject
+	EventBus eventBus;
+
+	private boolean hasSubscribed = false;
+
 	public KillTrolls(QuestHelper questHelper)
 	{
 		super(questHelper, NpcID.ICE_TROLL_MALE_5824, new WorldPoint(2390, 10280, 1), "Kill 10 ice trolls.", true);
@@ -23,7 +30,10 @@ public class KillTrolls extends NpcStep
 
 	protected void updateSteps()
 	{
-		int numToKill = client.getVarbitValue(3312);
+		if (!hasSubscribed)
+			eventBus.subscribe(GameTick.class, this, this::onGameTick);
+
+		int numToKill =  client.getVarbitValue(3312);
 		this.setText("Kill " + numToKill + " trolls to continue.");
 	}
 }

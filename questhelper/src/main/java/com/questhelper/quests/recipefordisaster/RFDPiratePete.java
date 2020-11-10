@@ -249,7 +249,7 @@ public class RFDPiratePete extends BasicQuestHelper
 		pickUpRocks = new DetailedQuestStep(this, new WorldPoint(2950, 9511, 1), "Pick up 5 rocks in the west of the area.", rocks5);
 		enterCave = new ObjectStep(this, ObjectID.UNDERWATER_CAVERN_ENTRANCE_12461, new WorldPoint(2950, 9516, 1), "Enter the underwater cave entrance.");
 		killMudksippers5 = new NpcStep(this, NpcID.MUDSKIPPER, new WorldPoint(2951, 9526, 1), "Kill mudskippers for 5 hides.", true, mudskipperHide5);
-		((NpcStep) (killMudksippers5)).addAlternateNpcs(NpcID.MUDSKIPPER_4821);
+		((NpcStep)(killMudksippers5)).addAlternateNpcs(NpcID.MUDSKIPPER_4821);
 		returnToNung = new NpcStep(this, NpcID.NUNG, new WorldPoint(2971, 9513, 1), "Bring the hides to Nung.", mudskipperHide5);
 		talkToNungAgain = new NpcStep(this, NpcID.NUNG, new WorldPoint(2971, 9513, 1), "Talk to Nung again.");
 		returnToNung.addSubSteps(talkToNungAgain);

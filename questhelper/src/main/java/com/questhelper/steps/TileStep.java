@@ -23,7 +23,7 @@ public class TileStep extends DetailedQuestStep
 	@Inject
 	private WorldMapPointManager worldMapPointManager;
 
-	private WorldPoint worldPoint;
+	private final WorldPoint worldPoint;
 
 	public TileStep(QuestHelper questHelper, WorldPoint worldPoint, String text, Requirement... requirements)
 	{

@@ -25,18 +25,11 @@
 package com.questhelper.quests.thefremennikisles;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -46,6 +39,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -479,7 +479,7 @@ public class TheFremennikIsles extends BasicQuestHelper
 		collectFromKeepaAgain.addDialogStep("But rules are rules. Pay up!");
 		collectFromFlosi = new NpcStep(this, NpcID.FLOSI_DALKSSON, new WorldPoint(2418, 3813, 0), "Collect tax from Flossi in north east Jatizso.");
 		collectFromFlosi.addDialogStep("But rules are rules. Pay up!");
-		talkToGjukiAfterCollection2 = new NpcStep(this, NpcID.KING_GJUKI_SORVOTT_IV, new WorldPoint(2407, 3804, 0), "Report back to King Gjuki Sorvott IV on Jatizso.");
+		talkToGjukiAfterCollection2 =  new NpcStep(this, NpcID.KING_GJUKI_SORVOTT_IV, new WorldPoint(2407, 3804, 0), "Report back to King Gjuki Sorvott IV on Jatizso.");
 
 		travelToNeitiznotToSpyAgain = new NpcStep(this, NpcID.MARIA_GUNNARS_1883, new WorldPoint(2644, 3710, 0), "Travel to Neitiznot with Maria Gunnars.");
 		returnToRellekkaFromJatizsoToSpyAgain = new NpcStep(this, NpcID.MORD_GUNNARS_1940, new WorldPoint(2420, 3781, 0), "Return to Rellekka with Mord.");

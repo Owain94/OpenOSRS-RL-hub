@@ -44,8 +44,8 @@ public enum QuestEmote
 	GOBLIN_BOW("Goblin bow", EMOTE_GOBLIN_BOW),
 	BLOW_KISS("Blow Kiss", EMOTE_BLOW_KISS);
 
-	private String name;
-	private int spriteId;
+	private final String name;
+	private final int spriteId;
 
 	QuestEmote(String name, int spriteId)
 	{

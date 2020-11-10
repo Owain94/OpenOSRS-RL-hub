@@ -116,12 +116,7 @@ public class ObjectCondition extends ConditionForStep
 		{
 			return true;
 		}
-		if (checkForObjects(tile.getWallObject()))
-		{
-			return true;
-		}
-
-		return false;
+		return checkForObjects(tile.getWallObject());
 	}
 
 	private boolean checkForObjects(TileObject object)

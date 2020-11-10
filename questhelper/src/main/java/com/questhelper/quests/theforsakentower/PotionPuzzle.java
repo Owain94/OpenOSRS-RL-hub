@@ -1,18 +1,18 @@
 package com.questhelper.quests.theforsakentower;
 
 import com.google.inject.Inject;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
+import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.conditional.VarbitCondition;
 import com.questhelper.steps.conditional.ZoneCondition;
 import java.awt.Graphics2D;
@@ -80,6 +80,8 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 	public void startUp()
 	{
 		updateSteps();
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 	}
 
 	@Override
@@ -119,7 +121,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 			{
 				if (!fluidFound)
 				{
-					getFluid.addWidgetChoice(correctFluid - 1, 187, 3);
+					getFluid.addWidgetChoice(correctFluid-1, 187, 3);
 					getFluid.setText("Take Fluid " + correctFluid + " from the table.");
 
 					useFluidOnRefinery.addRequirement(fluids[correctFluid]);
@@ -242,7 +244,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		hasFluid3 = new ItemRequirementCondition(fluid3);
 		hasFluid4 = new ItemRequirementCondition(fluid4);
 		hasFluid5 = new ItemRequirementCondition(fluid5);
-		hasFluids = new ConditionForStep[]{null, hasFluid1, hasFluid2, hasFluid3, hasFluid4, hasFluid5};
+		hasFluids = new ConditionForStep[]{null, hasFluid1, hasFluid2, hasFluid3, hasFluid4, hasFluid5 };
 	}
 
 	private void setupZones()

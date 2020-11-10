@@ -32,9 +32,6 @@ import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.questhelper.panel.QuestHelperPanel;
-import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.steps.QuestStep;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +63,9 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import com.questhelper.panel.QuestHelperPanel;
+import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.steps.QuestStep;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -161,7 +161,6 @@ public class QuestHelperPlugin extends Plugin
 	@Override
 	protected void startUp() throws IOException
 	{
-		quests = scanAndInstantiate(getClass().getClassLoader());
 		overlayManager.add(questHelperOverlay);
 		overlayManager.add(questHelperWorldOverlay);
 		overlayManager.add(questHelperWidgetOverlay);
@@ -225,12 +224,13 @@ public class QuestHelperPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onGameStateChanged(final GameStateChanged event)
+	public void onGameStateChanged(final GameStateChanged event) throws IOException
 	{
 		final GameState state = event.getGameState();
 
 		if (state == GameState.LOGIN_SCREEN)
 		{
+			quests = scanAndInstantiate(getClass().getClassLoader());
 			panel.refresh(new ArrayList<>(), true);
 			if (selectedQuest != null && selectedQuest.getCurrentStep() != null)
 			{
@@ -340,7 +340,7 @@ public class QuestHelperPlugin extends Plugin
 				QuestHelper questHelperPhoenix = quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName());
 				QuestHelper questHelperBlackArm = quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getName());
 				if (questHelperBlackArm != null && !questHelperBlackArm.isCompleted()
-					|| questHelperPhoenix != null && !questHelperPhoenix.isCompleted())
+				|| questHelperPhoenix != null && !questHelperPhoenix.isCompleted())
 				{
 					if (selectedQuest != null &&
 						(selectedQuest.getQuest().getName().equals(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName()) ||
@@ -428,8 +428,7 @@ public class QuestHelperPlugin extends Plugin
 		}
 	}
 
-	private MenuEntry[] addNewEntry(MenuEntry[] menuEntries, String newEntry, String target, int widgetIndex, int widgetID)
-	{
+	private MenuEntry[] addNewEntry(MenuEntry[] menuEntries, String newEntry, String target, int widgetIndex, int widgetID) {
 		menuEntries = Arrays.copyOf(menuEntries, menuEntries.length + 1);
 
 		MenuEntry menuEntry = menuEntries[menuEntries.length - 1] = new MenuEntry();

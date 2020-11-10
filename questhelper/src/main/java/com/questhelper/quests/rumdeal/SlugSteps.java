@@ -37,6 +37,7 @@ import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.inject.Inject;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
@@ -46,10 +47,13 @@ import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class SlugSteps extends DetailedOwnerStep
 {
+	@Inject
+	EventBus eventBus;
 
 	DetailedQuestStep addSluglings, talkToPete, goDownFromTop, fish5Slugs, goDownToSluglings, goUpFromSluglings, goUpToDropSluglings, goUpF1ToPressure, goUpToF2ToPressure, pressure;
 	ConditionalStep getSluglings, pressureSluglings, pullPressureLever;
@@ -165,6 +169,8 @@ public class SlugSteps extends DetailedOwnerStep
 		pullPressureLever.addStep(onIslandF2, pressure);
 		pullPressureLever.addStep(onIslandF1, goUpToF2ToPressure);
 		pullPressureLever.addStep(onIslandF0, goUpF1ToPressure);
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+
 	}
 
 	@Override

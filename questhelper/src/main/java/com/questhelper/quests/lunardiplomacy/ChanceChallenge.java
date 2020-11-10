@@ -11,14 +11,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class ChanceChallenge extends DetailedOwnerStep
 {
+	@Inject
+	EventBus eventBus;
+
 	DetailedQuestStep talk, spinD1, spinD2, spinD3, spinD4, spinD5, spinD6;
 
 	int currentGoal;
@@ -65,6 +71,7 @@ public class ChanceChallenge extends DetailedOwnerStep
 		spinD4 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17020, new WorldPoint(1732, 5060, 2), "Flip the south west die.");
 		spinD5 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17022, new WorldPoint(1739, 5067, 2), "Flip the north east die.");
 		spinD6 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17021, new WorldPoint(1739, 5060, 2), "Flip the south east die.");
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Subscribe

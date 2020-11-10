@@ -389,9 +389,6 @@ public class QuestOverviewPanel extends JPanel
 		{
 			for (ItemRequirement itemRequirement : itemRequirements)
 			{
-				if (itemRequirement == null)
-					continue;
-
 				if (!text.toString().equals(""))
 				{
 					text.append("<br>");

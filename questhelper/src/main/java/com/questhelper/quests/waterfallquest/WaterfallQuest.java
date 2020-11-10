@@ -24,18 +24,8 @@
  */
 package com.questhelper.quests.waterfallquest;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
@@ -49,6 +39,16 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.WATERFALL_QUEST
@@ -219,7 +219,7 @@ public class WaterfallQuest extends BasicQuestHelper
 		enterGnomeDungeon = new ObjectStep(this, ObjectID.LADDER_5250, new WorldPoint(2533, 3155, 0), "Go to the centre of the Tree Gnome Village and go down the ladder at the entrance.");
 		searchGnomeCrate = new ObjectStep(this, ObjectID.CRATE_1990, new WorldPoint(2548, 9565, 0), "Search the off-coloured crate in the east room.");
 		enterGnomeDoor = new ObjectStep(this, ObjectID.DOOR_1991, new WorldPoint(2515, 9575, 0), "Go through the gate in the west room.", key);
-		talkToGolrie = new NpcStep(this, NpcID.GOLRIE_4183, new WorldPoint(2514, 9580, 0), "Talk to Bolrie.");
+		talkToGolrie = new NpcStep(this, NpcID.GOLRIE_4183, new WorldPoint(2514, 9580, 0), "Talk to Golrie.");
 		usePebble = new ObjectStep(this, ObjectID.GLARIALS_TOMBSTONE, new WorldPoint(2559, 3445, 0), "Bank everything besides the pebble and some food. After, go use Glarial's pebble to Glarial's Tombstone east of Baxtorian Falls.", glarialsPebble);
 		usePebble.addIcon(ItemID.GLARIALS_PEBBLE);
 

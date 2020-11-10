@@ -83,6 +83,16 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 		this.steps.put(null, step);
 	}
 
+	public void subscribe()
+	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
+		eventBus.subscribe(ChatMessage.class, this, this::onChatMessage);
+		eventBus.subscribe(NpcSpawned.class, this, this::onNpcSpawned);
+		eventBus.subscribe(NpcDespawned.class, this, this::onNpcDespawned);
+		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
+	}
+
 	public void addStep(Conditions conditions, QuestStep step)
 	{
 		this.steps.put(conditions, step);
@@ -188,6 +198,7 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 		}
 		updateSteps();
 		started = true;
+		subscribe();
 	}
 
 	@Override

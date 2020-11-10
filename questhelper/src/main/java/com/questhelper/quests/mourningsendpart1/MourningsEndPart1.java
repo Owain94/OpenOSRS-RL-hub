@@ -24,18 +24,10 @@
  */
 package com.questhelper.quests.mourningsendpart1;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -53,6 +45,14 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MOURNINGS_END_PART_I
@@ -316,8 +316,8 @@ public class MourningsEndPart1 extends BasicQuestHelper
 
 	public void loadZones()
 	{
-		mournerHQ = new Zone(new WorldPoint(2547, 3321, 0), new WorldPoint(2555, 3327, 0));
-		mournerHQ2 = new Zone(new WorldPoint(2542, 3324, 0), new WorldPoint(2546, 3327, 0));
+		mournerHQ = new Zone(new WorldPoint(2547, 3321,0), new WorldPoint(2555, 3327, 0));
+		mournerHQ2 = new Zone(new WorldPoint(2542, 3324,0), new WorldPoint(2546, 3327, 0));
 		mournerBasement = new Zone(new WorldPoint(2034, 4628, 0), new WorldPoint(2045, 4651, 0));
 	}
 
@@ -481,8 +481,8 @@ public class MourningsEndPart1 extends BasicQuestHelper
 		allSteps.add(enterWestArdougnePanel);
 
 		allSteps.add(new PanelDetails("Dye the sheep", new ArrayList<>(Arrays.asList(getToads, dyeSheep, enterBaseAfterSheep, enterBasementAfterSheep, talkToEssylltAfterSheep)), fixedDevice, ogreBellows, redDye, yellowDye, greenDye, blueDye));
-
-
+ 
+		 
 		allSteps.add(new PanelDetails("Poison the citizens",
 			new ArrayList<>(Arrays.asList(pickUpRottenApple, talkToElena, pickUpBarrel, useBarrelOnPile, useApplesOnPress, getNaphtha, useNaphthaOnBarrel, useSieveOnBarrel, cookNaphtha, usePowderOnFood1, usePowderOnFood2, talkToEssylltAfterPoison)), coal20OrNaphtha));
 

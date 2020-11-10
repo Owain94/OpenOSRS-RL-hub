@@ -33,6 +33,7 @@ import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.inject.Inject;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
@@ -42,10 +43,13 @@ import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class FishMonkfish extends DetailedOwnerStep
 {
+	@Inject
+	EventBus eventBus;
 
 	DetailedQuestStep fishMonkfish, cookMonkfish, talkToArnoldWithMonkfish;
 	ItemRequirement cookedMonkfish = new ItemRequirement("Fresh monkfish", ItemID.FRESH_MONKFISH_7943, 5);
@@ -111,6 +115,8 @@ public class FishMonkfish extends DetailedOwnerStep
 		fishMonkfish = new ObjectStep(getQuestHelper(), NullObjectID.NULL_13477, new WorldPoint(2311, 3696, 0), "Fish at least 5 fresh monkfish. Sea Trolls will appear, and you'll need to kill them.", smallNet, combatGear);
 		cookMonkfish = new ObjectStep(getQuestHelper(), ObjectID.RANGE_12611, new WorldPoint(2316, 3669, 0), "Cook 5 monkfish. If you burn any, catch some more.", rawMonkfish);
 		talkToArnoldWithMonkfish = new NpcStep(getQuestHelper(), NpcID.ARNOLD_LYDSPOR, new WorldPoint(2329, 3688, 0), "Bring the monkfish to Arnold at the bank.", cookedMonkfish);
+
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.questhelper.steps;
 
+import com.google.inject.Inject;
 import com.questhelper.QuestHelperPlugin;
 import static com.questhelper.QuestHelperWorldOverlay.CLICKBOX_BORDER_COLOR;
 import static com.questhelper.QuestHelperWorldOverlay.CLICKBOX_FILL_COLOR;
@@ -30,11 +31,15 @@ import net.runelite.api.events.GroundObjectDespawned;
 import net.runelite.api.events.GroundObjectSpawned;
 import net.runelite.api.events.WallObjectDespawned;
 import net.runelite.api.events.WallObjectSpawned;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class ObjectStep extends DetailedQuestStep
 {
+	@Inject
+	EventBus eventBus;
+
 	private final int objectID;
 	private final ArrayList<Integer> alternateObjectIDs = new ArrayList<>();
 	private TileObject object;
@@ -53,6 +58,19 @@ public class ObjectStep extends DetailedQuestStep
 	{
 		super(questHelper, null, text, requirements);
 		this.objectID = objectID;
+	}
+
+	public void subscribe()
+	{
+		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
+		eventBus.subscribe(GameObjectSpawned.class, this, this::onGameObjectSpawned);
+		eventBus.subscribe(GameObjectDespawned.class, this, this::onGameObjectDespawned);
+		eventBus.subscribe(GroundObjectSpawned.class, this, this::onGroundObjectSpawned);
+		eventBus.subscribe(GroundObjectDespawned.class, this, this::onGroundObjectDespawned);
+		eventBus.subscribe(DecorativeObjectSpawned.class, this, this::onDecorativeObjectSpawned);
+		eventBus.subscribe(DecorativeObjectDespawned.class, this, this::onDecorativeObjectDespawned);
+		eventBus.subscribe(WallObjectSpawned.class, this, this::onWallObjectSpawned);
+		eventBus.subscribe(WallObjectDespawned.class, this, this::onWallObjectDespawned);
 	}
 
 	@Override
@@ -107,6 +125,7 @@ public class ObjectStep extends DetailedQuestStep
 				}
 			}
 		}
+		subscribe();
 	}
 
 	@Override

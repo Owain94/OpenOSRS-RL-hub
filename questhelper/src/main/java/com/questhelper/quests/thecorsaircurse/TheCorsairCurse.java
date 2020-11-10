@@ -24,19 +24,12 @@
  */
 package com.questhelper.quests.thecorsaircurse;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.DigStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.Operation;
@@ -46,6 +39,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
@@ -276,7 +276,7 @@ public class TheCorsairCurse extends BasicQuestHelper
 		digSand.addDialogStep("Search for the possessed doll and face the consequences.");
 		digSand.addSubSteps(goUpFromTess);
 
-		goUpToIthoi2 = new ObjectStep(this, ObjectID.STAIRS_31735, new WorldPoint(2531, 2833, 0), "Go look through Ithoi's telescope.");
+		goUpToIthoi2 =  new ObjectStep(this, ObjectID.STAIRS_31735, new WorldPoint(2531, 2833, 0), "Go look through Ithoi's telescope.");
 		lookThroughTelescope = new ObjectStep(this, ObjectID.TELESCOPE_31632, new WorldPoint(2528, 2835, 1), "Go look through Ithoi's telescope.");
 		lookThroughTelescope.addSubSteps(goUpToIthoi2);
 
@@ -331,7 +331,7 @@ public class TheCorsairCurse extends BasicQuestHelper
 		talkToTockShip3.addDialogStep("I've seen Ithoi running around. He's not sick at all.");
 		talkToTockShip3.addSubSteps(goOntoShip3);
 
-		goUpToIthoiToKill = new ObjectStep(this, ObjectID.STAIRS_31735, new WorldPoint(2531, 2833, 0), "Go kill Ithoi (level 35) in his hut.");
+		goUpToIthoiToKill =  new ObjectStep(this, ObjectID.STAIRS_31735, new WorldPoint(2531, 2833, 0), "Go kill Ithoi (level 35) in his hut.");
 		goUpToIthoiToKill.addDialogStep("I'll be back.");
 		killIthoi = new NpcStep(this, NpcID.ITHOI_THE_NAVIGATOR_7964, new WorldPoint(2529, 2840, 1), "Kill Ithoi (level 35).");
 		killIthoi.addSubSteps(goUpToIthoiToKill);

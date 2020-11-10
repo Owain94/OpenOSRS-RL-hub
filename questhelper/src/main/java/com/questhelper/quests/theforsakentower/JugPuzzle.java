@@ -1,19 +1,19 @@
 package com.questhelper.quests.theforsakentower;
 
 import com.google.inject.Inject;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
+import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.conditional.VarbitCondition;
 import com.questhelper.steps.conditional.ZoneCondition;
 import java.awt.Graphics2D;
@@ -351,6 +351,8 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 		goDownToFirstFloor = new ObjectStep(getQuestHelper(), ObjectID.LADDER_33485, new WorldPoint(1382, 3827, 2), "Go down from the top floor.");
 		goDownToGroundFloor = new ObjectStep(getQuestHelper(), ObjectID.STAIRCASE_33552, new WorldPoint(1378, 3825, 1), "Go down to the ground floor.");
 		goUpToGroundFloor = new ObjectStep(getQuestHelper(), ObjectID.LADDER_33484, new WorldPoint(1382, 10229, 0), "Leave the tower's basement.");
+
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 
 	}
 

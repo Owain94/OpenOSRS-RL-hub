@@ -13,9 +13,9 @@ import net.runelite.api.coords.WorldPoint;
 
 public class ItemCondition extends ConditionForStep
 {
-	private ArrayList<Integer> itemID;
+	private final ArrayList<Integer> itemID;
 	private WorldPoint worldPoint;
-	private boolean npcInScene = false;
+	private final boolean npcInScene = false;
 
 	public ItemCondition(int itemID)
 	{

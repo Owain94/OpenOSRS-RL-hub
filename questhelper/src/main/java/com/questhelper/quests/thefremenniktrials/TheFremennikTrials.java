@@ -25,19 +25,12 @@
 package com.questhelper.quests.thefremenniktrials;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ChatMessageCondition;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -51,6 +44,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -83,7 +83,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		finishedThorvaldTask, talkedToSwensen, syncedSwensen, inSwensenRoom1, inSwensenRoom2, inSwensenRoom3, inSwensenRoom4, inSwensenRoom5, inSwensenRoom6, inSwensenRoom7, inSwensenArea,
 		inSwensenFinalRoom, finishedSwensenTask, talkedToPeer, finishedPeerTask, isMind, isTree, isLife, isFire, isTime, isWind, inPeerEntrance, inPeerUpstairs, inPeerExit, hasSolvedDoor,
 		hasRedHerring, hasWoodenDisk, hasRedDiskOld, hasRedDiskNew, hasStickyRedGoop, trapDoorOpen, hasUsedDisk, muralHasDisks, hasVase, hasVaseLid,
-		hasEmptyBucket, hasFullBucket, hasBucket45, hasBucket35, hasBucket25, hasBucket15, hasAnyBucket, hasFullJug, hasEmptyJug, hasJug23, hasJug13, hasAnyJug, cupboardOpen,
+	    hasEmptyBucket, hasFullBucket, hasBucket45, hasBucket35, hasBucket25, hasBucket15, hasAnyBucket, hasFullJug, hasEmptyJug, hasJug23, hasJug13, hasAnyJug, cupboardOpen,
 		chestOpen, hasFilledVase, hasFilledVaseWithLid, hasVaseWithLidWrong, hasFrozenKey, hasSeersKey, hasFrozenVase, syncedPeer, noRockAskeladdenNearby;
 
 	QuestStep talkToBrundt, talkToOlaf, pickVeg, chopSwayingTree, fletchLyre, talkToLalli,
@@ -363,7 +363,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		swensenRoom6 = new Zone(new WorldPoint(2650, 10034, 0), new WorldPoint(2656, 10040, 0));
 		swensenRoom7 = new Zone(new WorldPoint(2662, 10022, 0), new WorldPoint(2670, 10030, 0));
 		swensenFinalRoom = new Zone(new WorldPoint(2661, 10034, 0), new WorldPoint(2670, 10043, 0));
-		swensenArea = new Zone(new WorldPoint(2626, 10001, 0), new WorldPoint(2674, 10044, 0));
+		swensenArea =  new Zone(new WorldPoint(2626, 10001, 0), new WorldPoint(2674, 10044, 0));
 
 		peerEntrance = new Zone(new WorldPoint(2629, 3659, 0), new WorldPoint(2633, 3666, 0));
 		peerUpstairs = new Zone(new WorldPoint(2629, 3659, 2), new WorldPoint(2638, 3666, 2));
@@ -379,7 +379,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		hasStartedOlaf = new Conditions(true, LogicType.OR,
 			new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, true, "That is great news outerlander! We always need more music lovers here!"),
-			new WidgetTextCondition(119, 3, true, "Bard<col=000080> will vote for me if"));
+			new WidgetTextCondition(119, 3, true,  "Bard<col=000080> will vote for me if"));
 
 		syncedOlaf = new Conditions(true, LogicType.AND, synced, hasStartedOlaf);
 
@@ -425,7 +425,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		isNearPipe = new ZoneCondition(nearPipe);
 
 		hasPlacedStrangeObject = new Conditions(true, LogicType.OR,
-			new WidgetTextCondition(217, 4, "That is going to make a really loud bang"));
+			new WidgetTextCondition(217, 4,"That is going to make a really loud bang"));
 
 		hasReplacedBeer = new Conditions(true, LogicType.AND, new ChatMessageCondition("You empty the keg and refill it with low alcohol beer."));
 		finishedManniTask = new Conditions(true, LogicType.OR,
@@ -484,7 +484,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		talkedToPeerForSigmund = new Conditions(true, LogicType.OR,
 			new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "That is all."),
 			new WidgetTextCondition(119, 3, true, true, "<col=000080>The <col=800000>seer<col=000080> is looking for a <col=800000>warrior to be his bodyguard<col=000080>..."));
-		Conditions thorvaldAsked = new Conditions(true, LogicType.AND, new WidgetTextCondition(217, 4, "Okay, I'll see what I can do."),
+		Conditions thorvaldAsked = new Conditions(true, LogicType.AND, new WidgetTextCondition(217, 4,  "Okay, I'll see what I can do."),
 			new ZoneCondition(new Zone(new WorldPoint(2661, 3690, 0), new WorldPoint(2669, 3696, 0))));
 		talkedToThorvaldForSigmund = new Conditions(true, LogicType.OR,
 			thorvaldAsked,
@@ -647,11 +647,11 @@ public class TheFremennikTrials extends BasicQuestHelper
 		usePotato = new ObjectStep(this, ObjectID.LALLIS_STEW, new WorldPoint(2773, 3624, 0),
 			"Use a potato on the stew.", petRock, potato);
 		usePotato.addIcon(ItemID.POTATO);
-		useRock = new ObjectStep(this, ObjectID.LALLIS_STEW, new WorldPoint(2773, 3624, 0),
+		useRock =  new ObjectStep(this, ObjectID.LALLIS_STEW, new WorldPoint(2773, 3624, 0),
 			"Use your pet rock on the stew.", petRock);
 		useRock.addIcon(ItemID.PET_ROCK);
 		useOnion.addSubSteps(useCabbage, usePotato, useRock);
-		talkToLaliAfterStew = new NpcStep(this, NpcID.LALLI, new WorldPoint(2771, 3621, 0), "Talk to Lalli for golden wool.");
+		talkToLaliAfterStew =  new NpcStep(this, NpcID.LALLI, new WorldPoint(2771, 3621, 0), "Talk to Lalli for golden wool.");
 		spinWool = new DetailedQuestStep(this, "Spin the golden fleece into wool using a spinning wheel. The closest wheel is in Seers' Village.", goldenFleece);
 		makeLyre = new DetailedQuestStep(this, "Use the golden wool on your unstrung lyre.", lyreUnstrung, goldenWool);
 		enchantLyre = new ObjectStep(this, ObjectID.STRANGE_ALTAR, new WorldPoint(2626, 3598, 0), "Bring your lyre to the Strange Altar south west of Rellekka, and use either a raw shark, raw sea turtle or raw manta ray on it.", lyre, rawShark);
@@ -670,7 +670,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 		prepareToUseStrangeObject = new DetailedQuestStep(this, new WorldPoint(2664, 3674, 0), "Return to Rellekka with the strange object, a tinderbox, and low alcohol beer.", strangeObject, tinderbox, alcoholFreeBeer);
 		useStrangeObject = new ObjectStep(this, ObjectID.PIPE_4162, new WorldPoint(2663, 3674, 0), "Use a tinderbox on the strange object then use it on the nearby pipe.", strangeObject, tinderbox);
-		useStrangeObjectOnPipe = new ObjectStep(this, ObjectID.PIPE_4162, new WorldPoint(2663, 3674, 0), "Use the lit strange object on the nearby pipe!", litStrangeObject);
+		useStrangeObjectOnPipe =  new ObjectStep(this, ObjectID.PIPE_4162, new WorldPoint(2663, 3674, 0), "Use the lit strange object on the nearby pipe!", litStrangeObject);
 		useStrangeObjectOnPipe.addIcon(ItemID.LIT_STRANGE_OBJECT);
 		useStrangeObject.addSubSteps(useStrangeObjectOnPipe);
 		getKegOfBeer = new DetailedQuestStep(this, new WorldPoint(2660, 3676, 0), "Pick up a keg of beer in the longhall.", kegOfBeer);
@@ -726,9 +726,9 @@ public class TheFremennikTrials extends BasicQuestHelper
 		talkToAskeladdenForSigmund.addDialogStep("Yes");
 		talkToAskeladdenForSigmund.addSubSteps(talkToAskeladdenForSigmund2);
 
-		bringNoteToThora = new NpcStep(this, NpcID.THORA_THE_BARKEEP, new WorldPoint(2662, 3673, 0), "Bring the promissory note to Thora the Barkeep in the longhall.", promissoryNote);
+		bringNoteToThora =  new NpcStep(this, NpcID.THORA_THE_BARKEEP, new WorldPoint(2662, 3673, 0), "Bring the promissory note to Thora the Barkeep in the longhall.", promissoryNote);
 		bringNoteToThora.addDialogStep("Ask about the Merchant's trial");
-		bringCocktailToManni = new NpcStep(this, NpcID.MANNI_THE_REVELLER, new WorldPoint(2658, 3675, 0), "Bring the cocktail to Manni the Reveller in the longhall.", legendaryCocktail);
+		bringCocktailToManni =  new NpcStep(this, NpcID.MANNI_THE_REVELLER, new WorldPoint(2658, 3675, 0), "Bring the cocktail to Manni the Reveller in the longhall.", legendaryCocktail);
 		bringCocktailToManni.addDialogStep("Ask about the Merchant's trial");
 		bringChampionsTokenToThorvald = new NpcStep(this, NpcID.THORVALD_THE_WARRIOR, new WorldPoint(2666, 3693, 0), "Bring the champions token to Thorvald north of the longhall.", championsToken);
 		bringChampionsTokenToThorvald.addDialogStep("Ask about the Merchant's trial");
@@ -866,7 +866,7 @@ public class TheFremennikTrials extends BasicQuestHelper
 		goDownstairsWithKey.addSubSteps(goDownstairsWithKey2);
 		leaveSeersHouse = new ObjectStep(this, ObjectID.DOOR_4166, new WorldPoint(2636, 3667, 0), "Leave the Seer's house.", seersKey);
 
-		finishQuest = new NpcStep(this, NpcID.BRUNDT_THE_CHIEFTAIN_9263, new WorldPoint(2658, 3669, 0), "Talk to Brundt in Rellekka's longhall to finish the quest.");
+		finishQuest =  new NpcStep(this, NpcID.BRUNDT_THE_CHIEFTAIN_9263, new WorldPoint(2658, 3669, 0), "Talk to Brundt in Rellekka's longhall to finish the quest.");
 		finishQuest.addDialogStep("Ask about anything else.");
 	}
 

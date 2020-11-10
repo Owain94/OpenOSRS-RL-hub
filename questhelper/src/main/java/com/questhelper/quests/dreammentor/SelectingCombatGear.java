@@ -30,12 +30,17 @@ import com.questhelper.steps.QuestStep;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import javax.inject.Inject;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class SelectingCombatGear extends QuestStep
 {
+	@Inject
+	EventBus eventbus;
+
 	ArrayList<Widget> itemsToHighlight;
 
 	public SelectingCombatGear(QuestHelper questHelper)
@@ -47,6 +52,7 @@ public class SelectingCombatGear extends QuestStep
 	public void startUp()
 	{
 		updateItems();
+		eventbus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Subscribe

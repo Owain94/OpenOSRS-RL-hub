@@ -50,6 +50,7 @@ import net.runelite.api.SpriteID;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -63,6 +64,9 @@ public abstract class QuestStep implements Module
 
 	@Inject
 	private ClientThread clientThread;
+
+	@Inject
+	private EventBus eventBus;
 
 	@Inject
 	SpriteManager spriteManager;
@@ -133,6 +137,12 @@ public abstract class QuestStep implements Module
 		this.questHelper = questHelper;
 	}
 
+	public void subscribe()
+	{
+		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
+		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
+	}
+
 	@Override
 	public void configure(Binder binder)
 	{
@@ -142,6 +152,7 @@ public abstract class QuestStep implements Module
 	{
 		clientThread.invokeLater(this::highlightChoice);
 		clientThread.invokeLater(this::highlightWidgetChoice);
+		subscribe();
 	}
 
 	public void shutDown()
@@ -236,6 +247,11 @@ public abstract class QuestStep implements Module
 	public void addDialogStep(String choice)
 	{
 		choices.addChoice(new DialogChoiceStep(choice));
+	}
+
+	public void addDialogStepWithExclusion(String choice, String exclusionString)
+	{
+		choices.addDialogChoiceWithExclusion(new DialogChoiceStep(choice), exclusionString);
 	}
 
 	public void addDialogStep(int id, String choice)

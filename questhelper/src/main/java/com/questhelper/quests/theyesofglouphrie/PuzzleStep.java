@@ -25,15 +25,15 @@
 package com.questhelper.quests.theyesofglouphrie;
 
 import com.google.inject.Inject;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.WidgetDetails;
 import com.questhelper.steps.WidgetStep;
+import com.questhelper.steps.OwnerStep;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,7 +106,6 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		clickDiscHole3 = new WidgetStep(getQuestHelper(), "Insert the disc.", 447, 84);
 		clickDiscHole4 = new WidgetStep(getQuestHelper(), "Insert the disc.", 447, 86);
 		setupShapes();
-
 	}
 
 	@Override
@@ -119,6 +118,9 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		answer4 = client.getVarbitValue(2513); // 4 input
 
 		updateSteps();
+
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		eventBus.subscribe(ItemContainerChanged.class, this, this::onItemContainerChanged);
 	}
 
 	@Override
@@ -477,7 +479,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (event.getContainerId() == 440)
+		if(event.getContainerId() == 440)
 		{
 			ItemContainer container = event.getItemContainer();
 			currentInv = container.getItems();
@@ -543,7 +545,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		shapeValues.put(3, yellowCircleRedTri);
 		shapeValues.put(4, greenCircleRedSquare);
 		shapeValues.put(5, blueCircleRedPentagon);
-		shapeValues.put(6, indigoCircleOrangeTriangle);
+		shapeValues.put(6,indigoCircleOrangeTriangle);
 		shapeValues.put(7, shapes.get(ItemID.A_VIOLET_CIRCLE));
 		shapeValues.put(8, shapes.get(ItemID.AN_ORANGE_SQUARE));
 		shapeValues.put(9, shapes.get(ItemID.A_YELLOW_TRIANGLE));

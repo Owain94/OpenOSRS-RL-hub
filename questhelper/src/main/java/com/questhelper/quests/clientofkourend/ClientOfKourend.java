@@ -24,16 +24,10 @@
  */
 package com.questhelper.quests.clientofkourend;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
@@ -41,6 +35,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
@@ -126,7 +126,7 @@ public class ClientOfKourend extends BasicQuestHelper
 
 		useFeatherOnScroll = new DetailedQuestStep(this, "Use a feather on the Enchanted Scroll", feather, enchantedScroll);
 
-		talkToLeenz = new NpcStep(this, NpcID.LEENZ, new WorldPoint(2807, 3726, 0), "Talk to Leenz in Port Piscarilius general store.", enchantedQuill);
+		talkToLeenz = new NpcStep(this, NpcID.LEENZ, new WorldPoint(1807, 3726, 0), "Talk to Leenz in Port Piscarilius general store.", enchantedQuill);
 		talkToLeenz.addDialogStep("Can I ask you about Port Piscarilius?");
 		talkToLeenz.addDialogStep("Why should I gain favour with Port Piscarilius?");
 		talkToHorace = new NpcStep(this, NpcID.HORACE, new WorldPoint(1774, 3589, 0), "Talk to Horace in the Hosidius general store.", enchantedQuill);

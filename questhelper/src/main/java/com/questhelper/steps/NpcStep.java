@@ -47,11 +47,15 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class NpcStep extends DetailedQuestStep
 {
+	@Inject
+	EventBus eventBus;
+
 	@Inject
 	protected Client client;
 
@@ -91,6 +95,11 @@ public class NpcStep extends DetailedQuestStep
 		this(questHelper, npcID, null, text, allowMultipleHighlights, requirements);
 	}
 
+	public void subscribe()
+	{
+
+	}
+
 	@Override
 	public void startUp()
 	{
@@ -111,6 +120,7 @@ public class NpcStep extends DetailedQuestStep
 				}
 			}
 		}
+		subscribe();
 	}
 
 	public void addAlternateNpcs(Integer... alternateNpcIDs)
