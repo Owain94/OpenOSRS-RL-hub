@@ -35,11 +35,7 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 
 public class PotionPuzzle extends QuestStep implements OwnerStep
 {
-	@Inject
-	protected EventBus eventBus;
-
-	@Inject
-	protected Client client;
+	EventBus eventBus;
 
 	// Potion 1
 	private static final Pattern LINE1 = Pattern.compile("^(.*) blend is directly");
@@ -76,12 +72,16 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		setupSteps();
 	}
 
+	public void subscribe()
+	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
+	}
+
 	@Override
 	public void startUp()
 	{
 		updateSteps();
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 	}
 
 	@Override
@@ -226,7 +226,6 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		fluid4.setHighlightInInventory(true);
 		fluid5 = new ItemRequirement("Unknown fluid 5", ItemID.UNKNOWN_FLUID_5);
 		fluid5.setHighlightInInventory(true);
-
 		fluids = new ItemRequirement[]{null, fluid1, fluid2, fluid3, fluid4, fluid5};
 	}
 

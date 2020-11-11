@@ -60,7 +60,7 @@ import net.runelite.client.util.ImageUtil;
 public abstract class QuestStep implements Module
 {
 	@Inject
-	protected Client client;
+	public Client client;
 
 	@Inject
 	private ClientThread clientThread;

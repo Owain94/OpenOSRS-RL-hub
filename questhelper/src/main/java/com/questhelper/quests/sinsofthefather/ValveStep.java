@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
+import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
@@ -48,9 +49,6 @@ import net.runelite.client.eventbus.Subscribe;
 
 public class ValveStep extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
 	DetailedQuestStep readNote, setNorthValve, setSouthValve, setNorthValveNoHighlight, setSouthValveNoHighlight, cutTree;
 
 	private int valveTotalValue;
@@ -77,6 +75,11 @@ public class ValveStep extends DetailedOwnerStep
 	public ValveStep(QuestHelper questHelper)
 	{
 		super(questHelper, "Turn the valves to solve the water puzzle.");
+	}
+
+	public void subscribe()
+	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override
@@ -270,8 +273,6 @@ public class ValveStep extends DetailedOwnerStep
 
 		cutTree = new ObjectStep(getQuestHelper(), ObjectID.BLISTERWOOD_TREE, new WorldPoint(3635, 3362, 0),
 			"Gather 8 logs from the Blisterwood tree.", scentedTop, scentedLegs, scentedShoes);
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override

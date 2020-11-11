@@ -24,11 +24,15 @@
  */
 package com.questhelper.quests.rumdeal;
 
+import com.google.inject.Inject;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.quests.lunardiplomacy.ChanceChallenge;
+import com.questhelper.quests.lunardiplomacy.MimicChallenge;
+import com.questhelper.quests.lunardiplomacy.NumberChallenge;
 import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
@@ -53,12 +57,20 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.RUM_DEAL
 )
 public class RumDeal extends BasicQuestHelper
 {
+	@Inject
+	EventBus eventBus;
+
+	boolean subscribed = false;
+
 	ItemRequirement combatGear, dibber, rake, slayerGloves, blindweedSeed, rakeHighlight, blindweedSeedHighlight, blindweed, blindweedHighlight, bucket, bucketHighlight,
 		stagnantWater, stagnantWaterHighlight, netBowl, sluglings5, holyWrench, wrench, spiderCarcass, spiderCarcassHighlight, swill;
 
@@ -71,13 +83,29 @@ public class RumDeal extends BasicQuestHelper
 		killSpirit, goUpFromSpiders, talkToBraindeathAfterSpirit, goDownToSpiders, killSpider, goUpFromSpidersWithCorpse, goUpToDropSpider, dropSpider, goDownAfterSpider,
 		talkToBraindeathAfterSpider, useBucketOnTap, goDownToDonnie, talkToDonnie, goUpToBraindeathToFinish, talkToBraindeathToFinish, pickUpCarcass;
 
-	SlugSteps getSlugs;
+	SlugSteps getSlugs = new SlugSteps(this);
 
 	Zone island, islandF0, islandF1, islandF2, northIsland, spiderRoom;
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		if (eventBus != null && client != null)
+		{
+			if (!subscribed)
+			{
+				getSlugs.eventBus = eventBus;
+				getSlugs.client = client;
+				getSlugs.subscribe();
+				subscribed = true;
+			}
+		}
+	}
 
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		loadZones();
 		setupItemRequirements();
 		setupConditions();
@@ -376,8 +404,6 @@ public class RumDeal extends BasicQuestHelper
 		talkToBraindeathAfterWater = new NpcStep(this, NpcID.CAPTAIN_BRAINDEATH, new WorldPoint(2145, 5108, 1), "Talk to Captain Braindeath.");
 		talkToBraindeathAfterWater.addSubSteps(goDownFromTopAfterDropWater);
 
-		getSlugs = new SlugSteps(this);
-
 		goDownAfterSlugs = new ObjectStep(this, ObjectID.LADDER_10168, new WorldPoint(2163, 5092, 2), "Return to Captain Braindeath.");
 		talkToBraindeathAfterSlugs = new NpcStep(this, NpcID.CAPTAIN_BRAINDEATH, new WorldPoint(2145, 5108, 1), "Talk to Captain Braindeath.");
 		talkToBraindeathAfterSlugs.addSubSteps(goDownAfterSlugs);
@@ -432,6 +458,10 @@ public class RumDeal extends BasicQuestHelper
 	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
+		if (getSlugs != null)
+		{
+
+		}
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Arrays.asList(talkToPete, talkToBraindeath)), rake, dibber, slayerGloves, combatGear));
 		allSteps.add(new PanelDetails("Get blindweed", new ArrayList<>(Arrays.asList(goDownstairs, rakePatch, plantSeed, waitForGrowth, pickPlant, goUpStairsWithPlant, dropPlant)), rake, dibber));

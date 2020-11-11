@@ -12,13 +12,10 @@ import net.runelite.client.eventbus.Subscribe;
 
 public class MemoryChallenge extends DetailedQuestStep
 {
-
-	@Inject
-	EventBus eventBus;
-
-	public MemoryChallenge(QuestHelper questHelper)
+	public MemoryChallenge(QuestHelper questHelper, EventBus eventBus)
 	{
 		super(questHelper, "Follow the path to the end.");
+		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Override
@@ -26,7 +23,6 @@ public class MemoryChallenge extends DetailedQuestStep
 	{
 		super.startUp();
 		setupPaths();
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Subscribe

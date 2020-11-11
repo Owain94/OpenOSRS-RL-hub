@@ -34,6 +34,7 @@ import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.inject.Inject;
+import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
@@ -48,10 +49,8 @@ import net.runelite.client.eventbus.Subscribe;
 
 public class FishMonkfish extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
-	DetailedQuestStep fishMonkfish, cookMonkfish, talkToArnoldWithMonkfish;
+	DetailedQuestStep fishMonkfish;
+	DetailedQuestStep cookMonkfish, talkToArnoldWithMonkfish;
 	ItemRequirement cookedMonkfish = new ItemRequirement("Fresh monkfish", ItemID.FRESH_MONKFISH_7943, 5);
 	ItemRequirement rawMonkfish = new ItemRequirement("Fresh monkfish", ItemID.FRESH_MONKFISH, 5);
 	ItemRequirement combatGear = new ItemRequirement("Combat gear", -1, -1);
@@ -62,6 +61,12 @@ public class FishMonkfish extends DetailedOwnerStep
 	{
 		super(questHelper);
 		smallNet.setTip("You can get one from Arnold");
+		fishMonkfish = new ObjectStep(getQuestHelper(), NullObjectID.NULL_13477, new WorldPoint(2311, 3696, 0), "Fish at least 5 fresh monkfish. Sea Trolls will appear, and you'll need to kill them.", smallNet, combatGear);
+	}
+
+	public void subscribe()
+	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Subscribe
@@ -112,11 +117,8 @@ public class FishMonkfish extends DetailedOwnerStep
 	@Override
 	protected void setupSteps()
 	{
-		fishMonkfish = new ObjectStep(getQuestHelper(), NullObjectID.NULL_13477, new WorldPoint(2311, 3696, 0), "Fish at least 5 fresh monkfish. Sea Trolls will appear, and you'll need to kill them.", smallNet, combatGear);
 		cookMonkfish = new ObjectStep(getQuestHelper(), ObjectID.RANGE_12611, new WorldPoint(2316, 3669, 0), "Cook 5 monkfish. If you burn any, catch some more.", rawMonkfish);
 		talkToArnoldWithMonkfish = new NpcStep(getQuestHelper(), NpcID.ARNOLD_LYDSPOR, new WorldPoint(2329, 3688, 0), "Bring the monkfish to Arnold at the bank.", cookedMonkfish);
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override

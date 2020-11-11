@@ -45,10 +45,6 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 
 public class DoorPuzzleStep extends DetailedQuestStep
 {
-	@Inject
-	Client client;
-
-	@Inject
 	EventBus eventBus;
 
 	private final int UNKNOWN_VALUE = 0;
@@ -95,6 +91,11 @@ public class DoorPuzzleStep extends DetailedQuestStep
 	public DoorPuzzleStep(BasicQuestHelper questHelper)
 	{
 		super(questHelper, "Solve the puzzle by marking the highlighted squares.");
+	}
+
+	public void subscribe()
+	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	private PuzzleLine[] solve()
@@ -425,8 +426,6 @@ public class DoorPuzzleStep extends DetailedQuestStep
 		allSolutions.put(13, getSolutions(new PuzzleLine(FILLED, EMPTY, FILLED, FILLED, FILLED)));
 		allSolutions.put(14, getSolutions(new PuzzleLine(EMPTY, FILLED, FILLED, FILLED, FILLED)));
 		allSolutions.put(15, getSolutions(new PuzzleLine(FILLED, FILLED, FILLED, FILLED, FILLED)));
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 
 		return allSolutions;
 	}
