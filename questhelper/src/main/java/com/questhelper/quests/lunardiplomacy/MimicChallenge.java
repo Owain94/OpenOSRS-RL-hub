@@ -34,6 +34,7 @@ import com.questhelper.steps.emote.QuestEmote;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.inject.Inject;
+import net.runelite.api.Client;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
@@ -42,9 +43,6 @@ import net.runelite.client.eventbus.Subscribe;
 
 public class MimicChallenge extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
 	DetailedQuestStep cry, bow, dance, wave, think, talk;
 
 	public MimicChallenge(QuestHelper questHelper)
@@ -61,6 +59,11 @@ public class MimicChallenge extends DetailedOwnerStep
 		think = new EmoteStep(getQuestHelper(), QuestEmote.THINK, new WorldPoint(1772, 5070, 2), "Perform the think emote.");
 		talk = new NpcStep(getQuestHelper(), NpcID.ETHEREAL_MIMIC, "Talk to the Ethereal Mimic.");
 		talk.addDialogStep("Suppose I may as well have a go.");
+	}
+
+
+	public void subscribe()
+	{
 		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 

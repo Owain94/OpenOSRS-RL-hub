@@ -5,13 +5,17 @@ import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.QuestStep;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import net.runelite.api.Client;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 /* Possible improvement would be to show a number on each square indicating turns remaining to solved position */
 public class PowerPuzzle extends QuestStep
 {
+	EventBus eventBus;
+
 	int[] solvedPositions =
 		{
 			0, 0, 1, 0, 4, 1,
@@ -27,6 +31,11 @@ public class PowerPuzzle extends QuestStep
 	public PowerPuzzle(QuestHelper questHelper)
 	{
 		super(questHelper, "Click the highlighted boxes to turn the squares to solve the puzzle.");
+	}
+
+	public void subscribe()
+	{
+		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Override

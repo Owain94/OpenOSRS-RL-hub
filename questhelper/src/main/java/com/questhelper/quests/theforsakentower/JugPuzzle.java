@@ -42,11 +42,9 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	private static final Pattern JUG_EMPTIED = Pattern.compile("^You empty the ([0-9])-gallon jug");
 	private static final Pattern JUG_CHECKED = Pattern.compile("^The ([0-9])-gallon jug(?: contains ([0-9]) gallons* of coolant| is empty)");
 
-	@Inject
-	protected EventBus eventBus;
 
-	@Inject
-	protected Client client;
+	EventBus eventBus;
+
 
 	protected QuestStep currentStep;
 
@@ -66,11 +64,15 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 		super(questHelper, "");
 		jugs.put("5", -1);
 		jugs.put("8", -1);
-
 		setupItemRequirements();
 		setupZones();
 		setupConditions();
 		setupSteps();
+	}
+
+	public void subscribe()
+	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override
@@ -351,9 +353,6 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 		goDownToFirstFloor = new ObjectStep(getQuestHelper(), ObjectID.LADDER_33485, new WorldPoint(1382, 3827, 2), "Go down from the top floor.");
 		goDownToGroundFloor = new ObjectStep(getQuestHelper(), ObjectID.STAIRCASE_33552, new WorldPoint(1378, 3825, 1), "Go down to the ground floor.");
 		goUpToGroundFloor = new ObjectStep(getQuestHelper(), ObjectID.LADDER_33484, new WorldPoint(1382, 10229, 0), "Leave the tower's basement.");
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-
 	}
 
 	public ArrayList<PanelDetails> panelDetails()

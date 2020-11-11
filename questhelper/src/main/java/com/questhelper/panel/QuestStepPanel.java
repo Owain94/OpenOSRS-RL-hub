@@ -169,21 +169,24 @@ public class QuestStepPanel extends JPanel
 
 		for (QuestStep step : panelDetails.getSteps())
 		{
-			if (!step.isShowInSidebar())
+			if (step != null)
 			{
-				steps.put(step, null);
-				continue;
+				if (!step.isShowInSidebar())
+				{
+					steps.put(step, null);
+					continue;
+				}
+
+				JLabel questStepLabel = new JLabel();
+				questStepLabel.setLayout(new BorderLayout());
+				questStepLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
+				questStepLabel.setHorizontalAlignment(SwingConstants.LEFT);
+				questStepLabel.setVerticalAlignment(SwingConstants.TOP);
+				questStepLabel.setText(generateText(step));
+
+				steps.put(step, questStepLabel);
+				questStepsPanel.add(questStepLabel);
 			}
-
-			JLabel questStepLabel = new JLabel();
-			questStepLabel.setLayout(new BorderLayout());
-			questStepLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
-			questStepLabel.setHorizontalAlignment(SwingConstants.LEFT);
-			questStepLabel.setVerticalAlignment(SwingConstants.TOP);
-			questStepLabel.setText(generateText(step));
-
-			steps.put(step, questStepLabel);
-			questStepsPanel.add(questStepLabel);
 		}
 
 		bodyPanel.add(questStepsPanel, BorderLayout.CENTER);

@@ -33,6 +33,7 @@ import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.inject.Inject;
+import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
@@ -42,9 +43,6 @@ import net.runelite.client.eventbus.Subscribe;
 
 public class FixWall extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
 	DetailedQuestStep useIronBar, repairWall1, repairWall2, repairWall3, repairWall4, repairWall5;
 
 	ItemRequirement ironSheets, ironBars, hammer;
@@ -52,6 +50,11 @@ public class FixWall extends DetailedOwnerStep
 	public FixWall(QuestHelper questHelper)
 	{
 		super(questHelper);
+	}
+
+	public void subscribe()
+	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Subscribe
@@ -125,7 +128,6 @@ public class FixWall extends DetailedOwnerStep
 		repairWall5 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_13700, new WorldPoint(2311, 3684, 0), "Repair the west wall.", ironSheets, hammer);
 		repairWall5.addIcon(ItemID.IRON_SHEET);
 		repairWall1.addSubSteps(repairWall2, repairWall3, repairWall4, repairWall5);
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override

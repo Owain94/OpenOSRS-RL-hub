@@ -24,6 +24,7 @@
  */
 package com.questhelper.quests.swansong;
 
+import com.google.inject.Inject;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
@@ -47,17 +48,31 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.SWAN_SONG
 )
 public class SwanSong extends BasicQuestHelper
 {
+	@Inject
+	EventBus eventBus;
+
+	@Inject
+	Client client;
+
+	boolean repairWallSubscribed = false;
+	boolean fishAndCookMonkfishSubscribed = false;
+
+
 	ItemRequirement mist10, lava10, blood5, bones7, pot, potLid, ironBar5, log, tinderbox, hammer, brownApron, monkfish5, rawMonkfish5, combatGear, potHiglight,
 		potLidHiglight, tinderboxHiglight, ironBar5Higlight, logHiglight, ironSheet5, smallNet, airtightPot, combatGearRanged, boneSeeds;
 
@@ -68,15 +83,38 @@ public class SwanSong extends BasicQuestHelper
 		talkToFranklinAgain, talkToHermanAfterTasks, enterWizardsBasement, talkToFruscone, talkToMalignius, talkToCrafter, makeAirtightPot, talkToMaligniusWithPot,
 		talkToHermanForFinalFight, killQueen, talkToHermanToFinish, talkToHermanWithPot;
 
-	FixWall repairWall;
+	FixWall repairWall = new FixWall(this);
 
-	FishMonkfish fishAndCookMonkfish;
+	FishMonkfish fishAndCookMonkfish = new FishMonkfish(this);
 
 	Zone colonyEntrance, basement;
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		if (eventBus != null && client != null)
+		{
+			if (!repairWallSubscribed)
+			{
+				repairWall.eventBus = eventBus;
+				repairWall.client = client;
+				repairWall.subscribe();
+				repairWallSubscribed = true;
+			}
+			if (!fishAndCookMonkfishSubscribed)
+			{
+				fishAndCookMonkfish.eventBus = eventBus;
+				fishAndCookMonkfish.client = client;
+				fishAndCookMonkfish.subscribe();
+				fishAndCookMonkfishSubscribed = true;
+			}
+		}
+	}
 
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		loadZones();
 		setupItemRequirements();
 		setupConditions();
@@ -235,10 +273,8 @@ public class SwanSong extends BasicQuestHelper
 		useLog.addIcon(ItemID.LOGS);
 		useTinderbox = new ObjectStep(this, NullObjectID.NULL_13702, new WorldPoint(2344, 3676, 0), "Light the logs in the firebox in the building with a furnace.", tinderboxHiglight);
 		useTinderbox.addIcon(ItemID.TINDERBOX);
-		repairWall = new FixWall(this);
 
 		talkToArnold = new NpcStep(this, NpcID.ARNOLD_LYDSPOR, new WorldPoint(2329, 3688, 0), "Talk to Arnold at the bank in the Fishing Colony.");
-		fishAndCookMonkfish = new FishMonkfish(this);
 
 		talkToFranklinAgain = new NpcStep(this, NpcID.FRANKLIN_CARANOS, new WorldPoint(2341, 3667, 0), "Talk to Franklin again.");
 		talkToHermanAfterTasks = new NpcStep(this, NpcID.HERMAN_CARANOS, new WorldPoint(2354, 3683, 0), "Talk to the Herman in the east of the colony again.");

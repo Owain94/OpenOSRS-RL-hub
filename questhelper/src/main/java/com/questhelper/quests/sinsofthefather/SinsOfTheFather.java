@@ -24,6 +24,7 @@
  */
 package com.questhelper.quests.sinsofthefather;
 
+import com.google.inject.Inject;
 import com.questhelper.ItemCollections;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
@@ -52,24 +53,39 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.SINS_OF_THE_FATHER
 )
 public class SinsOfTheFather extends BasicQuestHelper
 {
+	@Inject
+	EventBus eventBus;
+
+	@Inject
+	Client client;
+
+	DoorPuzzleStep doDoorPuzzle= new DoorPuzzleStep(this);
+	boolean doDoorPuzzleSubscribed = false;
+	ValveStep valveStep = new ValveStep(this);
+	boolean valveStepSubscribed = false;
+
 	QuestStep startQuest, talkToHameln, talkToCarl, inspectBarrel, followCarl, killKroy, destroyLab, talkToVeliafAfterKroy, talkToVeliafInPater,
 		talkToIvan, listenToMeeting, talkToIvanAfterMeeting, talkToIvanAfterTrek, talkToVeliafInBoatHouse, travelToGraveyard, talkToVeliafInGraveyard, talkToVanescula,
 		talkToVanesculaAfterPuzzle, talkToVanesculaAfterTeam, talkToSafalaanInLab, killBloodveld, talkToSafalaanInDeepLab, searchLabBookcase,
 		takeBookToSafalaan, talkToVanesculaAfterLab, talkToPolmafi, talkToPolmafiMore, bringUnscentedToVanescula, talkToVeliafForFight, killDamien, talkToVeliafAfterDamien,
 		talkToVanesculaAfterDamien, enterDarkmeyer, talkToDesmodus, talkToMordan, talkToMaria, talkToDesmodusAgain, getNote, bringVanesculaLogs, bringVertidaLogs,
 		talkToVertidaForFlail, talkToVanesculaWithFlail, talkToSafalaanWithFlail, talkToVanesculaBeforeFight, talkToVanesculaForFight, talkToVeliafAfterFight,
-		finishQuest, templeTrek, talkToTeamSteps, valveStep, createFlailSteps, doDoorPuzzle, cutLogs, goDownToKroy, destroyLab2, enterPater, killJuvinates,
+		finishQuest, templeTrek, talkToTeamSteps, createFlailSteps, cutLogs, goDownToKroy, destroyLab2, enterPater, killJuvinates,
 		leaveJuvinateArea, openPuzzleDoor, goToLab, enterDeepLab, goDownToPolmafi, goDownToPolmafiNoItems, talkToVeliafForFinalFight, readNote,
 		goDownToVerditaWithLogs, fightVanstrom, enterBaseToFinish;
 
@@ -92,9 +108,31 @@ public class SinsOfTheFather extends BasicQuestHelper
 		inJuvinateArea, juvinateNearby, inPuzzleInterface, talkedToKael, talkedToVertida, talkedToPolmafi, talkedToRadigad, talkedToIvan, inLab, inDeepLab, inNewBase,
 		inDamienRoom, hasNote, hasSickle, hasRubySickle, hasEnchantedRubySickle, hasBlisterwoodSickle, inFinalFightArea;
 
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		if (eventBus != null && client != null)
+		{
+			if (!doDoorPuzzleSubscribed)
+			{
+				doDoorPuzzle.eventBus = eventBus;
+				doDoorPuzzle.client = client;
+				doDoorPuzzle.subscribe();
+				doDoorPuzzleSubscribed = true;
+			}
+			if (!valveStepSubscribed)
+			{
+				valveStep.eventBus = eventBus;
+				valveStep.client = client;
+				valveStep.subscribe();
+				valveStepSubscribed = true;
+			}
+		}
+	}
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
+		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		Map<Integer, QuestStep> steps = new HashMap<>();
 		setupZones();
 		setupItemRequirements();
@@ -791,9 +829,7 @@ public class SinsOfTheFather extends BasicQuestHelper
 		templeTrek = new NpcStep(this, NpcID.IVAN_STROM_9530, new WorldPoint(3444, 3485, 0),
 			"Speak to Ivan Strom outside the east entrance of Paterdomus to go temple treking with him.");
 		talkToTeamSteps = new DetailedQuestStep(this, "Convince the Myreque to take on Drakan.");
-		valveStep = new ValveStep(this);
 		createFlailSteps = new DetailedQuestStep(this, "Create the blisterwood flail.", blisterwoodFlail);
-		doDoorPuzzle = new DoorPuzzleStep(this);
 	}
 
 	@Override
