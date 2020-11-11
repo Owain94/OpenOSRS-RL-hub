@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2020, Hydrox6 <ikada@protonmail.ch>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,22 +22,47 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package io.hydrox.trailblazerclues;
 
-version = "0.0.10"
+import java.util.HashMap;
+import java.util.Map;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-project.extra["PluginName"] = "Quest Helper"
-project.extra["PluginDescription"] = "An in-game interactive guide for quests"
+@Getter
+@RequiredArgsConstructor
+public enum Region
+{
+	MISTHALIN(1, 2749),
+	KARAMJA(2, 2750),
+	ASGARNIA(3, 2751),
+	DESERT(6, 2752),
+	MORYTANIA(5, 2753),
+	WILDERNESS(11, 2754),
+	KANDARIN(4, 2755),
+	FREMENNIK(8, 2756),
+	TIRANNWN(7, 2757);
 
-tasks {
-    jar {
-        manifest {
-            attributes(mapOf(
-                    "Plugin-Version" to project.version,
-                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
-                    "Plugin-Provider" to project.extra["PluginProvider"],
-                    "Plugin-Description" to project.extra["PluginDescription"],
-                    "Plugin-License" to project.extra["PluginLicense"]
-            ))
-        }
-    }
+	private static final Map<Integer, Region> IDS = new HashMap<>();
+
+	static
+	{
+		for (Region r : values())
+		{
+			IDS.put(r.id, r);
+		}
+	}
+
+	private final int id;
+	private final int spriteID;
+
+	static Region fromID(int id)
+	{
+		return IDS.get(id);
+	}
+
+	String getName()
+	{
+		return name().substring(0, 1) + name().substring(1).toLowerCase();
+	}
 }

@@ -66,6 +66,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -75,7 +76,8 @@ import org.pf4j.Extension;
 @Extension
 @PluginDescriptor(
 	name = "Quest Helper",
-	description = "Helps you with your quests"
+	description = "Helps you with your quests",
+	type = PluginType.UTILITY
 )
 @Slf4j
 public class QuestHelperPlugin extends Plugin
