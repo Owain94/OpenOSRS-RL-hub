@@ -264,7 +264,18 @@ public class QuestHelperPlugin extends Plugin
 	{
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
-			List<QuestHelper> questHelpers = quests.values().stream().filter(quest -> !quest.isCompleted()).collect(Collectors.toList());
+			List<QuestHelper> questHelpers = new ArrayList<>();
+			if (quests != null)
+			for (Object o : quests.values().toArray())
+			{
+				if (o instanceof QuestHelper)
+				{
+					QuestHelper qh = (QuestHelper) o;
+					if (!qh.isCompleted())
+						questHelpers.add(qh);
+				}
+			}
+			if (questHelpers.size() > 0)
 			SwingUtilities.invokeLater(() -> panel.refresh(questHelpers, false));
 		}
 	}
