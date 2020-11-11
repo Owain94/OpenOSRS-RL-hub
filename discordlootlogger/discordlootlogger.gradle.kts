@@ -23,7 +23,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.0.6"
 
 project.extra["PluginName"] = "Discord Loot Logger"
 project.extra["PluginDescription"] = "Logs loot received to a Discord Webhook"
@@ -40,6 +40,7 @@ tasks {
                     "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
                     "Plugin-Description" to project.extra["PluginDescription"],
+                    "Plugin-Dependencies" to nameToId("loottracker"),
                     "Plugin-License" to project.extra["PluginLicense"]
             ))
         }
