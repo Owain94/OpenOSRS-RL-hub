@@ -1,21 +1,6 @@
 package info.osleague.runelite.osleague;
 
 import com.google.gson.Gson;
-import info.osleague.runelite.osleague.osleague.OsLeagueImport;
-import info.osleague.runelite.osleague.osleague.OsLeagueRelics;
-import info.osleague.runelite.osleague.osleague.OsLeagueTasks;
-import java.awt.Color;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -30,18 +15,29 @@ import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
+
+import javax.inject.Inject;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import org.pf4j.Extension;
 
 @Extension
 @Slf4j
 @PluginDescriptor(
-	name = "OsLeague",
-	description = "who needs one anyways, right?",
-	type = PluginType.GAMEMODE
+	name = "OsLeague"
 )
 public class OsLeaguePlugin extends Plugin
 {
@@ -65,15 +61,6 @@ public class OsLeaguePlugin extends Plugin
 	private List<Relic> relics;
 	private List<Area> areas;
 
-	private static void showMessageBox(final String title, final String message)
-	{
-		SwingUtilities.invokeLater(() ->
-			JOptionPane.showMessageDialog(
-				null,
-				message, title,
-				INFORMATION_MESSAGE));
-	}
-
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
@@ -81,8 +68,7 @@ public class OsLeaguePlugin extends Plugin
 		{
 			case LOGGING_IN:
 			case LOGIN_SCREEN:
-				this.relics = null;
-				this.areas = null;
+				clearSavedData();
 				break;
 		}
 	}
@@ -100,6 +86,13 @@ public class OsLeaguePlugin extends Plugin
 			.build();
 
 		clientToolbar.addNavigation(titleBarButton);
+	}
+
+	@Override
+	protected void shutDown() throws Exception
+	{
+		clientToolbar.removeNavigation(titleBarButton);
+		clearSavedData();
 	}
 
 	@Subscribe
@@ -122,15 +115,24 @@ public class OsLeaguePlugin extends Plugin
 		}
 	}
 
+	private void clearSavedData()
+	{
+		this.tasks = null;
+		this.relics = null;
+		this.areas = null;
+		filtersRecentlySetToAll = false;
+	}
+
 	private void sendTasksUpdatedMessage()
 	{
-		String chatMessage = this.tasks.size() + "/" + MAX_TASK_COUNT + " tasks saved for export to OS League Tools";
+		String chatMessage = this.tasks.size() + "/" + MAX_TASK_COUNT +	" tasks saved for export to OS League Tools";
 		sendChatMessage(chatMessage, Color.BLUE);
 	}
 
 	private boolean isTaskWindowOpen()
 	{
-		return client.getWidget(657, 10) != null;
+		Widget widget = client.getWidget(657, 10);
+		return widget != null && !widget.isHidden();
 	}
 
 	private boolean getAllFiltersSetToAll()
@@ -142,9 +144,9 @@ public class OsLeaguePlugin extends Plugin
 			TRAILBLAZER_LEAGUE_TASK_COMPLETED_FILTER(10034),
 		 */
 		return (client.getVarbitValue(10033) == 0 &&
-			client.getVarbitValue(11689) == 0 &&
-			client.getVarbitValue(11692) == 0 &&
-			client.getVarbitValue(10034) == 0);
+				client.getVarbitValue(11689) == 0 &&
+				client.getVarbitValue(11692) == 0 &&
+				client.getVarbitValue(10034) == 0);
 	}
 
 	private void copyJsonToClipboard()
@@ -159,12 +161,12 @@ public class OsLeaguePlugin extends Plugin
 
 		Gson gson = new Gson();
 
-		OsLeagueImport osLeagueImport = new OsLeagueImport();
-		osLeagueImport.unlockedRegions = gson.toJson(this.areas.stream().map(Area::getName).toArray());
-		osLeagueImport.unlockedRelics = gson.toJson(new OsLeagueRelics(this.relics));
-		osLeagueImport.tasks = gson.toJson(new OsLeagueTasks(this.tasks));
+		OsLeagueExport osLeagueExport = new OsLeagueExport();
+		osLeagueExport.areas = this.areas;
+		osLeagueExport.relics = this.relics;
+		osLeagueExport.tasks = this.tasks;
 
-		String json = gson.toJson(osLeagueImport);
+		String json = gson.toJson(osLeagueExport);
 		final StringSelection stringSelection = new StringSelection(json);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
 
@@ -264,12 +266,9 @@ public class OsLeaguePlugin extends Plugin
 		List<Task> tasks = new ArrayList<>();
 		for (int i = 0; i < taskLabels.length; i++)
 		{
-			String label = taskLabels[i].getText();
-			int osLeagueIndex = i + RemappedTaskRange.getOffset(i);
+			String name = taskLabels[i].getText();
 			Task task = new Task(
-				i,
-				osLeagueIndex,
-				label,
+				i, name,
 				getTaskPoints(taskPoints[i]),
 				isTaskCompleted(taskLabels[i]),
 				taskDifficulties[i].getSpriteId());
@@ -295,16 +294,25 @@ public class OsLeaguePlugin extends Plugin
 		return taskLabel.getTextColor() != 0x9f9f9f;
 	}
 
+	private static void showMessageBox(final String title, final String message)
+	{
+		SwingUtilities.invokeLater(() ->
+			JOptionPane.showMessageDialog(
+				null,
+				message, title,
+				INFORMATION_MESSAGE));
+	}
+
 	private void sendChatMessage(String chatMessage, Color color)
 	{
 		final String message = new ChatMessageBuilder()
-			.append(color, chatMessage)
-			.build();
+				.append(color, chatMessage)
+				.build();
 
 		chatMessageManager.queue(
-			QueuedMessage.builder()
-				.type(ChatMessageType.CONSOLE)
-				.runeLiteFormattedMessage(message)
-				.build());
+				QueuedMessage.builder()
+						.type(ChatMessageType.CONSOLE)
+						.runeLiteFormattedMessage(message)
+						.build());
 	}
 }

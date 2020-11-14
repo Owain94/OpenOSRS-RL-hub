@@ -1,8 +1,9 @@
 package info.osleague.runelite.osleague;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import lombok.Getter;
+
+import java.util.Map;
 
 public enum Area
 {
@@ -16,6 +17,16 @@ public enum Area
 	TIRANNWN("Tirannwn", 2729),
 	MORYTANIA("Morytania", 2730);
 
+	@Getter
+	private final String name;
+	private final int spriteId;
+
+	Area(String name, int spriteId)
+	{
+		this.name = name;
+		this.spriteId = spriteId;
+	}
+
 	private static final Map<Integer, Area> SPRITES;
 
 	static
@@ -28,16 +39,6 @@ public enum Area
 		}
 
 		SPRITES = spriteBuilder.build();
-	}
-
-	@Getter
-	private final String name;
-	private final int spriteId;
-
-	Area(String name, int spriteId)
-	{
-		this.name = name;
-		this.spriteId = spriteId;
 	}
 
 	static Area getAreaBySprite(int id)
