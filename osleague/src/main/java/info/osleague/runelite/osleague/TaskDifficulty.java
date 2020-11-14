@@ -1,8 +1,9 @@
 package info.osleague.runelite.osleague;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import lombok.Getter;
+
+import java.util.Map;
 
 @Getter
 enum TaskDifficulty
@@ -12,6 +13,8 @@ enum TaskDifficulty
 	HARD(2318),
 	ELITE(2319),
 	MASTER(2320);
+
+	private final int spriteId;
 
 	private static final Map<Integer, TaskDifficulty> TASK_DIFFICULTY_SPRITE_IDS;
 
@@ -26,8 +29,6 @@ enum TaskDifficulty
 
 		TASK_DIFFICULTY_SPRITE_IDS = builder.build();
 	}
-
-	private final int spriteId;
 
 	TaskDifficulty(int spriteId)
 	{

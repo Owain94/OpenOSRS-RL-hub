@@ -1,8 +1,9 @@
 package info.osleague.runelite.osleague;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import lombok.Getter;
+
+import java.util.Map;
 
 public enum Relic
 {
@@ -25,20 +26,6 @@ public enum Relic
 	EXPLODING_ATTACKS("Exploding Attacks", 2716, 5, 1),
 	WEAPON_SPECIALIST("Weapon Specialist", 2717, 5, 2);
 
-	private static final Map<Integer, Relic> SPRITES;
-
-	static
-	{
-		ImmutableMap.Builder<Integer, Relic> spriteBuilder = new ImmutableMap.Builder<>();
-
-		for (Relic relic : values())
-		{
-			spriteBuilder.put(relic.spriteId, relic);
-		}
-
-		SPRITES = spriteBuilder.build();
-	}
-
 	private final String name;
 	private final int spriteId;
 	@Getter
@@ -52,6 +39,20 @@ public enum Relic
 		this.spriteId = spriteId;
 		this.tierId = tierId;
 		this.relicId = relicId;
+	}
+
+	private static final Map<Integer, Relic> SPRITES;
+
+	static
+	{
+		ImmutableMap.Builder<Integer, Relic> spriteBuilder = new ImmutableMap.Builder<>();
+
+		for (Relic relic : values())
+		{
+			spriteBuilder.put(relic.spriteId, relic);
+		}
+
+		SPRITES = spriteBuilder.build();
 	}
 
 	static Relic getRelicBySprite(int id)
