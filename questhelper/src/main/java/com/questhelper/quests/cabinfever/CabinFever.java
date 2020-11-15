@@ -83,253 +83,6 @@ public class CabinFever extends BasicQuestHelper
 
 	Zone boatAtDock, boatF0, boatF1, boatF2, enemyBoatF0, enemyBoatF1, enemyBoatF2, sail, enemySail;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToBill);
-
-		ConditionalStep setSail = new ConditionalStep(this, goOnBillBoat);
-		setSail.addStep(onBoatAtDock, talkToBillOnBoat);
-
-		steps.put(10, setSail);
-		steps.put(20, setSail);
-		// Set sail, 1741 0->1
-
-		ConditionalStep sabotageSteps = new ConditionalStep(this, setSail);
-		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, addedFuse, hasTinderbox), lightEnemyFuse);
-		sabotageSteps.addStep(new Conditions(onEnemySail, addedFuse, hasTinderbox), leaveEnemySail);
-		sabotageSteps.addStep(new Conditions(onEnemySail, addedFuse, hasRope), swingToBoat);
-		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, addedFuse, hasRope), goUpToEnemySail);
-		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, addedFuse), pickUpRope);
-
-		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, hasFuseOrAdded), useFuseOnEnemyBarrel);
-		sabotageSteps.addStep(new Conditions(onEnemyBoatF0, hasFuseOrAdded), leaveEnemyHull);
-		sabotageSteps.addStep(new Conditions(onEnemySail, hasFuseOrAdded), leaveEnemySail);
-
-		sabotageSteps.addStep(new Conditions(onSail, hasRopes4, hasFuseOrAdded, hasTinderbox), useRopeOnSailForSabo);
-		sabotageSteps.addStep(new Conditions(onBoatF1, hasRopes4, hasFuseOrAdded, hasTinderbox), climbUpNetForSabo);
-		sabotageSteps.addStep(new Conditions(onBoatF0, hasRopes4, hasFuseOrAdded, hasTinderbox), leaveHullForSabo);
-		sabotageSteps.addStep(new Conditions(onBoatF0, hasRopes4, hasFuseOrAdded), takeTinderbox);
-		sabotageSteps.addStep(new Conditions(onBoatF0, hasRopes4), take1Fuse);
-
-		sabotageSteps.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		sabotageSteps.addStep(onEnemySail, leaveEnemySail);
-		sabotageSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
-		sabotageSteps.addStep(onEnemyBoatF1, pickUpRope);
-		sabotageSteps.addStep(onEnemyBoatF0, leaveEnemyHull);
-		sabotageSteps.addStep(onSail, leaveSail);
-		sabotageSteps.addStep(onBoatF2, leaveTop);
-		sabotageSteps.addStep(onBoatF1, enterHull);
-		sabotageSteps.addStep(onBoatF0, take4Ropes);
-
-		steps.put(30, sabotageSteps);
-
-		ConditionalStep talkToBillAfterSaboSteps = new ConditionalStep(this, setSail);
-		talkToBillAfterSaboSteps.addStep(new Conditions(onEnemySail, hasRope), useRopeOnEnemySailAfterSabo);
-		talkToBillAfterSaboSteps.addStep(new Conditions(onEnemyBoatF1, hasRope), climbEnemyNetAfterSabo);
-		talkToBillAfterSaboSteps.addStep(onEnemySail, leaveEnemySail);
-		talkToBillAfterSaboSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
-		talkToBillAfterSaboSteps.addStep(onEnemyBoatF1, pickUpRope);
-		talkToBillAfterSaboSteps.addStep(onEnemyBoatF0, leaveEnemyHull);
-		talkToBillAfterSaboSteps.addStep(onSail, leaveSail);
-		talkToBillAfterSaboSteps.addStep(onBoatF2, leaveTop);
-		talkToBillAfterSaboSteps.addStep(onBoatF1, talkToBillAfterSabo);
-		talkToBillAfterSaboSteps.addStep(onBoatF0, leaveHull);
-
-		steps.put(40, talkToBillAfterSaboSteps);
-
-		// TODO: Make this at least a bit less terrible
-		ConditionalStep repairWalls = new ConditionalStep(this, setSail);
-		repairWalls.addStep(new Conditions(onBoatF0, pasted1, pasted2, planked3, hasHammer, hasPaste3), pasteHole3);
-		repairWalls.addStep(new Conditions(onBoatF0, pasted1, pasted2, hasHammer, hasPaste3, hasPlank2, hasTacks30), repairHole3);
-		repairWalls.addStep(new Conditions(onBoatF0, pasted1, planked2, hasHammer, hasPaste6, hasPlank2, hasTacks30), pasteHole2);
-		repairWalls.addStep(new Conditions(onBoatF0, pasted1, hasHammer, hasPaste6, hasPlank4, hasTacks60), repairHole2);
-		repairWalls.addStep(new Conditions(onBoatF0, planked1, hasHammer, hasPaste9, hasPlank4, hasTacks60), pasteHole1);
-		repairWalls.addStep(new Conditions(onBoatF0, hasHammer, hasPaste9, hasPlank6, hasTacks90), repairHole1);
-
-		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired3, hasPlanked3), takePasteHole3);
-		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired2), takeHoleItems3);
-		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired1, hasPlanked2), takePasteHole2);
-		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired1), takeHoleItems2);
-		repairWalls.addStep(new Conditions(onBoatF0, planked1), takePasteHole1);
-		repairWalls.addStep(onBoatF0, takeHoleItems1);
-
-		repairWalls.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		repairWalls.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		repairWalls.addStep(onEnemySail, leaveEnemySail);
-		repairWalls.addStep(onEnemyBoatF2, leaveEnemyTop);
-		repairWalls.addStep(onEnemyBoatF1, pickUpRope);
-		repairWalls.addStep(onEnemyBoatF0, leaveEnemyHull);
-		repairWalls.addStep(onSail, leaveSail);
-		repairWalls.addStep(onBoatF2, leaveTop);
-		repairWalls.addStep(onBoatF1, goDownToFixLeak);
-
-		steps.put(50, repairWalls);
-
-		ConditionalStep talkToBillAfterRepairing = new ConditionalStep(this, setSail);
-		talkToBillAfterRepairing.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		talkToBillAfterRepairing.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		talkToBillAfterRepairing.addStep(onEnemySail, leaveEnemySail);
-		talkToBillAfterRepairing.addStep(onEnemyBoatF2, leaveEnemyTop);
-		talkToBillAfterRepairing.addStep(onEnemyBoatF1, pickUpRope);
-		talkToBillAfterRepairing.addStep(onEnemyBoatF0, leaveEnemyHull);
-		talkToBillAfterRepairing.addStep(onSail, leaveSail);
-		talkToBillAfterRepairing.addStep(onBoatF2, leaveTop);
-		talkToBillAfterRepairing.addStep(onBoatF1, talkToBillAfterRepair);
-		talkToBillAfterRepairing.addStep(onBoatF0, goUpAfterRepair);
-
-		steps.put(60, talkToBillAfterRepairing);
-
-		ConditionalStep lootingSteps = new ConditionalStep(this, setSail);
-		lootingSteps.addStep(new Conditions(onBoatF0, has10Plunder), useLootOnChest);
-		lootingSteps.addStep(new Conditions(onBoatF1, has10Plunder), enterHullWithLoot);
-		lootingSteps.addStep(new Conditions(onEnemySail, has10Plunder, hasRope), useRopeOnSailWithLoot);
-		lootingSteps.addStep(new Conditions(onEnemySail, has10Plunder), leaveEnemySail);
-		lootingSteps.addStep(new Conditions(onEnemyBoatF1, has10Plunder, hasRope), climbNetWithLoot);
-		lootingSteps.addStep(new Conditions(onEnemyBoatF1, has10Plunder), pickUpRope);
-		lootingSteps.addStep(new Conditions(onEnemyBoatF0, has10Plunder), leaveEnemyHullWithLoot);
-		lootingSteps.addStep(new Conditions(onEnemyBoatF0, lootedAll), hopWorld);
-		// TODO: Make this change if you've already handed in some plunder
-		lootingSteps.addStep(onEnemyBoatF0, lootEnemyShip);
-		lootingSteps.addStep(onEnemyBoatF1, enterEnemyHullForLoot);
-		lootingSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
-		lootingSteps.addStep(onEnemySail, leaveEnemySail);
-		lootingSteps.addStep(new Conditions(onSail, hasRopes2), useRopeOnSailToLoot);
-		lootingSteps.addStep(new Conditions(onBoatF1, hasRopes2), goUpToSailToLoot);
-		lootingSteps.addStep(new Conditions(onBoatF0, hasRopes2), leaveHull);
-		lootingSteps.addStep(onSail, leaveSail);
-		lootingSteps.addStep(onBoatF2, leaveTop);
-		lootingSteps.addStep(onBoatF1, enterHull);
-		lootingSteps.addStep(onBoatF0, take2Ropes);
-
-		steps.put(70, lootingSteps);
-
-		ConditionalStep talkToBillAfterLooting = new ConditionalStep(this, setSail);
-		talkToBillAfterLooting.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		talkToBillAfterLooting.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		talkToBillAfterLooting.addStep(onEnemySail, leaveEnemySail);
-		talkToBillAfterLooting.addStep(onEnemyBoatF2, leaveEnemyTop);
-		talkToBillAfterLooting.addStep(onEnemyBoatF1, pickUpRope);
-		talkToBillAfterLooting.addStep(onEnemyBoatF0, leaveEnemyHull);
-		talkToBillAfterLooting.addStep(onSail, leaveSail);
-		talkToBillAfterLooting.addStep(onBoatF2, leaveTop);
-		talkToBillAfterLooting.addStep(onBoatF1, talkToBillAfterLoot);
-		talkToBillAfterLooting.addStep(onBoatF0, goUpAfterLoot);
-
-		steps.put(80, talkToBillAfterLooting);
-
-		ConditionalStep repairCannonSteps = new ConditionalStep(this, setSail);
-		repairCannonSteps.addStep(new Conditions(onBoatF1, hasBarrel), useBarrel);
-		repairCannonSteps.addStep(new Conditions(onBoatF0, hasBarrel), goUpWithBarrel);
-		repairCannonSteps.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		repairCannonSteps.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		repairCannonSteps.addStep(onEnemySail, leaveEnemySail);
-		repairCannonSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
-		repairCannonSteps.addStep(onEnemyBoatF1, pickUpRope);
-		repairCannonSteps.addStep(onEnemyBoatF0, leaveEnemyHull);
-		repairCannonSteps.addStep(onSail, leaveSail);
-		repairCannonSteps.addStep(onBoatF2, leaveTop);
-		repairCannonSteps.addStep(onBoatF1, goDownForBarrel);
-		repairCannonSteps.addStep(onBoatF0, takeBarrel);
-
-		steps.put(90, repairCannonSteps);
-
-		ConditionalStep billAfterCannonRepair = new ConditionalStep(this, setSail);
-		billAfterCannonRepair.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		billAfterCannonRepair.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		billAfterCannonRepair.addStep(onEnemySail, leaveEnemySail);
-		billAfterCannonRepair.addStep(onEnemyBoatF2, leaveEnemyTop);
-		billAfterCannonRepair.addStep(onEnemyBoatF1, pickUpRope);
-		billAfterCannonRepair.addStep(onEnemyBoatF0, leaveEnemyHull);
-		billAfterCannonRepair.addStep(onSail, leaveSail);
-		billAfterCannonRepair.addStep(onBoatF2, leaveTop);
-		billAfterCannonRepair.addStep(onBoatF1, talkToBillAfterBarrel);
-		billAfterCannonRepair.addStep(onBoatF0, leaveHull);
-
-		steps.put(100, billAfterCannonRepair);
-
-		ConditionalStep fireCannons = new ConditionalStep(this, setSail);
-		fireCannons.addStep(new Conditions(onBoatF1, cannonBroken, hasBarrel), useBarrel);
-		fireCannons.addStep(new Conditions(onBoatF0, cannonBroken, hasBarrel), goUpWithBarrel);
-		fireCannons.addStep(new Conditions(onBoatF1, cannonBroken), goDownForBarrel);
-		fireCannons.addStep(new Conditions(onBoatF0, cannonBroken), takeBarrel);
-
-		fireCannons.addStep(new Conditions(onBoatF1, canisterInWrong), resetCannon);
-		fireCannons.addStep(new Conditions(onBoatF1, firedCannon), useRamrodToClean);
-		fireCannons.addStep(new Conditions(onBoatF1, usedFuse, usedCanister), fireCannon);
-		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, usedCanister), useFuse);
-		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, usedRamrod), useCanister);
-		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, hasRamrod, addedPowder), useRamrod);
-		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, hasRamrod, hasPowder), usePowder);
-		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, hasRamrod), getPowder);
-		fireCannons.addStep(new Conditions(onBoatF0, hasFuse, hasCanister, hasRamrod), goUpToCannon);
-
-		fireCannons.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		fireCannons.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		fireCannons.addStep(onEnemySail, leaveEnemySail);
-		fireCannons.addStep(onEnemyBoatF2, leaveEnemyTop);
-		fireCannons.addStep(onEnemyBoatF1, pickUpRope);
-		fireCannons.addStep(onEnemyBoatF0, leaveEnemyHull);
-		fireCannons.addStep(onSail, leaveSail);
-		fireCannons.addStep(onBoatF2, leaveTop);
-		fireCannons.addStep(onBoatF1, goDownForRamrod);
-		fireCannons.addStep(onBoatF0, getRamrod);
-
-		steps.put(110, fireCannons);
-
-		ConditionalStep talkToBillAfterCanisters = new ConditionalStep(this, setSail);
-		talkToBillAfterCanisters.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		talkToBillAfterCanisters.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		talkToBillAfterCanisters.addStep(onEnemySail, leaveEnemySail);
-		talkToBillAfterCanisters.addStep(onEnemyBoatF2, leaveEnemyTop);
-		talkToBillAfterCanisters.addStep(onEnemyBoatF1, pickUpRope);
-		talkToBillAfterCanisters.addStep(onEnemyBoatF0, leaveEnemyHull);
-		talkToBillAfterCanisters.addStep(onSail, leaveSail);
-		talkToBillAfterCanisters.addStep(onBoatF2, leaveTop);
-		talkToBillAfterCanisters.addStep(onBoatF1, talkToBillAfterCanisterCannon);
-		talkToBillAfterCanisters.addStep(onBoatF0, leaveHull);
-
-		steps.put(120, talkToBillAfterCanisters);
-
-		ConditionalStep fireCannonsWithBalls = new ConditionalStep(this, setSail);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, cannonBroken, hasBarrel), useBarrel);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF0, cannonBroken, hasBarrel), goUpWithBarrel);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, cannonBroken), goDownForBarrel);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF0, cannonBroken), takeBarrel);
-
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, canisterInWrong), resetCannon);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, firedCannon), useRamrodToCleanForBalls);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, usedFuse, usedBalls), fireCannonForBalls);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, usedBalls), useFuseForBalls);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, usedRamrod), useBall);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, hasRamrod, addedPowder), useRamrodForBalls);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, hasRamrod, hasPowder), usePowderForBalls);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, hasRamrod), getPowderForBalls);
-		fireCannonsWithBalls.addStep(new Conditions(onBoatF0, hasFuse, hasCannonball, hasRamrod), goUpToCannonWithBalls);
-
-		fireCannonsWithBalls.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
-		fireCannonsWithBalls.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
-		fireCannonsWithBalls.addStep(onEnemySail, leaveEnemySail);
-		fireCannonsWithBalls.addStep(onEnemyBoatF2, leaveEnemyTop);
-		fireCannonsWithBalls.addStep(onEnemyBoatF1, pickUpRope);
-		fireCannonsWithBalls.addStep(onEnemyBoatF0, leaveEnemyHull);
-		fireCannonsWithBalls.addStep(onSail, leaveSail);
-		fireCannonsWithBalls.addStep(onBoatF2, leaveTop);
-		fireCannonsWithBalls.addStep(onBoatF1, goDownForBalls);
-		fireCannonsWithBalls.addStep(onBoatF0, getBalls);
-
-		steps.put(130, fireCannonsWithBalls);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		food = new ItemRequirement("Food", -1, -1);
@@ -638,7 +391,6 @@ public class CabinFever extends BasicQuestHelper
 		return new ArrayList<>(Collections.singletonList(food));
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -659,6 +411,253 @@ public class CabinFever extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Fire canisters", new ArrayList<>(Arrays.asList(goDownForRamrod, getRamrod, goUpToCannon, getPowder, usePowder, useRamrod, useCanister, useFuse, fireCannon, repeatCanisterSteps, talkToBillAfterCanisterCannon))));
 		allSteps.add(new PanelDetails("Fire cannon balls", new ArrayList<>(Arrays.asList(goDownForBalls, getBalls, goUpToCannonWithBalls, getPowderForBalls, usePowderForBalls, useRamrodForBalls, useBall, useFuseForBalls, fireCannonForBalls, repeatBallSteps))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToBill);
+
+		ConditionalStep setSail = new ConditionalStep(this, goOnBillBoat);
+		setSail.addStep(onBoatAtDock, talkToBillOnBoat);
+
+		steps.put(10, setSail);
+		steps.put(20, setSail);
+		// Set sail, 1741 0->1
+
+		ConditionalStep sabotageSteps = new ConditionalStep(this, setSail);
+		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, addedFuse, hasTinderbox), lightEnemyFuse);
+		sabotageSteps.addStep(new Conditions(onEnemySail, addedFuse, hasTinderbox), leaveEnemySail);
+		sabotageSteps.addStep(new Conditions(onEnemySail, addedFuse, hasRope), swingToBoat);
+		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, addedFuse, hasRope), goUpToEnemySail);
+		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, addedFuse), pickUpRope);
+
+		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, hasFuseOrAdded), useFuseOnEnemyBarrel);
+		sabotageSteps.addStep(new Conditions(onEnemyBoatF0, hasFuseOrAdded), leaveEnemyHull);
+		sabotageSteps.addStep(new Conditions(onEnemySail, hasFuseOrAdded), leaveEnemySail);
+
+		sabotageSteps.addStep(new Conditions(onSail, hasRopes4, hasFuseOrAdded, hasTinderbox), useRopeOnSailForSabo);
+		sabotageSteps.addStep(new Conditions(onBoatF1, hasRopes4, hasFuseOrAdded, hasTinderbox), climbUpNetForSabo);
+		sabotageSteps.addStep(new Conditions(onBoatF0, hasRopes4, hasFuseOrAdded, hasTinderbox), leaveHullForSabo);
+		sabotageSteps.addStep(new Conditions(onBoatF0, hasRopes4, hasFuseOrAdded), takeTinderbox);
+		sabotageSteps.addStep(new Conditions(onBoatF0, hasRopes4), take1Fuse);
+
+		sabotageSteps.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		sabotageSteps.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		sabotageSteps.addStep(onEnemySail, leaveEnemySail);
+		sabotageSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
+		sabotageSteps.addStep(onEnemyBoatF1, pickUpRope);
+		sabotageSteps.addStep(onEnemyBoatF0, leaveEnemyHull);
+		sabotageSteps.addStep(onSail, leaveSail);
+		sabotageSteps.addStep(onBoatF2, leaveTop);
+		sabotageSteps.addStep(onBoatF1, enterHull);
+		sabotageSteps.addStep(onBoatF0, take4Ropes);
+
+		steps.put(30, sabotageSteps);
+
+		ConditionalStep talkToBillAfterSaboSteps = new ConditionalStep(this, setSail);
+		talkToBillAfterSaboSteps.addStep(new Conditions(onEnemySail, hasRope), useRopeOnEnemySailAfterSabo);
+		talkToBillAfterSaboSteps.addStep(new Conditions(onEnemyBoatF1, hasRope), climbEnemyNetAfterSabo);
+		talkToBillAfterSaboSteps.addStep(onEnemySail, leaveEnemySail);
+		talkToBillAfterSaboSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
+		talkToBillAfterSaboSteps.addStep(onEnemyBoatF1, pickUpRope);
+		talkToBillAfterSaboSteps.addStep(onEnemyBoatF0, leaveEnemyHull);
+		talkToBillAfterSaboSteps.addStep(onSail, leaveSail);
+		talkToBillAfterSaboSteps.addStep(onBoatF2, leaveTop);
+		talkToBillAfterSaboSteps.addStep(onBoatF1, talkToBillAfterSabo);
+		talkToBillAfterSaboSteps.addStep(onBoatF0, leaveHull);
+
+		steps.put(40, talkToBillAfterSaboSteps);
+
+		// TODO: Make this at least a bit less terrible
+		ConditionalStep repairWalls = new ConditionalStep(this, setSail);
+		repairWalls.addStep(new Conditions(onBoatF0, pasted1, pasted2, planked3, hasHammer, hasPaste3), pasteHole3);
+		repairWalls.addStep(new Conditions(onBoatF0, pasted1, pasted2, hasHammer, hasPaste3, hasPlank2, hasTacks30), repairHole3);
+		repairWalls.addStep(new Conditions(onBoatF0, pasted1, planked2, hasHammer, hasPaste6, hasPlank2, hasTacks30), pasteHole2);
+		repairWalls.addStep(new Conditions(onBoatF0, pasted1, hasHammer, hasPaste6, hasPlank4, hasTacks60), repairHole2);
+		repairWalls.addStep(new Conditions(onBoatF0, planked1, hasHammer, hasPaste9, hasPlank4, hasTacks60), pasteHole1);
+		repairWalls.addStep(new Conditions(onBoatF0, hasHammer, hasPaste9, hasPlank6, hasTacks90), repairHole1);
+
+		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired3, hasPlanked3), takePasteHole3);
+		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired2), takeHoleItems3);
+		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired1, hasPlanked2), takePasteHole2);
+		repairWalls.addStep(new Conditions(onBoatF0, hasRepaired1), takeHoleItems2);
+		repairWalls.addStep(new Conditions(onBoatF0, planked1), takePasteHole1);
+		repairWalls.addStep(onBoatF0, takeHoleItems1);
+
+		repairWalls.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		repairWalls.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		repairWalls.addStep(onEnemySail, leaveEnemySail);
+		repairWalls.addStep(onEnemyBoatF2, leaveEnemyTop);
+		repairWalls.addStep(onEnemyBoatF1, pickUpRope);
+		repairWalls.addStep(onEnemyBoatF0, leaveEnemyHull);
+		repairWalls.addStep(onSail, leaveSail);
+		repairWalls.addStep(onBoatF2, leaveTop);
+		repairWalls.addStep(onBoatF1, goDownToFixLeak);
+
+		steps.put(50, repairWalls);
+
+		ConditionalStep talkToBillAfterRepairing = new ConditionalStep(this, setSail);
+		talkToBillAfterRepairing.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		talkToBillAfterRepairing.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		talkToBillAfterRepairing.addStep(onEnemySail, leaveEnemySail);
+		talkToBillAfterRepairing.addStep(onEnemyBoatF2, leaveEnemyTop);
+		talkToBillAfterRepairing.addStep(onEnemyBoatF1, pickUpRope);
+		talkToBillAfterRepairing.addStep(onEnemyBoatF0, leaveEnemyHull);
+		talkToBillAfterRepairing.addStep(onSail, leaveSail);
+		talkToBillAfterRepairing.addStep(onBoatF2, leaveTop);
+		talkToBillAfterRepairing.addStep(onBoatF1, talkToBillAfterRepair);
+		talkToBillAfterRepairing.addStep(onBoatF0, goUpAfterRepair);
+
+		steps.put(60, talkToBillAfterRepairing);
+
+		ConditionalStep lootingSteps = new ConditionalStep(this, setSail);
+		lootingSteps.addStep(new Conditions(onBoatF0, has10Plunder), useLootOnChest);
+		lootingSteps.addStep(new Conditions(onBoatF1, has10Plunder), enterHullWithLoot);
+		lootingSteps.addStep(new Conditions(onEnemySail, has10Plunder, hasRope), useRopeOnSailWithLoot);
+		lootingSteps.addStep(new Conditions(onEnemySail, has10Plunder), leaveEnemySail);
+		lootingSteps.addStep(new Conditions(onEnemyBoatF1, has10Plunder, hasRope), climbNetWithLoot);
+		lootingSteps.addStep(new Conditions(onEnemyBoatF1, has10Plunder), pickUpRope);
+		lootingSteps.addStep(new Conditions(onEnemyBoatF0, has10Plunder), leaveEnemyHullWithLoot);
+		lootingSteps.addStep(new Conditions(onEnemyBoatF0, lootedAll), hopWorld);
+		// TODO: Make this change if you've already handed in some plunder
+		lootingSteps.addStep(onEnemyBoatF0, lootEnemyShip);
+		lootingSteps.addStep(onEnemyBoatF1, enterEnemyHullForLoot);
+		lootingSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
+		lootingSteps.addStep(onEnemySail, leaveEnemySail);
+		lootingSteps.addStep(new Conditions(onSail, hasRopes2), useRopeOnSailToLoot);
+		lootingSteps.addStep(new Conditions(onBoatF1, hasRopes2), goUpToSailToLoot);
+		lootingSteps.addStep(new Conditions(onBoatF0, hasRopes2), leaveHull);
+		lootingSteps.addStep(onSail, leaveSail);
+		lootingSteps.addStep(onBoatF2, leaveTop);
+		lootingSteps.addStep(onBoatF1, enterHull);
+		lootingSteps.addStep(onBoatF0, take2Ropes);
+
+		steps.put(70, lootingSteps);
+
+		ConditionalStep talkToBillAfterLooting = new ConditionalStep(this, setSail);
+		talkToBillAfterLooting.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		talkToBillAfterLooting.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		talkToBillAfterLooting.addStep(onEnemySail, leaveEnemySail);
+		talkToBillAfterLooting.addStep(onEnemyBoatF2, leaveEnemyTop);
+		talkToBillAfterLooting.addStep(onEnemyBoatF1, pickUpRope);
+		talkToBillAfterLooting.addStep(onEnemyBoatF0, leaveEnemyHull);
+		talkToBillAfterLooting.addStep(onSail, leaveSail);
+		talkToBillAfterLooting.addStep(onBoatF2, leaveTop);
+		talkToBillAfterLooting.addStep(onBoatF1, talkToBillAfterLoot);
+		talkToBillAfterLooting.addStep(onBoatF0, goUpAfterLoot);
+
+		steps.put(80, talkToBillAfterLooting);
+
+		ConditionalStep repairCannonSteps = new ConditionalStep(this, setSail);
+		repairCannonSteps.addStep(new Conditions(onBoatF1, hasBarrel), useBarrel);
+		repairCannonSteps.addStep(new Conditions(onBoatF0, hasBarrel), goUpWithBarrel);
+		repairCannonSteps.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		repairCannonSteps.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		repairCannonSteps.addStep(onEnemySail, leaveEnemySail);
+		repairCannonSteps.addStep(onEnemyBoatF2, leaveEnemyTop);
+		repairCannonSteps.addStep(onEnemyBoatF1, pickUpRope);
+		repairCannonSteps.addStep(onEnemyBoatF0, leaveEnemyHull);
+		repairCannonSteps.addStep(onSail, leaveSail);
+		repairCannonSteps.addStep(onBoatF2, leaveTop);
+		repairCannonSteps.addStep(onBoatF1, goDownForBarrel);
+		repairCannonSteps.addStep(onBoatF0, takeBarrel);
+
+		steps.put(90, repairCannonSteps);
+
+		ConditionalStep billAfterCannonRepair = new ConditionalStep(this, setSail);
+		billAfterCannonRepair.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		billAfterCannonRepair.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		billAfterCannonRepair.addStep(onEnemySail, leaveEnemySail);
+		billAfterCannonRepair.addStep(onEnemyBoatF2, leaveEnemyTop);
+		billAfterCannonRepair.addStep(onEnemyBoatF1, pickUpRope);
+		billAfterCannonRepair.addStep(onEnemyBoatF0, leaveEnemyHull);
+		billAfterCannonRepair.addStep(onSail, leaveSail);
+		billAfterCannonRepair.addStep(onBoatF2, leaveTop);
+		billAfterCannonRepair.addStep(onBoatF1, talkToBillAfterBarrel);
+		billAfterCannonRepair.addStep(onBoatF0, leaveHull);
+
+		steps.put(100, billAfterCannonRepair);
+
+		ConditionalStep fireCannons = new ConditionalStep(this, setSail);
+		fireCannons.addStep(new Conditions(onBoatF1, cannonBroken, hasBarrel), useBarrel);
+		fireCannons.addStep(new Conditions(onBoatF0, cannonBroken, hasBarrel), goUpWithBarrel);
+		fireCannons.addStep(new Conditions(onBoatF1, cannonBroken), goDownForBarrel);
+		fireCannons.addStep(new Conditions(onBoatF0, cannonBroken), takeBarrel);
+
+		fireCannons.addStep(new Conditions(onBoatF1, canisterInWrong), resetCannon);
+		fireCannons.addStep(new Conditions(onBoatF1, firedCannon), useRamrodToClean);
+		fireCannons.addStep(new Conditions(onBoatF1, usedFuse, usedCanister), fireCannon);
+		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, usedCanister), useFuse);
+		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, usedRamrod), useCanister);
+		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, hasRamrod, addedPowder), useRamrod);
+		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, hasRamrod, hasPowder), usePowder);
+		fireCannons.addStep(new Conditions(onBoatF1, hasFuse, hasCanister, hasRamrod), getPowder);
+		fireCannons.addStep(new Conditions(onBoatF0, hasFuse, hasCanister, hasRamrod), goUpToCannon);
+
+		fireCannons.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		fireCannons.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		fireCannons.addStep(onEnemySail, leaveEnemySail);
+		fireCannons.addStep(onEnemyBoatF2, leaveEnemyTop);
+		fireCannons.addStep(onEnemyBoatF1, pickUpRope);
+		fireCannons.addStep(onEnemyBoatF0, leaveEnemyHull);
+		fireCannons.addStep(onSail, leaveSail);
+		fireCannons.addStep(onBoatF2, leaveTop);
+		fireCannons.addStep(onBoatF1, goDownForRamrod);
+		fireCannons.addStep(onBoatF0, getRamrod);
+
+		steps.put(110, fireCannons);
+
+		ConditionalStep talkToBillAfterCanisters = new ConditionalStep(this, setSail);
+		talkToBillAfterCanisters.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		talkToBillAfterCanisters.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		talkToBillAfterCanisters.addStep(onEnemySail, leaveEnemySail);
+		talkToBillAfterCanisters.addStep(onEnemyBoatF2, leaveEnemyTop);
+		talkToBillAfterCanisters.addStep(onEnemyBoatF1, pickUpRope);
+		talkToBillAfterCanisters.addStep(onEnemyBoatF0, leaveEnemyHull);
+		talkToBillAfterCanisters.addStep(onSail, leaveSail);
+		talkToBillAfterCanisters.addStep(onBoatF2, leaveTop);
+		talkToBillAfterCanisters.addStep(onBoatF1, talkToBillAfterCanisterCannon);
+		talkToBillAfterCanisters.addStep(onBoatF0, leaveHull);
+
+		steps.put(120, talkToBillAfterCanisters);
+
+		ConditionalStep fireCannonsWithBalls = new ConditionalStep(this, setSail);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, cannonBroken, hasBarrel), useBarrel);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF0, cannonBroken, hasBarrel), goUpWithBarrel);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, cannonBroken), goDownForBarrel);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF0, cannonBroken), takeBarrel);
+
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, canisterInWrong), resetCannon);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, firedCannon), useRamrodToCleanForBalls);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, usedFuse, usedBalls), fireCannonForBalls);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, usedBalls), useFuseForBalls);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, usedRamrod), useBall);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, hasRamrod, addedPowder), useRamrodForBalls);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, hasRamrod, hasPowder), usePowderForBalls);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF1, hasFuse, hasCannonball, hasRamrod), getPowderForBalls);
+		fireCannonsWithBalls.addStep(new Conditions(onBoatF0, hasFuse, hasCannonball, hasRamrod), goUpToCannonWithBalls);
+
+		fireCannonsWithBalls.addStep(new Conditions(onEnemySail, hasRope), swingToBoat);
+		fireCannonsWithBalls.addStep(new Conditions(onEnemyBoatF1, hasRope), goUpToEnemySail);
+		fireCannonsWithBalls.addStep(onEnemySail, leaveEnemySail);
+		fireCannonsWithBalls.addStep(onEnemyBoatF2, leaveEnemyTop);
+		fireCannonsWithBalls.addStep(onEnemyBoatF1, pickUpRope);
+		fireCannonsWithBalls.addStep(onEnemyBoatF0, leaveEnemyHull);
+		fireCannonsWithBalls.addStep(onSail, leaveSail);
+		fireCannonsWithBalls.addStep(onBoatF2, leaveTop);
+		fireCannonsWithBalls.addStep(onBoatF1, goDownForBalls);
+		fireCannonsWithBalls.addStep(onBoatF0, getBalls);
+
+		steps.put(130, fireCannonsWithBalls);
+
+		return steps;
 	}
 }
 

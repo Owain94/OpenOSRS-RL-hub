@@ -41,14 +41,14 @@ import net.runelite.api.widgets.WidgetInfo;
 )
 public class LegendsQuest extends BasicQuestHelper
 {
-	ItemRequirement axe, machete, radimusNotes, papyrus3, charcoal3, papyrus, charcoal, radimusNotesHighlight, completeNotes, bullRoarer, lockpick,
+	ItemRequirement axe, machete, radimusNotes, papyrus3, charcoal3, papyrus, charcoal, radimusNotesHighlight, completeNotesHighlighted, bullRoarer, lockpick,
 		soulRune, mindRune, earthRune, lawRune2, opal, jade, sapphire, ruby, diamond, pickaxe, bullRoarerHighlight, sketch, lawRuneHighlight,
 		soulRuneHighlight, mindRuneHighlight, earthRuneHighlight, opalHighlighted, jadeHighlighted, topazHighlighted, sapphireHighlighted,
 		emeraldHighlighted, rubyHighlighted, diamondHighlighted, topaz, emerald, bindingBook, bindingBookHighlighted, goldBar2, hammer, goldBowl,
 		goldBowlHighlighted, combatGear, goldBowlBlessed, goldBowlFull, goldBowlFullHighlighted, reed, macheteHighlighted, yommiSeeds, germinatedSeeds,
 		germinatedSeedsHighlighted, runeOrDragonAxe, ardrigal, snakeWeed, vialOfWater, unpoweredOrb, ardrigalMixture, braveryPotion, braveryPotionHighlighted,
 		snakeMixture, rope, elemental30, cosmic3, ropeHighlighted, lumpCrystal, chunkCrystal, hunkCrystal, heartCrystal, heartCrystal2, darkDagger, glowingDagger,
-		force, forceHighlighted, yommiTotem, yommiTotemHighlighted, gildedTotem;
+		force, forceHighlighted, yommiTotem, yommiTotemHighlighted, gildedTotem, completeNotes;
 
 	ItemRequirements chargeOrbRunes;
 
@@ -86,238 +86,6 @@ public class LegendsQuest extends BasicQuestHelper
 	NpcStep useNotes, useBindingBookOnUngadulu, returnToRadimus, talkToRadimusInGuild, talkToRadimusInGuildAgain;
 
 	ObjectStep useReedOnPoolAgain, climbDownWinch, drinkBraveryPotionAndClimbDown, useTotemOnTotem, useTotemOnTotemAgain;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-
-		ConditionalStep startQuest = new ConditionalStep(this, talkToGuard);
-		startQuest.addStep(inGuild, talkToRadimus);
-
-		steps.put(0, startQuest);
-
-		ConditionalStep sketchJungle = new ConditionalStep(this, enterJungle);
-		sketchJungle.addStep(new Conditions(inKhazari, completeWest, completeMiddle), sketchEast);
-		sketchJungle.addStep(new Conditions(inKhazari, completeWest), sketchMiddle);
-		sketchJungle.addStep(inKhazari, sketchWest);
-
-		steps.put(1, sketchJungle);
-
-		steps.put(2, useNotes);
-
-		ConditionalStep talkWithGujuo = new ConditionalStep(this, enterJungleWithRoarer);
-		talkWithGujuo.addStep(gujuoNearby, talkToGujuo);
-		talkWithGujuo.addStep(inKhazari, spinBull);
-
-		steps.put(3, talkWithGujuo);
-		steps.put(4, talkWithGujuo);
-
-		ConditionalStep investigatingTheCave = new ConditionalStep(this, enterJungleWithRoarer);
-		investigatingTheCave.addStep(new Conditions(inKhazari, talkedToUngadulu, gujuoNearby), talkToGujuoAgain);
-		investigatingTheCave.addStep(new Conditions(inKhazari, talkedToUngadulu), spinBullAgain);
-		investigatingTheCave.addStep(new Conditions(inCaves, talkedToUngadulu), leaveCave);
-		investigatingTheCave.addStep(inCaves, investigateFireWall);
-		investigatingTheCave.addStep(inKhazari, enterMossyRock);
-
-		steps.put(5, investigatingTheCave);
-		steps.put(6, investigatingTheCave);
-		steps.put(7, investigatingTheCave);
-
-		runePuzzle = new ConditionalStep(this, enterMossyRockAgain);
-		runePuzzle.addStep(new Conditions(inCaveRoom4, addedLawRune), useLaw2);
-		runePuzzle.addStep(new Conditions(inCaveRoom4, addedEarthRune), useLaw);
-		runePuzzle.addStep(new Conditions(inCaveRoom4, addedMindRune), useEarth);
-		runePuzzle.addStep(new Conditions(inCaveRoom4, addedSoulRune), useMind);
-		runePuzzle.addStep(new Conditions(inCaveRoom4, searchedMarkedWall), useSoul);
-		runePuzzle.addStep(new Conditions(inCaveRoom4), searchMarkedWall);
-		runePuzzle.addStep(new Conditions(inCaveRoom3), enterGate2);
-		runePuzzle.addStep(new Conditions(inCaveRoom2), enterGate1);
-		runePuzzle.addStep(new Conditions(inCaveRoom1), enterBookcase);
-		runePuzzle.setLockingCondition(inCaveRoom5);
-		runePuzzle.setBlocker(true);
-
-		gemPuzzle = new ConditionalStep(this, useSapphire);
-		gemPuzzle.addStep(new Conditions(bookNearby), pickUpBook);
-		gemPuzzle.addStep(new Conditions(bookAppearing), waitForBook);
-		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced, topazPlaced, jadePlaced, emeraldPlaced), useOpal);
-		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced, topazPlaced, jadePlaced), useEmerald);
-		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced, topazPlaced), useJade);
-		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced), useTopaz);
-		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced), useRuby);
-		gemPuzzle.addStep(new Conditions(sapphirePlaced), useDiamond);
-		gemPuzzle.setLockingCondition(hadBindingBook);
-		gemPuzzle.setBlocker(true);
-
-		blessBowl = new ConditionalStep(this, makeBowl);
-		blessBowl.addStep(new Conditions(inKhazari, hasBlessedBowl, hasReed), useReedOnPool);
-		blessBowl.addStep(new Conditions(inKhazari, hasBlessedBowl), useMacheteOnReeds);
-		blessBowl.addStep(new Conditions(inKhazari, hasGoldBowl, gujuoNearby), talkToGujuoWithBowl);
-		blessBowl.addStep(new Conditions(inKhazari, hasGoldBowl), spinBullToBless);
-		blessBowl.addStep(hasGoldBowl, enterJungleWithBowl);
-
-		ConditionalStep solvingCaves = new ConditionalStep(this, enterJungleWithRoarer);
-		solvingCaves.addStep(new Conditions(inFire, nezNearby), fightNezikchenedInFire);
-		solvingCaves.addStep(new Conditions(inFire, hadBindingBook), useBindingBookOnUngadulu);
-		solvingCaves.addStep(new Conditions(inCaves, hadBindingBook, hasFullBowl), useBowlOnFireWall);
-		solvingCaves.addStep(new Conditions(hadBindingBook, hasFullBowl), enterMossyRockWithBowl);
-		solvingCaves.addStep(hadBindingBook, blessBowl);
-		solvingCaves.addStep(inCaveRoom5, gemPuzzle);
-		solvingCaves.addStep(hadSketch, runePuzzle);
-		solvingCaves.addStep(new Conditions(inKhazari, gujuoNearby), talkToGujuoAgain);
-		solvingCaves.addStep(new Conditions(inKhazari), spinBullAgain);
-		solvingCaves.addStep(inCaves, leaveCave);
-
-		steps.put(8, solvingCaves);
-		// No step 9 encountered, but including as may occur for some players
-		steps.put(9, solvingCaves);
-		steps.put(10, solvingCaves);
-		steps.put(11, solvingCaves);
-
-		ConditionalStep talkingToUngadulu = new ConditionalStep(this, enterMossyRockAfterFight);
-		talkingToUngadulu.addStep(hasSeed, useBowlOnSeeds);
-		talkingToUngadulu.addStep(inFire, talkToUngadulu);
-		talkingToUngadulu.addStep(inCaves, enterFireAfterFight);
-
-		steps.put(12, talkingToUngadulu);
-
-		ConditionalStep plantSeedAttempt = new ConditionalStep(this, useMacheteOnReedsAgain);
-		plantSeedAttempt.addStep(hasReed, useReedOnPool);
-		plantSeedAttempt.addStep(inCaves, leaveCaveWithSeed);
-
-		steps.put(13, plantSeedAttempt);
-
-		ConditionalStep learnAboutThePool = new ConditionalStep(this, enterJungleAfterSeeds);
-		learnAboutThePool.addStep(gujuoNearby, talkToGujuoAfterSeeds);
-		learnAboutThePool.addStep(inKhazari, spinBullAfterSeeds);
-
-		steps.put(14, learnAboutThePool);
-
-		ConditionalStep reachingTheDeeperCaves = new ConditionalStep(this, addArdrigal);
-		reachingTheDeeperCaves.addStep(new Conditions(inCaveRoom6, addedRope), drinkBraveryPotionAndClimbDown);
-		reachingTheDeeperCaves.addStep(inCaveRoom6, useRopeOnWinch);
-		reachingTheDeeperCaves.addStep(inCaveRoom5, useSpellOnDoor);
-		reachingTheDeeperCaves.addStep(inCaveRoom4, searchMarkedWallToSource);
-		reachingTheDeeperCaves.addStep(inCaveRoom3, enterGate2ToSource);
-		reachingTheDeeperCaves.addStep(inCaveRoom2, enterGate1ToSource);
-		reachingTheDeeperCaves.addStep(new Conditions(inCaveRoom1, hasBraveryPotion), enterBookcaseToSource);
-		reachingTheDeeperCaves.addStep(new Conditions(inKhazari, hasBraveryPotion), enterMossyRockToSource);
-		reachingTheDeeperCaves.addStep(hasBraveryPotion, enterJungleToGoToSource);
-		reachingTheDeeperCaves.addStep(hasSnakeMixture, addArdrigalToSnake);
-		reachingTheDeeperCaves.addStep(hasArdrigalMixture, addSnake);
-
-		steps.put(15, reachingTheDeeperCaves);
-
-		ConditionalStep solvingViyeldiCaves = new ConditionalStep(this, enterMossyRockForViyeldi);
-		solvingViyeldiCaves.addStep(inChallengeCave, useCrystalsOnFurnace);
-		solvingViyeldiCaves.addStep(inCaveRoom6, climbDownWinch);
-		solvingViyeldiCaves.addStep(inCaveRoom5, useSpellOnDoor);
-		solvingViyeldiCaves.addStep(inCaveRoom4, searchMarkedWallToSource);
-		solvingViyeldiCaves.addStep(inCaveRoom3, enterGate2ToSource);
-		solvingViyeldiCaves.addStep(inCaveRoom2, enterGate1ToSource);
-		solvingViyeldiCaves.addStep(inCaveRoom1, enterBookcaseToSource);
-
-		steps.put(16, solvingViyeldiCaves);
-
-		ConditionalStep useHeart = new ConditionalStep(this, enterMossyRockForViyeldi);
-		useHeart.addStep(new Conditions(inChallengeCave, hasHeartCrystal2), useHeartOnRecess);
-		useHeart.addStep(inChallengeCave, useHeartOnRock);
-		useHeart.addStep(inCaveRoom6, climbDownWinch);
-		useHeart.addStep(inCaveRoom5, useSpellOnDoor);
-		useHeart.addStep(inCaveRoom4, searchMarkedWallToSource);
-		useHeart.addStep(inCaveRoom3, enterGate2ToSource);
-		useHeart.addStep(inCaveRoom2, enterGate1ToSource);
-		useHeart.addStep(inCaveRoom1, enterBookcaseToSource);
-
-		steps.put(17, useHeart);
-
-		ConditionalStep attemptToPushBoulder = new ConditionalStep(this, enterMossyRockForViyeldi);
-		attemptToPushBoulder.addStep(echnedNearby, talkToEchned);
-		attemptToPushBoulder.addStep(inChallengeCave, pushBoulder);
-		attemptToPushBoulder.addStep(inCaveRoom6, climbDownWinch);
-		attemptToPushBoulder.addStep(inCaveRoom5, useSpellOnDoor);
-		attemptToPushBoulder.addStep(inCaveRoom4, searchMarkedWallToSource);
-		attemptToPushBoulder.addStep(inCaveRoom3, enterGate2ToSource);
-		attemptToPushBoulder.addStep(inCaveRoom2, enterGate1ToSource);
-		attemptToPushBoulder.addStep(inCaveRoom1, enterBookcaseToSource);
-
-		steps.put(18, attemptToPushBoulder);
-		steps.put(19, attemptToPushBoulder);
-
-		ConditionalStep killViy = new ConditionalStep(this, enterMossyRockForViyeldi);
-		killViy.addStep(new Conditions(nezNearby, inChallengeCave), fightNezikchenedAtSource);
-		killViy.addStep(new Conditions(echnedNearby, hasGlowingDagger), giveDaggerToEchned);
-		killViy.addStep(new Conditions(echnedNearby, hasForce), castForce);
-		killViy.addStep(new Conditions(inChallengeCave, hasForce), pushBoulderWithForce);
-		killViy.addStep(new Conditions(inChallengeCave, hasGlowingDagger), pushBoulderAgain);
-		killViy.addStep(viyeldiNearby, killViyeldi);
-		killViy.addStep(inChallengeCave, pickUpHat);
-		killViy.addStep(inCaveRoom6, climbDownWinch);
-		killViy.addStep(inCaveRoom5, useSpellOnDoor);
-		killViy.addStep(inCaveRoom4, searchMarkedWallToSource);
-		killViy.addStep(inCaveRoom3, enterGate2ToSource);
-		killViy.addStep(inCaveRoom2, enterGate1ToSource);
-		killViy.addStep(inCaveRoom1, enterBookcaseToSource);
-
-		steps.put(20, killViy);
-		// didn't see step 21
-
-		ConditionalStep saveTheSource = new ConditionalStep(this, enterMossyRockForViyeldi);
-		saveTheSource.addStep(sacredWaterNearby, useBowlOnSacredWater);
-		saveTheSource.addStep(inChallengeCave, pushBoulderAfterFight);
-		saveTheSource.addStep(inCaveRoom6, climbDownWinch);
-		saveTheSource.addStep(inCaveRoom5, useSpellOnDoor);
-		saveTheSource.addStep(inCaveRoom4, searchMarkedWallToSource);
-		saveTheSource.addStep(inCaveRoom3, enterGate2ToSource);
-		saveTheSource.addStep(inCaveRoom2, enterGate1ToSource);
-		saveTheSource.addStep(inCaveRoom1, enterBookcaseToSource);
-
-		steps.put(22, saveTheSource);
-		// didn't see steps 23/24
-
-		ConditionalStep growTree = new ConditionalStep(this, enterJungleToPlant);
-		growTree.addStep(new Conditions(inKhazari, totemNearby), pickUpTotem);
-		growTree.addStep(new Conditions(inKhazari, trimmedNearby), craftTree);
-		growTree.addStep(new Conditions(inKhazari, felledNearby), useAxeAgain);
-		growTree.addStep(new Conditions(inKhazari, adultNearby), useAxe);
-		growTree.addStep(new Conditions(inKhazari, saplingNearby), useWaterOnTree);
-		growTree.addStep(new Conditions(inKhazari, hasFullBowl), plantSeed);
-		growTree.addStep(new Conditions(inKhazari, hasReed), useReedOnPoolEnd);
-		growTree.addStep(inKhazari, useReedOnPoolEnd);
-		growTree.addStep(inCaves, returnToSurface);
-
-		steps.put(25, growTree);
-
-		ConditionalStep placingTheTotem = new ConditionalStep(this, useTotemOnTotem);
-		placingTheTotem.addStep(new Conditions(inKhazari, ranalphNearby), killRanalph);
-		placingTheTotem.addStep(new Conditions(inKhazari, irvigNearby), killIrvig);
-		placingTheTotem.addStep(new Conditions(inKhazari, sanNearby), killSan);
-		placingTheTotem.addStep(new Conditions(inKhazari, nezNearby), defeatDemon);
-
-		steps.put(30, placingTheTotem);
-		steps.put(31, placingTheTotem);
-		steps.put(32, placingTheTotem);
-		steps.put(33, placingTheTotem);
-		steps.put(34, placingTheTotem);
-
-		steps.put(35, useTotemOnTotemAgain);
-
-		steps.put(40, returnToRadimus);
-		steps.put(45, returnToRadimus);
-
-		steps.put(50, talkToRadimusInGuild);
-		steps.put(55, talkToRadimusInGuild);
-		steps.put(60, talkToRadimusInGuild);
-		steps.put(65, talkToRadimusInGuild);
-
-		steps.put(70, talkToRadimusInGuildAgain);
-
-		return steps;
-	}
 
 	private void setupZones()
 	{
@@ -372,7 +140,10 @@ public class LegendsQuest extends BasicQuestHelper
 
 		completeNotes = new ItemRequirement("Radimus notes", ItemID.RADIMUS_NOTES_715);
 		completeNotes.setTip("You can get another from Radimus in the Legends' Guild, and you'll need to re-sketch the jungle");
-		completeNotes.setHighlightInInventory(true);
+
+		completeNotesHighlighted = new ItemRequirement("Radimus notes", ItemID.RADIMUS_NOTES_715);
+		completeNotesHighlighted.setTip("You can get another from Radimus in the Legends' Guild, and you'll need to re-sketch the jungle");
+		completeNotesHighlighted.setHighlightInInventory(true);
 
 		sketch = new ItemRequirement("Sketch", ItemID.SKETCH);
 		sketch.setTip("You can get another by summoning Gujuo with the bull roarer again");
@@ -649,10 +420,10 @@ public class LegendsQuest extends BasicQuestHelper
 		sketchMiddle.addDialogStep("Start Mapping Khazari Jungle.");
 		sketchWest = new DetailedQuestStep(this, new WorldPoint(2791, 2917, 0), "Stand in the west of the Khazari Jungle and right-click complete the Radimus note.", radimusNotesHighlight, papyrus, charcoal);
 		sketchWest.addDialogStep("Start Mapping Khazari Jungle.");
-		useNotes = new NpcStep(this, NpcID.JUNGLE_FORESTER, new WorldPoint(2867, 2942, 0), "Use the Radimus notes on a Jungle Foreseter outside the Khazari Jungle.", true, completeNotes);
+		useNotes = new NpcStep(this, NpcID.JUNGLE_FORESTER, new WorldPoint(2867, 2942, 0), "Use the Radimus notes on a Jungle Foreseter outside the Khazari Jungle.", true, completeNotesHighlighted);
 		useNotes.addAlternateNpcs(NpcID.JUNGLE_FORESTER_3955);
 		useNotes.addDialogStep("Yes, go ahead make a copy!");
-		enterJungleWithRoarer = new DetailedQuestStep(this, "Re-enter the Khazari Jungle. You'll need to cut through some trees and bushes to enter.", bullRoarer, axe, machete, lockpick, pickaxe, soulRune, mindRune, earthRune, lawRune2, opal, jade, sapphire, ruby, diamond);
+		enterJungleWithRoarer = new DetailedQuestStep(this, "Re-enter the Khazari Jungle. You'll need to cut through some trees and bushes to enter.", bullRoarer, axe, machete, lockpick, pickaxe, soulRune, mindRune, earthRune, lawRune2, opal, jade, topaz, sapphire, emerald, ruby, diamond);
 		spinBull = new DetailedQuestStep(this, "Spin the bull roarer until Gujuo appears.", bullRoarerHighlight);
 		talkToGujuo = new NpcStep(this, NpcID.GUJUO, "Talk to Gujuo.");
 		talkToGujuo.addDialogSteps("I was hoping to attract the attention of a native.", "I want to develop friendly relations with your people.", "Can you get your people together?", "What can we do instead then?", "How do we make the totem pole?", "I will release Ungadulu...");
@@ -939,8 +710,240 @@ public class LegendsQuest extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Finishing off", new ArrayList<>(Arrays.asList(
 			returnToRadimus, talkToRadimusInGuild, talkToRadimusInGuildAgain)),
-			gildedTotem, completeNotes));
+			gildedTotem, completeNotesHighlighted));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		Map<Integer, QuestStep> steps = new HashMap<>();
+		setupZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+
+		ConditionalStep startQuest = new ConditionalStep(this, talkToGuard);
+		startQuest.addStep(inGuild, talkToRadimus);
+
+		steps.put(0, startQuest);
+
+		ConditionalStep sketchJungle = new ConditionalStep(this, enterJungle);
+		sketchJungle.addStep(new Conditions(inKhazari, completeWest, completeMiddle), sketchEast);
+		sketchJungle.addStep(new Conditions(inKhazari, completeWest), sketchMiddle);
+		sketchJungle.addStep(inKhazari, sketchWest);
+
+		steps.put(1, sketchJungle);
+
+		steps.put(2, useNotes);
+
+		ConditionalStep talkWithGujuo = new ConditionalStep(this, enterJungleWithRoarer);
+		talkWithGujuo.addStep(gujuoNearby, talkToGujuo);
+		talkWithGujuo.addStep(inKhazari, spinBull);
+
+		steps.put(3, talkWithGujuo);
+		steps.put(4, talkWithGujuo);
+
+		ConditionalStep investigatingTheCave = new ConditionalStep(this, enterJungleWithRoarer);
+		investigatingTheCave.addStep(new Conditions(inKhazari, talkedToUngadulu, gujuoNearby), talkToGujuoAgain);
+		investigatingTheCave.addStep(new Conditions(inKhazari, talkedToUngadulu), spinBullAgain);
+		investigatingTheCave.addStep(new Conditions(inCaves, talkedToUngadulu), leaveCave);
+		investigatingTheCave.addStep(inCaves, investigateFireWall);
+		investigatingTheCave.addStep(inKhazari, enterMossyRock);
+
+		steps.put(5, investigatingTheCave);
+		steps.put(6, investigatingTheCave);
+		steps.put(7, investigatingTheCave);
+
+		runePuzzle = new ConditionalStep(this, enterMossyRockAgain);
+		runePuzzle.addStep(new Conditions(inCaveRoom4, addedLawRune), useLaw2);
+		runePuzzle.addStep(new Conditions(inCaveRoom4, addedEarthRune), useLaw);
+		runePuzzle.addStep(new Conditions(inCaveRoom4, addedMindRune), useEarth);
+		runePuzzle.addStep(new Conditions(inCaveRoom4, addedSoulRune), useMind);
+		runePuzzle.addStep(new Conditions(inCaveRoom4, searchedMarkedWall), useSoul);
+		runePuzzle.addStep(new Conditions(inCaveRoom4), searchMarkedWall);
+		runePuzzle.addStep(new Conditions(inCaveRoom3), enterGate2);
+		runePuzzle.addStep(new Conditions(inCaveRoom2), enterGate1);
+		runePuzzle.addStep(new Conditions(inCaveRoom1), enterBookcase);
+		runePuzzle.setLockingCondition(inCaveRoom5);
+		runePuzzle.setBlocker(true);
+
+		gemPuzzle = new ConditionalStep(this, useSapphire);
+		gemPuzzle.addStep(new Conditions(bookNearby), pickUpBook);
+		gemPuzzle.addStep(new Conditions(bookAppearing), waitForBook);
+		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced, topazPlaced, jadePlaced, emeraldPlaced), useOpal);
+		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced, topazPlaced, jadePlaced), useEmerald);
+		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced, topazPlaced), useJade);
+		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced, rubyPlaced), useTopaz);
+		gemPuzzle.addStep(new Conditions(sapphirePlaced, diamondPlaced), useRuby);
+		gemPuzzle.addStep(new Conditions(sapphirePlaced), useDiamond);
+		gemPuzzle.setLockingCondition(hadBindingBook);
+		gemPuzzle.setBlocker(true);
+
+		blessBowl = new ConditionalStep(this, makeBowl);
+		blessBowl.addStep(new Conditions(inKhazari, hasBlessedBowl, hasReed), useReedOnPool);
+		blessBowl.addStep(new Conditions(inKhazari, hasBlessedBowl), useMacheteOnReeds);
+		blessBowl.addStep(new Conditions(inKhazari, hasGoldBowl, gujuoNearby), talkToGujuoWithBowl);
+		blessBowl.addStep(new Conditions(inKhazari, hasGoldBowl), spinBullToBless);
+		blessBowl.addStep(hasGoldBowl, enterJungleWithBowl);
+
+		ConditionalStep solvingCaves = new ConditionalStep(this, enterJungleWithRoarer);
+		solvingCaves.addStep(new Conditions(inFire, nezNearby), fightNezikchenedInFire);
+		solvingCaves.addStep(new Conditions(inFire, hadBindingBook), useBindingBookOnUngadulu);
+		solvingCaves.addStep(new Conditions(inCaves, hadBindingBook, hasFullBowl), useBowlOnFireWall);
+		solvingCaves.addStep(new Conditions(hadBindingBook, hasFullBowl), enterMossyRockWithBowl);
+		solvingCaves.addStep(hadBindingBook, blessBowl);
+		solvingCaves.addStep(inCaveRoom5, gemPuzzle);
+		solvingCaves.addStep(hadSketch, runePuzzle);
+		solvingCaves.addStep(new Conditions(inKhazari, gujuoNearby), talkToGujuoAgain);
+		solvingCaves.addStep(new Conditions(inKhazari), spinBullAgain);
+		solvingCaves.addStep(inCaves, leaveCave);
+
+		steps.put(8, solvingCaves);
+		// No step 9 encountered, but including as may occur for some players
+		steps.put(9, solvingCaves);
+		steps.put(10, solvingCaves);
+		steps.put(11, solvingCaves);
+
+		ConditionalStep talkingToUngadulu = new ConditionalStep(this, enterMossyRockAfterFight);
+		talkingToUngadulu.addStep(hasSeed, useBowlOnSeeds);
+		talkingToUngadulu.addStep(inFire, talkToUngadulu);
+		talkingToUngadulu.addStep(inCaves, enterFireAfterFight);
+
+		steps.put(12, talkingToUngadulu);
+
+		ConditionalStep plantSeedAttempt = new ConditionalStep(this, useMacheteOnReedsAgain);
+		plantSeedAttempt.addStep(hasReed, useReedOnPool);
+		plantSeedAttempt.addStep(inCaves, leaveCaveWithSeed);
+
+		steps.put(13, plantSeedAttempt);
+
+		ConditionalStep learnAboutThePool = new ConditionalStep(this, enterJungleAfterSeeds);
+		learnAboutThePool.addStep(gujuoNearby, talkToGujuoAfterSeeds);
+		learnAboutThePool.addStep(inKhazari, spinBullAfterSeeds);
+
+		steps.put(14, learnAboutThePool);
+
+		ConditionalStep reachingTheDeeperCaves = new ConditionalStep(this, addArdrigal);
+		reachingTheDeeperCaves.addStep(new Conditions(inCaveRoom6, addedRope), drinkBraveryPotionAndClimbDown);
+		reachingTheDeeperCaves.addStep(inCaveRoom6, useRopeOnWinch);
+		reachingTheDeeperCaves.addStep(inCaveRoom5, useSpellOnDoor);
+		reachingTheDeeperCaves.addStep(inCaveRoom4, searchMarkedWallToSource);
+		reachingTheDeeperCaves.addStep(inCaveRoom3, enterGate2ToSource);
+		reachingTheDeeperCaves.addStep(inCaveRoom2, enterGate1ToSource);
+		reachingTheDeeperCaves.addStep(new Conditions(inCaveRoom1, hasBraveryPotion), enterBookcaseToSource);
+		reachingTheDeeperCaves.addStep(new Conditions(inKhazari, hasBraveryPotion), enterMossyRockToSource);
+		reachingTheDeeperCaves.addStep(hasBraveryPotion, enterJungleToGoToSource);
+		reachingTheDeeperCaves.addStep(hasSnakeMixture, addArdrigalToSnake);
+		reachingTheDeeperCaves.addStep(hasArdrigalMixture, addSnake);
+
+		steps.put(15, reachingTheDeeperCaves);
+
+		ConditionalStep solvingViyeldiCaves = new ConditionalStep(this, enterMossyRockForViyeldi);
+		solvingViyeldiCaves.addStep(inChallengeCave, useCrystalsOnFurnace);
+		solvingViyeldiCaves.addStep(inCaveRoom6, climbDownWinch);
+		solvingViyeldiCaves.addStep(inCaveRoom5, useSpellOnDoor);
+		solvingViyeldiCaves.addStep(inCaveRoom4, searchMarkedWallToSource);
+		solvingViyeldiCaves.addStep(inCaveRoom3, enterGate2ToSource);
+		solvingViyeldiCaves.addStep(inCaveRoom2, enterGate1ToSource);
+		solvingViyeldiCaves.addStep(inCaveRoom1, enterBookcaseToSource);
+
+		steps.put(16, solvingViyeldiCaves);
+
+		ConditionalStep useHeart = new ConditionalStep(this, enterMossyRockForViyeldi);
+		useHeart.addStep(new Conditions(inChallengeCave, hasHeartCrystal2), useHeartOnRecess);
+		useHeart.addStep(inChallengeCave, useHeartOnRock);
+		useHeart.addStep(inCaveRoom6, climbDownWinch);
+		useHeart.addStep(inCaveRoom5, useSpellOnDoor);
+		useHeart.addStep(inCaveRoom4, searchMarkedWallToSource);
+		useHeart.addStep(inCaveRoom3, enterGate2ToSource);
+		useHeart.addStep(inCaveRoom2, enterGate1ToSource);
+		useHeart.addStep(inCaveRoom1, enterBookcaseToSource);
+
+		steps.put(17, useHeart);
+
+		ConditionalStep attemptToPushBoulder = new ConditionalStep(this, enterMossyRockForViyeldi);
+		attemptToPushBoulder.addStep(echnedNearby, talkToEchned);
+		attemptToPushBoulder.addStep(inChallengeCave, pushBoulder);
+		attemptToPushBoulder.addStep(inCaveRoom6, climbDownWinch);
+		attemptToPushBoulder.addStep(inCaveRoom5, useSpellOnDoor);
+		attemptToPushBoulder.addStep(inCaveRoom4, searchMarkedWallToSource);
+		attemptToPushBoulder.addStep(inCaveRoom3, enterGate2ToSource);
+		attemptToPushBoulder.addStep(inCaveRoom2, enterGate1ToSource);
+		attemptToPushBoulder.addStep(inCaveRoom1, enterBookcaseToSource);
+
+		steps.put(18, attemptToPushBoulder);
+		steps.put(19, attemptToPushBoulder);
+
+		ConditionalStep killViy = new ConditionalStep(this, enterMossyRockForViyeldi);
+		killViy.addStep(new Conditions(nezNearby, inChallengeCave), fightNezikchenedAtSource);
+		killViy.addStep(new Conditions(echnedNearby, hasGlowingDagger), giveDaggerToEchned);
+		killViy.addStep(new Conditions(echnedNearby, hasForce), castForce);
+		killViy.addStep(new Conditions(inChallengeCave, hasForce), pushBoulderWithForce);
+		killViy.addStep(new Conditions(inChallengeCave, hasGlowingDagger), pushBoulderAgain);
+		killViy.addStep(viyeldiNearby, killViyeldi);
+		killViy.addStep(inChallengeCave, pickUpHat);
+		killViy.addStep(inCaveRoom6, climbDownWinch);
+		killViy.addStep(inCaveRoom5, useSpellOnDoor);
+		killViy.addStep(inCaveRoom4, searchMarkedWallToSource);
+		killViy.addStep(inCaveRoom3, enterGate2ToSource);
+		killViy.addStep(inCaveRoom2, enterGate1ToSource);
+		killViy.addStep(inCaveRoom1, enterBookcaseToSource);
+
+		steps.put(20, killViy);
+		// didn't see step 21
+
+		ConditionalStep saveTheSource = new ConditionalStep(this, enterMossyRockForViyeldi);
+		saveTheSource.addStep(sacredWaterNearby, useBowlOnSacredWater);
+		saveTheSource.addStep(inChallengeCave, pushBoulderAfterFight);
+		saveTheSource.addStep(inCaveRoom6, climbDownWinch);
+		saveTheSource.addStep(inCaveRoom5, useSpellOnDoor);
+		saveTheSource.addStep(inCaveRoom4, searchMarkedWallToSource);
+		saveTheSource.addStep(inCaveRoom3, enterGate2ToSource);
+		saveTheSource.addStep(inCaveRoom2, enterGate1ToSource);
+		saveTheSource.addStep(inCaveRoom1, enterBookcaseToSource);
+
+		steps.put(22, saveTheSource);
+		// didn't see steps 23/24
+
+		ConditionalStep growTree = new ConditionalStep(this, enterJungleToPlant);
+		growTree.addStep(new Conditions(inKhazari, totemNearby), pickUpTotem);
+		growTree.addStep(new Conditions(inKhazari, trimmedNearby), craftTree);
+		growTree.addStep(new Conditions(inKhazari, felledNearby), useAxeAgain);
+		growTree.addStep(new Conditions(inKhazari, adultNearby), useAxe);
+		growTree.addStep(new Conditions(inKhazari, saplingNearby), useWaterOnTree);
+		growTree.addStep(new Conditions(inKhazari, hasFullBowl), plantSeed);
+		growTree.addStep(new Conditions(inKhazari, hasReed), useReedOnPoolEnd);
+		growTree.addStep(inKhazari, useReedOnPoolEnd);
+		growTree.addStep(inCaves, returnToSurface);
+
+		steps.put(25, growTree);
+
+		ConditionalStep placingTheTotem = new ConditionalStep(this, useTotemOnTotem);
+		placingTheTotem.addStep(new Conditions(inKhazari, ranalphNearby), killRanalph);
+		placingTheTotem.addStep(new Conditions(inKhazari, irvigNearby), killIrvig);
+		placingTheTotem.addStep(new Conditions(inKhazari, sanNearby), killSan);
+		placingTheTotem.addStep(new Conditions(inKhazari, nezNearby), defeatDemon);
+
+		steps.put(30, placingTheTotem);
+		steps.put(31, placingTheTotem);
+		steps.put(32, placingTheTotem);
+		steps.put(33, placingTheTotem);
+		steps.put(34, placingTheTotem);
+
+		steps.put(35, useTotemOnTotemAgain);
+
+		steps.put(40, returnToRadimus);
+		steps.put(45, returnToRadimus);
+
+		steps.put(50, talkToRadimusInGuild);
+		steps.put(55, talkToRadimusInGuild);
+		steps.put(60, talkToRadimusInGuild);
+		steps.put(65, talkToRadimusInGuild);
+
+		steps.put(70, talkToRadimusInGuildAgain);
+
+		return steps;
 	}
 }

@@ -56,26 +56,6 @@ public class WitchsPotion extends BasicQuestHelper
 
 	QuestStep talkToWitch, killRat, returnToWitch, drinkPotion;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToWitch);
-
-		ConditionalStep getIngredients = new ConditionalStep(this, killRat);
-		getIngredients.addStep(hasRatTail, returnToWitch);
-
-		steps.put(1, getIngredients);
-
-		steps.put(2, drinkPotion);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		ratTail = new ItemRequirement("Rat's tail", ItemID.RATS_TAIL);
@@ -125,5 +105,25 @@ public class WitchsPotion extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Collections.singletonList(talkToWitch))));
 		allSteps.add(new PanelDetails("Make the potion", new ArrayList<>(Arrays.asList(killRat, returnToWitch))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToWitch);
+
+		ConditionalStep getIngredients = new ConditionalStep(this, killRat);
+		getIngredients.addStep(hasRatTail, returnToWitch);
+
+		steps.put(1, getIngredients);
+
+		steps.put(2, drinkPotion);
+
+		return steps;
 	}
 }

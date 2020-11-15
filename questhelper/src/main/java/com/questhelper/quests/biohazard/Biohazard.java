@@ -74,84 +74,6 @@ public class Biohazard extends BasicQuestHelper
 
 	Zone westArdougne1, westArdougne2, westArdougne3, mournerBackyard, mournerBuilding1, mournerBuilding2, mournersBuildingUpstairs, varrockSouthEast, upstairsArdougneCastle;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToElena);
-
-		steps.put(1, talkToJerico);
-
-		ConditionalStep prepareADistraction = new ConditionalStep(this, getBirdFeed);
-		prepareADistraction.addStep(new Conditions(hasPigeonCage, hasBirdFeed), investigateWatchtower);
-		prepareADistraction.addStep(hasBirdFeed, getPigeonCage);
-		prepareADistraction.addStep(new ObjectCondition(ObjectID.CUPBOARD_2057), getBirdFeed2);
-		steps.put(2, prepareADistraction);
-
-		ConditionalStep causeADistraction = new ConditionalStep(this, getPigeonCage);
-		causeADistraction.addStep(hasPigeonCage, clickPigeonCage);
-		steps.put(3, causeADistraction);
-
-		steps.put(4, talkToOmartAgain);
-
-		ConditionalStep poisonFood = new ConditionalStep(this, talkToOmartToReturnToWest);
-		poisonFood.addStep(new Conditions(inMournerBackyard, hasRottenApple), useRottenAppleOnCauldron);
-		poisonFood.addStep(inMournerBackyard, pickupRottenApple);
-		poisonFood.addStep(inWestArdougne, enterBackyardOfHeadquaters);
-
-		steps.put(5, poisonFood);
-
-		ConditionalStep infiltrateMourners = new ConditionalStep(this, talkToOmartToReturnToWest);
-		infiltrateMourners.addStep(new Conditions(hasKey, upstairsInMournerBuilding), searchCrateForDistillator);
-		infiltrateMourners.addStep(upstairsInMournerBuilding, killMourner);
-		infiltrateMourners.addStep(inMournerBuilding, goUpstairsInMournerBuilding);
-		infiltrateMourners.addStep(new Conditions(inWestArdougne, hasMedicalGown), enterMournerHeadquaters);
-		infiltrateMourners.addStep(new Conditions(inWestArdougne, new ObjectCondition(ObjectID.CUPBOARD_2063)), searchSarahsCupboard2);
-		infiltrateMourners.addStep(inWestArdougne, searchSarahsCupboard);
-
-		steps.put(6, infiltrateMourners);
-
-		ConditionalStep returnToElenaWithDistillator = new ConditionalStep(this, talkToOmartToReturnToWest);
-		returnToElenaWithDistillator.addStep(new Conditions(upstairsInMournerBuilding, hasDistillator), goBackDownstairsInMournersHeadquaters);
-		returnToElenaWithDistillator.addStep(new Conditions(hasDistillator, inWestArdougne), talkToKilron);
-		returnToElenaWithDistillator.addStep(hasDistillator, talkToElenaWithDistillator);
-
-		returnToElenaWithDistillator.addStep(new Conditions(hasKey, upstairsInMournerBuilding), searchCrateForDistillator);
-		returnToElenaWithDistillator.addStep(upstairsInMournerBuilding, killMourner);
-		returnToElenaWithDistillator.addStep(inMournerBuilding, goUpstairsInMournerBuilding);
-		returnToElenaWithDistillator.addStep(new Conditions(inWestArdougne, hasMedicalGown), enterMournerHeadquaters);
-		returnToElenaWithDistillator.addStep(new Conditions(inWestArdougne, new ObjectCondition(ObjectID.CUPBOARD_2063)), searchSarahsCupboard2);
-		returnToElenaWithDistillator.addStep(inWestArdougne, searchSarahsCupboard);
-
-		steps.put(7, returnToElenaWithDistillator);
-
-		steps.put(10, talkToTheChemist);
-
-		ConditionalStep smuggleInChemicals = new ConditionalStep(this, goToVarrock);
-		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney, hasEthenea, hasBroline, hasPriestSet), talkToGuidor);
-		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney, hasEthenea, hasBroline), talkToAsyff);
-		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney, hasEthenea), hopsVarrock);
-		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney), vinciVarrock);
-		smuggleInChemicals.addStep(inVarrockSouthEast, chancyVarrock);
-		smuggleInChemicals.addStep(hasChemicals, giveChemicals);
-
-		steps.put(12, smuggleInChemicals);
-
-		steps.put(14, returnToElenaAfterSampling);
-
-		ConditionalStep talkToTheKing = new ConditionalStep(this, informTheKingGoUpstairs);
-		talkToTheKing.addStep(isUpstairsArdougneCastle, informTheKing);
-
-		steps.put(15, talkToTheKing);
-		// Finishing gives: 72: 0->17, 71: 0->4117, 70: 0->1
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		gasMask = new ItemRequirement("Gas mask", ItemID.GAS_MASK, 1, true);
@@ -293,14 +215,6 @@ public class Biohazard extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Mourner (level 13)");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
@@ -313,6 +227,14 @@ public class Biohazard extends BasicQuestHelper
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
 		reqs.add(teleports);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Mourner (level 13)");
 		return reqs;
 	}
 
@@ -334,5 +256,83 @@ public class Biohazard extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Revealing the truth", returnToElenaAfterSampling, informTheKing));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToElena);
+
+		steps.put(1, talkToJerico);
+
+		ConditionalStep prepareADistraction = new ConditionalStep(this, getBirdFeed);
+		prepareADistraction.addStep(new Conditions(hasPigeonCage, hasBirdFeed), investigateWatchtower);
+		prepareADistraction.addStep(hasBirdFeed, getPigeonCage);
+		prepareADistraction.addStep(new ObjectCondition(ObjectID.CUPBOARD_2057), getBirdFeed2);
+		steps.put(2, prepareADistraction);
+
+		ConditionalStep causeADistraction = new ConditionalStep(this, getPigeonCage);
+		causeADistraction.addStep(hasPigeonCage, clickPigeonCage);
+		steps.put(3, causeADistraction);
+
+		steps.put(4, talkToOmartAgain);
+
+		ConditionalStep poisonFood = new ConditionalStep(this, talkToOmartToReturnToWest);
+		poisonFood.addStep(new Conditions(inMournerBackyard, hasRottenApple), useRottenAppleOnCauldron);
+		poisonFood.addStep(inMournerBackyard, pickupRottenApple);
+		poisonFood.addStep(inWestArdougne, enterBackyardOfHeadquaters);
+
+		steps.put(5, poisonFood);
+
+		ConditionalStep infiltrateMourners = new ConditionalStep(this, talkToOmartToReturnToWest);
+		infiltrateMourners.addStep(new Conditions(hasKey, upstairsInMournerBuilding), searchCrateForDistillator);
+		infiltrateMourners.addStep(upstairsInMournerBuilding, killMourner);
+		infiltrateMourners.addStep(inMournerBuilding, goUpstairsInMournerBuilding);
+		infiltrateMourners.addStep(new Conditions(inWestArdougne, hasMedicalGown), enterMournerHeadquaters);
+		infiltrateMourners.addStep(new Conditions(inWestArdougne, new ObjectCondition(ObjectID.CUPBOARD_2063)), searchSarahsCupboard2);
+		infiltrateMourners.addStep(inWestArdougne, searchSarahsCupboard);
+
+		steps.put(6, infiltrateMourners);
+
+		ConditionalStep returnToElenaWithDistillator = new ConditionalStep(this, talkToOmartToReturnToWest);
+		returnToElenaWithDistillator.addStep(new Conditions(upstairsInMournerBuilding, hasDistillator), goBackDownstairsInMournersHeadquaters);
+		returnToElenaWithDistillator.addStep(new Conditions(hasDistillator, inWestArdougne), talkToKilron);
+		returnToElenaWithDistillator.addStep(hasDistillator, talkToElenaWithDistillator);
+
+		returnToElenaWithDistillator.addStep(new Conditions(hasKey, upstairsInMournerBuilding), searchCrateForDistillator);
+		returnToElenaWithDistillator.addStep(upstairsInMournerBuilding, killMourner);
+		returnToElenaWithDistillator.addStep(inMournerBuilding, goUpstairsInMournerBuilding);
+		returnToElenaWithDistillator.addStep(new Conditions(inWestArdougne, hasMedicalGown), enterMournerHeadquaters);
+		returnToElenaWithDistillator.addStep(new Conditions(inWestArdougne, new ObjectCondition(ObjectID.CUPBOARD_2063)), searchSarahsCupboard2);
+		returnToElenaWithDistillator.addStep(inWestArdougne, searchSarahsCupboard);
+
+		steps.put(7, returnToElenaWithDistillator);
+
+		steps.put(10, talkToTheChemist);
+
+		ConditionalStep smuggleInChemicals = new ConditionalStep(this, goToVarrock);
+		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney, hasEthenea, hasBroline, hasPriestSet), talkToGuidor);
+		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney, hasEthenea, hasBroline), talkToAsyff);
+		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney, hasEthenea), hopsVarrock);
+		smuggleInChemicals.addStep(new Conditions(inVarrockSouthEast, hasLiquidHoney), vinciVarrock);
+		smuggleInChemicals.addStep(inVarrockSouthEast, chancyVarrock);
+		smuggleInChemicals.addStep(hasChemicals, giveChemicals);
+
+		steps.put(12, smuggleInChemicals);
+
+		steps.put(14, returnToElenaAfterSampling);
+
+		ConditionalStep talkToTheKing = new ConditionalStep(this, informTheKingGoUpstairs);
+		talkToTheKing.addStep(isUpstairsArdougneCastle, informTheKing);
+
+		steps.put(15, talkToTheKing);
+		// Finishing gives: 72: 0->17, 71: 0->4117, 70: 0->1
+		return steps;
 	}
 }

@@ -47,20 +47,16 @@ import net.runelite.client.util.SwingUtil;
 public class QuestStepPanel extends JPanel
 {
 	private static final int TITLE_PADDING = 5;
-
-	PanelDetails panelDetails;
-
 	private final JPanel headerPanel = new JPanel();
 	private final JLabel headerLabel = new JLabel();
 	private final JPanel bodyPanel = new JPanel();
 	private final JCheckBox lockStep = new JCheckBox();
 	private final JPanel leftTitleContainer;
 	private final JPanel viewControls;
-
+	private final HashMap<QuestStep, JLabel> steps = new HashMap<>();
+	PanelDetails panelDetails;
 	private QuestStep currentlyHighlighted = null;
 	private boolean stepAutoLocked;
-
-	private final HashMap<QuestStep, JLabel> steps = new HashMap<>();
 
 	public QuestStepPanel(PanelDetails panelDetails, QuestStep currentStep)
 	{
@@ -169,24 +165,21 @@ public class QuestStepPanel extends JPanel
 
 		for (QuestStep step : panelDetails.getSteps())
 		{
-			if (step != null)
+			if (!step.isShowInSidebar())
 			{
-				if (!step.isShowInSidebar())
-				{
-					steps.put(step, null);
-					continue;
-				}
-
-				JLabel questStepLabel = new JLabel();
-				questStepLabel.setLayout(new BorderLayout());
-				questStepLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
-				questStepLabel.setHorizontalAlignment(SwingConstants.LEFT);
-				questStepLabel.setVerticalAlignment(SwingConstants.TOP);
-				questStepLabel.setText(generateText(step));
-
-				steps.put(step, questStepLabel);
-				questStepsPanel.add(questStepLabel);
+				steps.put(step, null);
+				continue;
 			}
+
+			JLabel questStepLabel = new JLabel();
+			questStepLabel.setLayout(new BorderLayout());
+			questStepLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
+			questStepLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			questStepLabel.setVerticalAlignment(SwingConstants.TOP);
+			questStepLabel.setText(generateText(step));
+
+			steps.put(step, questStepLabel);
+			questStepsPanel.add(questStepLabel);
 		}
 
 		bodyPanel.add(questStepsPanel, BorderLayout.CENTER);

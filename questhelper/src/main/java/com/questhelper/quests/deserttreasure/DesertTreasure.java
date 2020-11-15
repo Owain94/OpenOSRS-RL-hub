@@ -88,103 +88,6 @@ public class DesertTreasure extends BasicQuestHelper
 
 	Zone smokeDungeon, fareedRoom, shadowDungeon, draynorSewer, trollArea, path1, path2, icePath, iceBridge, floor1, floor2, floor3, floor4, azzRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToArchaeologist);
-		steps.put(1, talkToExpert);
-		steps.put(2, talkToExpertAgain);
-		steps.put(3, talkToExpertAgain);
-		steps.put(4, bringTranslationToArchaeologist);
-		steps.put(5, talkToArchaeologistAgainAfterTranslation);
-		steps.put(6, buyDrink);
-		steps.put(7, talkToBartender);
-		steps.put(8, talkToEblis);
-		steps.put(9, bringItemsToEblis);
-		steps.put(10, talkToEblisAtMirrors);
-
-		getSmokeDiamond = new ConditionalStep(this, enterSmokeDungeon);
-		getSmokeDiamond.addStep(new Conditions(inFareedRoom), killFareed);
-		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, unlockedFareedDoor), enterFareedRoom);
-		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, hasWarmKey), useWarmKey);
-		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1, litTorch2, litTorch3, litTorch4), openChest);
-		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1, litTorch2, litTorch3), lightTorch4);
-		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1, litTorch2), lightTorch3);
-		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1), lightTorch2);
-		getSmokeDiamond.addStep(inSmokeDungeon, lightTorch1);
-
-		getSmokeDiamond.setLockingCondition(killedFareed);
-
-		getShadowDiamond = new ConditionalStep(this, talkToRasolo);
-		getShadowDiamond.addStep(damis2Nearby, killDamis2);
-		getShadowDiamond.addStep(damis1Nearby, killDamis1);
-		getShadowDiamond.addStep(inShadowDungeon, waitForDamis);
-		getShadowDiamond.addStep(gotRing, enterShadowDungeon);
-		getShadowDiamond.addStep(unlockedCrossChest, returnCross);
-		getShadowDiamond.addStep(talkedToRasolo, getCross);
-		getShadowDiamond.setLockingCondition(killedDamis);
-
-		getBloodDiamond = new ConditionalStep(this, talkToMalak);
-		getBloodDiamond.addStep(killedDessous, talkToMalakForDiamond);
-		getBloodDiamond.addStep(dessousNearby, killDessous);
-		getBloodDiamond.addStep(hasSilverPotComplete, usePotOnGrave);
-		getBloodDiamond.addStep(hasSilverPotGarlic, addSpice);
-		getBloodDiamond.addStep(hasSilverPotSpice, addPowderToFinish);
-		getBloodDiamond.addStep(hasSilverPotBlood, addPowder);
-		getBloodDiamond.addStep(hasSilverPot2, talkToMalakWithPot);
-		getBloodDiamond.addStep(hasSilverPot, blessPot);
-		getBloodDiamond.addStep(new Conditions(askedAboutKillingDessous, inDraynorSewer), talkToRuantun);
-		getBloodDiamond.addStep(askedAboutKillingDessous, enterSewer);
-		getBloodDiamond.addStep(talkedToMalak, askAboutKillingDessous);
-		getBloodDiamond.setLockingCondition(gotBloodDiamond);
-
-		getIceDiamond = new ConditionalStep(this, giveCakeToTroll);
-		getIceDiamond.addStep(new Conditions(onIceBridge, freedTrolls), talkToTrolls);
-		getIceDiamond.addStep(new Conditions(freedTrolls), talkToChildTrollAfterFreeing);
-		getIceDiamond.addStep(new Conditions(onIceBridge, killedKamil, smashedIce1), breakIce2);
-		getIceDiamond.addStep(new Conditions(onIceBridge, killedKamil), breakIce1);
-		getIceDiamond.addStep(new Conditions(onIcePath, killedKamil), goThroughPathGate);
-		getIceDiamond.addStep(new Conditions(inPath, killedKamil), climbOnToLedge);
-		getIceDiamond.addStep(inPath, killKamil);
-		getIceDiamond.addStep(new Conditions(killedTrolls, inTrollArea), enterTrollCave);
-		getIceDiamond.addStep(inTrollArea, killIceTrolls);
-		getIceDiamond.addStep(talkedToTrollChild, enterIceGate);
-		getIceDiamond.addStep(gaveCake, talkToChildTroll);
-		getIceDiamond.setLockingCondition(gotIceDiamond);
-
-		getDiamonds = new ConditionalStep(this, getSmokeDiamond);
-		getDiamonds.addStep(new Conditions(hadSmokeDiamond, killedDamis, gotBloodDiamond), getIceDiamond);
-		getDiamonds.addStep(new Conditions(hadSmokeDiamond, killedDamis), getBloodDiamond);
-		getDiamonds.addStep(killedFareed, getShadowDiamond);
-
-		steps.put(11, getDiamonds);
-
-		ConditionalStep placeDiamonds = new ConditionalStep(this, placeBlood);
-		placeDiamonds.addStep(new Conditions(placedBlood, placedSmoke, placedIce), placeShadow);
-		placeDiamonds.addStep(new Conditions(placedBlood, placedSmoke), placeIce);
-		placeDiamonds.addStep(placedBlood, placeSmoke);
-
-		steps.put(12, placeDiamonds);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, enterPyramid);
-		finishQuest.addStep(inAzzRoom, talkToAzz);
-		finishQuest.addStep(inFloor4, enterMiddleOfPyramid);
-		finishQuest.addStep(inFloor3, goDownFromThirdFloor);
-		finishQuest.addStep(inFloor2, goDownFromSecondFloor);
-		finishQuest.addStep(inFloor1, goDownFromFirstFloor);
-
-		steps.put(13, finishQuest);
-		steps.put(14, finishQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		coins650 = new ItemRequirement("Coins", ItemID.COINS_995, 650);
@@ -532,7 +435,6 @@ public class DesertTreasure extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(combatGear, food, prayerPotions, energyOrStaminas, restorePotions));
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -578,5 +480,102 @@ public class DesertTreasure extends BasicQuestHelper
 		allSteps.add(iceDiamondPanel);
 		allSteps.add(finishingPanel);
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToArchaeologist);
+		steps.put(1, talkToExpert);
+		steps.put(2, talkToExpertAgain);
+		steps.put(3, talkToExpertAgain);
+		steps.put(4, bringTranslationToArchaeologist);
+		steps.put(5, talkToArchaeologistAgainAfterTranslation);
+		steps.put(6, buyDrink);
+		steps.put(7, talkToBartender);
+		steps.put(8, talkToEblis);
+		steps.put(9, bringItemsToEblis);
+		steps.put(10, talkToEblisAtMirrors);
+
+		getSmokeDiamond = new ConditionalStep(this, enterSmokeDungeon);
+		getSmokeDiamond.addStep(new Conditions(inFareedRoom), killFareed);
+		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, unlockedFareedDoor), enterFareedRoom);
+		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, hasWarmKey), useWarmKey);
+		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1, litTorch2, litTorch3, litTorch4), openChest);
+		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1, litTorch2, litTorch3), lightTorch4);
+		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1, litTorch2), lightTorch3);
+		getSmokeDiamond.addStep(new Conditions(inSmokeDungeon, litTorch1), lightTorch2);
+		getSmokeDiamond.addStep(inSmokeDungeon, lightTorch1);
+
+		getSmokeDiamond.setLockingCondition(killedFareed);
+
+		getShadowDiamond = new ConditionalStep(this, talkToRasolo);
+		getShadowDiamond.addStep(damis2Nearby, killDamis2);
+		getShadowDiamond.addStep(damis1Nearby, killDamis1);
+		getShadowDiamond.addStep(inShadowDungeon, waitForDamis);
+		getShadowDiamond.addStep(gotRing, enterShadowDungeon);
+		getShadowDiamond.addStep(unlockedCrossChest, returnCross);
+		getShadowDiamond.addStep(talkedToRasolo, getCross);
+		getShadowDiamond.setLockingCondition(killedDamis);
+
+		getBloodDiamond = new ConditionalStep(this, talkToMalak);
+		getBloodDiamond.addStep(killedDessous, talkToMalakForDiamond);
+		getBloodDiamond.addStep(dessousNearby, killDessous);
+		getBloodDiamond.addStep(hasSilverPotComplete, usePotOnGrave);
+		getBloodDiamond.addStep(hasSilverPotGarlic, addSpice);
+		getBloodDiamond.addStep(hasSilverPotSpice, addPowderToFinish);
+		getBloodDiamond.addStep(hasSilverPotBlood, addPowder);
+		getBloodDiamond.addStep(hasSilverPot2, talkToMalakWithPot);
+		getBloodDiamond.addStep(hasSilverPot, blessPot);
+		getBloodDiamond.addStep(new Conditions(askedAboutKillingDessous, inDraynorSewer), talkToRuantun);
+		getBloodDiamond.addStep(askedAboutKillingDessous, enterSewer);
+		getBloodDiamond.addStep(talkedToMalak, askAboutKillingDessous);
+		getBloodDiamond.setLockingCondition(gotBloodDiamond);
+
+		getIceDiamond = new ConditionalStep(this, giveCakeToTroll);
+		getIceDiamond.addStep(new Conditions(onIceBridge, freedTrolls), talkToTrolls);
+		getIceDiamond.addStep(new Conditions(freedTrolls), talkToChildTrollAfterFreeing);
+		getIceDiamond.addStep(new Conditions(onIceBridge, killedKamil, smashedIce1), breakIce2);
+		getIceDiamond.addStep(new Conditions(onIceBridge, killedKamil), breakIce1);
+		getIceDiamond.addStep(new Conditions(onIcePath, killedKamil), goThroughPathGate);
+		getIceDiamond.addStep(new Conditions(inPath, killedKamil), climbOnToLedge);
+		getIceDiamond.addStep(inPath, killKamil);
+		getIceDiamond.addStep(new Conditions(killedTrolls, inTrollArea), enterTrollCave);
+		getIceDiamond.addStep(inTrollArea, killIceTrolls);
+		getIceDiamond.addStep(talkedToTrollChild, enterIceGate);
+		getIceDiamond.addStep(gaveCake, talkToChildTroll);
+		getIceDiamond.setLockingCondition(gotIceDiamond);
+
+		getDiamonds = new ConditionalStep(this, getSmokeDiamond);
+		getDiamonds.addStep(new Conditions(hadSmokeDiamond, killedDamis, gotBloodDiamond), getIceDiamond);
+		getDiamonds.addStep(new Conditions(hadSmokeDiamond, killedDamis), getBloodDiamond);
+		getDiamonds.addStep(killedFareed, getShadowDiamond);
+
+		steps.put(11, getDiamonds);
+
+		ConditionalStep placeDiamonds = new ConditionalStep(this, placeBlood);
+		placeDiamonds.addStep(new Conditions(placedBlood, placedSmoke, placedIce), placeShadow);
+		placeDiamonds.addStep(new Conditions(placedBlood, placedSmoke), placeIce);
+		placeDiamonds.addStep(placedBlood, placeSmoke);
+
+		steps.put(12, placeDiamonds);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, enterPyramid);
+		finishQuest.addStep(inAzzRoom, talkToAzz);
+		finishQuest.addStep(inFloor4, enterMiddleOfPyramid);
+		finishQuest.addStep(inFloor3, goDownFromThirdFloor);
+		finishQuest.addStep(inFloor2, goDownFromSecondFloor);
+		finishQuest.addStep(inFloor1, goDownFromFirstFloor);
+
+		steps.put(13, finishQuest);
+		steps.put(14, finishQuest);
+
+		return steps;
 	}
 }

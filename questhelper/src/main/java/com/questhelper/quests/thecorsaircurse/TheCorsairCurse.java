@@ -71,111 +71,6 @@ public class TheCorsairCurse extends BasicQuestHelper
 
 	Zone cove, cavern, ithoiHut, gnocciHut, arsenHut, ship;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToTockFarm);
-		steps.put(5, talkToTockFarm);
-
-		steps.put(10, talkToTockRimmington);
-
-		ConditionalStep solveCurses = new ConditionalStep(this, goUpToIthoi);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, finishedArsen, lookedThroughTelescope, finishedGnocci, inArsenHut), talkToColin2);
-		solveCurses.addStep(new Conditions(talkedToIthoi, finishedArsen, lookedThroughTelescope, finishedGnocci), goUpToColin2);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, finishedGnocci, inArsenHut), talkToArsen2);
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, finishedGnocci, inGnocciHut), goDownFromGnocci2);
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, finishedGnocci), goUpToArsen2);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, foundDoll, inGnocciHut), talkToGnocci2);
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, foundDoll), goUpToGnocci2);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, foundDoll, inIthoiHut), goDownFromIthoi2);
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, talkedToColin, foundDoll, inIthoiHut), lookThroughTelescope);
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, talkedToColin, foundDoll), goUpToIthoi2);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, talkedToColin, hasSpade), digSand);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inCavern, hasOgreArtefact), talkToTess);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inShip, hasOgreArtefact), leaveShip);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, hasOgreArtefact), goDownToTess);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, hasSpade, inShip), talkToTockShip);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, hasSpade), goOntoShip);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inGnocciHut, hasTinderbox), pickUpSpade);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inGnocciHut), grabTinderbox);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci), pickUpSpade);
-
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, inGnocciHut), talkToGnocci);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, inArsenHut), goDownFromArsen);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin), goUpToGnocci);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, inArsenHut), talkToColin);
-		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen), goUpToColin);
-		solveCurses.addStep(new Conditions(talkedToIthoi, inArsenHut), talkToArsen);
-		solveCurses.addStep(new Conditions(talkedToIthoi, inIthoiHut), goDownFromIthoi);
-
-		solveCurses.addStep(talkedToIthoi, goUpToArsen);
-
-		solveCurses.addStep(inIthoiHut, talkToIthoi);
-		solveCurses.addStep(inCavern, goUpFromTess);
-		steps.put(15, solveCurses);
-
-		ConditionalStep returnToTock = new ConditionalStep(this, goOntoShip2);
-		returnToTock.addStep(inShip, talkToTockShip2);
-		steps.put(20, returnToTock);
-
-		ConditionalStep solveFoodMystery = new ConditionalStep(this, goUpToGnocci3);
-		solveFoodMystery.addStep(inGnocciHut, talkToGnocci3);
-		solveFoodMystery.addStep(inShip, leaveShip2);
-		steps.put(25, solveFoodMystery);
-
-		ConditionalStep solveFoodWithArsen = new ConditionalStep(this, grabTinderbox);
-		solveFoodWithArsen.addStep(inArsenHut, talkToArsen3);
-		solveFoodWithArsen.addStep(new Conditions(hasTinderbox, inGnocciHut), goDownFromGnocci3);
-		solveFoodWithArsen.addStep(hasTinderbox, goUpToArsen3);
-
-		steps.put(30, solveFoodWithArsen);
-
-		ConditionalStep solveFoodWithIthoi = new ConditionalStep(this, grabTinderbox);
-		solveFoodWithIthoi.addStep(inArsenHut, goDownFromArsen3);
-		solveFoodWithIthoi.addStep(new Conditions(hasTinderbox, inIthoiHut), talkToIthoi2);
-		solveFoodWithIthoi.addStep(hasTinderbox, goUpToIthoi3);
-
-		steps.put(35, solveFoodWithIthoi);
-		steps.put(40, solveFoodWithIthoi);
-
-		ConditionalStep burnIthoi = new ConditionalStep(this, useTinderboxOnWood);
-		burnIthoi.addStep(inIthoiHut, goDownFromIthoi3);
-
-		steps.put(45, burnIthoi);
-
-		steps.put(49, new DetailedQuestStep(this, "Watch the cutscene."));
-
-		ConditionalStep returnToTockWithAnswers = new ConditionalStep(this, goOntoShip3);
-		returnToTockWithAnswers.addStep(inShip, talkToTockShip3);
-
-		steps.put(50, returnToTockWithAnswers);
-
-		ConditionalStep goAndKillIthoi = new ConditionalStep(this, goUpToIthoiToKill);
-		goAndKillIthoi.addStep(inIthoiHut, killIthoi);
-
-		steps.put(52, goAndKillIthoi);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, goOntoShip4);
-		finishQuest.addStep(inShip, talkToTockShip4);
-
-		steps.put(55, finishQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		combatGear = new ItemRequirement("Combat gear + food to defeat Ithoi (level 34), who uses magic", -1, -1);
@@ -368,5 +263,110 @@ public class TheCorsairCurse extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Discover betrayal", new ArrayList<>(Arrays.asList(talkToTockShip2, talkToGnocci3, talkToArsen3, talkToIthoi2, useTinderboxOnWood, talkToTockShip3))));
 		allSteps.add(new PanelDetails("Deal with Ithoi", new ArrayList<>(Arrays.asList(killIthoi, talkToTockShip4))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToTockFarm);
+		steps.put(5, talkToTockFarm);
+
+		steps.put(10, talkToTockRimmington);
+
+		ConditionalStep solveCurses = new ConditionalStep(this, goUpToIthoi);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, finishedArsen, lookedThroughTelescope, finishedGnocci, inArsenHut), talkToColin2);
+		solveCurses.addStep(new Conditions(talkedToIthoi, finishedArsen, lookedThroughTelescope, finishedGnocci), goUpToColin2);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, finishedGnocci, inArsenHut), talkToArsen2);
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, finishedGnocci, inGnocciHut), goDownFromGnocci2);
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, finishedGnocci), goUpToArsen2);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, foundDoll, inGnocciHut), talkToGnocci2);
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, foundDoll), goUpToGnocci2);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, lookedThroughTelescope, foundDoll, inIthoiHut), goDownFromIthoi2);
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, talkedToColin, foundDoll, inIthoiHut), lookThroughTelescope);
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, talkedToColin, foundDoll), goUpToIthoi2);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, returnedToothPick, talkedToColin, hasSpade), digSand);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inCavern, hasOgreArtefact), talkToTess);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inShip, hasOgreArtefact), leaveShip);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, hasOgreArtefact), goDownToTess);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, hasSpade, inShip), talkToTockShip);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, hasSpade), goOntoShip);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inGnocciHut, hasTinderbox), pickUpSpade);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci, inGnocciHut), grabTinderbox);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, talkedToGnocci), pickUpSpade);
+
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, inGnocciHut), talkToGnocci);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin, inArsenHut), goDownFromArsen);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, talkedToColin), goUpToGnocci);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen, inArsenHut), talkToColin);
+		solveCurses.addStep(new Conditions(talkedToIthoi, talkedToArsen), goUpToColin);
+		solveCurses.addStep(new Conditions(talkedToIthoi, inArsenHut), talkToArsen);
+		solveCurses.addStep(new Conditions(talkedToIthoi, inIthoiHut), goDownFromIthoi);
+
+		solveCurses.addStep(talkedToIthoi, goUpToArsen);
+
+		solveCurses.addStep(inIthoiHut, talkToIthoi);
+		solveCurses.addStep(inCavern, goUpFromTess);
+		steps.put(15, solveCurses);
+
+		ConditionalStep returnToTock = new ConditionalStep(this, goOntoShip2);
+		returnToTock.addStep(inShip, talkToTockShip2);
+		steps.put(20, returnToTock);
+
+		ConditionalStep solveFoodMystery = new ConditionalStep(this, goUpToGnocci3);
+		solveFoodMystery.addStep(inGnocciHut, talkToGnocci3);
+		solveFoodMystery.addStep(inShip, leaveShip2);
+		steps.put(25, solveFoodMystery);
+
+		ConditionalStep solveFoodWithArsen = new ConditionalStep(this, grabTinderbox);
+		solveFoodWithArsen.addStep(inArsenHut, talkToArsen3);
+		solveFoodWithArsen.addStep(new Conditions(hasTinderbox, inGnocciHut), goDownFromGnocci3);
+		solveFoodWithArsen.addStep(hasTinderbox, goUpToArsen3);
+
+		steps.put(30, solveFoodWithArsen);
+
+		ConditionalStep solveFoodWithIthoi = new ConditionalStep(this, grabTinderbox);
+		solveFoodWithIthoi.addStep(inArsenHut, goDownFromArsen3);
+		solveFoodWithIthoi.addStep(new Conditions(hasTinderbox, inIthoiHut), talkToIthoi2);
+		solveFoodWithIthoi.addStep(hasTinderbox, goUpToIthoi3);
+
+		steps.put(35, solveFoodWithIthoi);
+		steps.put(40, solveFoodWithIthoi);
+
+		ConditionalStep burnIthoi = new ConditionalStep(this, useTinderboxOnWood);
+		burnIthoi.addStep(inIthoiHut, goDownFromIthoi3);
+
+		steps.put(45, burnIthoi);
+
+		steps.put(49, new DetailedQuestStep(this, "Watch the cutscene."));
+
+		ConditionalStep returnToTockWithAnswers = new ConditionalStep(this, goOntoShip3);
+		returnToTockWithAnswers.addStep(inShip, talkToTockShip3);
+
+		steps.put(50, returnToTockWithAnswers);
+
+		ConditionalStep goAndKillIthoi = new ConditionalStep(this, goUpToIthoiToKill);
+		goAndKillIthoi.addStep(inIthoiHut, killIthoi);
+
+		steps.put(52, goAndKillIthoi);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, goOntoShip4);
+		finishQuest.addStep(inShip, talkToTockShip4);
+
+		steps.put(55, finishQuest);
+
+		return steps;
 	}
 }

@@ -74,64 +74,6 @@ public class FamilyCrest extends BasicQuestHelper
 
 	Zone dwarvenMines, hobgoblinDungeon, jollyBoar, edgevilleDungeon;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToDimintheis);
-		steps.put(1, talkToCaleb);
-		steps.put(2, talkToCalebWithFish);
-		steps.put(3, talkToCalebOnceMore);
-		steps.put(4, talkToGemTrader);
-		steps.put(5, talkToMan);
-
-		ConditionalStep goTalkToBoot = new ConditionalStep(this, enterDwarvenMine);
-		goTalkToBoot.addStep(inDwarvenMines, talkToBoot);
-
-		steps.put(6, goTalkToBoot);
-
-		ConditionalStep getGold = new ConditionalStep(this, enterWitchavenDungeon);
-		getGold.addStep(new Conditions(hasPerfectNecklace, hasPerfectRing), returnToMan);
-		getGold.addStep(hasPerfectNecklace, makeRing);
-		getGold.addStep(hasGoldBar2, makeNecklace);
-		getGold.addStep(hasGold2, smeltGold);
-		getGold.addStep(new Conditions(northRoomUp, southRoomDown), mineGold);
-		getGold.addStep(new Conditions(northRoomUp, northWallUp), pullSouthRoomLever2);
-		getGold.addStep(new Conditions(northRoomUp, northWallDown), pullNorthLever3);
-		getGold.addStep(new Conditions(northWallDown, southRoomUp), pullNorthRoomLever);
-		getGold.addStep(southRoomUp, pullNorthLeverAgain);
-		getGold.addStep(northWallUp, pullSouthRoomLever);
-		getGold.addStep(northWallDown, pullNorthLever);
-		getGold.addStep(inHobgoblinDungeon, followPathAroundEast);
-
-		steps.put(7, getGold);
-
-		ConditionalStep goTalkToJohnathon = new ConditionalStep(this, goUpToJohnathon);
-		goTalkToJohnathon.addStep(inJollyBoar, talkToJohnathon);
-
-		steps.put(8, goTalkToJohnathon);
-
-		ConditionalStep goGiveAntipoisonToJohnathon = new ConditionalStep(this, goUpToJohnathon);
-		goGiveAntipoisonToJohnathon.addStep(inJollyBoar, giveJohnathonAntipoison);
-
-		steps.put(9, goGiveAntipoisonToJohnathon);
-
-		ConditionalStep goKillChronizon = new ConditionalStep(this, goDownToChronizon);
-		goKillChronizon.addStep(hasCrest, returnCrest);
-		goKillChronizon.addStep(hasCrestPiece3, repairCrest);
-		goKillChronizon.addStep(crest3Nearby, pickUpCrest3);
-		goKillChronizon.addStep(inEdgevilleDungeon, killChronizon);
-
-		steps.put(10, goKillChronizon);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		shrimp = new ItemRequirement("Shrimps", ItemID.SHRIMPS);
@@ -295,7 +237,6 @@ public class FamilyCrest extends BasicQuestHelper
 		return reqs;
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -314,5 +255,63 @@ public class FamilyCrest extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Johnathon's piece", new ArrayList<>(Arrays.asList(goUpToJohnathon, giveJohnathonAntipoison, killChronizon)), runesForBlasts, antipoison));
 		allSteps.add(new PanelDetails("Return the crest", new ArrayList<>(Arrays.asList(repairCrest, returnCrest))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToDimintheis);
+		steps.put(1, talkToCaleb);
+		steps.put(2, talkToCalebWithFish);
+		steps.put(3, talkToCalebOnceMore);
+		steps.put(4, talkToGemTrader);
+		steps.put(5, talkToMan);
+
+		ConditionalStep goTalkToBoot = new ConditionalStep(this, enterDwarvenMine);
+		goTalkToBoot.addStep(inDwarvenMines, talkToBoot);
+
+		steps.put(6, goTalkToBoot);
+
+		ConditionalStep getGold = new ConditionalStep(this, enterWitchavenDungeon);
+		getGold.addStep(new Conditions(hasPerfectNecklace, hasPerfectRing), returnToMan);
+		getGold.addStep(hasPerfectNecklace, makeRing);
+		getGold.addStep(hasGoldBar2, makeNecklace);
+		getGold.addStep(hasGold2, smeltGold);
+		getGold.addStep(new Conditions(northRoomUp, southRoomDown), mineGold);
+		getGold.addStep(new Conditions(northRoomUp, northWallUp), pullSouthRoomLever2);
+		getGold.addStep(new Conditions(northRoomUp, northWallDown), pullNorthLever3);
+		getGold.addStep(new Conditions(northWallDown, southRoomUp), pullNorthRoomLever);
+		getGold.addStep(southRoomUp, pullNorthLeverAgain);
+		getGold.addStep(northWallUp, pullSouthRoomLever);
+		getGold.addStep(northWallDown, pullNorthLever);
+		getGold.addStep(inHobgoblinDungeon, followPathAroundEast);
+
+		steps.put(7, getGold);
+
+		ConditionalStep goTalkToJohnathon = new ConditionalStep(this, goUpToJohnathon);
+		goTalkToJohnathon.addStep(inJollyBoar, talkToJohnathon);
+
+		steps.put(8, goTalkToJohnathon);
+
+		ConditionalStep goGiveAntipoisonToJohnathon = new ConditionalStep(this, goUpToJohnathon);
+		goGiveAntipoisonToJohnathon.addStep(inJollyBoar, giveJohnathonAntipoison);
+
+		steps.put(9, goGiveAntipoisonToJohnathon);
+
+		ConditionalStep goKillChronizon = new ConditionalStep(this, goDownToChronizon);
+		goKillChronizon.addStep(hasCrest, returnCrest);
+		goKillChronizon.addStep(hasCrestPiece3, repairCrest);
+		goKillChronizon.addStep(crest3Nearby, pickUpCrest3);
+		goKillChronizon.addStep(inEdgevilleDungeon, killChronizon);
+
+		steps.put(10, goKillChronizon);
+
+		return steps;
 	}
 }

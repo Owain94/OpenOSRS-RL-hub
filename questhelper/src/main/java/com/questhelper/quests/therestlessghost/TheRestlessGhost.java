@@ -65,37 +65,6 @@ public class TheRestlessGhost extends BasicQuestHelper
 	private QuestStep talkToAereck, talkToUrhney, speakToGhost, openCoffin, searchCoffin, enterWizardsTowerBasement, searchAltarAndRun, exitWizardsTowerBasement,
 		openCoffinToPutSkullIn, putSkullInCoffin;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToAereck);
-		steps.put(1, talkToUrhney);
-
-		ConditionalStep talkToGhost = new ConditionalStep(this, openCoffin);
-		talkToGhost.addStep(ghostSpawned, speakToGhost);
-		talkToGhost.addStep(coffinOpened, searchCoffin);
-		steps.put(2, talkToGhost);
-
-		ConditionalStep getSkullForGhost = new ConditionalStep(this, enterWizardsTowerBasement);
-		getSkullForGhost.addStep(inBasement, searchAltarAndRun);
-		steps.put(3, getSkullForGhost);
-
-		ConditionalStep returnSkullToGhost = new ConditionalStep(this, enterWizardsTowerBasement);
-		returnSkullToGhost.addStep(new Conditions(inBasement, hasSkull), exitWizardsTowerBasement);
-		returnSkullToGhost.addStep(new Conditions(hasSkull, coffinOpened), putSkullInCoffin);
-		returnSkullToGhost.addStep(hasSkull, openCoffinToPutSkullIn);
-		returnSkullToGhost.addStep(inBasement, searchAltarAndRun);
-		steps.put(4, returnSkullToGhost);
-
-		return steps;
-	}
-
 	public void setupZones()
 	{
 		basement = new Zone(new WorldPoint(3094, 9553, 0), new WorldPoint(3125, 9582, 0));
@@ -165,6 +134,12 @@ public class TheRestlessGhost extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		return new ArrayList<>(Arrays.asList("A skeleton (level 13) you can run away from"));
+	}
+
+	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -177,8 +152,33 @@ public class TheRestlessGhost extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
+	public Map<Integer, QuestStep> loadSteps()
 	{
-		return new ArrayList<>(Arrays.asList("A skeleton (level 13) you can run away from"));
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToAereck);
+		steps.put(1, talkToUrhney);
+
+		ConditionalStep talkToGhost = new ConditionalStep(this, openCoffin);
+		talkToGhost.addStep(ghostSpawned, speakToGhost);
+		talkToGhost.addStep(coffinOpened, searchCoffin);
+		steps.put(2, talkToGhost);
+
+		ConditionalStep getSkullForGhost = new ConditionalStep(this, enterWizardsTowerBasement);
+		getSkullForGhost.addStep(inBasement, searchAltarAndRun);
+		steps.put(3, getSkullForGhost);
+
+		ConditionalStep returnSkullToGhost = new ConditionalStep(this, enterWizardsTowerBasement);
+		returnSkullToGhost.addStep(new Conditions(inBasement, hasSkull), exitWizardsTowerBasement);
+		returnSkullToGhost.addStep(new Conditions(hasSkull, coffinOpened), putSkullInCoffin);
+		returnSkullToGhost.addStep(hasSkull, openCoffinToPutSkullIn);
+		returnSkullToGhost.addStep(inBasement, searchAltarAndRun);
+		steps.put(4, returnSkullToGhost);
+
+		return steps;
 	}
 }

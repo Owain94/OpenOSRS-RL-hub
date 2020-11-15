@@ -1,6 +1,5 @@
 package com.questhelper.quests.theslugmenace;
 
-import com.google.inject.Inject;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.QuestStep;
@@ -10,14 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class PuzzleStep extends QuestStep
 {
-	@Inject
-	EventBus eventBus;
-
 	private final int FLIP_BUTTON = 33;
 	private final int DOWN_BUTTON = 32;
 	private final int LEFT_BUTTON = 31;
@@ -31,12 +26,9 @@ public class PuzzleStep extends QuestStep
 	private final int ROTATE = 3;
 	private final int SELECTED = 4;
 	private final int SELECT_BUTTON = 5;
-
-	private HashMap<Integer, Integer> highlightButtons = new HashMap<>();
-
 	private final HashMap<Integer, Integer>[] pieces = new HashMap[3];
-
 	private final HashMap<Integer, Integer>[] solvedPieces = new HashMap[3];
+	private HashMap<Integer, Integer> highlightButtons = new HashMap<>();
 
 	public PuzzleStep(QuestHelper questHelper)
 	{
@@ -101,14 +93,34 @@ public class PuzzleStep extends QuestStep
 	public void startUp()
 	{
 		updateSolvedPositionState();
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
-
 	}
 
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged varbitChanged)
 	{
 		updateSolvedPositionState();
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
+		{
+			if (entry.getValue() == 0)
+			{
+				continue;
+			}
+
+			Widget widget = client.getWidget(462, entry.getKey());
+			if (widget != null)
+			{
+				graphics.setColor(new Color(0, 255, 255, 65));
+				graphics.fill(widget.getBounds());
+				graphics.setColor(Color.CYAN);
+				graphics.draw(widget.getBounds());
+			}
+		}
 	}
 
 	private void updateSolvedPositionState()
@@ -199,27 +211,5 @@ public class PuzzleStep extends QuestStep
 		}
 
 		highlightButtons = highlightButtonsTmp;
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
-		{
-			if (entry.getValue() == 0)
-			{
-				continue;
-			}
-
-			Widget widget = client.getWidget(462, entry.getKey());
-			if (widget != null)
-			{
-				graphics.setColor(new Color(0, 255, 255, 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(Color.CYAN);
-				graphics.draw(widget.getBounds());
-			}
-		}
 	}
 }

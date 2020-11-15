@@ -106,171 +106,6 @@ public class TheFremennikTrials extends BasicQuestHelper
 
 	Zone nearPipe, koscheiRoom, swensenRoom1, swensenRoom2, swensenRoom3, swensenRoom4, swensenRoom5, swensenRoom6, swensenRoom7, swensenFinalRoom, swensenArea, peerEntrance, peerUpstairs, peerExit;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToBrundt);
-
-		olafTask = new ConditionalStep(this, talkToOlaf);
-		olafTask.addStep(hasEnchantedLyre, performMusic);
-		olafTask.addStep(new Conditions(hasStartedOlaf, hasLyre), enchantLyre);
-		olafTask.addStep(new Conditions(hasGoldenWool, hasLyreUnstrung), makeLyre);
-		olafTask.addStep(new Conditions(hasGoldenFleece, hasLyreUnstrung), spinWool);
-		olafTask.addStep(new Conditions(hasGoldenFleece, hasBranch), fletchLyre);
-		olafTask.addStep(hasGoldenFleece, chopSwayingTree);
-		olafTask.addStep(new Conditions(gottenRock, onionInCauldron, cabbageInCauldron, potatoInCauldron, petRockInCauldron), talkToLaliAfterStew);
-		olafTask.addStep(new Conditions(gottenRock, onionInCauldron, cabbageInCauldron, potatoInCauldron), useRock);
-		olafTask.addStep(new Conditions(gottenRock, onionInCauldron, cabbageInCauldron), usePotato);
-		olafTask.addStep(new Conditions(gottenRock, onionInCauldron), useCabbage);
-		olafTask.addStep(gottenRock, useOnion);
-		olafTask.addStep(new Conditions(hasStartedOlaf, talkedToLalli), talkToAskeladdenForRock);
-		olafTask.addStep(hasStartedOlaf, talkToLalli);
-		olafTask.setLockingCondition(finishedOlafTask);
-
-		manniTask = new ConditionalStep(this, talkToManni);
-		manniTask.addStep(new Conditions(hasReplacedBeer, hasKegOfBeer), cheatInBeerDrinking);
-		manniTask.addStep(new Conditions(hasReplacedBeer), getKegOfBeer);
-		manniTask.addStep(new Conditions(hasPlacedStrangeObject, hasAlcoholFreeBeer, hasKegOfBeer), useAlcoholFreeOnKeg);
-		manniTask.addStep(new Conditions(hasPlacedStrangeObject, hasAlcoholFreeBeer), getKegOfBeer);
-		manniTask.addStep(new Conditions(hasPlacedStrangeObject), getAlcoholFreeBeer);
-		manniTask.addStep(new Conditions(talkedToManni, hasLitStrangeObject, hasAlcoholFreeBeer, isNearPipe), useStrangeObjectOnPipe);
-		manniTask.addStep(new Conditions(talkedToManni, hasStrangeObject, hasAlcoholFreeBeer, isNearPipe), useStrangeObject);
-		manniTask.addStep(new Conditions(talkedToManni, hasStrangeObject, hasAlcoholFreeBeer), prepareToUseStrangeObject);
-		manniTask.addStep(new Conditions(talkedToManni, hasStrangeObject), getAlcoholFreeBeer);
-		manniTask.addStep(new Conditions(talkedToManni, hasBeer), getStrangeObject);
-		manniTask.addStep(talkedToManni, pickUpBeer);
-		manniTask.setLockingCondition(finishedManniTask);
-
-		sigliTask = new ConditionalStep(this, talkToSigli);
-		sigliTask.addStep(hasChargedHuntersTalisman, returnToSigli);
-		sigliTask.addStep(hasHuntersTalisman, huntDraugen);
-		sigliTask.setLockingCondition(finishedSigliTask);
-
-		sigmundTask = new ConditionalStep(this, talkToSigmund);
-		sigmundTask.addStep(hasExoticFlower, bringExoticFlowerToSigmund);
-		sigmundTask.addStep(hasBallad, bringBalladToSailor);
-		sigmundTask.addStep(hasSturdyBoots, bringSturdyBootsToOlaf);
-		sigmundTask.addStep(hasFiscalStatement, bringFiscalStatementToYsra);
-		sigmundTask.addStep(hasTrackingMap, bringTrackingMapToBrundt);
-		sigmundTask.addStep(hasCustomBowString, bringCustomBowStringToSigli);
-		sigmundTask.addStep(hasUnusualFish, bringUnusualFishToSkulgrimen);
-		sigmundTask.addStep(hasSeaFishingMap, bringSeaFishingMapToFisherman);
-		sigmundTask.addStep(hasWeatherForecast, bringWeatherForecastToSwensen);
-		sigmundTask.addStep(hasWarriorsContract, bringWarriorsContractToPeer);
-		sigmundTask.addStep(hasChampionsToken, bringChampionsTokenToThorvald);
-		sigmundTask.addStep(hasLegendaryCocktail, bringCocktailToManni);
-		sigmundTask.addStep(hasPromissoryNote, bringNoteToThora);
-
-		sigmundTask.addStep(new Conditions(talkedToThoraForSigmund, noRockAskeladdenNearby), talkToAskeladdenForSigmund2);
-		sigmundTask.addStep(talkedToThoraForSigmund, talkToAskeladdenForSigmund);
-		sigmundTask.addStep(talkedToManniForSigmund, talkToThoraForSigmund);
-		sigmundTask.addStep(talkedToThorvaldForSigmund, talkToManniForSigmund);
-		sigmundTask.addStep(talkedToPeerForSigmund, talkToThorvaldForSigmund);
-		sigmundTask.addStep(talkedToSwensenForSigmund, talkToPeerForSigmund);
-		sigmundTask.addStep(talkedToFishermanForSigmund, talkToSwenesenForSigmund);
-		sigmundTask.addStep(talkedToSkulgrimenForSigmund, talkToFishermanForSigmund);
-		sigmundTask.addStep(talkedToSigliForSigmund, talkToSkulgrimenForSigmund);
-		sigmundTask.addStep(talkedToBrundtForSigmund, talkToSigliForSigmund);
-		sigmundTask.addStep(talkedToYsra, talkToBrundtForSigmund);
-		sigmundTask.addStep(talkedToOlafForSigmund, talkToYsra);
-		sigmundTask.addStep(talkedToSailor, talkToOlafForSigmund);
-		sigmundTask.addStep(getFlower, talkToSailor);
-		sigmundTask.setLockingCondition(finishedSigmundTask);
-
-		thorvaldTask = new ConditionalStep(this, talkToThorvald);
-		thorvaldTask.addStep(koschei4Near, killKoschei4);
-		thorvaldTask.addStep(koschei3Near, killKoschei3);
-		thorvaldTask.addStep(koschei2Near, killKoschei2);
-		thorvaldTask.addStep(koschei1Near, killKoschei1);
-		thorvaldTask.addStep(inKoscheiRoom, waitForKoschei);
-		thorvaldTask.addStep(talkedToThorvald, goDownLadderToKoschei);
-		thorvaldTask.setLockingCondition(finishedThorvaldTask);
-
-		swensenTask = new ConditionalStep(this, talkToSwensen);
-		swensenTask.addStep(inSwensenFinalRoom, swensenUpLadder);
-		swensenTask.addStep(inSwensenRoom7, swensen7North);
-		swensenTask.addStep(inSwensenRoom6, swensen6East);
-		swensenTask.addStep(inSwensenRoom5, swensen5South);
-		swensenTask.addStep(inSwensenRoom4, swensen4North);
-		swensenTask.addStep(inSwensenRoom3, swensen3East);
-		swensenTask.addStep(inSwensenRoom2, swensen2West);
-		swensenTask.addStep(inSwensenRoom1, swensen1South);
-		swensenTask.addStep(inSwensenArea, resetSwensen);
-		swensenTask.addStep(talkedToSwensen, goDownLadderSwensen);
-		swensenTask.setLockingCondition(finishedSwensenTask);
-
-		peerTask = new ConditionalStep(this, talkToPeer);
-		peerTask.addStep(new Conditions(inPeerExit, hasSeersKey), leaveSeersHouse);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasSeersKey, trapDoorOpen), goDownstairsWithKey2);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasSeersKey), goDownstairsWithKey);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasFrozenKey), useFrozenKeyOnRange);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasFilledVaseWithLid), useVaseOnTable);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasFilledVase), useLidOnVase);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasVase), fillVase);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseWithLidWrong), takeLidOff);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasBucket45), useBucketOnScale);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasFullBucket, hasJug23), useBucketOnJug3);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasEmptyBucket, hasJug23), useBucketOnTap2);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasBucket25, hasEmptyJug), useBucketOnJug2);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasBucket25, hasFullJug), useJugOnDrain1);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasFullBucket, hasEmptyJug), useBucketOnJug1);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasEmptyBucket, hasEmptyJug), useBucketOnTap1);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasAnyBucket, hasAnyJug), emptyJugAndBucket);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasAnyBucket, chestOpen), searchChest2);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasAnyBucket), searchChest1);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, cupboardOpen), searchCupboard2);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid), searchCupboard1);
-		peerTask.addStep(new Conditions(inPeerExit, hasVaseLid), goUpstairsWithVaseLid);
-		peerTask.addStep(new Conditions(inPeerExit, hasRedDiskNew, hasUsedDisk), useDiskNewOnMural);
-		peerTask.addStep(new Conditions(inPeerExit, hasRedDiskOld, hasUsedDisk), useDiskOldOnMural);
-		peerTask.addStep(new Conditions(inPeerExit, hasRedDiskOld, hasRedDiskNew), useDiskAnyOnMural);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasRedDiskOld, hasRedDiskNew, trapDoorOpen), goDown1);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasRedDiskOld, hasRedDiskNew), openTrapDoorAndGoDown1);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasStickyRedGoop, hasWoodenDisk, hasRedDiskOld), useGoopOnDisk);
-		peerTask.addStep(new Conditions(inPeerUpstairs, hasRedHerring, hasWoodenDisk, hasRedDiskOld), cookHerring);
-		peerTask.addStep(new Conditions(inPeerUpstairs, new Conditions(LogicType.OR, hasRedDiskNew, new Conditions(hasRedHerring, hasWoodenDisk))), searchUnicorn);
-		peerTask.addStep(new Conditions(inPeerUpstairs, new Conditions(LogicType.OR, hasStickyRedGoop, hasRedHerring)), searchBull);
-		peerTask.addStep(inPeerUpstairs, searchBookcase);
-		peerTask.addStep(inPeerExit, goBackUpstairs);
-		peerTask.addStep(new Conditions(LogicType.OR, inPeerEntrance, hasSolvedDoor), goUpEntranceLadderPeer);
-		peerTask.addStep(isWind, inputWind);
-		peerTask.addStep(isTime, inputTime);
-		peerTask.addStep(isFire, inputFire);
-		peerTask.addStep(isLife, inputLife);
-		peerTask.addStep(isTree, inputTree);
-		peerTask.addStep(isMind, inputMind);
-		peerTask.addStep(talkedToPeer, enterPeerHouse);
-		peerTask.setLockingCondition(finishedPeerTask);
-
-		DetailedQuestStep resyncStep = new DetailedQuestStep(this, "Please open the quest's Quest Journal to sync your state.");
-		ConditionalStep resyncCondition = new ConditionalStep(this, resyncStep);
-		resyncCondition.setLockingCondition(syncedAll);
-
-		ConditionalStep trials = new ConditionalStep(this, resyncCondition);
-		trials.addStep(new Conditions(syncedPeer, finishedOlafTask, finishedManniTask, finishedSigliTask, finishedSigmundTask, finishedThorvaldTask, finishedSwensenTask), peerTask);
-		trials.addStep(new Conditions(syncedSwensen, finishedOlafTask, finishedManniTask, finishedSigliTask, finishedSigmundTask, finishedThorvaldTask), swensenTask);
-		trials.addStep(new Conditions(syncedThorvald, finishedOlafTask, finishedManniTask, finishedSigliTask, finishedSigmundTask), thorvaldTask);
-		trials.addStep(new Conditions(syncedSigmund, finishedOlafTask, finishedManniTask, finishedSigliTask), sigmundTask);
-		trials.addStep(new Conditions(finishedOlafTask, finishedManniTask), sigliTask);
-		trials.addStep(new Conditions(syncedManni, finishedOlafTask), manniTask);
-		trials.addStep(syncedOlaf, olafTask);
-		steps.put(1, trials);
-		steps.put(2, trials);
-		steps.put(3, trials);
-		steps.put(4, trials);
-		steps.put(5, trials);
-		steps.put(6, trials);
-		steps.put(7, trials);
-		steps.put(8, finishQuest);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		coins = new ItemRequirement("Coins", ItemID.COINS_995, 5250);
@@ -883,14 +718,6 @@ public class TheFremennikTrials extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getNotes()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("If the guide at any point appears to de-sync during this quest, please try opening the quest journal to fix it.");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRecommended()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
@@ -907,6 +734,14 @@ public class TheFremennikTrials extends BasicQuestHelper
 		ArrayList<String> reqs = new ArrayList<>();
 		reqs.add("Koschei the deathless");
 		reqs.add("Draugen (level 69)");
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getNotes()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("If the guide at any point appears to de-sync during this quest, please try opening the quest journal to fix it.");
 		return reqs;
 	}
 
@@ -971,5 +806,170 @@ public class TheFremennikTrials extends BasicQuestHelper
 		allSteps.add(peerPanel);
 		allSteps.add(finalPanel);
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToBrundt);
+
+		olafTask = new ConditionalStep(this, talkToOlaf);
+		olafTask.addStep(hasEnchantedLyre, performMusic);
+		olafTask.addStep(new Conditions(hasStartedOlaf, hasLyre), enchantLyre);
+		olafTask.addStep(new Conditions(hasGoldenWool, hasLyreUnstrung), makeLyre);
+		olafTask.addStep(new Conditions(hasGoldenFleece, hasLyreUnstrung), spinWool);
+		olafTask.addStep(new Conditions(hasGoldenFleece, hasBranch), fletchLyre);
+		olafTask.addStep(hasGoldenFleece, chopSwayingTree);
+		olafTask.addStep(new Conditions(gottenRock, onionInCauldron, cabbageInCauldron, potatoInCauldron, petRockInCauldron), talkToLaliAfterStew);
+		olafTask.addStep(new Conditions(gottenRock, onionInCauldron, cabbageInCauldron, potatoInCauldron), useRock);
+		olafTask.addStep(new Conditions(gottenRock, onionInCauldron, cabbageInCauldron), usePotato);
+		olafTask.addStep(new Conditions(gottenRock, onionInCauldron), useCabbage);
+		olafTask.addStep(gottenRock, useOnion);
+		olafTask.addStep(new Conditions(hasStartedOlaf, talkedToLalli), talkToAskeladdenForRock);
+		olafTask.addStep(hasStartedOlaf, talkToLalli);
+		olafTask.setLockingCondition(finishedOlafTask);
+
+		manniTask = new ConditionalStep(this, talkToManni);
+		manniTask.addStep(new Conditions(hasReplacedBeer, hasKegOfBeer), cheatInBeerDrinking);
+		manniTask.addStep(new Conditions(hasReplacedBeer), getKegOfBeer);
+		manniTask.addStep(new Conditions(hasPlacedStrangeObject, hasAlcoholFreeBeer, hasKegOfBeer), useAlcoholFreeOnKeg);
+		manniTask.addStep(new Conditions(hasPlacedStrangeObject, hasAlcoholFreeBeer), getKegOfBeer);
+		manniTask.addStep(new Conditions(hasPlacedStrangeObject), getAlcoholFreeBeer);
+		manniTask.addStep(new Conditions(talkedToManni, hasLitStrangeObject, hasAlcoholFreeBeer, isNearPipe), useStrangeObjectOnPipe);
+		manniTask.addStep(new Conditions(talkedToManni, hasStrangeObject, hasAlcoholFreeBeer, isNearPipe), useStrangeObject);
+		manniTask.addStep(new Conditions(talkedToManni, hasStrangeObject, hasAlcoholFreeBeer), prepareToUseStrangeObject);
+		manniTask.addStep(new Conditions(talkedToManni, hasStrangeObject), getAlcoholFreeBeer);
+		manniTask.addStep(new Conditions(talkedToManni, hasBeer), getStrangeObject);
+		manniTask.addStep(talkedToManni, pickUpBeer);
+		manniTask.setLockingCondition(finishedManniTask);
+
+		sigliTask = new ConditionalStep(this, talkToSigli);
+		sigliTask.addStep(hasChargedHuntersTalisman, returnToSigli);
+		sigliTask.addStep(hasHuntersTalisman, huntDraugen);
+		sigliTask.setLockingCondition(finishedSigliTask);
+
+		sigmundTask = new ConditionalStep(this, talkToSigmund);
+		sigmundTask.addStep(hasExoticFlower, bringExoticFlowerToSigmund);
+		sigmundTask.addStep(hasBallad, bringBalladToSailor);
+		sigmundTask.addStep(hasSturdyBoots, bringSturdyBootsToOlaf);
+		sigmundTask.addStep(hasFiscalStatement, bringFiscalStatementToYsra);
+		sigmundTask.addStep(hasTrackingMap, bringTrackingMapToBrundt);
+		sigmundTask.addStep(hasCustomBowString, bringCustomBowStringToSigli);
+		sigmundTask.addStep(hasUnusualFish, bringUnusualFishToSkulgrimen);
+		sigmundTask.addStep(hasSeaFishingMap, bringSeaFishingMapToFisherman);
+		sigmundTask.addStep(hasWeatherForecast, bringWeatherForecastToSwensen);
+		sigmundTask.addStep(hasWarriorsContract, bringWarriorsContractToPeer);
+		sigmundTask.addStep(hasChampionsToken, bringChampionsTokenToThorvald);
+		sigmundTask.addStep(hasLegendaryCocktail, bringCocktailToManni);
+		sigmundTask.addStep(hasPromissoryNote, bringNoteToThora);
+
+		sigmundTask.addStep(new Conditions(talkedToThoraForSigmund, noRockAskeladdenNearby), talkToAskeladdenForSigmund2);
+		sigmundTask.addStep(talkedToThoraForSigmund, talkToAskeladdenForSigmund);
+		sigmundTask.addStep(talkedToManniForSigmund, talkToThoraForSigmund);
+		sigmundTask.addStep(talkedToThorvaldForSigmund, talkToManniForSigmund);
+		sigmundTask.addStep(talkedToPeerForSigmund, talkToThorvaldForSigmund);
+		sigmundTask.addStep(talkedToSwensenForSigmund, talkToPeerForSigmund);
+		sigmundTask.addStep(talkedToFishermanForSigmund, talkToSwenesenForSigmund);
+		sigmundTask.addStep(talkedToSkulgrimenForSigmund, talkToFishermanForSigmund);
+		sigmundTask.addStep(talkedToSigliForSigmund, talkToSkulgrimenForSigmund);
+		sigmundTask.addStep(talkedToBrundtForSigmund, talkToSigliForSigmund);
+		sigmundTask.addStep(talkedToYsra, talkToBrundtForSigmund);
+		sigmundTask.addStep(talkedToOlafForSigmund, talkToYsra);
+		sigmundTask.addStep(talkedToSailor, talkToOlafForSigmund);
+		sigmundTask.addStep(getFlower, talkToSailor);
+		sigmundTask.setLockingCondition(finishedSigmundTask);
+
+		thorvaldTask = new ConditionalStep(this, talkToThorvald);
+		thorvaldTask.addStep(koschei4Near, killKoschei4);
+		thorvaldTask.addStep(koschei3Near, killKoschei3);
+		thorvaldTask.addStep(koschei2Near, killKoschei2);
+		thorvaldTask.addStep(koschei1Near, killKoschei1);
+		thorvaldTask.addStep(inKoscheiRoom, waitForKoschei);
+		thorvaldTask.addStep(talkedToThorvald, goDownLadderToKoschei);
+		thorvaldTask.setLockingCondition(finishedThorvaldTask);
+
+		swensenTask = new ConditionalStep(this, talkToSwensen);
+		swensenTask.addStep(inSwensenFinalRoom, swensenUpLadder);
+		swensenTask.addStep(inSwensenRoom7, swensen7North);
+		swensenTask.addStep(inSwensenRoom6, swensen6East);
+		swensenTask.addStep(inSwensenRoom5, swensen5South);
+		swensenTask.addStep(inSwensenRoom4, swensen4North);
+		swensenTask.addStep(inSwensenRoom3, swensen3East);
+		swensenTask.addStep(inSwensenRoom2, swensen2West);
+		swensenTask.addStep(inSwensenRoom1, swensen1South);
+		swensenTask.addStep(inSwensenArea, resetSwensen);
+		swensenTask.addStep(talkedToSwensen, goDownLadderSwensen);
+		swensenTask.setLockingCondition(finishedSwensenTask);
+
+		peerTask = new ConditionalStep(this, talkToPeer);
+		peerTask.addStep(new Conditions(inPeerExit, hasSeersKey), leaveSeersHouse);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasSeersKey, trapDoorOpen), goDownstairsWithKey2);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasSeersKey), goDownstairsWithKey);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasFrozenKey), useFrozenKeyOnRange);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasFilledVaseWithLid), useVaseOnTable);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasFilledVase), useLidOnVase);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasVase), fillVase);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseWithLidWrong), takeLidOff);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasBucket45), useBucketOnScale);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasFullBucket, hasJug23), useBucketOnJug3);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasEmptyBucket, hasJug23), useBucketOnTap2);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasBucket25, hasEmptyJug), useBucketOnJug2);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasBucket25, hasFullJug), useJugOnDrain1);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasFullBucket, hasEmptyJug), useBucketOnJug1);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasEmptyBucket, hasEmptyJug), useBucketOnTap1);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasAnyBucket, hasAnyJug), emptyJugAndBucket);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasAnyBucket, chestOpen), searchChest2);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, hasAnyBucket), searchChest1);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid, cupboardOpen), searchCupboard2);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasVaseLid), searchCupboard1);
+		peerTask.addStep(new Conditions(inPeerExit, hasVaseLid), goUpstairsWithVaseLid);
+		peerTask.addStep(new Conditions(inPeerExit, hasRedDiskNew, hasUsedDisk), useDiskNewOnMural);
+		peerTask.addStep(new Conditions(inPeerExit, hasRedDiskOld, hasUsedDisk), useDiskOldOnMural);
+		peerTask.addStep(new Conditions(inPeerExit, hasRedDiskOld, hasRedDiskNew), useDiskAnyOnMural);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasRedDiskOld, hasRedDiskNew, trapDoorOpen), goDown1);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasRedDiskOld, hasRedDiskNew), openTrapDoorAndGoDown1);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasStickyRedGoop, hasWoodenDisk, hasRedDiskOld), useGoopOnDisk);
+		peerTask.addStep(new Conditions(inPeerUpstairs, hasRedHerring, hasWoodenDisk, hasRedDiskOld), cookHerring);
+		peerTask.addStep(new Conditions(inPeerUpstairs, new Conditions(LogicType.OR, hasRedDiskNew, new Conditions(hasRedHerring, hasWoodenDisk))), searchUnicorn);
+		peerTask.addStep(new Conditions(inPeerUpstairs, new Conditions(LogicType.OR, hasStickyRedGoop, hasRedHerring)), searchBull);
+		peerTask.addStep(inPeerUpstairs, searchBookcase);
+		peerTask.addStep(inPeerExit, goBackUpstairs);
+		peerTask.addStep(new Conditions(LogicType.OR, inPeerEntrance, hasSolvedDoor), goUpEntranceLadderPeer);
+		peerTask.addStep(isWind, inputWind);
+		peerTask.addStep(isTime, inputTime);
+		peerTask.addStep(isFire, inputFire);
+		peerTask.addStep(isLife, inputLife);
+		peerTask.addStep(isTree, inputTree);
+		peerTask.addStep(isMind, inputMind);
+		peerTask.addStep(talkedToPeer, enterPeerHouse);
+		peerTask.setLockingCondition(finishedPeerTask);
+
+		DetailedQuestStep resyncStep = new DetailedQuestStep(this, "Please open the quest's Quest Journal to sync your state.");
+		ConditionalStep resyncCondition = new ConditionalStep(this, resyncStep);
+		resyncCondition.setLockingCondition(syncedAll);
+
+		ConditionalStep trials = new ConditionalStep(this, resyncCondition);
+		trials.addStep(new Conditions(syncedPeer, finishedOlafTask, finishedManniTask, finishedSigliTask, finishedSigmundTask, finishedThorvaldTask, finishedSwensenTask), peerTask);
+		trials.addStep(new Conditions(syncedSwensen, finishedOlafTask, finishedManniTask, finishedSigliTask, finishedSigmundTask, finishedThorvaldTask), swensenTask);
+		trials.addStep(new Conditions(syncedThorvald, finishedOlafTask, finishedManniTask, finishedSigliTask, finishedSigmundTask), thorvaldTask);
+		trials.addStep(new Conditions(syncedSigmund, finishedOlafTask, finishedManniTask, finishedSigliTask), sigmundTask);
+		trials.addStep(new Conditions(finishedOlafTask, finishedManniTask), sigliTask);
+		trials.addStep(new Conditions(syncedManni, finishedOlafTask), manniTask);
+		trials.addStep(syncedOlaf, olafTask);
+		steps.put(1, trials);
+		steps.put(2, trials);
+		steps.put(3, trials);
+		steps.put(4, trials);
+		steps.put(5, trials);
+		steps.put(6, trials);
+		steps.put(7, trials);
+		steps.put(8, finishQuest);
+		return steps;
 	}
 }

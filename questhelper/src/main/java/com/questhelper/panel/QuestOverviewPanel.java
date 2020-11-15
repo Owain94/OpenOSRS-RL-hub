@@ -53,27 +53,7 @@ import net.runelite.client.util.SwingUtil;
 
 public class QuestOverviewPanel extends JPanel
 {
-	private final QuestHelperPlugin questHelperPlugin;
-	public QuestHelper currentQuest;
-
-	private final JPanel questStepsContainer = new JPanel();
-	private final JPanel actionsContainer = new JPanel();
-
-	private final JPanel introPanel = new JPanel();
-	private final JLabel questOverviewNotes = new JLabel();
-
-	private final JPanel questItemRequirementsListPanel = new JPanel();
-	private final JPanel questItemRecommendedListPanel = new JPanel();
-	private final JPanel questCombatRequirementsListPanel = new JPanel();
-	private final JPanel questOverviewNotesPanel = new JPanel();
-
-	private final JLabel questNameLabel = new JLabel();
-
 	private static final ImageIcon CLOSE_ICON;
-
-	private final JButton collapseBtn = new JButton();
-
-	private final List<QuestStepPanel> questStepPanelList = new ArrayList<>();
 
 	static
 	{
@@ -81,6 +61,21 @@ public class QuestOverviewPanel extends JPanel
 
 		CLOSE_ICON = new ImageIcon(closeImg);
 	}
+
+	private final QuestHelperPlugin questHelperPlugin;
+	private final JPanel questStepsContainer = new JPanel();
+	private final JPanel actionsContainer = new JPanel();
+	private final JPanel introPanel = new JPanel();
+	private final JLabel questOverviewNotes = new JLabel();
+	private final JPanel questItemRequirementsListPanel = new JPanel();
+	private final JPanel questItemRecommendedListPanel = new JPanel();
+	private final JPanel questCombatRequirementsListPanel = new JPanel();
+	private final JPanel questOverviewNotesPanel = new JPanel();
+	private final JLabel questNameLabel = new JLabel();
+	private final JButton collapseBtn = new JButton();
+
+	private final List<QuestStepPanel> questStepPanelList = new ArrayList<>();
+	public QuestHelper currentQuest;
 
 	public QuestOverviewPanel(QuestHelperPlugin questHelperPlugin)
 	{

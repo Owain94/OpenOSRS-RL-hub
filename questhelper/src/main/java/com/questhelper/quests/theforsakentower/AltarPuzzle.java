@@ -1,3 +1,27 @@
+/*
+ * Copyright (c) 2020, Zoinkwiz
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.questhelper.quests.theforsakentower;
 
 import com.google.inject.Inject;
@@ -29,21 +53,19 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 
 public class AltarPuzzle extends QuestStep implements OwnerStep
 {
-	EventBus eventBus;
+	@Inject
+	protected EventBus eventBus;
 
-	private QuestStep currentStep;
-
+	@Inject
+	protected Client client;
 	ItemRequirement ring1, ring2, ring3, ring4;
-
 	Zone secondFloor, floor1, basement;
-
 	ConditionForStep inSecondFloor, inFloor1, inBasement;
-
 	DetailedQuestStep goUpLadder, goUpStairs, goUpToSecondFloor, restartStep, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15;
-
 	ArrayList<DetailedQuestStep> rebalanceW = new ArrayList<>();
 	ArrayList<DetailedQuestStep> rebalanceE = new ArrayList<>();
 	ArrayList<DetailedQuestStep> rebalanceC = new ArrayList<>();
+	private QuestStep currentStep;
 
 
 	public AltarPuzzle(QuestHelper questHelper)
@@ -53,11 +75,6 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 		setupZones();
 		setupConditions();
 		setupSteps();
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override
@@ -71,6 +88,37 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 	{
 		shutDownStep();
 		currentStep = null;
+	}
+
+	@Override
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
+		}
+	}
+
+	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeWorldOverlayHint(graphics, plugin);
+		}
+	}
+
+	@Override
+	public QuestStep getActiveStep()
+	{
+		if (currentStep != this)
+		{
+			return currentStep.getActiveStep();
+		}
+		else
+		{
+			return this;
+		}
 	}
 
 	@Subscribe
@@ -280,37 +328,6 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 			eventBus.unregister(currentStep);
 			currentStep.shutDown();
 			currentStep = null;
-		}
-	}
-
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
-		}
-	}
-
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldOverlayHint(graphics, plugin);
-		}
-	}
-
-	@Override
-	public QuestStep getActiveStep()
-	{
-		if (currentStep != this)
-		{
-			return currentStep.getActiveStep();
-		}
-		else
-		{
-			return this;
 		}
 	}
 

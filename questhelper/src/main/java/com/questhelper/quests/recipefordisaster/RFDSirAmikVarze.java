@@ -80,52 +80,6 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 
 	int evilChickenLevel = 19;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupRequirements();
-		setupConditions();
-		setupSteps();
-		calculateEvilChickenLevel();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goInspectPete = new ConditionalStep(this, enterDiningRoom);
-		goInspectPete.addStep(inDiningRoom, inspectAmik);
-		steps.put(0, goInspectPete);
-
-		ConditionalStep goAskCook = new ConditionalStep(this, talkToCook);
-		goAskCook.addStep(inDiningRoom, enterKitchen);
-		steps.put(5, goAskCook);
-
-		tokenAndEggSteps = new ConditionalStep(this, enterZanaris);
-		tokenAndEggSteps.addStep(tokenNearby, pickUpToken);
-		tokenAndEggSteps.addStep(new Conditions(hasEgg, inEvilChickenLair), killBlackDragon);
-		tokenAndEggSteps.addStep(eggNearby, pickUpEgg);
-		tokenAndEggSteps.addStep(inEvilChickenLair, killEvilChicken);
-		tokenAndEggSteps.addStep(inZanaris, useChickenOnShrine);
-		tokenAndEggSteps.setLockingCondition(hasEggAndToken);
-		tokenAndEggSteps.setBlocker(true);
-
-		ConditionalStep makeBrulee = new ConditionalStep(this, useMilkOnCream);
-		makeBrulee.addStep(new Conditions(hasUncookedBrulee), rubToken);
-		makeBrulee.addStep(new Conditions(hasBruleeWithEgg, hasCinnamon), useCinnamonOnBrulee);
-		makeBrulee.addStep(hasBruleeWithEgg, grindBranch);
-		makeBrulee.addStep(hasBaseBrulee, useEggOnBrulee);
-		makeBrulee.addStep(hasCornflourMixture, addPodToCornflourMixture);
-		makeBrulee.addStep(hasMilkyMixture, useCornflourOnMilky);
-
-		ConditionalStep saveAmik = new ConditionalStep(this, talkToWom);
-		saveAmik.addStep(new Conditions(inDiningRoom, hasCompleteBrulee), useBruleeOnVarze);
-		saveAmik.addStep(hasCompleteBrulee, enterDiningRoomAgain);
-		saveAmik.addStep(hasEggAndToken, makeBrulee);
-		saveAmik.addStep(talkedToWom, tokenAndEggSteps);
-		steps.put(10, saveAmik);
-
-		return steps;
-	}
-
 	public void setupRequirements()
 	{
 		bucketOfMilk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
@@ -309,24 +263,6 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		return new ArrayList<>(Arrays.asList(axe, macheteAndRadimus, dramenStaffOrLunar, rawChicken, bucketOfMilk, potOfCream, cornflour, pestleAndMortar, iceGloves, rawChicken));
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		return new ArrayList<>(Arrays.asList(combatGear, antidragonShield, antifirePotion));
-	}
-
-	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		return new ArrayList<>(Arrays.asList("Evil Chicken (level " + evilChickenLevel + ")", "Black dragon (level 227)"));
-	}
-
-	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -341,8 +277,72 @@ public class RFDSirAmikVarze extends BasicQuestHelper
 	}
 
 	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupRequirements();
+		setupConditions();
+		setupSteps();
+		calculateEvilChickenLevel();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goInspectPete = new ConditionalStep(this, enterDiningRoom);
+		goInspectPete.addStep(inDiningRoom, inspectAmik);
+		steps.put(0, goInspectPete);
+
+		ConditionalStep goAskCook = new ConditionalStep(this, talkToCook);
+		goAskCook.addStep(inDiningRoom, enterKitchen);
+		steps.put(5, goAskCook);
+
+		tokenAndEggSteps = new ConditionalStep(this, enterZanaris);
+		tokenAndEggSteps.addStep(tokenNearby, pickUpToken);
+		tokenAndEggSteps.addStep(new Conditions(hasEgg, inEvilChickenLair), killBlackDragon);
+		tokenAndEggSteps.addStep(eggNearby, pickUpEgg);
+		tokenAndEggSteps.addStep(inEvilChickenLair, killEvilChicken);
+		tokenAndEggSteps.addStep(inZanaris, useChickenOnShrine);
+		tokenAndEggSteps.setLockingCondition(hasEggAndToken);
+		tokenAndEggSteps.setBlocker(true);
+
+		ConditionalStep makeBrulee = new ConditionalStep(this, useMilkOnCream);
+		makeBrulee.addStep(new Conditions(hasUncookedBrulee), rubToken);
+		makeBrulee.addStep(new Conditions(hasBruleeWithEgg, hasCinnamon), useCinnamonOnBrulee);
+		makeBrulee.addStep(hasBruleeWithEgg, grindBranch);
+		makeBrulee.addStep(hasBaseBrulee, useEggOnBrulee);
+		makeBrulee.addStep(hasCornflourMixture, addPodToCornflourMixture);
+		makeBrulee.addStep(hasMilkyMixture, useCornflourOnMilky);
+
+		ConditionalStep saveAmik = new ConditionalStep(this, talkToWom);
+		saveAmik.addStep(new Conditions(inDiningRoom, hasCompleteBrulee), useBruleeOnVarze);
+		saveAmik.addStep(hasCompleteBrulee, enterDiningRoomAgain);
+		saveAmik.addStep(hasEggAndToken, makeBrulee);
+		saveAmik.addStep(talkedToWom, tokenAndEggSteps);
+		steps.put(10, saveAmik);
+
+		return steps;
+	}
+
+	@Override
 	public boolean isCompleted()
 	{
 		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER_SIR_AMIK_VARZE.getId()) >= 20 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		return new ArrayList<>(Arrays.asList(axe, macheteAndRadimus, dramenStaffOrLunar, rawChicken, bucketOfMilk, potOfCream, cornflour, pestleAndMortar, iceGloves));
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		return new ArrayList<>(Arrays.asList(combatGear, antidragonShield, antifirePotion));
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		return new ArrayList<>(Arrays.asList("Evil Chicken (level " + evilChickenLevel + ")", "Black dragon (level 227)"));
 	}
 }

@@ -62,38 +62,6 @@ public class TheKnightsSword extends BasicQuestHelper
 
 	Zone dungeon, faladorCastle1, faladorCastle2;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToSquire);
-		steps.put(1, talkToReldo);
-		steps.put(2, talkToThurgo);
-		steps.put(3, talkToThurgoAgain);
-		steps.put(4, talkToSquire2);
-
-		ConditionalStep getPortrait = new ConditionalStep(this, goUpCastle1);
-		getPortrait.addStep(hasPortrait, givePortraitToThurgo);
-		getPortrait.addStep(inFaladorCastle2, searchCupboard);
-		getPortrait.addStep(inFaladorCastle1, goUpCastle2);
-
-		steps.put(5, getPortrait);
-
-		ConditionalStep returnSwordToSquire = new ConditionalStep(this, enterDungeon);
-		returnSwordToSquire.addStep(hasBluriteSword, finishQuest);
-		returnSwordToSquire.addStep(hasBluriteOre, bringThurgoOre);
-		returnSwordToSquire.addStep(inDungeon, mineBlurite);
-
-		steps.put(6, returnSwordToSquire);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		redberryPie = new ItemRequirement("Redberry pie", ItemID.REDBERRY_PIE);
@@ -189,5 +157,37 @@ public class TheKnightsSword extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Making the sword", new ArrayList<>(Arrays.asList(enterDungeon, mineBlurite, bringThurgoOre)), pickaxe, portrait, ironBars));
 		allSteps.add(new PanelDetails("Return the sword", new ArrayList<>(Collections.singletonList(finishQuest))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToSquire);
+		steps.put(1, talkToReldo);
+		steps.put(2, talkToThurgo);
+		steps.put(3, talkToThurgoAgain);
+		steps.put(4, talkToSquire2);
+
+		ConditionalStep getPortrait = new ConditionalStep(this, goUpCastle1);
+		getPortrait.addStep(hasPortrait, givePortraitToThurgo);
+		getPortrait.addStep(inFaladorCastle2, searchCupboard);
+		getPortrait.addStep(inFaladorCastle1, goUpCastle2);
+
+		steps.put(5, getPortrait);
+
+		ConditionalStep returnSwordToSquire = new ConditionalStep(this, enterDungeon);
+		returnSwordToSquire.addStep(hasBluriteSword, finishQuest);
+		returnSwordToSquire.addStep(hasBluriteOre, bringThurgoOre);
+		returnSwordToSquire.addStep(inDungeon, mineBlurite);
+
+		steps.put(6, returnSwordToSquire);
+
+		return steps;
 	}
 }

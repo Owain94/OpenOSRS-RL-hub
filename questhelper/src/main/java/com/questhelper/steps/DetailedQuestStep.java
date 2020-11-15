@@ -66,7 +66,6 @@ import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.OverlayUtil;
@@ -77,37 +76,24 @@ import net.runelite.client.util.ImageUtil;
 
 public class DetailedQuestStep extends QuestStep
 {
-	@Inject
-	EventBus eventBus;
-
-	@Inject
-	ItemManager itemManager;
-
-	@Inject
-	WorldMapPointManager worldMapPointManager;
-
-	protected WorldPoint worldPoint;
-
-	@Setter
-	protected WorldPoint worldMapPoint;
-
-	@Setter
-	protected ArrayList<WorldPoint> linePoints;
-
-	@Setter
-	protected List<Requirement> requirements = new ArrayList<>();
-
-	protected HashMap<Tile, List<Integer>> tileHighlights = new HashMap<>();
-
-	protected QuestHelperWorldMapPoint mapPoint;
-
 	protected static final int MAX_DISTANCE = 2350;
 	protected static final int MAX_DRAW_DISTANCE = 16;
-	protected int currentRender = 0;
-
 	private final Color ARROW_COLOUR = new Color(0, 168, 243);
-
+	protected WorldPoint worldPoint;
+	@Setter
+	protected WorldPoint worldMapPoint;
+	@Setter
+	protected ArrayList<WorldPoint> linePoints;
+	@Setter
+	protected List<Requirement> requirements = new ArrayList<>();
+	protected HashMap<Tile, List<Integer>> tileHighlights = new HashMap<>();
+	protected QuestHelperWorldMapPoint mapPoint;
+	protected int currentRender = 0;
 	protected boolean started;
+	@Inject
+	ItemManager itemManager;
+	@Inject
+	WorldMapPointManager worldMapPointManager;
 
 	public DetailedQuestStep(QuestHelper questHelper, String text, Requirement... requirements)
 	{
@@ -122,11 +108,57 @@ public class DetailedQuestStep extends QuestStep
 		this.requirements.addAll(Arrays.asList(requirements));
 	}
 
-	public void subscribe()
+	public static Line2D.Double getWorldLines(@Nonnull Client client, @Nonnull LocalPoint startLocation, LocalPoint endLocation)
 	{
-		eventBus.subscribe(ItemSpawned.class, this, this::onItemSpawned);
-		eventBus.subscribe(ItemDespawned.class, this, this::onItemDespawned);
-		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
+		final int plane = client.getPlane();
+
+		final int startX = startLocation.getX();
+		final int startY = startLocation.getY();
+		final int endX = endLocation.getX();
+		final int endY = endLocation.getY();
+
+		final int sceneX = startLocation.getSceneX();
+		final int sceneY = startLocation.getSceneY();
+
+		if (sceneX < 0 || sceneY < 0 || sceneX >= Constants.SCENE_SIZE || sceneY >= Constants.SCENE_SIZE)
+		{
+			return null;
+		}
+
+		int tilePlane = plane;
+
+		final int startHeight = Perspective.getTileHeight(client, startLocation, tilePlane);
+		final int endHeight = Perspective.getTileHeight(client, endLocation, tilePlane);
+
+		Point p1 = Perspective.localToCanvas(client, startX, startY, startHeight);
+		Point p2 = Perspective.localToCanvas(client, endX, endY, endHeight);
+
+		if (p1 == null || p2 == null)
+		{
+			return null;
+		}
+
+		Line2D.Double line = new Line2D.Double(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+
+		return line;
+	}
+
+	private static WorldPoint rotate(WorldPoint point, int rotation)
+	{
+		int chunkX = point.getX() & ~(CHUNK_SIZE - 1);
+		int chunkY = point.getY() & ~(CHUNK_SIZE - 1);
+		int x = point.getX() & (CHUNK_SIZE - 1);
+		int y = point.getY() & (CHUNK_SIZE - 1);
+		switch (rotation)
+		{
+			case 1:
+				return new WorldPoint(chunkX + y, chunkY + (CHUNK_SIZE - 1 - x), point.getPlane());
+			case 2:
+				return new WorldPoint(chunkX + (CHUNK_SIZE - 1 - x), chunkY + (CHUNK_SIZE - 1 - y), point.getPlane());
+			case 3:
+				return new WorldPoint(chunkX + (CHUNK_SIZE - 1 - y), chunkY + x, point.getPlane());
+		}
+		return point;
 	}
 
 	@Override
@@ -150,7 +182,6 @@ public class DetailedQuestStep extends QuestStep
 		}
 		addItemTiles();
 		started = true;
-		subscribe();
 	}
 
 	@Override
@@ -173,31 +204,6 @@ public class DetailedQuestStep extends QuestStep
 	public void leftCutscene()
 	{
 		super.leftCutscene();
-	}
-
-	public void clearArrow()
-	{
-		client.clearHintArrow();
-	}
-
-	public void addRequirement(Requirement requirement)
-	{
-		requirements.add(requirement);
-	}
-
-	public void addRequirement(ItemRequirement requirement)
-	{
-		requirements.add(requirement);
-	}
-
-	public void addRequirement(ArrayList<Requirement> requirement)
-	{
-		requirements.addAll(requirement);
-	}
-
-	public void addItemRequirements(ArrayList<ItemRequirement> requirement)
-	{
-		requirements.addAll(requirement);
 	}
 
 	@Override
@@ -239,6 +245,82 @@ public class DetailedQuestStep extends QuestStep
 				}
 			}
 		}
+	}
+
+	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		currentRender = (currentRender + 1) % 48;
+		if (client.getLocalPlayer() == null)
+		{
+			return;
+		}
+
+		if (inCutscene)
+		{
+			return;
+		}
+		if (currentRender < 24)
+		{
+			renderArrow(graphics);
+		}
+
+		if (linePoints != null && linePoints.size() > 1)
+		{
+			drawLinesOnWorld(graphics);
+		}
+
+		tileHighlights.forEach((tile, ids) -> checkAllTilesForHighlighting(tile, ids, graphics));
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		renderInventory(graphics);
+		createMinimapLines(graphics);
+		createWorldMapLines(graphics);
+
+		if (mapPoint == null)
+		{
+			return;
+		}
+
+		WorldPoint point = mapPoint.getWorldPoint();
+
+		if (currentRender < 24)
+		{
+			renderMinimapArrow(graphics);
+		}
+
+		final Rectangle mapViewArea = getWorldMapClipArea();
+
+		Point drawPoint = mapWorldPointToGraphicsPoint(point);
+		renderWorldMapArrow(mapViewArea, drawPoint);
+	}
+
+	public void clearArrow()
+	{
+		client.clearHintArrow();
+	}
+
+	public void addRequirement(Requirement requirement)
+	{
+		requirements.add(requirement);
+	}
+
+	public void addRequirement(ItemRequirement requirement)
+	{
+		requirements.add(requirement);
+	}
+
+	public void addRequirement(ArrayList<Requirement> requirement)
+	{
+		requirements.addAll(requirement);
+	}
+
+	public void addItemRequirements(ArrayList<ItemRequirement> requirement)
+	{
+		requirements.addAll(requirement);
 	}
 
 	@Subscribe
@@ -309,51 +391,16 @@ public class DetailedQuestStep extends QuestStep
 		}
 	}
 
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		currentRender = (currentRender + 1) % 48;
-		if (client.getLocalPlayer() == null)
-		{
-			return;
-		}
-
-		if (inCutscene)
-		{
-			return;
-		}
-		if (currentRender < 24)
-		{
-			renderArrow(graphics);
-		}
-
-		if (linePoints != null && linePoints.size() > 1)
-		{
-			drawLinesOnWorld(graphics);
-		}
-
-		tileHighlights.forEach((tile, ids) -> checkAllTilesForHighlighting(tile, ids, graphics));
-	}
-
 	public void drawLinesOnWorld(Graphics2D graphics)
 	{
 		for (int i = 0; i < linePoints.size() - 1; i++)
 		{
-			Collection<WorldPoint> startPoints = toLocalInstance(client, linePoints.get(i));
-			Collection<WorldPoint> endPoints = toLocalInstance(client, linePoints.get(i + 1));
-			if (startPoints.isEmpty() || endPoints.isEmpty())
+			LocalPoint startLp = getInstanceLocalPoint(linePoints.get(i));
+			LocalPoint endLp = getInstanceLocalPoint(linePoints.get(i + 1));
+			if (startLp == null || endLp == null)
 			{
 				continue;
 			}
-			WorldPoint startWp = startPoints.iterator().next();
-			WorldPoint endWp = endPoints.iterator().next();
-			if (startWp == null || endWp == null || !startWp.isInScene(client) || !endWp.isInScene(client))
-			{
-				continue;
-			}
-
-			LocalPoint startLp = LocalPoint.fromWorld(client, startWp);
-			LocalPoint endLp = LocalPoint.fromWorld(client, endWp);
 
 			Line2D.Double newLine = getWorldLines(client, startLp, endLp);
 			if (newLine != null)
@@ -369,18 +416,8 @@ public class DetailedQuestStep extends QuestStep
 		{
 			return;
 		}
-		Collection<WorldPoint> allPoints = toLocalInstance(client, worldPoint);
-		if (allPoints.isEmpty())
-		{
-			return;
-		}
-		WorldPoint wp = allPoints.iterator().next();
-		if (wp == null || !wp.isInScene(client))
-		{
-			return;
-		}
 
-		LocalPoint lp = LocalPoint.fromWorld(client, wp);
+		LocalPoint lp = getInstanceLocalPoint(worldPoint);
 		if (lp == null)
 		{
 			return;
@@ -407,13 +444,7 @@ public class DetailedQuestStep extends QuestStep
 
 		WorldPoint playerLocation = player.getWorldLocation();
 
-		Collection<WorldPoint> allPoints = toLocalInstance(client, worldPoint);
-		if (allPoints.isEmpty())
-		{
-			return;
-		}
-
-		WorldPoint wp = allPoints.iterator().next();
+		WorldPoint wp = getInstanceWorldPoint(worldPoint);
 		if (wp == null)
 		{
 			return;
@@ -477,6 +508,33 @@ public class DetailedQuestStep extends QuestStep
 		drawMinimapArrow(graphics, line);
 	}
 
+	protected WorldPoint getInstanceWorldPoint(WorldPoint wp)
+	{
+		Collection<WorldPoint> points = toLocalInstance(client, wp);
+
+		for (WorldPoint point : points)
+		{
+			if (point != null && point.getPlane() == wp.getPlane() && point.isInScene(client))
+			{
+				return point;
+			}
+		}
+		return null;
+	}
+
+	protected LocalPoint getInstanceLocalPoint(WorldPoint wp)
+	{
+		WorldPoint instanceWorldPoint = getInstanceWorldPoint(wp);
+		if (instanceWorldPoint == null)
+		{
+			return null;
+		}
+
+		LocalPoint localPoint = LocalPoint.fromWorld(client, instanceWorldPoint);
+
+		return localPoint;
+	}
+
 	protected void createMinimapLines(Graphics2D graphics)
 	{
 		if (linePoints == null || linePoints.size() < 2)
@@ -485,8 +543,8 @@ public class DetailedQuestStep extends QuestStep
 		}
 		for (int i = 0; i < linePoints.size() - 1; i++)
 		{
-			LocalPoint startPoint = LocalPoint.fromWorld(client, linePoints.get(i));
-			LocalPoint destinationPoint = LocalPoint.fromWorld(client, linePoints.get(i + 1));
+			LocalPoint startPoint = getInstanceLocalPoint(linePoints.get(i));
+			LocalPoint destinationPoint = getInstanceLocalPoint(linePoints.get(i + 1));
 			if (startPoint == null || destinationPoint == null)
 			{
 				continue;
@@ -520,6 +578,23 @@ public class DetailedQuestStep extends QuestStep
 			}
 			boolean isEndOfLine = (linePoints.size() - 2) == i;
 			drawLine(graphics, line, isEndOfLine, bounds);
+		}
+	}
+
+	public void createWorldMapLines(Graphics2D graphics)
+	{
+		if (linePoints == null || linePoints.size() < 2)
+		{
+			return;
+		}
+		Rectangle mapViewArea = getWorldMapClipArea();
+		for (int i = 0; i < linePoints.size() - 1; i++)
+		{
+			Point startPoint = mapWorldPointToGraphicsPoint(linePoints.get(i));
+			Point endPoint = mapWorldPointToGraphicsPoint(linePoints.get(i + 1));
+
+			boolean isEndOfLine = (linePoints.size() - 2) == i;
+			renderWorldMapLines(graphics, mapViewArea, startPoint, endPoint, isEndOfLine);
 		}
 	}
 
@@ -610,44 +685,6 @@ public class DetailedQuestStep extends QuestStep
 		graphics.draw(line);
 
 		drawArrowHead(graphics, line);
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		renderInventory(graphics);
-
-		if (mapPoint == null)
-		{
-			return;
-		}
-
-		WorldPoint point = mapPoint.getWorldPoint();
-
-		if (currentRender < 24)
-		{
-			renderMinimapArrow(graphics);
-		}
-		createMinimapLines(graphics);
-
-		final Rectangle mapViewArea = getWorldMapClipArea();
-
-		Point drawPoint = mapWorldPointToGraphicsPoint(point);
-		renderWorldMapArrow(mapViewArea, drawPoint);
-
-		if (linePoints == null || linePoints.size() < 2)
-		{
-			return;
-		}
-
-		for (int i = 0; i < linePoints.size() - 1; i++)
-		{
-			Point startPoint = mapWorldPointToGraphicsPoint(linePoints.get(i));
-			Point endPoint = mapWorldPointToGraphicsPoint(linePoints.get(i + 1));
-
-			boolean isEndOfLine = (linePoints.size() - 2) == i;
-			renderWorldMapLines(graphics, mapViewArea, startPoint, endPoint, isEndOfLine);
-		}
 	}
 
 	public Point mapWorldPointToGraphicsPoint(WorldPoint worldPoint)
@@ -753,41 +790,6 @@ public class DetailedQuestStep extends QuestStep
 
 		Line2D.Double line = new Line2D.Double(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
 		drawLine(graphics, line, isEndOfLine, getWorldMapClipArea());
-	}
-
-	public static Line2D.Double getWorldLines(@Nonnull Client client, @Nonnull LocalPoint startLocation, LocalPoint endLocation)
-	{
-		final int plane = client.getPlane();
-
-		final int startX = startLocation.getX();
-		final int startY = startLocation.getY();
-		final int endX = endLocation.getX();
-		final int endY = endLocation.getY();
-
-		final int sceneX = startLocation.getSceneX();
-		final int sceneY = startLocation.getSceneY();
-
-		if (sceneX < 0 || sceneY < 0 || sceneX >= Constants.SCENE_SIZE || sceneY >= Constants.SCENE_SIZE)
-		{
-			return null;
-		}
-
-		int tilePlane = plane;
-
-		final int startHeight = Perspective.getTileHeight(client, startLocation, tilePlane);
-		final int endHeight = Perspective.getTileHeight(client, endLocation, tilePlane);
-
-		Point p1 = Perspective.localToCanvas(client, startX, startY, startHeight);
-		Point p2 = Perspective.localToCanvas(client, endX, endY, endHeight);
-
-		if (p1 == null || p2 == null)
-		{
-			return null;
-		}
-
-		Line2D.Double line = new Line2D.Double(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-
-		return line;
 	}
 
 	private Rectangle getWorldMapClipArea()
@@ -930,46 +932,29 @@ public class DetailedQuestStep extends QuestStep
 		// find instance chunks using the template point. there might be more than one.
 		List<WorldPoint> worldPoints = new ArrayList<>();
 
-		final int z = client.getLocalPlayer().getWorldLocation().getPlane();
-
 		int[][][] instanceTemplateChunks = client.getInstanceTemplateChunks();
-		for (int x = 0; x < instanceTemplateChunks[z].length; ++x)
+		for (int z = 0; z < instanceTemplateChunks.length; ++z)
 		{
-			for (int y = 0; y < instanceTemplateChunks[z][x].length; ++y)
+			for (int x = 0; x < instanceTemplateChunks[z].length; ++x)
 			{
-				int chunkData = instanceTemplateChunks[z][x][y];
-				int rotation = chunkData >> 1 & 0x3;
-				int templateChunkY = (chunkData >> 3 & 0x7FF) * CHUNK_SIZE;
-				int templateChunkX = (chunkData >> 14 & 0x3FF) * CHUNK_SIZE;
-				if (worldPoint.getX() >= templateChunkX && worldPoint.getX() < templateChunkX + CHUNK_SIZE
-					&& worldPoint.getY() >= templateChunkY && worldPoint.getY() < templateChunkY + CHUNK_SIZE)
+				for (int y = 0; y < instanceTemplateChunks[z][x].length; ++y)
 				{
-					WorldPoint p = new WorldPoint(client.getBaseX() + x * CHUNK_SIZE + (worldPoint.getX() & (CHUNK_SIZE - 1)),
-						client.getBaseY() + y * CHUNK_SIZE + (worldPoint.getY() & (CHUNK_SIZE - 1)),
-						z);
-					p = rotate(p, rotation);
-					worldPoints.add(p);
+					int chunkData = instanceTemplateChunks[z][x][y];
+					int rotation = chunkData >> 1 & 0x3;
+					int templateChunkY = (chunkData >> 3 & 0x7FF) * CHUNK_SIZE;
+					int templateChunkX = (chunkData >> 14 & 0x3FF) * CHUNK_SIZE;
+					if (worldPoint.getX() >= templateChunkX && worldPoint.getX() < templateChunkX + CHUNK_SIZE
+						&& worldPoint.getY() >= templateChunkY && worldPoint.getY() < templateChunkY + CHUNK_SIZE)
+					{
+						WorldPoint p = new WorldPoint(client.getBaseX() + x * CHUNK_SIZE + (worldPoint.getX() & (CHUNK_SIZE - 1)),
+							client.getBaseY() + y * CHUNK_SIZE + (worldPoint.getY() & (CHUNK_SIZE - 1)),
+							z);
+						p = rotate(p, rotation);
+						worldPoints.add(p);
+					}
 				}
 			}
 		}
 		return worldPoints;
-	}
-
-	private static WorldPoint rotate(WorldPoint point, int rotation)
-	{
-		int chunkX = point.getX() & ~(CHUNK_SIZE - 1);
-		int chunkY = point.getY() & ~(CHUNK_SIZE - 1);
-		int x = point.getX() & (CHUNK_SIZE - 1);
-		int y = point.getY() & (CHUNK_SIZE - 1);
-		switch (rotation)
-		{
-			case 1:
-				return new WorldPoint(chunkX + y, chunkY + (CHUNK_SIZE - 1 - x), point.getPlane());
-			case 2:
-				return new WorldPoint(chunkX + (CHUNK_SIZE - 1 - x), chunkY + (CHUNK_SIZE - 1 - y), point.getPlane());
-			case 3:
-				return new WorldPoint(chunkX + (CHUNK_SIZE - 1 - y), chunkY + x, point.getPlane());
-		}
-		return point;
 	}
 }

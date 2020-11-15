@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -46,14 +45,10 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class DyeShipSteps extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
 	boolean coloursKnown = false;
 
 	HashMap<String, FlagColour> shapeColours = new HashMap<>();
@@ -207,6 +202,31 @@ public class DyeShipSteps extends DetailedOwnerStep
 		}
 	}
 
+	@Override
+	protected void setupSteps()
+	{
+		searchMast = new ObjectStep(getQuestHelper(), ObjectID.MAST_16640, new WorldPoint(3619, 3543, 2), "Search the Mast repeatedly until you've found out all the colours for the toy boat.");
+		dyeTop = new DetailedQuestStep(getQuestHelper(), "Dye the top of the model ship's flag to match the real ship.", modelShip);
+		dyeBottom = new DetailedQuestStep(getQuestHelper(), "Dye the bottom of the model ship's flag to match the real ship.", modelShip);
+		dyeSkull = new DetailedQuestStep(getQuestHelper(), "Dye the skull of the model ship's flag to match the real ship.", modelShip);
+		talkToMan = new NpcStep(getQuestHelper(), NpcID.OLD_MAN, new WorldPoint(3616, 3543, 1), "Talk to the Old Man with the model ship to get a key.");
+		talkToMan.addDialogStep("Is this your toy boat?");
+		goDownToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16112, new WorldPoint(3615, 3541, 2), "Go to the main deck of the ship.");
+		goUpToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0), "Go up the ladder in the ship west of Port Phasmatys.");
+		goDownToMan.addSubSteps(goUpToMan);
+
+		goUpToDeckForMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0),
+			"Go up the ladder in the ship west of Port Phasmatys.");
+		goUpToMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3615, 3541, 1),
+			"Go up to the mast of the ship.");
+	}
+
+	@Override
+	public Collection<QuestStep> getSteps()
+	{
+		return Arrays.asList(searchMast, dyeTop, dyeBottom, dyeSkull, talkToMan, goDownToMan, goUpToMan, goUpToDeckForMast, goUpToMast);
+	}
+
 	public void updateColours()
 	{
 		Widget textWidget = client.getWidget(229, 1);
@@ -239,33 +259,6 @@ public class DyeShipSteps extends DetailedOwnerStep
 		}
 	}
 
-	@Override
-	protected void setupSteps()
-	{
-		searchMast = new ObjectStep(getQuestHelper(), ObjectID.MAST_16640, new WorldPoint(3619, 3543, 2), "Search the Mast repeatedly until you've found out all the colours for the toy boat.");
-		dyeTop = new DetailedQuestStep(getQuestHelper(), "Dye the top of the model ship's flag to match the real ship.", modelShip);
-		dyeBottom = new DetailedQuestStep(getQuestHelper(), "Dye the bottom of the model ship's flag to match the real ship.", modelShip);
-		dyeSkull = new DetailedQuestStep(getQuestHelper(), "Dye the skull of the model ship's flag to match the real ship.", modelShip);
-		talkToMan = new NpcStep(getQuestHelper(), NpcID.OLD_MAN, new WorldPoint(3616, 3543, 1), "Talk to the Old Man with the model ship to get a key.");
-		talkToMan.addDialogStep("Is this your toy boat?");
-		goDownToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16112, new WorldPoint(3615, 3541, 2), "Go to the main deck of the ship.");
-		goUpToMan = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0), "Go up the ladder in the ship west of Port Phasmatys.");
-		goDownToMan.addSubSteps(goUpToMan);
-
-		goUpToDeckForMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3613, 3543, 0),
-			"Go up the ladder in the ship west of Port Phasmatys.");
-		goUpToMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3615, 3541, 1),
-			"Go up to the mast of the ship.");
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-	}
-
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(searchMast, dyeTop, dyeBottom, dyeSkull, talkToMan, goDownToMan, goUpToMan, goUpToDeckForMast, goUpToMast);
-	}
-
 	public Collection<QuestStep> getDisplaySteps()
 	{
 		return Arrays.asList(goUpToDeckForMast, goUpToMast, searchMast, dyeTop, dyeBottom, dyeSkull, goDownToMan, talkToMan);
@@ -291,16 +284,6 @@ public class DyeShipSteps extends DetailedOwnerStep
 			this.item = item;
 		}
 
-		public String getColourText()
-		{
-			return colourText;
-		}
-
-		public ItemRequirement getItem()
-		{
-			return item;
-		}
-
 		public static FlagColour findByKey(String colour)
 		{
 			FlagColour[] flagColours = FlagColour.values();
@@ -312,6 +295,16 @@ public class DyeShipSteps extends DetailedOwnerStep
 				}
 			}
 			return null;
+		}
+
+		public String getColourText()
+		{
+			return colourText;
+		}
+
+		public ItemRequirement getItem()
+		{
+			return item;
 		}
 	}
 }

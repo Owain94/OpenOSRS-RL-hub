@@ -68,64 +68,6 @@ public class PrinceAliRescue extends BasicQuestHelper
 
 	Zone cell;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToHassan);
-		steps.put(10, talkToOsman);
-
-		makeDyedWig = new ConditionalStep(this, talkToNed);
-		makeDyedWig.addStep(hasWig, dyeWig);
-		makeDyedWig.setLockingCondition(hasDyedWig);
-
-		makePaste = new ConditionalStep(this, talkToAggie);
-		makePaste.setLockingCondition(hasPaste);
-
-		makeKeyMould = new ConditionalStep(this, talkToKeli);
-		makeKeyMould.setLockingCondition(hasOrGivenKeyMould);
-
-		getKey = new ConditionalStep(this, bringImprintToOsman);
-		getKey.setLockingCondition(givenKeyMould);
-
-		ConditionalStep prepareToSaveAli = new ConditionalStep(this, makeDyedWig);
-		prepareToSaveAli.addStep(new Conditions(hasDyedWig, hasPaste, givenKeyMould), talkToLeela);
-		prepareToSaveAli.addStep(new Conditions(hasDyedWig, hasPaste, hasOrGivenKeyMould), getKey);
-		prepareToSaveAli.addStep(new Conditions(hasDyedWig, hasPaste), makeKeyMould);
-		prepareToSaveAli.addStep(hasDyedWig, makePaste);
-
-		steps.put(20, prepareToSaveAli);
-
-		ConditionalStep getJoeDrunk = new ConditionalStep(this, makeDyedWig);
-		getJoeDrunk.addStep(new Conditions(hasDyedWig, hasPaste, hasKey), talkToJoe);
-		getJoeDrunk.addStep(hasDyedWig, makePaste);
-
-		steps.put(30, getJoeDrunk);
-		steps.put(31, getJoeDrunk);
-		steps.put(32, getJoeDrunk);
-		steps.put(33, getJoeDrunk);
-
-		ConditionalStep tieUpKeli = new ConditionalStep(this, makeDyedWig);
-		tieUpKeli.addStep(new Conditions(hasDyedWig, hasPaste, hasKey), useRopeOnKeli);
-		tieUpKeli.addStep(hasDyedWig, makePaste);
-		steps.put(40, tieUpKeli);
-
-		ConditionalStep freeAli = new ConditionalStep(this, makeDyedWig);
-		freeAli.addStep(new Conditions(hasDyedWig, hasPaste, hasKey, inCell), talkToAli);
-		freeAli.addStep(new Conditions(hasDyedWig, hasPaste, hasKey), useKeyOnDoor);
-		freeAli.addStep(hasDyedWig, makePaste);
-		steps.put(50, freeAli);
-
-		steps.put(100, returnToHassan);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		softClay = new ItemRequirement("Soft clay", ItemID.SOFT_CLAY);
@@ -274,5 +216,63 @@ public class PrinceAliRescue extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Return to Al Kharid", new ArrayList<>(Collections.singletonList(returnToHassan))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToHassan);
+		steps.put(10, talkToOsman);
+
+		makeDyedWig = new ConditionalStep(this, talkToNed);
+		makeDyedWig.addStep(hasWig, dyeWig);
+		makeDyedWig.setLockingCondition(hasDyedWig);
+
+		makePaste = new ConditionalStep(this, talkToAggie);
+		makePaste.setLockingCondition(hasPaste);
+
+		makeKeyMould = new ConditionalStep(this, talkToKeli);
+		makeKeyMould.setLockingCondition(hasOrGivenKeyMould);
+
+		getKey = new ConditionalStep(this, bringImprintToOsman);
+		getKey.setLockingCondition(givenKeyMould);
+
+		ConditionalStep prepareToSaveAli = new ConditionalStep(this, makeDyedWig);
+		prepareToSaveAli.addStep(new Conditions(hasDyedWig, hasPaste, givenKeyMould), talkToLeela);
+		prepareToSaveAli.addStep(new Conditions(hasDyedWig, hasPaste, hasOrGivenKeyMould), getKey);
+		prepareToSaveAli.addStep(new Conditions(hasDyedWig, hasPaste), makeKeyMould);
+		prepareToSaveAli.addStep(hasDyedWig, makePaste);
+
+		steps.put(20, prepareToSaveAli);
+
+		ConditionalStep getJoeDrunk = new ConditionalStep(this, makeDyedWig);
+		getJoeDrunk.addStep(new Conditions(hasDyedWig, hasPaste, hasKey), talkToJoe);
+		getJoeDrunk.addStep(hasDyedWig, makePaste);
+
+		steps.put(30, getJoeDrunk);
+		steps.put(31, getJoeDrunk);
+		steps.put(32, getJoeDrunk);
+		steps.put(33, getJoeDrunk);
+
+		ConditionalStep tieUpKeli = new ConditionalStep(this, makeDyedWig);
+		tieUpKeli.addStep(new Conditions(hasDyedWig, hasPaste, hasKey), useRopeOnKeli);
+		tieUpKeli.addStep(hasDyedWig, makePaste);
+		steps.put(40, tieUpKeli);
+
+		ConditionalStep freeAli = new ConditionalStep(this, makeDyedWig);
+		freeAli.addStep(new Conditions(hasDyedWig, hasPaste, hasKey, inCell), talkToAli);
+		freeAli.addStep(new Conditions(hasDyedWig, hasPaste, hasKey), useKeyOnDoor);
+		freeAli.addStep(hasDyedWig, makePaste);
+		steps.put(50, freeAli);
+
+		steps.put(100, returnToHassan);
+
+		return steps;
 	}
 }

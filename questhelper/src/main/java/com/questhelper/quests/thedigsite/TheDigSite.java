@@ -80,108 +80,6 @@ public class TheDigSite extends BasicQuestHelper
 
 	Zone undergroundTemple1, dougRoom, undergroundTemple2;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToExaminer);
-
-		ConditionalStep returnWithLetter = new ConditionalStep(this, talkToHaig);
-		returnWithLetter.addStep(letterStamped, talkToExaminer2);
-		steps.put(1, returnWithLetter);
-
-		ConditionalStep goTakeTest1 = new ConditionalStep(this, syncStep);
-		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, orangeStudentQ1Learnt, greenStudentQ1Learnt), takeTest1);
-		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, orangeStudentQ1Learnt, talkedToGreenStudent), talkToGreenStudent2);
-		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, orangeStudentQ1Learnt, hasSkull, hasBrush), talkToGreenStudent);
-
-		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, talkedToOrangeStudent, hasSkull, hasBrush), talkToOrangeStudent2);
-		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, hasSpecialCup, hasSkull, hasBrush), talkToOrangeStudent);
-
-		goTakeTest1.addStep(new Conditions(talkedToFemaleStudent, hasSpecialCup, hasSkull, hasBrush), talkToFemaleStudent2);
-		goTakeTest1.addStep(new Conditions(hasTeddy, hasSpecialCup, hasSkull, hasBrush), talkToFemaleStudent);
-
-		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy, hasSpecialCup), pickpocketWorkmen);
-		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy, hasTray, talkedToGuide), panWater);
-		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy, hasTray), talkToGuide);
-		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy), takeTray);
-		goTakeTest1.addStep(syncedUp, searchBush);
-		steps.put(2, goTakeTest1);
-
-		ConditionalStep goTakeTest2 = new ConditionalStep(this, syncStep);
-		goTakeTest2.addStep(new Conditions(syncedUp2, femaleStudentQ2Learnt, orangeStudentQ2Learnt, greenStudentQ2Learnt), takeTest2);
-		goTakeTest2.addStep(new Conditions(syncedUp2, femaleStudentQ2Learnt, orangeStudentQ2Learnt), talkToGreenStudent3);
-		goTakeTest2.addStep(new Conditions(syncedUp2, femaleStudentQ2Learnt), talkToOrangeStudent3);
-		goTakeTest2.addStep(syncedUp2, talkToFemaleStudent3);
-		steps.put(3, goTakeTest2);
-
-		ConditionalStep goTakeTest3 = new ConditionalStep(this, syncStep);
-		goTakeTest3.addStep(new Conditions(femaleStudentQ3Learnt, orangeStudentQ3Learnt, greenStudentQ3Learnt), takeTest3);
-		goTakeTest3.addStep(new Conditions(syncedUp3, femaleStudentQ3Learnt, orangeStudentQ3Learnt), talkToGreenStudent4);
-		goTakeTest3.addStep(new Conditions(syncedUp3, femaleStudentQ3Learnt), talkToOrangeStudent4);
-		goTakeTest3.addStep(new Conditions(syncedUp3, femaleExtorting), talkToFemaleStudent5);
-		goTakeTest3.addStep(syncedUp2, talkToFemaleStudent4);
-		steps.put(4, goTakeTest3);
-
-		ConditionalStep findTalisman = new ConditionalStep(this, getJar);
-		findTalisman.addStep(new Conditions(givenTalismanIn), useInvitationOnWorkman);
-		findTalisman.addStep(new Conditions(hasTalisman), talkToExpert);
-		findTalisman.addStep(new Conditions(hasJar, hasPick, hasBrush), digForTalisman);
-		findTalisman.addStep(new Conditions(hasJar, hasPick), getBrush);
-		findTalisman.addStep(hasJar, getPick);
-		steps.put(5, findTalisman);
-
-		ConditionalStep learnHowToMakeExplosives = new ConditionalStep(this, useRopeOnWinch2);
-		learnHowToMakeExplosives.addStep(inDougRoom, talkToDoug);
-		learnHowToMakeExplosives.addStep(new Conditions(inUndergroundTemple1, hasArcenia), goUpRope);
-		learnHowToMakeExplosives.addStep(inUndergroundTemple1, pickUpRoot);
-		learnHowToMakeExplosives.addStep(new Conditions(rope2Added), goDownToDoug);
-
-		ConditionalStep makeExplosives = new ConditionalStep(this, goDownWinch);
-		makeExplosives.addStep(new Conditions(hasChemicalCompound, inUndergroundTemple1), useCompound);
-
-		makeExplosives.addStep(inDougRoom, goUpFromDoug);
-		makeExplosives.addStep(new Conditions(inUndergroundTemple1, hasArcenia), goUpRope);
-		makeExplosives.addStep(inUndergroundTemple1, pickUpRoot);
-
-		makeExplosives.addStep(new Conditions(hasChemicalCompound), goDownToExplode);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasMixedChemicals2), addRoot);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasMixedChemicals), addCharcoal);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasNitrate, hasNitro), mixNitroWithNitrate);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, hasNitro), usePowderOnExpert);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, hasLiquid), useLiquidOnExpert);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, hasLiquid), useVialOnBarrel);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, openedBarrel), useVialOnBarrel);
-		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder), useTrowelOnBarrel);
-		makeExplosives.addStep(new Conditions(openPowderChestNearby, hasArcenia), searchChest);
-		makeExplosives.addStep(hasArcenia, unlockChest);
-
-		ConditionalStep discovery = new ConditionalStep(this, useRopeOnWinch);
-		discovery.addStep(hasKeyOrPowderOrMixtures, makeExplosives);
-		discovery.addStep(searchedBricks, learnHowToMakeExplosives);
-		discovery.addStep(new Conditions(inUndergroundTemple1, hasArcenia), searchBricks);
-		discovery.addStep(inUndergroundTemple1, pickUpRoot);
-		discovery.addStep(rope1Added, goDownWinch);
-		steps.put(6, discovery);
-
-		ConditionalStep explodeWall = new ConditionalStep(this, goDownToExplode2);
-		explodeWall.addStep(inUndergroundTemple1, useTinderbox);
-		steps.put(7, explodeWall);
-
-		ConditionalStep completeQuest = new ConditionalStep(this, goDownForTablet);
-		completeQuest.addStep(new Conditions(hasTablet, inUndergroundTemple2), goUpWithTablet);
-		completeQuest.addStep(new Conditions(hasTablet), useTabletOnExpert);
-		completeQuest.addStep(inUndergroundTemple2, takeTablet);
-		steps.put(8, completeQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		pestleAndMortar = new ItemRequirement("Pestle and mortar", ItemID.PESTLE_AND_MORTAR);
@@ -486,12 +384,6 @@ public class TheDigSite extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getNotes()
-	{
-		return new ArrayList<>(Collections.singletonList("This quest helper is susceptible to getting out of sync with the actual quest. If this happens to you, opening up the quest's journal should fix it."));
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		return new ArrayList<>(Arrays.asList(pestleAndMortar, vialHighlighted, tinderbox, tea, ropes2, opal, charcoal, leatherBoots, leatherGloves));
@@ -501,6 +393,12 @@ public class TheDigSite extends BasicQuestHelper
 	public ArrayList<ItemRequirement> getItemRecommended()
 	{
 		return new ArrayList<>();
+	}
+
+	@Override
+	public ArrayList<String> getNotes()
+	{
+		return new ArrayList<>(Collections.singletonList("This quest helper is susceptible to getting out of sync with the actual quest. If this happens to you, opening up the quest's journal should fix it."));
 	}
 
 	@Override
@@ -519,5 +417,107 @@ public class TheDigSite extends BasicQuestHelper
 			useCompound, useTinderbox, takeTablet, useTabletOnExpert)), ropes2, pestleAndMortar, vialHighlighted, tinderboxHighlighted, charcoal));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToExaminer);
+
+		ConditionalStep returnWithLetter = new ConditionalStep(this, talkToHaig);
+		returnWithLetter.addStep(letterStamped, talkToExaminer2);
+		steps.put(1, returnWithLetter);
+
+		ConditionalStep goTakeTest1 = new ConditionalStep(this, syncStep);
+		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, orangeStudentQ1Learnt, greenStudentQ1Learnt), takeTest1);
+		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, orangeStudentQ1Learnt, talkedToGreenStudent), talkToGreenStudent2);
+		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, orangeStudentQ1Learnt, hasSkull, hasBrush), talkToGreenStudent);
+
+		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, talkedToOrangeStudent, hasSkull, hasBrush), talkToOrangeStudent2);
+		goTakeTest1.addStep(new Conditions(femaleStudentQ1Learnt, hasSpecialCup, hasSkull, hasBrush), talkToOrangeStudent);
+
+		goTakeTest1.addStep(new Conditions(talkedToFemaleStudent, hasSpecialCup, hasSkull, hasBrush), talkToFemaleStudent2);
+		goTakeTest1.addStep(new Conditions(hasTeddy, hasSpecialCup, hasSkull, hasBrush), talkToFemaleStudent);
+
+		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy, hasSpecialCup), pickpocketWorkmen);
+		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy, hasTray, talkedToGuide), panWater);
+		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy, hasTray), talkToGuide);
+		goTakeTest1.addStep(new Conditions(syncedUp, hasTeddy), takeTray);
+		goTakeTest1.addStep(syncedUp, searchBush);
+		steps.put(2, goTakeTest1);
+
+		ConditionalStep goTakeTest2 = new ConditionalStep(this, syncStep);
+		goTakeTest2.addStep(new Conditions(syncedUp2, femaleStudentQ2Learnt, orangeStudentQ2Learnt, greenStudentQ2Learnt), takeTest2);
+		goTakeTest2.addStep(new Conditions(syncedUp2, femaleStudentQ2Learnt, orangeStudentQ2Learnt), talkToGreenStudent3);
+		goTakeTest2.addStep(new Conditions(syncedUp2, femaleStudentQ2Learnt), talkToOrangeStudent3);
+		goTakeTest2.addStep(syncedUp2, talkToFemaleStudent3);
+		steps.put(3, goTakeTest2);
+
+		ConditionalStep goTakeTest3 = new ConditionalStep(this, syncStep);
+		goTakeTest3.addStep(new Conditions(femaleStudentQ3Learnt, orangeStudentQ3Learnt, greenStudentQ3Learnt), takeTest3);
+		goTakeTest3.addStep(new Conditions(syncedUp3, femaleStudentQ3Learnt, orangeStudentQ3Learnt), talkToGreenStudent4);
+		goTakeTest3.addStep(new Conditions(syncedUp3, femaleStudentQ3Learnt), talkToOrangeStudent4);
+		goTakeTest3.addStep(new Conditions(syncedUp3, femaleExtorting), talkToFemaleStudent5);
+		goTakeTest3.addStep(syncedUp2, talkToFemaleStudent4);
+		steps.put(4, goTakeTest3);
+
+		ConditionalStep findTalisman = new ConditionalStep(this, getJar);
+		findTalisman.addStep(new Conditions(givenTalismanIn), useInvitationOnWorkman);
+		findTalisman.addStep(new Conditions(hasTalisman), talkToExpert);
+		findTalisman.addStep(new Conditions(hasJar, hasPick, hasBrush), digForTalisman);
+		findTalisman.addStep(new Conditions(hasJar, hasPick), getBrush);
+		findTalisman.addStep(hasJar, getPick);
+		steps.put(5, findTalisman);
+
+		ConditionalStep learnHowToMakeExplosives = new ConditionalStep(this, useRopeOnWinch2);
+		learnHowToMakeExplosives.addStep(inDougRoom, talkToDoug);
+		learnHowToMakeExplosives.addStep(new Conditions(inUndergroundTemple1, hasArcenia), goUpRope);
+		learnHowToMakeExplosives.addStep(inUndergroundTemple1, pickUpRoot);
+		learnHowToMakeExplosives.addStep(new Conditions(rope2Added), goDownToDoug);
+
+		ConditionalStep makeExplosives = new ConditionalStep(this, goDownWinch);
+		makeExplosives.addStep(new Conditions(hasChemicalCompound, inUndergroundTemple1), useCompound);
+
+		makeExplosives.addStep(inDougRoom, goUpFromDoug);
+		makeExplosives.addStep(new Conditions(inUndergroundTemple1, hasArcenia), goUpRope);
+		makeExplosives.addStep(inUndergroundTemple1, pickUpRoot);
+
+		makeExplosives.addStep(new Conditions(hasChemicalCompound), goDownToExplode);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasMixedChemicals2), addRoot);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasMixedChemicals), addCharcoal);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasNitrate, hasNitro), mixNitroWithNitrate);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, hasNitro), usePowderOnExpert);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, hasLiquid), useLiquidOnExpert);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, hasLiquid), useVialOnBarrel);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder, openedBarrel), useVialOnBarrel);
+		makeExplosives.addStep(new Conditions(hasArcenia, hasPowder), useTrowelOnBarrel);
+		makeExplosives.addStep(new Conditions(openPowderChestNearby, hasArcenia), searchChest);
+		makeExplosives.addStep(hasArcenia, unlockChest);
+
+		ConditionalStep discovery = new ConditionalStep(this, useRopeOnWinch);
+		discovery.addStep(hasKeyOrPowderOrMixtures, makeExplosives);
+		discovery.addStep(searchedBricks, learnHowToMakeExplosives);
+		discovery.addStep(new Conditions(inUndergroundTemple1, hasArcenia), searchBricks);
+		discovery.addStep(inUndergroundTemple1, pickUpRoot);
+		discovery.addStep(rope1Added, goDownWinch);
+		steps.put(6, discovery);
+
+		ConditionalStep explodeWall = new ConditionalStep(this, goDownToExplode2);
+		explodeWall.addStep(inUndergroundTemple1, useTinderbox);
+		steps.put(7, explodeWall);
+
+		ConditionalStep completeQuest = new ConditionalStep(this, goDownForTablet);
+		completeQuest.addStep(new Conditions(hasTablet, inUndergroundTemple2), goUpWithTablet);
+		completeQuest.addStep(new Conditions(hasTablet), useTabletOnExpert);
+		completeQuest.addStep(inUndergroundTemple2, takeTablet);
+		steps.put(8, completeQuest);
+
+		return steps;
 	}
 }

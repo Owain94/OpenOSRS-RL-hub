@@ -52,7 +52,22 @@ public class ItemRequirements extends ItemRequirement
 	}
 
 	@Override
-	public boolean check(Client client)
+	protected Color getColor(Client client)
+	{
+		Color color;
+
+		if (this.check(client))
+		{
+			color = Color.GREEN;
+		}
+		else
+		{
+			color = Color.RED;
+		}
+		return color;
+	}
+
+	public boolean check(Client client, boolean checkEquippedOnly)
 	{
 		int successes = 0;
 		for (ItemRequirement itemRequirement : itemRequirements)
@@ -69,18 +84,8 @@ public class ItemRequirements extends ItemRequirement
 	}
 
 	@Override
-	protected Color getColor(Client client)
+	public boolean check(Client client)
 	{
-		Color color;
-
-		if (this.check(client))
-		{
-			color = Color.GREEN;
-		}
-		else
-		{
-			color = Color.RED;
-		}
-		return color;
+		return check(client, true);
 	}
 }

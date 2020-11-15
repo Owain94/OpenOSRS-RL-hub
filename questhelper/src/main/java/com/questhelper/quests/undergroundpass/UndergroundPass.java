@@ -591,6 +591,69 @@ public class UndergroundPass extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(rope2);
+		reqs.add(bow);
+		reqs.add(arrows);
+		reqs.add(spade);
+		reqs.add(plank);
+		reqs.add(bucket);
+		reqs.add(tinderbox);
+		reqs.add(combatEquipment);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(food);
+		reqs.add(staminaPotions);
+		reqs.add(coins);
+		reqs.add(agilityPotions);
+		reqs.add(telegrabRunes);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("3 Demons (level 91, safespottable)");
+		reqs.add("3 Paladins (level 62, safespottable)");
+		reqs.add("Kalrag (level 89)");
+		reqs.add("Disciple of Iban (level 13)");
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getNotes()
+	{
+		ArrayList<String> notes = new ArrayList<>();
+		notes.add("Kalrag attacks with melee only, so Protect From Melee can keep you safe in that fight.");
+		notes.add("Using the bow provided for combat can save inventory space.");
+		notes.add("Bring all items with you to start the quest, as leaving the dungeon will require you to restart from the beginning.");
+		return notes;
+	}
+
+	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+		allSteps.add(new PanelDetails("Starting out", new ArrayList<>(Arrays.asList(talkToKingLathas, talkToKoftik))));
+		allSteps.add(new PanelDetails("The Underground Pass", new ArrayList<>(Arrays.asList(talkToKoftikAtBridge, shootBridgeRope, crossThePit, crossTheGrid, passTrap1, collectOrb1, collectOrb2, collectOrb3, collectOrb4, orbsToFurnace, climbDownWell))));
+		allSteps.add(new PanelDetails("Descending Deeper", new ArrayList<>(Arrays.asList(navigateMaze, searchUnicornCage, useRailingOnBoulder))));
+		allSteps.add(new PanelDetails("Cold-blooded Killing", new ArrayList<>(Arrays.asList(searchUnicornCageAgain, walkToKnights, killJerro, killHarry, killCarl, useBadgeJerroOnWell, openIbansDoor))));
+		allSteps.add(new PanelDetails("The Witch Kardia", new ArrayList<>(Arrays.asList(talkToNiloof, pickUpWitchsCat, useCatOnDoor, searchWitchsChest))));
+		allSteps.add(new PanelDetails("Imbuing the Doll", new ArrayList<>(Arrays.asList(killHolthion, killDoomion, killOthanian, searchDoomionsChest, returnToDwarfs, useBucketOnBrew, useBrewOnTomb, useTinderboxOnTomb, killKalrag, searchCage))));
+		allSteps.add(new PanelDetails("Entering the Temple", new ArrayList<>(Arrays.asList(killDisciple, enterTemple, useDollOnWell))));
+		allSteps.add(new PanelDetails("Foggy Memories", new ArrayList<>(Arrays.asList(talkToKoftikAfterTemple, talkToKingLathasAfterTemple))));
+		return allSteps;
+	}
+
+	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
 		setupItemReqs();
@@ -724,68 +787,5 @@ public class UndergroundPass extends BasicQuestHelper
 			.put(9, goDestroyDoll)
 			.put(10, wrappingUp)
 			.build();
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(rope2);
-		reqs.add(bow);
-		reqs.add(arrows);
-		reqs.add(spade);
-		reqs.add(plank);
-		reqs.add(bucket);
-		reqs.add(tinderbox);
-		reqs.add(combatEquipment);
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(food);
-		reqs.add(staminaPotions);
-		reqs.add(coins);
-		reqs.add(agilityPotions);
-		reqs.add(telegrabRunes);
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("3 Demons (level 91, safespottable)");
-		reqs.add("3 Paladins (level 62, safespottable)");
-		reqs.add("Kalrag (level 89)");
-		reqs.add("Disciple of Iban (level 13)");
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<String> getNotes()
-	{
-		ArrayList<String> notes = new ArrayList<>();
-		notes.add("Kalrag attacks with melee only, so Protect From Melee can keep you safe in that fight.");
-		notes.add("Using the bow provided for combat can save inventory space.");
-		notes.add("Bring all items with you to start the quest, as leaving the dungeon will require you to restart from the beginning.");
-		return notes;
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting out", new ArrayList<>(Arrays.asList(talkToKingLathas, talkToKoftik))));
-		allSteps.add(new PanelDetails("The Underground Pass", new ArrayList<>(Arrays.asList(talkToKoftikAtBridge, shootBridgeRope, crossThePit, crossTheGrid, passTrap1, collectOrb1, collectOrb2, collectOrb3, collectOrb4, orbsToFurnace, climbDownWell))));
-		allSteps.add(new PanelDetails("Descending Deeper", new ArrayList<>(Arrays.asList(navigateMaze, searchUnicornCage, useRailingOnBoulder))));
-		allSteps.add(new PanelDetails("Cold-blooded Killing", new ArrayList<>(Arrays.asList(searchUnicornCageAgain, walkToKnights, killJerro, killHarry, killCarl, useBadgeJerroOnWell, openIbansDoor))));
-		allSteps.add(new PanelDetails("The Witch Kardia", new ArrayList<>(Arrays.asList(talkToNiloof, pickUpWitchsCat, useCatOnDoor, searchWitchsChest))));
-		allSteps.add(new PanelDetails("Imbuing the Doll", new ArrayList<>(Arrays.asList(killHolthion, killDoomion, killOthanian, searchDoomionsChest, returnToDwarfs, useBucketOnBrew, useBrewOnTomb, useTinderboxOnTomb, killKalrag, searchCage))));
-		allSteps.add(new PanelDetails("Entering the Temple", new ArrayList<>(Arrays.asList(killDisciple, enterTemple, useDollOnWell))));
-		allSteps.add(new PanelDetails("Foggy Memories", new ArrayList<>(Arrays.asList(talkToKoftikAfterTemple, talkToKingLathasAfterTemple))));
-		return allSteps;
 	}
 }

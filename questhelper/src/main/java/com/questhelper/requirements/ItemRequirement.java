@@ -43,24 +43,18 @@ public class ItemRequirement extends Requirement
 	private final int id;
 
 	private final String name;
-
+	private final List<Integer> alternates = new ArrayList<>();
 	@Setter
 	@Getter
 	private int quantity;
-
 	@Getter
 	private boolean equip;
-
 	@Setter
 	@Getter
 	private String tip;
-
 	@Getter
 	@Setter
 	private boolean highlightInInventory;
-
-	private final List<Integer> alternates = new ArrayList<>();
-
 	@Setter
 	private boolean exclusiveToOneItemType;
 
@@ -139,29 +133,6 @@ public class ItemRequirement extends Requirement
 		ArrayList<Integer> ids = new ArrayList<>(alternates);
 		ids.add(id);
 		return ids;
-	}
-
-	public ArrayList<LineComponent> getDisplayText(Client client)
-	{
-		ArrayList<LineComponent> lines = new ArrayList<>();
-
-		String text = "";
-		if (this.showQuantity())
-		{
-			text = this.getQuantity() + " x ";
-		}
-		text = text + this.getName();
-
-		Color color = getColor(client);
-
-		lines.add(LineComponent.builder()
-			.left(text)
-			.leftColor(color)
-			.build());
-
-		lines.addAll(getAdditionalText(client));
-
-		return lines;
 	}
 
 	protected Color getColor(Client client)
@@ -283,6 +254,29 @@ public class ItemRequirement extends Requirement
 	public boolean check(Client client)
 	{
 		return check(client, false);
+	}
+
+	public ArrayList<LineComponent> getDisplayText(Client client)
+	{
+		ArrayList<LineComponent> lines = new ArrayList<>();
+
+		String text = "";
+		if (this.showQuantity())
+		{
+			text = this.getQuantity() + " x ";
+		}
+		text = text + this.getName();
+
+		Color color = getColor(client);
+
+		lines.add(LineComponent.builder()
+			.left(text)
+			.leftColor(color)
+			.build());
+
+		lines.addAll(getAdditionalText(client));
+
+		return lines;
 	}
 
 	public boolean checkConsideringSlot(Client client)

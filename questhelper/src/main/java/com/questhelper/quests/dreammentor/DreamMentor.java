@@ -74,87 +74,6 @@ public class DreamMentor extends BasicQuestHelper
 
 	Zone lunarMine, cyrisusRoom, arena;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startQuest = new ConditionalStep(this, goDownToCyrisus);
-		startQuest.addStep(inCyrisusRoom, talkToCyrisus);
-		startQuest.addStep(inLunarMine, enterCyrisusCave);
-		steps.put(0, startQuest);
-		steps.put(2, startQuest);
-
-		ConditionalStep firstFeeding = new ConditionalStep(this, goDownToCyrisus);
-		firstFeeding.addStep(inCyrisusRoom, feed4Food);
-		firstFeeding.addStep(inLunarMine, enterCyrisusCave);
-		steps.put(4, firstFeeding);
-
-		ConditionalStep talkToCyrisusSteps = new ConditionalStep(this, goDownToCyrisus);
-		talkToCyrisusSteps.addStep(inCyrisusRoom, talkToCyrisus2);
-		talkToCyrisusSteps.addStep(inLunarMine, enterCyrisusCave);
-		steps.put(6, talkToCyrisusSteps);
-
-		ConditionalStep feedPhase2 = new ConditionalStep(this, goDownToCyrisus);
-		feedPhase2.addStep(new Conditions(inCyrisusRoom, at40Health), talkToCyrisus3);
-		feedPhase2.addStep(inCyrisusRoom, feed4Food2);
-		feedPhase2.addStep(inLunarMine, enterCyrisusCave);
-		steps.put(8, feedPhase2);
-		steps.put(10, feedPhase2);
-
-		ConditionalStep feedPhase3 = new ConditionalStep(this, goDownToCyrisus);
-		feedPhase3.addStep(new Conditions(inCyrisusRoom, at70Health), talkToCyrisus4);
-		feedPhase3.addStep(inCyrisusRoom, feed6Food);
-		feedPhase3.addStep(inLunarMine, enterCyrisusCave);
-		steps.put(12, feedPhase3);
-		steps.put(14, feedPhase3);
-
-		ConditionalStep goGetArmour = new ConditionalStep(this, talkToJack);
-		goGetArmour.addStep(new Conditions(inCyrisusRoom, cyrisusDressed, at100Health), supportCyrisusToRecovery);
-		goGetArmour.addStep(new Conditions(inLunarMine, cyrisusDressed, at100Health), enterCyrisusCaveAgain);
-		goGetArmour.addStep(new Conditions(cyrisusDressed, at100Health), goBackDownAfterGearing);
-
-		goGetArmour.addStep(new Conditions(inCyrisusRoom, cyrisusDressed), useFood3);
-		goGetArmour.addStep(new Conditions(inLunarMine, cyrisusDressed), enterCyrisusCaveAgain);
-		goGetArmour.addStep(new Conditions(cyrisusDressed), goBackDownAfterGearing);
-
-		goGetArmour.addStep(new Conditions(inCyrisusRoom, gotItems), giveCyrisusGear);
-		goGetArmour.addStep(new Conditions(inLunarMine, gotItems), enterCyrisusCaveAgain);
-		goGetArmour.addStep(gotItems, goBackDownToCyrisus);
-		goGetArmour.addStep(lookingAtBank, selectEquipment);
-		goGetArmour.addStep(inCyrisusRoom, leaveCave);
-		goGetArmour.addStep(inLunarMine, goUpToSurface);
-		steps.put(16, goGetArmour);
-
-		steps.put(18, talkAfterHelping);
-
-		steps.put(20, talkToOneiromancer);
-		steps.put(22, talkToOneiromancer);
-
-		ConditionalStep enterDream = new ConditionalStep(this, fillVialWithWater);
-		enterDream.addStep(new Conditions(inArena, illusiveNearby), killIllusive);
-		enterDream.addStep(new Conditions(inArena, untouchableNearby), killUntouchable);
-		enterDream.addStep(new Conditions(inArena, everlastingNearby), killEverlasting);
-		enterDream.addStep(new Conditions(inArena, inadaquacyNearby), killInadaquacy);
-		enterDream.addStep(inArena, killIllusive);
-		enterDream.addStep(new Conditions(litBrazier, new Conditions(LogicType.OR, hasDreamPotion, unlockedDream)), talkToCyrisusForDream);
-		enterDream.addStep(new Conditions(LogicType.OR, unlockedDream, hasDreamPotion), lightBrazier);
-		enterDream.addStep(new Conditions(hasVialGout, hasAstralPowder), useGroundAstralOnVial);
-		enterDream.addStep(new Conditions(hasVialGout, hasAstralShard), usePestleOnShards);
-		enterDream.addStep(hasVialGout, useHammerOnAstralRune);
-		enterDream.addStep(hasVialWater, addGoutweed);
-		steps.put(24, enterDream);
-
-		steps.put(26, returnToOneiromancer);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		sealOfPassage = new ItemRequirement("Seal of passage", ItemID.SEAL_OF_PASSAGE);
@@ -328,7 +247,6 @@ public class DreamMentor extends BasicQuestHelper
 		talkToOneiromancer = new NpcStep(this, NpcID.ONEIROMANCER, new WorldPoint(2151, 3867, 0), "Talk to the Oneiromancer in the south east of Lunar Isle.", sealOfPassage);
 		talkToOneiromancer.addDialogStep("Cyrisus.");
 
-		fillVialWithWater = new DetailedQuestStep(this, "Fill the vial with water.", dreamVial);
 		fillVialWithWater = new ObjectStep(this, ObjectID.SINK_16705, new WorldPoint(2091, 3922, 0), "Fill the vial with water.", dreamVial);
 		fillVialWithWater.addIcon(ItemID.DREAM_VIAL_EMPTY);
 
@@ -380,5 +298,86 @@ public class DreamMentor extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Defeating his fear", new ArrayList<>(Arrays.asList(talkToOneiromancer, fillVialWithWater, addGoutweed,
 			useHammerOnAstralRune, usePestleOnShards, useGroundAstralOnVial, lightBrazier, talkToCyrisusForDream, killInadaquacy, killEverlasting, killUntouchable, killIllusive, returnToOneiromancer)), goutweed, astralRune, hammer, pestleAndMortar, tinderbox, combatGear));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startQuest = new ConditionalStep(this, goDownToCyrisus);
+		startQuest.addStep(inCyrisusRoom, talkToCyrisus);
+		startQuest.addStep(inLunarMine, enterCyrisusCave);
+		steps.put(0, startQuest);
+		steps.put(2, startQuest);
+
+		ConditionalStep firstFeeding = new ConditionalStep(this, goDownToCyrisus);
+		firstFeeding.addStep(inCyrisusRoom, feed4Food);
+		firstFeeding.addStep(inLunarMine, enterCyrisusCave);
+		steps.put(4, firstFeeding);
+
+		ConditionalStep talkToCyrisusSteps = new ConditionalStep(this, goDownToCyrisus);
+		talkToCyrisusSteps.addStep(inCyrisusRoom, talkToCyrisus2);
+		talkToCyrisusSteps.addStep(inLunarMine, enterCyrisusCave);
+		steps.put(6, talkToCyrisusSteps);
+
+		ConditionalStep feedPhase2 = new ConditionalStep(this, goDownToCyrisus);
+		feedPhase2.addStep(new Conditions(inCyrisusRoom, at40Health), talkToCyrisus3);
+		feedPhase2.addStep(inCyrisusRoom, feed4Food2);
+		feedPhase2.addStep(inLunarMine, enterCyrisusCave);
+		steps.put(8, feedPhase2);
+		steps.put(10, feedPhase2);
+
+		ConditionalStep feedPhase3 = new ConditionalStep(this, goDownToCyrisus);
+		feedPhase3.addStep(new Conditions(inCyrisusRoom, at70Health), talkToCyrisus4);
+		feedPhase3.addStep(inCyrisusRoom, feed6Food);
+		feedPhase3.addStep(inLunarMine, enterCyrisusCave);
+		steps.put(12, feedPhase3);
+		steps.put(14, feedPhase3);
+
+		ConditionalStep goGetArmour = new ConditionalStep(this, talkToJack);
+		goGetArmour.addStep(new Conditions(inCyrisusRoom, cyrisusDressed, at100Health), supportCyrisusToRecovery);
+		goGetArmour.addStep(new Conditions(inLunarMine, cyrisusDressed, at100Health), enterCyrisusCaveAgain);
+		goGetArmour.addStep(new Conditions(cyrisusDressed, at100Health), goBackDownAfterGearing);
+
+		goGetArmour.addStep(new Conditions(inCyrisusRoom, cyrisusDressed), useFood3);
+		goGetArmour.addStep(new Conditions(inLunarMine, cyrisusDressed), enterCyrisusCaveAgain);
+		goGetArmour.addStep(new Conditions(cyrisusDressed), goBackDownAfterGearing);
+
+		goGetArmour.addStep(new Conditions(inCyrisusRoom, gotItems), giveCyrisusGear);
+		goGetArmour.addStep(new Conditions(inLunarMine, gotItems), enterCyrisusCaveAgain);
+		goGetArmour.addStep(gotItems, goBackDownToCyrisus);
+		goGetArmour.addStep(lookingAtBank, selectEquipment);
+		goGetArmour.addStep(inCyrisusRoom, leaveCave);
+		goGetArmour.addStep(inLunarMine, goUpToSurface);
+		steps.put(16, goGetArmour);
+
+		steps.put(18, talkAfterHelping);
+
+		steps.put(20, talkToOneiromancer);
+		steps.put(22, talkToOneiromancer);
+
+		ConditionalStep enterDream = new ConditionalStep(this, fillVialWithWater);
+		enterDream.addStep(new Conditions(inArena, illusiveNearby), killIllusive);
+		enterDream.addStep(new Conditions(inArena, untouchableNearby), killUntouchable);
+		enterDream.addStep(new Conditions(inArena, everlastingNearby), killEverlasting);
+		enterDream.addStep(new Conditions(inArena, inadaquacyNearby), killInadaquacy);
+		enterDream.addStep(inArena, killIllusive);
+		enterDream.addStep(new Conditions(litBrazier, new Conditions(LogicType.OR, hasDreamPotion, unlockedDream)), talkToCyrisusForDream);
+		enterDream.addStep(new Conditions(LogicType.OR, unlockedDream, hasDreamPotion), lightBrazier);
+		enterDream.addStep(new Conditions(hasVialGout, hasAstralPowder), useGroundAstralOnVial);
+		enterDream.addStep(new Conditions(hasVialGout, hasAstralShard), usePestleOnShards);
+		enterDream.addStep(hasVialGout, useHammerOnAstralRune);
+		enterDream.addStep(hasVialWater, addGoutweed);
+		steps.put(24, enterDream);
+
+		steps.put(26, returnToOneiromancer);
+
+		return steps;
 	}
 }

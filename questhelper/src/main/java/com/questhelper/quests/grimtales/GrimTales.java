@@ -76,94 +76,6 @@ public class GrimTales extends BasicQuestHelper
 
 	Zone house, basement, towerBase, towerUpstairs, mouseRoom1, mouseRoom2, mouseRoom3, mouseRoom4, mouseRoom5, mouseRoom6, wrongMouse1, wrongMouse2, cloud;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToSylas);
-		steps.put(1, talkToSylas);
-		steps.put(2, talkToSylas);
-		steps.put(3, talkToSylas);
-		steps.put(4, talkToSylas);
-
-		ConditionalStep getHelmet = new ConditionalStep(this, climbWall);
-		getHelmet.addStep(hasHelmet, giveHelmetToSylas);
-		getHelmet.addStep(releasedRupert, talkToRupertAfterAmulet);
-		getHelmet.addStep(new Conditions(givenPendant), talkMizAfterPendant);
-		getHelmet.addStep(new Conditions(hasMiazrqasPendant), givePendant);
-		getHelmet.addStep(new Conditions(inMouseRoom6), takePendant);
-		getHelmet.addStep(new Conditions(inMouseRoom5), climb5);
-		getHelmet.addStep(new Conditions(inMouseRoom4), climb4);
-		getHelmet.addStep(new Conditions(inMouseRoom3), climb3);
-		getHelmet.addStep(new Conditions(inMouseRoom2), climb2);
-		getHelmet.addStep(new Conditions(inMouseRoom1), climb1);
-		getHelmet.addStep(new Conditions(inWrongMouse2), leaveWrong2);
-		getHelmet.addStep(new Conditions(inWrongMouse1), leaveWrong1);
-		getHelmet.addStep(new Conditions(inHouse, hasShrinkPotion), drinkPotion);
-		getHelmet.addStep(new Conditions(inBasement, hasShrinkPotion), leaveBasement);
-		getHelmet.addStep(new Conditions(hasShrinkPotion), enterWitchsHouseWithPotion);
-		getHelmet.addStep(new Conditions(unlockedPiano), makePotions);
-		getHelmet.addStep(new Conditions(inBasement, unlockedPiano), searchPiano);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed8), lowerAAgain);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed7), lowerG);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed6), lowerE);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed5), lowerA);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed4), upperC);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed3), upperD);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed2), upperEAgain);
-
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed1), upperF);
-		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa), upperE);
-		getHelmet.addStep(new Conditions(inBasement, talkedToMiazrqa), playPiano);
-		getHelmet.addStep(new Conditions(inHouse, talkedToMiazrqa), enterWitchBasement);
-		getHelmet.addStep(new Conditions(talkedToMiazrqa), enterWitchsHouse);
-		getHelmet.addStep(new Conditions(inTowerUpstairs, talkedToRupert), climbDownBeard);
-		getHelmet.addStep(new Conditions(talkedToRupert), talkToMiazrqa);
-		getHelmet.addStep(new Conditions(inTowerUpstairs), talkToRupert);
-		getHelmet.addStep(new Conditions(inTowerBase, beardDropped), climbBeard);
-		getHelmet.addStep(new Conditions(talkedToDrainOnce, inTowerBase), talkToDrainPipeAgain);
-		getHelmet.addStep(new Conditions(inTowerBase), talkToDrainPipe);
-
-		ConditionalStep getFeatherAndHelmet = new ConditionalStep(this, talkToGrimgnash);
-		getFeatherAndHelmet.addStep(givenFeather, getHelmet);
-		getFeatherAndHelmet.addStep(hasFeather, returnFeatherToSylas);
-		getFeatherAndHelmet.addStep(grimgnashAsleep, stealFeather);
-
-		steps.put(10, getFeatherAndHelmet);
-
-		steps.put(12, talkToSylasAfterGivingItems);
-		steps.put(15, talkToSylasAfterGivingItems);
-		steps.put(16, talkToSylasAfterGivingItems);
-		steps.put(17, talkToSylasAfterGivingItems);
-		steps.put(19, talkToSylasAfterGivingItems);
-
-		ConditionalStep sortBean = new ConditionalStep(this, plantBean);
-		sortBean.addStep(plantedSeed, waterBean);
-
-		steps.put(20, sortBean);
-
-		ConditionalStep climbAndKillGlod = new ConditionalStep(this, climbBean);
-		climbAndKillGlod.addStep(hasGoblin, giveGoldenGoblinToSylas);
-		climbAndKillGlod.addStep(new Conditions(onCloud, killedGlod), pickUpGoldenGoblin);
-		climbAndKillGlod.addStep(killedGlod, climbBeanForStatue);
-		climbAndKillGlod.addStep(onCloud, killGlod);
-
-		steps.put(30, climbAndKillGlod);
-
-		ConditionalStep finish = new ConditionalStep(this, usePotionOnBean);
-		finish.addStep(usedPotion, chopBean);
-
-		steps.put(40, finish);
-
-		steps.put(50, talkToSylasFinish);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		tarrominUnf2 = new ItemRequirement("Tarromin potion (unf)", ItemID.TARROMIN_POTION_UNF, 2);
@@ -363,7 +275,6 @@ public class GrimTales extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(tarrominUnf2, dibber, can, axe, combatGear));
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -382,5 +293,93 @@ public class GrimTales extends BasicQuestHelper
 			enterWitchsHouse, enterWitchBasement, playPiano, searchPiano, makePotions, leaveBasement, drinkPotion, climb1, climb2, climb3, climb4, climb5, takePendant, givePendant, talkToRupertAfterAmulet)), tarrominUnf2));
 		allSteps.add(new PanelDetails("Golden goblin", new ArrayList<>(Arrays.asList(giveHelmetToSylas, plantBean, waterBean, climbBean, killGlod, pickUpGoldenGoblin, giveGoldenGoblinToSylas, usePotionOnBean, chopBean, talkToSylasFinish)), combatGear, dibber, can, axe, shrinkPotion));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToSylas);
+		steps.put(1, talkToSylas);
+		steps.put(2, talkToSylas);
+		steps.put(3, talkToSylas);
+		steps.put(4, talkToSylas);
+
+		ConditionalStep getHelmet = new ConditionalStep(this, climbWall);
+		getHelmet.addStep(hasHelmet, giveHelmetToSylas);
+		getHelmet.addStep(releasedRupert, talkToRupertAfterAmulet);
+		getHelmet.addStep(new Conditions(givenPendant), talkMizAfterPendant);
+		getHelmet.addStep(new Conditions(hasMiazrqasPendant), givePendant);
+		getHelmet.addStep(new Conditions(inMouseRoom6), takePendant);
+		getHelmet.addStep(new Conditions(inMouseRoom5), climb5);
+		getHelmet.addStep(new Conditions(inMouseRoom4), climb4);
+		getHelmet.addStep(new Conditions(inMouseRoom3), climb3);
+		getHelmet.addStep(new Conditions(inMouseRoom2), climb2);
+		getHelmet.addStep(new Conditions(inMouseRoom1), climb1);
+		getHelmet.addStep(new Conditions(inWrongMouse2), leaveWrong2);
+		getHelmet.addStep(new Conditions(inWrongMouse1), leaveWrong1);
+		getHelmet.addStep(new Conditions(inHouse, hasShrinkPotion), drinkPotion);
+		getHelmet.addStep(new Conditions(inBasement, hasShrinkPotion), leaveBasement);
+		getHelmet.addStep(new Conditions(hasShrinkPotion), enterWitchsHouseWithPotion);
+		getHelmet.addStep(new Conditions(unlockedPiano), makePotions);
+		getHelmet.addStep(new Conditions(inBasement, unlockedPiano), searchPiano);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed8), lowerAAgain);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed7), lowerG);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed6), lowerE);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed5), lowerA);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed4), upperC);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed3), upperD);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed2), upperEAgain);
+
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa, pressed1), upperF);
+		getHelmet.addStep(new Conditions(inPianoWidget, talkedToMiazrqa), upperE);
+		getHelmet.addStep(new Conditions(inBasement, talkedToMiazrqa), playPiano);
+		getHelmet.addStep(new Conditions(inHouse, talkedToMiazrqa), enterWitchBasement);
+		getHelmet.addStep(new Conditions(talkedToMiazrqa), enterWitchsHouse);
+		getHelmet.addStep(new Conditions(inTowerUpstairs, talkedToRupert), climbDownBeard);
+		getHelmet.addStep(new Conditions(talkedToRupert), talkToMiazrqa);
+		getHelmet.addStep(new Conditions(inTowerUpstairs), talkToRupert);
+		getHelmet.addStep(new Conditions(inTowerBase, beardDropped), climbBeard);
+		getHelmet.addStep(new Conditions(talkedToDrainOnce, inTowerBase), talkToDrainPipeAgain);
+		getHelmet.addStep(new Conditions(inTowerBase), talkToDrainPipe);
+
+		ConditionalStep getFeatherAndHelmet = new ConditionalStep(this, talkToGrimgnash);
+		getFeatherAndHelmet.addStep(givenFeather, getHelmet);
+		getFeatherAndHelmet.addStep(hasFeather, returnFeatherToSylas);
+		getFeatherAndHelmet.addStep(grimgnashAsleep, stealFeather);
+
+		steps.put(10, getFeatherAndHelmet);
+
+		steps.put(12, talkToSylasAfterGivingItems);
+		steps.put(15, talkToSylasAfterGivingItems);
+		steps.put(16, talkToSylasAfterGivingItems);
+		steps.put(17, talkToSylasAfterGivingItems);
+		steps.put(19, talkToSylasAfterGivingItems);
+
+		ConditionalStep sortBean = new ConditionalStep(this, plantBean);
+		sortBean.addStep(plantedSeed, waterBean);
+
+		steps.put(20, sortBean);
+
+		ConditionalStep climbAndKillGlod = new ConditionalStep(this, climbBean);
+		climbAndKillGlod.addStep(hasGoblin, giveGoldenGoblinToSylas);
+		climbAndKillGlod.addStep(new Conditions(onCloud, killedGlod), pickUpGoldenGoblin);
+		climbAndKillGlod.addStep(killedGlod, climbBeanForStatue);
+		climbAndKillGlod.addStep(onCloud, killGlod);
+
+		steps.put(30, climbAndKillGlod);
+
+		ConditionalStep finish = new ConditionalStep(this, usePotionOnBean);
+		finish.addStep(usedPotion, chopBean);
+
+		steps.put(40, finish);
+
+		steps.put(50, talkToSylasFinish);
+		return steps;
 	}
 }

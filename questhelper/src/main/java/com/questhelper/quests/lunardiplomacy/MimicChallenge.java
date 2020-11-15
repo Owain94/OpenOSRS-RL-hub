@@ -33,12 +33,9 @@ import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.emote.QuestEmote;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.inject.Inject;
-import net.runelite.api.Client;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class MimicChallenge extends DetailedOwnerStep
@@ -48,23 +45,6 @@ public class MimicChallenge extends DetailedOwnerStep
 	public MimicChallenge(QuestHelper questHelper)
 	{
 		super(questHelper, "Copy the emotes that the NPC does.");
-	}
-
-	public void setupSteps()
-	{
-		cry = new EmoteStep(getQuestHelper(), QuestEmote.CRY, new WorldPoint(1769, 5058, 2), "Perform the cry emote.");
-		bow = new EmoteStep(getQuestHelper(), QuestEmote.BOW, new WorldPoint(1770, 5063, 2), "Perform the bow emote.");
-		dance = new EmoteStep(getQuestHelper(), QuestEmote.DANCE, new WorldPoint(1772, 5070, 2), "Perform the dance emote.");
-		wave = new EmoteStep(getQuestHelper(), QuestEmote.WAVE, new WorldPoint(1767, 5061, 2), "Perform the wave emote.");
-		think = new EmoteStep(getQuestHelper(), QuestEmote.THINK, new WorldPoint(1772, 5070, 2), "Perform the think emote.");
-		talk = new NpcStep(getQuestHelper(), NpcID.ETHEREAL_MIMIC, "Talk to the Ethereal Mimic.");
-		talk.addDialogStep("Suppose I may as well have a go.");
-	}
-
-
-	public void subscribe()
-	{
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Subscribe
@@ -107,6 +87,23 @@ public class MimicChallenge extends DetailedOwnerStep
 		}
 	}
 
+	public void setupSteps()
+	{
+		cry = new EmoteStep(getQuestHelper(), QuestEmote.CRY, new WorldPoint(1769, 5058, 2), "Perform the cry emote.");
+		bow = new EmoteStep(getQuestHelper(), QuestEmote.BOW, new WorldPoint(1770, 5063, 2), "Perform the bow emote.");
+		dance = new EmoteStep(getQuestHelper(), QuestEmote.DANCE, new WorldPoint(1772, 5070, 2), "Perform the dance emote.");
+		wave = new EmoteStep(getQuestHelper(), QuestEmote.WAVE, new WorldPoint(1767, 5061, 2), "Perform the wave emote.");
+		think = new EmoteStep(getQuestHelper(), QuestEmote.THINK, new WorldPoint(1772, 5070, 2), "Perform the think emote.");
+		talk = new NpcStep(getQuestHelper(), NpcID.ETHEREAL_MIMIC, "Talk to the Ethereal Mimic.");
+		talk.addDialogStep("Suppose I may as well have a go.");
+	}
+
+	@Override
+	public Collection<QuestStep> getSteps()
+	{
+		return Arrays.asList(talk, cry, bow, dance, think, wave);
+	}
+
 	public void chooseStepBasedOnIfTalked(QuestStep emoteStep)
 	{
 		if (client.getVarbitValue(2419) == 1)
@@ -117,12 +114,6 @@ public class MimicChallenge extends DetailedOwnerStep
 		{
 			startUpStep(talk);
 		}
-	}
-
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(talk, cry, bow, dance, think, wave);
 	}
 
 	public Collection<QuestStep> getDisplaySteps()

@@ -58,38 +58,6 @@ public class RuneMysteries extends BasicQuestHelper
 
 	Zone wizardBasement, upstairsLumbridge;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goTalkToHoracio = new ConditionalStep(this, goUpToHoracio);
-		goTalkToHoracio.addStep(inUpstairsLumbridge, talkToHoracio);
-
-		steps.put(0, goTalkToHoracio);
-
-		ConditionalStep goTalkToSedridor = new ConditionalStep(this, goDownToSedridor);
-		goTalkToSedridor.addStep(inWizardBasement, talkToSedridor);
-
-		steps.put(1, goTalkToSedridor);
-
-		steps.put(2, finishTalkingToSedridor);
-
-		steps.put(3, talkToAubury);
-
-		steps.put(4, talkToAudburyAgain);
-
-		ConditionalStep goTalkToSedridor2 = new ConditionalStep(this, goDownToSedridor2);
-		goTalkToSedridor2.addStep(inWizardBasement, talkToSedridor2);
-		steps.put(5, goTalkToSedridor2);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		airTalisman = new ItemRequirement("Air talisman", ItemID.AIR_TALISMAN);
@@ -159,5 +127,37 @@ public class RuneMysteries extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Discover Runecrafting", new ArrayList<>(Arrays.asList(talkToHoracio, talkToSedridor, talkToAubury, talkToAudburyAgain, talkToSedridor2))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goTalkToHoracio = new ConditionalStep(this, goUpToHoracio);
+		goTalkToHoracio.addStep(inUpstairsLumbridge, talkToHoracio);
+
+		steps.put(0, goTalkToHoracio);
+
+		ConditionalStep goTalkToSedridor = new ConditionalStep(this, goDownToSedridor);
+		goTalkToSedridor.addStep(inWizardBasement, talkToSedridor);
+
+		steps.put(1, goTalkToSedridor);
+
+		steps.put(2, finishTalkingToSedridor);
+
+		steps.put(3, talkToAubury);
+
+		steps.put(4, talkToAudburyAgain);
+
+		ConditionalStep goTalkToSedridor2 = new ConditionalStep(this, goDownToSedridor2);
+		goTalkToSedridor2.addStep(inWizardBasement, talkToSedridor2);
+		steps.put(5, goTalkToSedridor2);
+
+		return steps;
 	}
 }

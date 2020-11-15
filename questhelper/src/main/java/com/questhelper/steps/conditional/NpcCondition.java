@@ -8,9 +8,9 @@ import net.runelite.api.coords.WorldPoint;
 public class NpcCondition extends ConditionForStep
 {
 	private final int npcID;
+	private final Zone zone;
 	private NPC npc;
 	private boolean npcInScene = false;
-	private final Zone zone;
 
 	public NpcCondition(int npcID)
 	{
@@ -28,19 +28,6 @@ public class NpcCondition extends ConditionForStep
 	{
 		this.npcID = npcID;
 		this.zone = zone;
-	}
-
-	@Override
-	public void initialize(Client client)
-	{
-		for (NPC npc : client.getNpcs())
-		{
-			if (npcID == npc.getId())
-			{
-				this.npc = npc;
-				npcInScene = true;
-			}
-		}
 	}
 
 	public boolean checkCondition(Client client)
@@ -63,6 +50,25 @@ public class NpcCondition extends ConditionForStep
 		}
 	}
 
+	@Override
+	public void initialize(Client client)
+	{
+		for (NPC npc : client.getNpcs())
+		{
+			if (npcID == npc.getId())
+			{
+				this.npc = npc;
+				npcInScene = true;
+			}
+		}
+	}
+
+	@Override
+	public void loadingHandler()
+	{
+		npcInScene = false;
+	}
+
 	public void checkNpcSpawned(NPC npc)
 	{
 		if (npc.getId() == this.npcID)
@@ -79,11 +85,5 @@ public class NpcCondition extends ConditionForStep
 			npc = null;
 			npcInScene = false;
 		}
-	}
-
-	@Override
-	public void loadingHandler()
-	{
-		npcInScene = false;
 	}
 }

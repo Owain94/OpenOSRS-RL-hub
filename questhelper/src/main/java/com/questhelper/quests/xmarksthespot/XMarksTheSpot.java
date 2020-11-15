@@ -49,26 +49,6 @@ public class XMarksTheSpot extends BasicQuestHelper
 
 	QuestStep speakVeosLumbridge, digOutsideBob, digCastle, digDraynor, digMartin, speakVeosSarim, speakVeosSarimWithoutCasket;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupRequirements();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, speakVeosLumbridge);
-		steps.put(1, steps.get(0));
-		steps.put(2, digOutsideBob);
-		steps.put(3, digCastle);
-		steps.put(4, digDraynor);
-		steps.put(5, digMartin);
-		steps.put(6, speakVeosSarim);
-		steps.put(7, speakVeosSarimWithoutCasket);
-
-		return steps;
-	}
-
 	private void setupRequirements()
 	{
 		spade = new ItemRequirement("Spade", ItemID.SPADE);
@@ -124,5 +104,25 @@ public class XMarksTheSpot extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Solve the clue scroll", new ArrayList<>(Arrays.asList(digOutsideBob, digCastle, digDraynor, digMartin))));
 		allSteps.add(new PanelDetails("Bring the casket to Veos", new ArrayList<>(Arrays.asList(speakVeosSarim))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupRequirements();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, speakVeosLumbridge);
+		steps.put(1, steps.get(0));
+		steps.put(2, digOutsideBob);
+		steps.put(3, digCastle);
+		steps.put(4, digDraynor);
+		steps.put(5, digMartin);
+		steps.put(6, speakVeosSarim);
+		steps.put(7, speakVeosSarimWithoutCasket);
+
+		return steps;
 	}
 }

@@ -68,94 +68,6 @@ public class TheEyesOfGlouphrie extends BasicQuestHelper
 
 	Zone cave, hazelmereHut, floor1, floor2, floor3;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startQuest = new ConditionalStep(this, enterCave);
-		startQuest.addStep(inCave, talkToBrimstail);
-
-		steps.put(0, startQuest);
-
-		ConditionalStep inspectDevices = new ConditionalStep(this, enterCave);
-		inspectDevices.addStep(new Conditions(inCave, inspectedBowl), inspectMachine);
-		inspectDevices.addStep(inCave, inspectBowl);
-
-		steps.put(1, inspectDevices);
-
-		ConditionalStep talkAfterInspect = new ConditionalStep(this, enterCave);
-		talkAfterInspect.addStep(inCave, talkToBrimstailAgain);
-
-		steps.put(2, talkAfterInspect);
-
-		ConditionalStep goTalkToHazelmere = new ConditionalStep(this, goUpToHazelmere);
-		goTalkToHazelmere.addStep(inHazelmereHut, talkToHazelmere);
-
-		steps.put(5, goTalkToHazelmere);
-		steps.put(9, goTalkToHazelmere);
-		steps.put(10, goTalkToHazelmere);
-		steps.put(11, goTalkToHazelmere);
-		steps.put(12, goTalkToHazelmere);
-		ConditionalStep talkToBrimAfterHazel = new ConditionalStep(this, enterCaveAgain);
-		talkToBrimAfterHazel.addStep(inCave, talkToBrimstailAfterHazelmere);
-
-		steps.put(15, talkToBrimAfterHazel);
-
-		ConditionalStep fixMachine = new ConditionalStep(this, grindMudRunes);
-		fixMachine.addStep(new Conditions(hasMagicGlue, inCave), repairMachine);
-		fixMachine.addStep(hasMagicGlue, enterCaveAgain);
-		fixMachine.addStep(hasGroundMud, useMudOnSap);
-
-		steps.put(20, fixMachine);
-		steps.put(21, fixMachine);
-		steps.put(22, fixMachine);
-		steps.put(23, fixMachine);
-
-		ConditionalStep brimstailAfterFixing = new ConditionalStep(this, enterCave);
-		brimstailAfterFixing.addStep(inCave, talkToBrimstailAfterRepairing);
-
-		steps.put(25, brimstailAfterFixing);
-
-		ConditionalStep getMoreTokens = new ConditionalStep(this, enterCave);
-		getMoreTokens.addStep(inCave, unlockMachine);
-
-		steps.put(27, getMoreTokens);
-		steps.put(30, getMoreTokens);
-
-		ConditionalStep goOperateMachine = new ConditionalStep(this, enterCave);
-		goOperateMachine.addStep(inCave, operateMachine);
-
-		steps.put(35, goOperateMachine);
-
-		ConditionalStep prepareToKill = new ConditionalStep(this, enterCave);
-		prepareToKill.addStep(inCave, talkToBrimstailAfterIllusion);
-
-		steps.put(36, prepareToKill);
-
-		ConditionalStep killThemAll = new ConditionalStep(this, enterCave);
-		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, killedCreature3), killCreature2);
-		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, inFloor3), killCreature3);
-		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, inFloor2), climbUpToF3Tree);
-		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, inFloor1), climbUpToF2Tree);
-		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4), climbUpToF1Tree);
-		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6), killCreature4);
-		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5), killCreature6);
-		killThemAll.addStep(killedCreature1, killCreature5);
-		killThemAll.addStep(inCave, killCreature1);
-
-		steps.put(40, killThemAll);
-
-		steps.put(50, talkToNarnode);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		bucketOfSap = new ItemRequirement("Bucket of sap", ItemID.BUCKET_OF_SAP);
@@ -280,5 +192,93 @@ public class TheEyesOfGlouphrie extends BasicQuestHelper
 
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startQuest = new ConditionalStep(this, enterCave);
+		startQuest.addStep(inCave, talkToBrimstail);
+
+		steps.put(0, startQuest);
+
+		ConditionalStep inspectDevices = new ConditionalStep(this, enterCave);
+		inspectDevices.addStep(new Conditions(inCave, inspectedBowl), inspectMachine);
+		inspectDevices.addStep(inCave, inspectBowl);
+
+		steps.put(1, inspectDevices);
+
+		ConditionalStep talkAfterInspect = new ConditionalStep(this, enterCave);
+		talkAfterInspect.addStep(inCave, talkToBrimstailAgain);
+
+		steps.put(2, talkAfterInspect);
+
+		ConditionalStep goTalkToHazelmere = new ConditionalStep(this, goUpToHazelmere);
+		goTalkToHazelmere.addStep(inHazelmereHut, talkToHazelmere);
+
+		steps.put(5, goTalkToHazelmere);
+		steps.put(9, goTalkToHazelmere);
+		steps.put(10, goTalkToHazelmere);
+		steps.put(11, goTalkToHazelmere);
+		steps.put(12, goTalkToHazelmere);
+		ConditionalStep talkToBrimAfterHazel = new ConditionalStep(this, enterCaveAgain);
+		talkToBrimAfterHazel.addStep(inCave, talkToBrimstailAfterHazelmere);
+
+		steps.put(15, talkToBrimAfterHazel);
+
+		ConditionalStep fixMachine = new ConditionalStep(this, grindMudRunes);
+		fixMachine.addStep(new Conditions(hasMagicGlue, inCave), repairMachine);
+		fixMachine.addStep(hasMagicGlue, enterCaveAgain);
+		fixMachine.addStep(hasGroundMud, useMudOnSap);
+
+		steps.put(20, fixMachine);
+		steps.put(21, fixMachine);
+		steps.put(22, fixMachine);
+		steps.put(23, fixMachine);
+
+		ConditionalStep brimstailAfterFixing = new ConditionalStep(this, enterCave);
+		brimstailAfterFixing.addStep(inCave, talkToBrimstailAfterRepairing);
+
+		steps.put(25, brimstailAfterFixing);
+
+		ConditionalStep getMoreTokens = new ConditionalStep(this, enterCave);
+		getMoreTokens.addStep(inCave, unlockMachine);
+
+		steps.put(27, getMoreTokens);
+		steps.put(30, getMoreTokens);
+
+		ConditionalStep goOperateMachine = new ConditionalStep(this, enterCave);
+		goOperateMachine.addStep(inCave, operateMachine);
+
+		steps.put(35, goOperateMachine);
+
+		ConditionalStep prepareToKill = new ConditionalStep(this, enterCave);
+		prepareToKill.addStep(inCave, talkToBrimstailAfterIllusion);
+
+		steps.put(36, prepareToKill);
+
+		ConditionalStep killThemAll = new ConditionalStep(this, enterCave);
+		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, killedCreature3), killCreature2);
+		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, inFloor3), killCreature3);
+		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, inFloor2), climbUpToF3Tree);
+		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4, inFloor1), climbUpToF2Tree);
+		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6, killedCreature4), climbUpToF1Tree);
+		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5, killedCreature6), killCreature4);
+		killThemAll.addStep(new Conditions(killedCreature1, killedCreature5), killCreature6);
+		killThemAll.addStep(killedCreature1, killCreature5);
+		killThemAll.addStep(inCave, killCreature1);
+
+		steps.put(40, killThemAll);
+
+		steps.put(50, talkToNarnode);
+
+		return steps;
 	}
 }

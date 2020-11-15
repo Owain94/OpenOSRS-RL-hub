@@ -50,7 +50,6 @@ import net.runelite.api.SpriteID;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -59,63 +58,44 @@ import net.runelite.client.util.ImageUtil;
 
 public abstract class QuestStep implements Module
 {
+	@Getter
+	protected final QuestHelper questHelper;
+	@Getter
+	private final ArrayList<QuestStep> substeps = new ArrayList<>();
 	@Inject
-	public Client client;
-
-	@Inject
-	private ClientThread clientThread;
-
-	@Inject
-	private EventBus eventBus;
-
-	@Inject
-	SpriteManager spriteManager;
-
+	protected Client client;
 	@Getter
 	protected ArrayList<String> text;
 
 	protected int ARROW_SHIFT_X = 8;
 	protected int ARROW_SHIFT_Y = 20;
-
+	protected boolean inCutscene;
+	@Setter
+	protected boolean allowInCutscene = false;
+	protected int iconItemID = -1;
+	protected BufferedImage icon;
+	@Getter
+	protected DialogChoiceSteps choices = new DialogChoiceSteps();
+	@Getter
+	protected WidgetChoiceSteps widgetChoices = new WidgetChoiceSteps();
+	@Inject
+	SpriteManager spriteManager;
+	@Inject
+	private ClientThread clientThread;
 	/* Locking applies to ConditionalSteps. Intended to be used as a method of forcing a step to run if it's been locked */
 	private boolean locked;
-
 	@Getter
 	@Setter
 	private boolean isLockable;
-
 	@Getter
 	@Setter
 	private boolean blocker;
-
 	@Getter
 	private boolean unlockable = true;
-
 	@Getter
 	@Setter
 	private ConditionForStep lockingCondition;
-
 	private int currentCutsceneStatus = 0;
-	protected boolean inCutscene;
-
-	@Setter
-	protected boolean allowInCutscene = false;
-
-	protected int iconItemID = -1;
-	protected BufferedImage icon;
-
-	@Getter
-	protected final QuestHelper questHelper;
-
-	@Getter
-	protected DialogChoiceSteps choices = new DialogChoiceSteps();
-
-	@Getter
-	protected WidgetChoiceSteps widgetChoices = new WidgetChoiceSteps();
-
-	@Getter
-	private final ArrayList<QuestStep> substeps = new ArrayList<>();
-
 	@Getter
 	@Setter
 	private boolean showInSidebar = true;
@@ -137,12 +117,6 @@ public abstract class QuestStep implements Module
 		this.questHelper = questHelper;
 	}
 
-	public void subscribe()
-	{
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
-		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
-	}
-
 	@Override
 	public void configure(Binder binder)
 	{
@@ -152,7 +126,6 @@ public abstract class QuestStep implements Module
 	{
 		clientThread.invokeLater(this::highlightChoice);
 		clientThread.invokeLater(this::highlightWidgetChoice);
-		subscribe();
 	}
 
 	public void shutDown()

@@ -94,6 +94,12 @@ public class ObjectCondition extends ConditionForStep
 		return false;
 	}
 
+	@Override
+	public void loadingHandler()
+	{
+		// Once this has checks done in ConditionalStep, this will need to set the boolean condition to false
+	}
+
 	private boolean checkTile(Tile tile)
 	{
 		if (tile == null)
@@ -122,11 +128,5 @@ public class ObjectCondition extends ConditionForStep
 	private boolean checkForObjects(TileObject object)
 	{
 		return object != null && object.getId() == objectID;
-	}
-
-	@Override
-	public void loadingHandler()
-	{
-		// Once this has checks done in ConditionalStep, this will need to set the boolean condition to false
 	}
 }

@@ -73,70 +73,6 @@ public class TheSlugMenace extends BasicQuestHelper
 
 	Zone hobgoblinDungeon, seaSlugDungeon, platform;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToTiffy);
-		steps.put(1, talkToNiall);
-
-		ConditionalStep talkToThreePeople = new ConditionalStep(this, talkToMaledict);
-		talkToThreePeople.addStep(talkedToAllImportantPeople, talkToNiall2);
-		talkToThreePeople.addStep(new Conditions(talkedToMaledict, talkedToHobb), talkToHolgart);
-		talkToThreePeople.addStep(talkedToMaledict, talkToHobb);
-
-		steps.put(2, talkToThreePeople);
-
-		ConditionalStep goToDungeon = new ConditionalStep(this, enterDungeon);
-		goToDungeon.addStep(inSeaSlugDungeon, tryToOpenImposingDoor);
-		goToDungeon.addStep(new Conditions(inHobgoblinDungeon, openedWall), enterWall);
-		goToDungeon.addStep(inHobgoblinDungeon, pushFalseWall);
-
-		steps.put(3, goToDungeon);
-
-		ConditionalStep getSlugAndTalkJorral = new ConditionalStep(this, pickUpDeadSlug);
-		getSlugAndTalkJorral.addStep(new Conditions(LogicType.OR, hasDeadSlug, pickedUpSlug), talkToJorral);
-
-		steps.put(4, getSlugAndTalkJorral);
-
-		steps.put(5, talkToNiall3);
-		steps.put(6, talkToNiall3);
-		steps.put(7, talkToMaledict2);
-		steps.put(8, talkToMaledict3);
-
-		ConditionalStep findPages = new ConditionalStep(this, searchMayorsDesk);
-		findPages.addStep(receivedFragments, useSwampPasteOnFragments);
-		findPages.addStep(new Conditions(hasPage1, hasPage2), talkToNiall4);
-		findPages.addStep(hasPage1, talkToLovecraft);
-
-		steps.put(9, findPages);
-
-		ConditionalStep goMakePaste = new ConditionalStep(this, talkToJeb);
-		goMakePaste.addStep(onPlatform, talkToBailey);
-
-		steps.put(10, goMakePaste);
-
-		ConditionalStep glueTogether = new ConditionalStep(this, useGlueOnFragment);
-		glueTogether.addStep(new Conditions(inSeaSlugDungeon, usedAllRunes), killSlugPrince);
-		glueTogether.addStep(new Conditions(hasAllRunes, inSeaSlugDungeon), useEmptyRunesOnDoor);
-		glueTogether.addStep(new Conditions(hasAllRunes, inHobgoblinDungeon), enterWallAgain);
-		glueTogether.addStep(usedAllRunes, enterDungeonAgainUsedRunes);
-		glueTogether.addStep(hasAllRunes, enterDungeonAgain);
-		glueTogether.addStep(repairedPage, useEmptyRunes);
-		glueTogether.addStep(puzzleUp, solvePuzzle);
-
-		steps.put(11, glueTogether);
-
-		steps.put(12, reportBackToTiffy);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		commorb = new ItemRequirement("Commorb (can get another from Sir Tiffy)", ItemID.COMMORB);
@@ -343,5 +279,69 @@ public class TheSlugMenace extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Uncovering the truth", new ArrayList<>(Arrays.asList(talkToJorral, talkToNiall3, talkToMaledict2, searchMayorsDesk, talkToLovecraft, talkToNiall4, useSwampPasteOnFragments, talkToJeb, talkToBailey, useGlueOnFragment, solvePuzzle, useEmptyRunes)), commorb2, deadSeaSlug, swampPaste, chisel, essence5, accessToAltars));
 		allSteps.add(new PanelDetails("Facing the prince", new ArrayList<>(Arrays.asList(enterDungeonAgain, enterWallAgain, useEmptyRunesOnDoor, killSlugPrince, reportBackToTiffy)), meleeGear, airRune, waterRune, earthRune, fireRune, mindRune));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToTiffy);
+		steps.put(1, talkToNiall);
+
+		ConditionalStep talkToThreePeople = new ConditionalStep(this, talkToMaledict);
+		talkToThreePeople.addStep(talkedToAllImportantPeople, talkToNiall2);
+		talkToThreePeople.addStep(new Conditions(talkedToMaledict, talkedToHobb), talkToHolgart);
+		talkToThreePeople.addStep(talkedToMaledict, talkToHobb);
+
+		steps.put(2, talkToThreePeople);
+
+		ConditionalStep goToDungeon = new ConditionalStep(this, enterDungeon);
+		goToDungeon.addStep(inSeaSlugDungeon, tryToOpenImposingDoor);
+		goToDungeon.addStep(new Conditions(inHobgoblinDungeon, openedWall), enterWall);
+		goToDungeon.addStep(inHobgoblinDungeon, pushFalseWall);
+
+		steps.put(3, goToDungeon);
+
+		ConditionalStep getSlugAndTalkJorral = new ConditionalStep(this, pickUpDeadSlug);
+		getSlugAndTalkJorral.addStep(new Conditions(LogicType.OR, hasDeadSlug, pickedUpSlug), talkToJorral);
+
+		steps.put(4, getSlugAndTalkJorral);
+
+		steps.put(5, talkToNiall3);
+		steps.put(6, talkToNiall3);
+		steps.put(7, talkToMaledict2);
+		steps.put(8, talkToMaledict3);
+
+		ConditionalStep findPages = new ConditionalStep(this, searchMayorsDesk);
+		findPages.addStep(receivedFragments, useSwampPasteOnFragments);
+		findPages.addStep(new Conditions(hasPage1, hasPage2), talkToNiall4);
+		findPages.addStep(hasPage1, talkToLovecraft);
+
+		steps.put(9, findPages);
+
+		ConditionalStep goMakePaste = new ConditionalStep(this, talkToJeb);
+		goMakePaste.addStep(onPlatform, talkToBailey);
+
+		steps.put(10, goMakePaste);
+
+		ConditionalStep glueTogether = new ConditionalStep(this, useGlueOnFragment);
+		glueTogether.addStep(new Conditions(inSeaSlugDungeon, usedAllRunes), killSlugPrince);
+		glueTogether.addStep(new Conditions(hasAllRunes, inSeaSlugDungeon), useEmptyRunesOnDoor);
+		glueTogether.addStep(new Conditions(hasAllRunes, inHobgoblinDungeon), enterWallAgain);
+		glueTogether.addStep(usedAllRunes, enterDungeonAgainUsedRunes);
+		glueTogether.addStep(hasAllRunes, enterDungeonAgain);
+		glueTogether.addStep(repairedPage, useEmptyRunes);
+		glueTogether.addStep(puzzleUp, solvePuzzle);
+
+		steps.put(11, glueTogether);
+
+		steps.put(12, reportBackToTiffy);
+
+		return steps;
 	}
 }

@@ -68,63 +68,6 @@ public class ATailOfTwoCats extends BasicQuestHelper
 	QuestStep talkToUnferth, talkToHild, findBob, talkToBob, talkToGertrude, talkToReldo, findBobAgain, talkToBobAgain, talkToSphinx, useRake, plantSeeds, makeBed, useLogsOnFireplace, lightLogs,
 		useChocolateCakeOnTable, useMilkOnTable, useShearsOnUnferth, reportToUnferth, talkToApoth, talkToUnferthAsDoctor, findBobToFinish, talkToBobToFinish, talkToUnferthToFinish, waitForPotatoesToGrow;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToUnferth);
-
-		steps.put(5, talkToHild);
-		steps.put(10, talkToHild);
-
-		ConditionalStep findbob1 = new ConditionalStep(this, findBob);
-		findbob1.addStep(bobNearby, talkToBob);
-
-		steps.put(15, findbob1);
-
-		steps.put(20, talkToGertrude);
-
-		steps.put(25, talkToReldo);
-		steps.put(28, talkToReldo);
-
-		ConditionalStep findbob2 = new ConditionalStep(this, findBobAgain);
-		findbob2.addStep(bobNearby, talkToBobAgain);
-
-		steps.put(30, findbob2);
-
-		steps.put(35, talkToSphinx);
-
-		ConditionalStep doChores = new ConditionalStep(this, useRake);
-		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs, placedMilk, usedShears), waitForPotatoesToGrow);
-		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs, placedMilk), useShearsOnUnferth);
-		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs, placedCake), useMilkOnTable);
-		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs), useChocolateCakeOnTable);
-		doChores.addStep(new Conditions(plantedSeed, madeBed, placedLogs), lightLogs);
-		doChores.addStep(new Conditions(plantedSeed, madeBed), useLogsOnFireplace);
-		doChores.addStep(plantedSeed, makeBed);
-		doChores.addStep(rakedPatch, plantSeeds);
-
-		steps.put(40, doChores);
-
-		steps.put(45, reportToUnferth);
-
-		steps.put(50, talkToApoth);
-
-		steps.put(55, talkToUnferthAsDoctor);
-
-		ConditionalStep findbob3 = new ConditionalStep(this, findBobToFinish);
-		findbob3.addStep(bobNearby, talkToBobToFinish);
-		steps.put(60, findbob3);
-
-		steps.put(65, talkToUnferthToFinish);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		catspeak = new ItemRequirement("Catspeak amulet", ItemID.CATSPEAK_AMULET);
@@ -241,5 +184,62 @@ public class ATailOfTwoCats extends BasicQuestHelper
 		allSteps.add(new PanelDetails("'Curing' Unferth", new ArrayList<>(Arrays.asList(talkToApoth, talkToUnferthAsDoctor, findBobToFinish, talkToBobToFinish, talkToUnferthToFinish)), catItem, catspeakE, vialOfWater));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToUnferth);
+
+		steps.put(5, talkToHild);
+		steps.put(10, talkToHild);
+
+		ConditionalStep findbob1 = new ConditionalStep(this, findBob);
+		findbob1.addStep(bobNearby, talkToBob);
+
+		steps.put(15, findbob1);
+
+		steps.put(20, talkToGertrude);
+
+		steps.put(25, talkToReldo);
+		steps.put(28, talkToReldo);
+
+		ConditionalStep findbob2 = new ConditionalStep(this, findBobAgain);
+		findbob2.addStep(bobNearby, talkToBobAgain);
+
+		steps.put(30, findbob2);
+
+		steps.put(35, talkToSphinx);
+
+		ConditionalStep doChores = new ConditionalStep(this, useRake);
+		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs, placedMilk, usedShears), waitForPotatoesToGrow);
+		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs, placedMilk), useShearsOnUnferth);
+		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs, placedCake), useMilkOnTable);
+		doChores.addStep(new Conditions(plantedSeed, madeBed, litLogs), useChocolateCakeOnTable);
+		doChores.addStep(new Conditions(plantedSeed, madeBed, placedLogs), lightLogs);
+		doChores.addStep(new Conditions(plantedSeed, madeBed), useLogsOnFireplace);
+		doChores.addStep(plantedSeed, makeBed);
+		doChores.addStep(rakedPatch, plantSeeds);
+
+		steps.put(40, doChores);
+
+		steps.put(45, reportToUnferth);
+
+		steps.put(50, talkToApoth);
+
+		steps.put(55, talkToUnferthAsDoctor);
+
+		ConditionalStep findbob3 = new ConditionalStep(this, findBobToFinish);
+		findbob3.addStep(bobNearby, talkToBobToFinish);
+		steps.put(60, findbob3);
+
+		steps.put(65, talkToUnferthToFinish);
+
+		return steps;
 	}
 }

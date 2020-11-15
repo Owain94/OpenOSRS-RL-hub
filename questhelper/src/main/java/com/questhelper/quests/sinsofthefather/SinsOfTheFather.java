@@ -24,7 +24,6 @@
  */
 package com.questhelper.quests.sinsofthefather;
 
-import com.google.inject.Inject;
 import com.questhelper.ItemCollections;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
@@ -53,39 +52,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.SINS_OF_THE_FATHER
 )
 public class SinsOfTheFather extends BasicQuestHelper
 {
-	@Inject
-	EventBus eventBus;
-
-	@Inject
-	Client client;
-
-	DoorPuzzleStep doDoorPuzzle= new DoorPuzzleStep(this);
-	boolean doDoorPuzzleSubscribed = false;
-	ValveStep valveStep = new ValveStep(this);
-	boolean valveStepSubscribed = false;
-
 	QuestStep startQuest, talkToHameln, talkToCarl, inspectBarrel, followCarl, killKroy, destroyLab, talkToVeliafAfterKroy, talkToVeliafInPater,
 		talkToIvan, listenToMeeting, talkToIvanAfterMeeting, talkToIvanAfterTrek, talkToVeliafInBoatHouse, travelToGraveyard, talkToVeliafInGraveyard, talkToVanescula,
 		talkToVanesculaAfterPuzzle, talkToVanesculaAfterTeam, talkToSafalaanInLab, killBloodveld, talkToSafalaanInDeepLab, searchLabBookcase,
 		takeBookToSafalaan, talkToVanesculaAfterLab, talkToPolmafi, talkToPolmafiMore, bringUnscentedToVanescula, talkToVeliafForFight, killDamien, talkToVeliafAfterDamien,
 		talkToVanesculaAfterDamien, enterDarkmeyer, talkToDesmodus, talkToMordan, talkToMaria, talkToDesmodusAgain, getNote, bringVanesculaLogs, bringVertidaLogs,
 		talkToVertidaForFlail, talkToVanesculaWithFlail, talkToSafalaanWithFlail, talkToVanesculaBeforeFight, talkToVanesculaForFight, talkToVeliafAfterFight,
-		finishQuest, templeTrek, talkToTeamSteps, createFlailSteps, cutLogs, goDownToKroy, destroyLab2, enterPater, killJuvinates,
+		finishQuest, templeTrek, talkToTeamSteps, valveStep, createFlailSteps, doDoorPuzzle, cutLogs, goDownToKroy, destroyLab2, enterPater, killJuvinates,
 		leaveJuvinateArea, openPuzzleDoor, goToLab, enterDeepLab, goDownToPolmafi, goDownToPolmafiNoItems, talkToVeliafForFinalFight, readNote,
 		goDownToVerditaWithLogs, fightVanstrom, enterBaseToFinish;
 
@@ -107,236 +91,6 @@ public class SinsOfTheFather extends BasicQuestHelper
 		inNailBeastArea, inBridgeArea, nailBeastNearby, hasAxe, hasLog, has2Logs, has3Logs, hasRepairedBridge1, hasRepairedBridge2, hasRepairedBridge3, inBridgeExitArea,
 		inJuvinateArea, juvinateNearby, inPuzzleInterface, talkedToKael, talkedToVertida, talkedToPolmafi, talkedToRadigad, talkedToIvan, inLab, inDeepLab, inNewBase,
 		inDamienRoom, hasNote, hasSickle, hasRubySickle, hasEnchantedRubySickle, hasBlisterwoodSickle, inFinalFightArea;
-
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		if (eventBus != null && client != null)
-		{
-			if (!doDoorPuzzleSubscribed)
-			{
-				doDoorPuzzle.eventBus = eventBus;
-				doDoorPuzzle.client = client;
-				doDoorPuzzle.subscribe();
-				doDoorPuzzleSubscribed = true;
-			}
-			if (!valveStepSubscribed)
-			{
-				valveStep.eventBus = eventBus;
-				valveStep.client = client;
-				valveStep.subscribe();
-				valveStepSubscribed = true;
-			}
-		}
-	}
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-
-		steps.put(0, startQuest);
-		steps.put(2, startQuest);
-		steps.put(4, talkToHameln);
-		steps.put(6, talkToCarl);
-
-		steps.put(8, inspectBarrel);
-		steps.put(10, inspectBarrel);
-
-		ConditionalStep followCarlSteps = new ConditionalStep(this, inspectBarrel);
-		followCarlSteps.addStep(inFollowingCarlArea, followCarl);
-		steps.put(12, followCarlSteps);
-
-		ConditionalStep goKillCarl = new ConditionalStep(this, goDownToKroy);
-		goKillCarl.addStep(inKroyArea, killKroy);
-
-		steps.put(14, goKillCarl);
-		steps.put(16, goKillCarl);
-
-		ConditionalStep goDestroyTables = new ConditionalStep(this, goDownToKroy);
-		goDestroyTables.addStep(new Conditions(inKroyArea, destroyedLabTable1), destroyLab2);
-		goDestroyTables.addStep(inKroyArea, destroyLab);
-
-		steps.put(18, goDestroyTables);
-
-		steps.put(20, talkToVeliafAfterKroy);
-
-
-		ConditionalStep goToVeliafInPater = new ConditionalStep(this, enterPater);
-		goToVeliafInPater.addStep(inPater, talkToVeliafInPater);
-		steps.put(22, goToVeliafInPater);
-		steps.put(24, goToVeliafInPater);
-		steps.put(26, goToVeliafInPater);
-
-		steps.put(28, talkToIvan);
-
-		steps.put(30, listenToMeeting);
-		steps.put(32, listenToMeeting);
-
-		steps.put(34, talkToIvanAfterMeeting);
-
-		ConditionalStep goTempleTrekking = new ConditionalStep(this, talkToIvanAfterMeeting);
-		goTempleTrekking.addStep(new Conditions(inJuvinateArea, juvinateNearby), killJuvinates);
-		goTempleTrekking.addStep(new Conditions(inJuvinateArea), leaveJuvinateArea);
-		goTempleTrekking.addStep(new Conditions(inBridgeExitArea), leaveBridgeArea);
-		goTempleTrekking.addStep(new Conditions(inBridgeArea, hasRepairedBridge3), crossBridge);
-		goTempleTrekking.addStep(new Conditions(inBridgeArea, hasLog, hasRepairedBridge2), repairBridge3);
-		goTempleTrekking.addStep(new Conditions(inBridgeArea, has2Logs, hasRepairedBridge1), repairBridge2);
-		goTempleTrekking.addStep(new Conditions(inBridgeArea, has3Logs), repairBridge1);
-		goTempleTrekking.addStep(new Conditions(inBridgeArea, hasAxe), get3LogsForBridge);
-		goTempleTrekking.addStep(new Conditions(inBridgeArea), killZombieForAxe);
-		goTempleTrekking.addStep(new Conditions(inNailBeastArea, nailBeastNearby), killNailBeasts);
-		goTempleTrekking.addStep(new Conditions(inNailBeastArea), leaveNailBeastArea);
-		goTempleTrekking.addStep(new Conditions(inSwingExitArea), leaveSwingArea);
-		goTempleTrekking.addStep(new Conditions(inSwingArea, vineAdded), swingOnVine);
-		goTempleTrekking.addStep(new Conditions(inSwingArea, hasLongVine), useVineOnBranch);
-		goTempleTrekking.addStep(new Conditions(inSwingArea, has3Vines), combineVines);
-		goTempleTrekking.addStep(new Conditions(inSwingArea, hasKnife), cutVines);
-		goTempleTrekking.addStep(inSwingArea, searchForKnife);
-		steps.put(36, goTempleTrekking);
-
-		steps.put(38, talkToIvanAfterTrek);
-
-		steps.put(40, talkToVeliafInBoatHouse);
-
-		steps.put(42, travelToGraveyard);
-
-		steps.put(44, talkToVeliafInGraveyard);
-
-		steps.put(46, talkToVeliafInGraveyard);
-
-		steps.put(48, talkToVanescula);
-
-		ConditionalStep goSolveDoor = new ConditionalStep(this, openPuzzleDoor);
-		goSolveDoor.addStep(inPuzzleInterface, doDoorPuzzle);
-		steps.put(50, goSolveDoor);
-
-		steps.put(52, talkToVanesculaAfterPuzzle);
-
-
-		ConditionalStep convinceTheTeam = new ConditionalStep(this, convinceVertida);
-		convinceTheTeam.addStep(talkedToIvan, convinceVeliaf);
-		convinceTheTeam.addStep(talkedToPolmafi, convinceIvan);
-		convinceTheTeam.addStep(talkedToRadigad, convincePolmafi);
-		convinceTheTeam.addStep(talkedToKael, convinceRadigad);
-		convinceTheTeam.addStep(talkedToVertida, convinceKael);
-		steps.put(54, convinceTheTeam);
-
-		steps.put(56, talkToVanesculaAfterTeam);
-
-		ConditionalStep goToLabSteps = new ConditionalStep(this, goToLab);
-		goToLabSteps.addStep(inLab, talkToSafalaanInLab);
-		steps.put(58, goToLabSteps);
-		steps.put(60, goToLabSteps);
-
-		ConditionalStep defeatBloodveld = new ConditionalStep(this, goToLab);
-		defeatBloodveld.addStep(inDeepLab, killBloodveld);
-		defeatBloodveld.addStep(inLab, enterDeepLab);
-		steps.put(62, defeatBloodveld);
-
-		ConditionalStep talkInDeepLabs = new ConditionalStep(this, goToLab);
-		talkInDeepLabs.addStep(inLab, talkToSafalaanInDeepLab);
-		steps.put(64, talkInDeepLabs);
-
-		ConditionalStep getBookSteps = new ConditionalStep(this, goToLab);
-		getBookSteps.addStep(inLab, searchLabBookcase);
-		steps.put(66, getBookSteps);
-
-		ConditionalStep bringBookToSafalaanSteps = new ConditionalStep(this, goToLab);
-		bringBookToSafalaanSteps.addStep(inLab, takeBookToSafalaan);
-		steps.put(68, bringBookToSafalaanSteps);
-
-		steps.put(70, talkToVanesculaAfterLab);
-
-		ConditionalStep bringPolmafiItems = new ConditionalStep(this, goDownToPolmafi);
-		bringPolmafiItems.addStep(inNewBase, talkToPolmafi);
-		steps.put(72, bringPolmafiItems);
-		steps.put(74, bringPolmafiItems);
-
-		steps.put(76, talkToPolmafiMore);
-
-		steps.put(78, bringUnscentedToVanescula);
-
-		steps.put(80, talkToVeliafForFight);
-		steps.put(82, talkToVeliafForFight);
-
-		ConditionalStep goKillDamien = new ConditionalStep(this, talkToVeliafForFight);
-		goKillDamien.addStep(inDamienRoom, killDamien);
-		steps.put(84, goKillDamien);
-
-		steps.put(86, talkToVeliafAfterDamien);
-
-		steps.put(88, talkToVanesculaAfterDamien);
-
-		steps.put(90, enterDarkmeyer);
-
-		steps.put(92, talkToDesmodus);
-
-		steps.put(94, talkToMordan);
-
-		steps.put(96, talkToMaria);
-
-		steps.put(98, talkToMaria);
-
-		steps.put(100, talkToDesmodusAgain);
-
-		steps.put(102, getNote);
-
-		ConditionalStep goReadNote = new ConditionalStep(this, getNote);
-		goReadNote.addStep(hasNote, readNote);
-		steps.put(104, getNote);
-
-		steps.put(106, valveStep);
-		steps.put(108, valveStep);
-		steps.put(110, valveStep);
-
-		ConditionalStep getLogs = new ConditionalStep(this, cutLogs);
-		getLogs.addStep(has8Logs, bringVanesculaLogs);
-
-		steps.put(112, getLogs);
-
-		ConditionalStep bringItemsToVertida = new ConditionalStep(this, cutLogs);
-		bringItemsToVertida.addStep(new Conditions(inNewBase, has8Logs), bringVertidaLogs);
-		bringItemsToVertida.addStep(has8Logs, goDownToVerditaWithLogs);
-		steps.put(114, bringItemsToVertida);
-
-		steps.put(116, talkToVertidaForFlail);
-
-		ConditionalStep createFlail = new ConditionalStep(this, goDownToMakeFlail);
-		createFlail.addStep(hasBlisterwoodSickle, useFlailOnSickle);
-		createFlail.addStep(hasEnchantedRubySickle, useLogOnSickle);
-		createFlail.addStep(hasRubySickle, enchantRubySickle);
-		createFlail.addStep(hasSickle, addRubyToSickle);
-		createFlail.addStep(inNewBase, getSickle);
-		steps.put(118, createFlail);
-
-		steps.put(120, talkToVanesculaWithFlail);
-
-		steps.put(122, talkToSafalaanWithFlail);
-
-		steps.put(124, talkToVanesculaBeforeFight);
-
-		steps.put(126, talkToVanesculaForFight);
-
-		steps.put(128, talkToVeliafForFinalFight);
-
-		ConditionalStep goFightVanstrom = new ConditionalStep(this, talkToVeliafForFinalFight);
-		goFightVanstrom.addStep(inFinalFightArea, fightVanstrom);
-		steps.put(130, goFightVanstrom);
-
-		steps.put(132, talkToVeliafAfterFight);
-
-		ConditionalStep goFinishQuest = new ConditionalStep(this, enterBaseToFinish);
-		goFinishQuest.addStep(inNewBase, finishQuest);
-		steps.put(134, goFinishQuest);
-		steps.put(136, goFinishQuest);
-
-		return steps;
-	}
 
 	private void setupZones()
 	{
@@ -829,7 +583,9 @@ public class SinsOfTheFather extends BasicQuestHelper
 		templeTrek = new NpcStep(this, NpcID.IVAN_STROM_9530, new WorldPoint(3444, 3485, 0),
 			"Speak to Ivan Strom outside the east entrance of Paterdomus to go temple treking with him.");
 		talkToTeamSteps = new DetailedQuestStep(this, "Convince the Myreque to take on Drakan.");
+		valveStep = new ValveStep(this);
 		createFlailSteps = new DetailedQuestStep(this, "Create the blisterwood flail.", blisterwoodFlail);
+		doDoorPuzzle = new DoorPuzzleStep(this);
 	}
 
 	@Override
@@ -878,5 +634,213 @@ public class SinsOfTheFather extends BasicQuestHelper
 			new ArrayList<>(Arrays.asList(talkToVanesculaWithFlail, talkToSafalaanWithFlail, talkToVanesculaBeforeFight, fightVanstrom, finishQuest)), combatGear, blisterwoodFlail));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		Map<Integer, QuestStep> steps = new HashMap<>();
+		setupZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+
+		steps.put(0, startQuest);
+		steps.put(2, startQuest);
+		steps.put(4, talkToHameln);
+		steps.put(6, talkToCarl);
+
+		steps.put(8, inspectBarrel);
+		steps.put(10, inspectBarrel);
+
+		ConditionalStep followCarlSteps = new ConditionalStep(this, inspectBarrel);
+		followCarlSteps.addStep(inFollowingCarlArea, followCarl);
+		steps.put(12, followCarlSteps);
+
+		ConditionalStep goKillCarl = new ConditionalStep(this, goDownToKroy);
+		goKillCarl.addStep(inKroyArea, killKroy);
+
+		steps.put(14, goKillCarl);
+		steps.put(16, goKillCarl);
+
+		ConditionalStep goDestroyTables = new ConditionalStep(this, goDownToKroy);
+		goDestroyTables.addStep(new Conditions(inKroyArea, destroyedLabTable1), destroyLab2);
+		goDestroyTables.addStep(inKroyArea, destroyLab);
+
+		steps.put(18, goDestroyTables);
+
+		steps.put(20, talkToVeliafAfterKroy);
+
+
+		ConditionalStep goToVeliafInPater = new ConditionalStep(this, enterPater);
+		goToVeliafInPater.addStep(inPater, talkToVeliafInPater);
+		steps.put(22, goToVeliafInPater);
+		steps.put(24, goToVeliafInPater);
+		steps.put(26, goToVeliafInPater);
+
+		steps.put(28, talkToIvan);
+
+		steps.put(30, listenToMeeting);
+		steps.put(32, listenToMeeting);
+
+		steps.put(34, talkToIvanAfterMeeting);
+
+		ConditionalStep goTempleTrekking = new ConditionalStep(this, talkToIvanAfterMeeting);
+		goTempleTrekking.addStep(new Conditions(inJuvinateArea, juvinateNearby), killJuvinates);
+		goTempleTrekking.addStep(new Conditions(inJuvinateArea), leaveJuvinateArea);
+		goTempleTrekking.addStep(new Conditions(inBridgeExitArea), leaveBridgeArea);
+		goTempleTrekking.addStep(new Conditions(inBridgeArea, hasRepairedBridge3), crossBridge);
+		goTempleTrekking.addStep(new Conditions(inBridgeArea, hasLog, hasRepairedBridge2), repairBridge3);
+		goTempleTrekking.addStep(new Conditions(inBridgeArea, has2Logs, hasRepairedBridge1), repairBridge2);
+		goTempleTrekking.addStep(new Conditions(inBridgeArea, has3Logs), repairBridge1);
+		goTempleTrekking.addStep(new Conditions(inBridgeArea, hasAxe), get3LogsForBridge);
+		goTempleTrekking.addStep(new Conditions(inBridgeArea), killZombieForAxe);
+		goTempleTrekking.addStep(new Conditions(inNailBeastArea, nailBeastNearby), killNailBeasts);
+		goTempleTrekking.addStep(new Conditions(inNailBeastArea), leaveNailBeastArea);
+		goTempleTrekking.addStep(new Conditions(inSwingExitArea), leaveSwingArea);
+		goTempleTrekking.addStep(new Conditions(inSwingArea, vineAdded), swingOnVine);
+		goTempleTrekking.addStep(new Conditions(inSwingArea, hasLongVine), useVineOnBranch);
+		goTempleTrekking.addStep(new Conditions(inSwingArea, has3Vines), combineVines);
+		goTempleTrekking.addStep(new Conditions(inSwingArea, hasKnife), cutVines);
+		goTempleTrekking.addStep(inSwingArea, searchForKnife);
+		steps.put(36, goTempleTrekking);
+
+		steps.put(38, talkToIvanAfterTrek);
+
+		steps.put(40, talkToVeliafInBoatHouse);
+
+		steps.put(42, travelToGraveyard);
+
+		steps.put(44, talkToVeliafInGraveyard);
+
+		steps.put(46, talkToVeliafInGraveyard);
+
+		steps.put(48, talkToVanescula);
+
+		ConditionalStep goSolveDoor = new ConditionalStep(this, openPuzzleDoor);
+		goSolveDoor.addStep(inPuzzleInterface, doDoorPuzzle);
+		steps.put(50, goSolveDoor);
+
+		steps.put(52, talkToVanesculaAfterPuzzle);
+
+
+		ConditionalStep convinceTheTeam = new ConditionalStep(this, convinceVertida);
+		convinceTheTeam.addStep(talkedToIvan, convinceVeliaf);
+		convinceTheTeam.addStep(talkedToPolmafi, convinceIvan);
+		convinceTheTeam.addStep(talkedToRadigad, convincePolmafi);
+		convinceTheTeam.addStep(talkedToKael, convinceRadigad);
+		convinceTheTeam.addStep(talkedToVertida, convinceKael);
+		steps.put(54, convinceTheTeam);
+
+		steps.put(56, talkToVanesculaAfterTeam);
+
+		ConditionalStep goToLabSteps = new ConditionalStep(this, goToLab);
+		goToLabSteps.addStep(inLab, talkToSafalaanInLab);
+		steps.put(58, goToLabSteps);
+		steps.put(60, goToLabSteps);
+
+		ConditionalStep defeatBloodveld = new ConditionalStep(this, goToLab);
+		defeatBloodveld.addStep(inDeepLab, killBloodveld);
+		defeatBloodveld.addStep(inLab, enterDeepLab);
+		steps.put(62, defeatBloodveld);
+
+		ConditionalStep talkInDeepLabs = new ConditionalStep(this, goToLab);
+		talkInDeepLabs.addStep(inLab, talkToSafalaanInDeepLab);
+		steps.put(64, talkInDeepLabs);
+
+		ConditionalStep getBookSteps = new ConditionalStep(this, goToLab);
+		getBookSteps.addStep(inLab, searchLabBookcase);
+		steps.put(66, getBookSteps);
+
+		ConditionalStep bringBookToSafalaanSteps = new ConditionalStep(this, goToLab);
+		bringBookToSafalaanSteps.addStep(inLab, takeBookToSafalaan);
+		steps.put(68, bringBookToSafalaanSteps);
+
+		steps.put(70, talkToVanesculaAfterLab);
+
+		ConditionalStep bringPolmafiItems = new ConditionalStep(this, goDownToPolmafi);
+		bringPolmafiItems.addStep(inNewBase, talkToPolmafi);
+		steps.put(72, bringPolmafiItems);
+		steps.put(74, bringPolmafiItems);
+
+		steps.put(76, talkToPolmafiMore);
+
+		steps.put(78, bringUnscentedToVanescula);
+
+		steps.put(80, talkToVeliafForFight);
+		steps.put(82, talkToVeliafForFight);
+
+		ConditionalStep goKillDamien = new ConditionalStep(this, talkToVeliafForFight);
+		goKillDamien.addStep(inDamienRoom, killDamien);
+		steps.put(84, goKillDamien);
+
+		steps.put(86, talkToVeliafAfterDamien);
+
+		steps.put(88, talkToVanesculaAfterDamien);
+
+		steps.put(90, enterDarkmeyer);
+
+		steps.put(92, talkToDesmodus);
+
+		steps.put(94, talkToMordan);
+
+		steps.put(96, talkToMaria);
+
+		steps.put(98, talkToMaria);
+
+		steps.put(100, talkToDesmodusAgain);
+
+		steps.put(102, getNote);
+
+		ConditionalStep goReadNote = new ConditionalStep(this, getNote);
+		goReadNote.addStep(hasNote, readNote);
+		steps.put(104, getNote);
+
+		steps.put(106, valveStep);
+		steps.put(108, valveStep);
+		steps.put(110, valveStep);
+
+		ConditionalStep getLogs = new ConditionalStep(this, cutLogs);
+		getLogs.addStep(has8Logs, bringVanesculaLogs);
+
+		steps.put(112, getLogs);
+
+		ConditionalStep bringItemsToVertida = new ConditionalStep(this, cutLogs);
+		bringItemsToVertida.addStep(new Conditions(inNewBase, has8Logs), bringVertidaLogs);
+		bringItemsToVertida.addStep(has8Logs, goDownToVerditaWithLogs);
+		steps.put(114, bringItemsToVertida);
+
+		steps.put(116, talkToVertidaForFlail);
+
+		ConditionalStep createFlail = new ConditionalStep(this, goDownToMakeFlail);
+		createFlail.addStep(hasBlisterwoodSickle, useFlailOnSickle);
+		createFlail.addStep(hasEnchantedRubySickle, useLogOnSickle);
+		createFlail.addStep(hasRubySickle, enchantRubySickle);
+		createFlail.addStep(hasSickle, addRubyToSickle);
+		createFlail.addStep(inNewBase, getSickle);
+		steps.put(118, createFlail);
+
+		steps.put(120, talkToVanesculaWithFlail);
+
+		steps.put(122, talkToSafalaanWithFlail);
+
+		steps.put(124, talkToVanesculaBeforeFight);
+
+		steps.put(126, talkToVanesculaForFight);
+
+		steps.put(128, talkToVeliafForFinalFight);
+
+		ConditionalStep goFightVanstrom = new ConditionalStep(this, talkToVeliafForFinalFight);
+		goFightVanstrom.addStep(inFinalFightArea, fightVanstrom);
+		steps.put(130, goFightVanstrom);
+
+		steps.put(132, talkToVeliafAfterFight);
+
+		ConditionalStep goFinishQuest = new ConditionalStep(this, enterBaseToFinish);
+		goFinishQuest.addStep(inNewBase, finishQuest);
+		steps.put(134, goFinishQuest);
+		steps.put(136, goFinishQuest);
+
+		return steps;
 	}
 }

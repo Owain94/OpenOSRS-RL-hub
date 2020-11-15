@@ -80,133 +80,6 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 
 	Zone islands, miscCastleFirstFloor, etcCastleFirstFloor, brandRoom1, brandRoom2, astridRoom1, astridRoom2;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startQuest = new ConditionalStep(this, travelToMisc);
-		startQuest.addStep(inMiscCastleFirstFloor, talkToVargas);
-		startQuest.addStep(new Conditions(inIslands, hasFlowers), goUpToVargas);
-		startQuest.addStep(inIslands, getFlowers);
-
-		steps.put(0, startQuest);
-
-		courtAstrid = new ConditionalStep(this, travelToMisc);
-		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3, blownKiss), useRingOnAstrid);
-		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3), blowKissToAstrid);
-		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked2P4), talkAstrid3);
-		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked2P1, talked2P2, talked2P3), giveBowToAstrid);
-		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked1P4), talkAstrid2);
-		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked1P3, talked1P2, talked1P3, givenFlowers), danceForAstrid);
-		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked1P1, talked1P2, talked1P3), giveFlowersToAstrid);
-		courtAstrid.addStep(inMiscCastleFirstFloor, talkAstrid1);
-		courtAstrid.addStep(inIslands, goUpstairsToAstrid);
-
-		courtBrand = new ConditionalStep(this, travelToMisc);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3, blownKiss), useRingOnAstrid);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3), blowKissToBrand);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked2P4), talkBrand3);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked2P1, talked2P2, talked2P3), giveCakeToBrand);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P4), talkBrand2);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P3, talked1P2, talked1P3, givenFlowers), clapForBrand);
-		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P1, talked1P2, talked1P3), giveFlowersToBrand);
-		courtBrand.addStep(inMiscCastleFirstFloor, talkBrand1);
-		courtBrand.addStep(inIslands, goUpstairsToBrand);
-
-		ConditionalStep establishPeace1 = new ConditionalStep(this, goUpEtcDip1);
-		establishPeace1.addStep(inEtcCastleFirstFloor, talkToSigridDip1);
-
-		ConditionalStep establishPeace2 = new ConditionalStep(this, goUpMiscDip1);
-		establishPeace2.addStep(inMiscCastleFirstFloor, talkToVargasDip1);
-		establishPeace2.addStep(inEtcCastleFirstFloor, goDownEtcDip1);
-
-		ConditionalStep establishPeace3 = new ConditionalStep(this, goUpEtcDip2);
-		establishPeace3.addStep(inEtcCastleFirstFloor, talkToSigridDip2);
-		establishPeace3.addStep(inMiscCastleFirstFloor, goDownMiscDip1);
-
-		ConditionalStep establishPeace4 = new ConditionalStep(this, goUpMiscDip2);
-		establishPeace4.addStep(inMiscCastleFirstFloor, talkToBrandDip);
-		establishPeace4.addStep(inEtcCastleFirstFloor, goDownEtcDip2);
-
-		ConditionalStep establishPeace5 = new ConditionalStep(this, goUpMiscDip2);
-		establishPeace5.addStep(new Conditions(inEtcCastleFirstFloor, hasGoodAnthem), talkToSigridDip3);
-		establishPeace5.addStep(new Conditions(inMiscCastleFirstFloor, hasGoodAnthem), goDownMiscDip2);
-		establishPeace5.addStep(hasGoodAnthem, goUpEtcDip3);
-		establishPeace5.addStep(new Conditions(hasAwfulAnthem, inMiscCastleFirstFloor), talkToGhrimDip);
-		establishPeace5.addStep(inMiscCastleFirstFloor, getAnotherAwfulAnthem);
-
-		ConditionalStep establishPeace6 = new ConditionalStep(this, goUpMiscDip2);
-		establishPeace6.addStep(new Conditions(inEtcCastleFirstFloor, hasGoodAnthem), talkToSigridDip3);
-		establishPeace6.addStep(new Conditions(inMiscCastleFirstFloor, hasGoodAnthem), goDownMiscDip2);
-		establishPeace6.addStep(hasGoodAnthem, goUpEtcDip3);
-		establishPeace6.addStep(new Conditions(hasAwfulAnthem, inMiscCastleFirstFloor), talkToGhrimDip);
-		establishPeace6.addStep(inMiscCastleFirstFloor, getAnotherAwfulAnthem);
-
-		ConditionalStep establishPeace7 = new ConditionalStep(this, goUpEtcDip3);
-		establishPeace7.addStep(new Conditions(hasTreaty, inMiscCastleFirstFloor), talkToVargasDip2);
-		establishPeace7.addStep(new Conditions(hasTreaty, inEtcCastleFirstFloor), goDownEtcDip3);
-		establishPeace7.addStep(hasTreaty, goUpMiscDip3);
-		establishPeace7.addStep(inEtcCastleFirstFloor, talkToSigridDip3);
-		establishPeace7.addStep(inMiscCastleFirstFloor, goDownMiscDip2);
-
-		ConditionalStep establishPeace8 = new ConditionalStep(this, talkToDerrik);
-		establishPeace8.addStep(new Conditions(hasGiantPen, inMiscCastleFirstFloor), giveVargasPen);
-		establishPeace8.addStep(hasGiantPen, goUpMiscDip4);
-		establishPeace8.addStep(hasGiantNib, makePen);
-		establishPeace8.addStep(inMiscCastleFirstFloor, goDownMiscDip3);
-
-		ConditionalStep courting;
-
-		if (client.getLocalPlayer() != null && client.getLocalPlayer().getPlayerAppearance() != null && client.getLocalPlayer().getPlayerAppearance().isFemale())
-		{
-			courting = courtBrand;
-		}
-		else
-		{
-			courting = courtAstrid;
-		}
-
-		ConditionalStep becomeRoyalty1 = new ConditionalStep(this, courting);
-		ConditionalStep becomeRoyalty2 = new ConditionalStep(this, courting);
-		ConditionalStep becomeRoyalty3 = new ConditionalStep(this, courting);
-		ConditionalStep becomeRoyalty4 = new ConditionalStep(this, courting);
-		ConditionalStep becomeRoyalty5 = new ConditionalStep(this, courting);
-		ConditionalStep becomeRoyalty6 = new ConditionalStep(this, courting);
-		ConditionalStep becomeRoyalty7 = new ConditionalStep(this, courting);
-		ConditionalStep becomeRoyalty8 = new ConditionalStep(this, courting);
-		becomeRoyalty1.addStep(hasCourted, establishPeace1);
-		becomeRoyalty2.addStep(hasCourted, establishPeace2);
-		becomeRoyalty3.addStep(hasCourted, establishPeace3);
-		becomeRoyalty4.addStep(hasCourted, establishPeace4);
-		becomeRoyalty5.addStep(hasCourted, establishPeace5);
-		becomeRoyalty6.addStep(hasCourted, establishPeace6);
-		becomeRoyalty7.addStep(hasCourted, establishPeace7);
-		becomeRoyalty8.addStep(hasCourted, establishPeace8);
-
-		steps.put(10, becomeRoyalty1);
-		steps.put(20, becomeRoyalty2);
-		steps.put(30, becomeRoyalty3);
-		steps.put(40, becomeRoyalty4);
-		steps.put(50, becomeRoyalty5);
-		steps.put(60, becomeRoyalty6);
-		steps.put(70, becomeRoyalty7);
-		steps.put(80, becomeRoyalty8);
-
-		ConditionalStep finishOff = new ConditionalStep(this, get75Support);
-		finishOff.addStep(new Conditions(inMiscCastleFirstFloor, has75Support), finishQuest);
-		finishOff.addStep(has75Support, goUpMiscForSupport);
-		finishOff.addStep(inMiscCastleFirstFloor, goDownMiscForSupport);
-
-		steps.put(90, finishOff);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		ironBar = new ItemRequirement("Iron bar", ItemID.IRON_BAR);
@@ -215,11 +88,11 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.getPickaxes());
 		rake = new ItemRequirement("Rake", ItemID.RAKE);
 		axe = new ItemRequirement("Any axe", ItemCollections.getAxes());
-		harpoon = new ItemRequirement("Harpoon", ItemID.HARPOON);
+		harpoon = new ItemRequirement("Harpoon", ItemCollections.getHarpoons());
 		lobsterPot = new ItemRequirement("Lobster pot", ItemID.LOBSTER_POT);
 		ring = new ItemRequirement("Any non-silver ring you are willing to lose", ItemID.GOLD_RING, -1);
 		ring.addAlternates(ItemID.SAPPHIRE_RING, ItemID.EMERALD_RING, ItemID.RUBY_RING, ItemID.DIAMOND_RING);
-		flowerOr15Coins = new ItemRequirement("A flower of 15 coins to buy some during the quest", ItemID.BLACK_FLOWERS, -1);
+		flowerOr15Coins = new ItemRequirement("A flower or 15 coins to buy some during the quest", ItemID.BLACK_FLOWERS, -1);
 		flowers = getAllFlowers();
 		flowers.setHighlightInInventory(true);
 		cake = new ItemRequirement("Cake", ItemID.CAKE);
@@ -475,18 +348,18 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getNotes()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Whether you marry Brand or Astrid depends on whether you're female or male respectively. If you have a preference on who you'd like to marry, you can change to male or female prior to the quest.");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRecommended()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
 		reqs.add(dramenStaff);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getNotes()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Whether you marry Brand or Astrid depends on whether you're female or male respectively. If you have a preference on who you'd like to marry, you can change to male or female prior to the quest.");
 		return reqs;
 	}
 
@@ -530,5 +403,132 @@ public class ThroneOfMiscellania extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Get support", new ArrayList<>(Arrays.asList(get75Support, finishQuest))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startQuest = new ConditionalStep(this, travelToMisc);
+		startQuest.addStep(inMiscCastleFirstFloor, talkToVargas);
+		startQuest.addStep(new Conditions(inIslands, hasFlowers), goUpToVargas);
+		startQuest.addStep(inIslands, getFlowers);
+
+		steps.put(0, startQuest);
+
+		courtAstrid = new ConditionalStep(this, travelToMisc);
+		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3, blownKiss), useRingOnAstrid);
+		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3), blowKissToAstrid);
+		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked2P4), talkAstrid3);
+		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked2P1, talked2P2, talked2P3), giveBowToAstrid);
+		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked1P4), talkAstrid2);
+		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked1P3, talked1P2, talked1P3, givenFlowers), danceForAstrid);
+		courtAstrid.addStep(new Conditions(inMiscCastleFirstFloor, talked1P1, talked1P2, talked1P3), giveFlowersToAstrid);
+		courtAstrid.addStep(inMiscCastleFirstFloor, talkAstrid1);
+		courtAstrid.addStep(inIslands, goUpstairsToAstrid);
+
+		courtBrand = new ConditionalStep(this, travelToMisc);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3, blownKiss), useRingOnAstrid);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked3P1, talked3P2, talked3P3), blowKissToBrand);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked2P4), talkBrand3);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked2P1, talked2P2, talked2P3), giveCakeToBrand);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P4), talkBrand2);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P3, talked1P2, talked1P3, givenFlowers), clapForBrand);
+		courtBrand.addStep(new Conditions(inMiscCastleFirstFloor, talked1P1, talked1P2, talked1P3), giveFlowersToBrand);
+		courtBrand.addStep(inMiscCastleFirstFloor, talkBrand1);
+		courtBrand.addStep(inIslands, goUpstairsToBrand);
+
+		ConditionalStep establishPeace1 = new ConditionalStep(this, goUpEtcDip1);
+		establishPeace1.addStep(inEtcCastleFirstFloor, talkToSigridDip1);
+
+		ConditionalStep establishPeace2 = new ConditionalStep(this, goUpMiscDip1);
+		establishPeace2.addStep(inMiscCastleFirstFloor, talkToVargasDip1);
+		establishPeace2.addStep(inEtcCastleFirstFloor, goDownEtcDip1);
+
+		ConditionalStep establishPeace3 = new ConditionalStep(this, goUpEtcDip2);
+		establishPeace3.addStep(inEtcCastleFirstFloor, talkToSigridDip2);
+		establishPeace3.addStep(inMiscCastleFirstFloor, goDownMiscDip1);
+
+		ConditionalStep establishPeace4 = new ConditionalStep(this, goUpMiscDip2);
+		establishPeace4.addStep(inMiscCastleFirstFloor, talkToBrandDip);
+		establishPeace4.addStep(inEtcCastleFirstFloor, goDownEtcDip2);
+
+		ConditionalStep establishPeace5 = new ConditionalStep(this, goUpMiscDip2);
+		establishPeace5.addStep(new Conditions(inEtcCastleFirstFloor, hasGoodAnthem), talkToSigridDip3);
+		establishPeace5.addStep(new Conditions(inMiscCastleFirstFloor, hasGoodAnthem), goDownMiscDip2);
+		establishPeace5.addStep(hasGoodAnthem, goUpEtcDip3);
+		establishPeace5.addStep(new Conditions(hasAwfulAnthem, inMiscCastleFirstFloor), talkToGhrimDip);
+		establishPeace5.addStep(inMiscCastleFirstFloor, getAnotherAwfulAnthem);
+
+		ConditionalStep establishPeace6 = new ConditionalStep(this, goUpMiscDip2);
+		establishPeace6.addStep(new Conditions(inEtcCastleFirstFloor, hasGoodAnthem), talkToSigridDip3);
+		establishPeace6.addStep(new Conditions(inMiscCastleFirstFloor, hasGoodAnthem), goDownMiscDip2);
+		establishPeace6.addStep(hasGoodAnthem, goUpEtcDip3);
+		establishPeace6.addStep(new Conditions(hasAwfulAnthem, inMiscCastleFirstFloor), talkToGhrimDip);
+		establishPeace6.addStep(inMiscCastleFirstFloor, getAnotherAwfulAnthem);
+
+		ConditionalStep establishPeace7 = new ConditionalStep(this, goUpEtcDip3);
+		establishPeace7.addStep(new Conditions(hasTreaty, inMiscCastleFirstFloor), talkToVargasDip2);
+		establishPeace7.addStep(new Conditions(hasTreaty, inEtcCastleFirstFloor), goDownEtcDip3);
+		establishPeace7.addStep(hasTreaty, goUpMiscDip3);
+		establishPeace7.addStep(inEtcCastleFirstFloor, talkToSigridDip3);
+		establishPeace7.addStep(inMiscCastleFirstFloor, goDownMiscDip2);
+
+		ConditionalStep establishPeace8 = new ConditionalStep(this, talkToDerrik);
+		establishPeace8.addStep(new Conditions(hasGiantPen, inMiscCastleFirstFloor), giveVargasPen);
+		establishPeace8.addStep(hasGiantPen, goUpMiscDip4);
+		establishPeace8.addStep(hasGiantNib, makePen);
+		establishPeace8.addStep(inMiscCastleFirstFloor, goDownMiscDip3);
+
+		ConditionalStep courting;
+
+		if (client.getLocalPlayer() != null && client.getLocalPlayer().getPlayerAppearance() != null && client.getLocalPlayer().getPlayerAppearance().isFemale())
+		{
+			courting = courtBrand;
+		}
+		else
+		{
+			courting = courtAstrid;
+		}
+
+		ConditionalStep becomeRoyalty1 = new ConditionalStep(this, courting);
+		ConditionalStep becomeRoyalty2 = new ConditionalStep(this, courting);
+		ConditionalStep becomeRoyalty3 = new ConditionalStep(this, courting);
+		ConditionalStep becomeRoyalty4 = new ConditionalStep(this, courting);
+		ConditionalStep becomeRoyalty5 = new ConditionalStep(this, courting);
+		ConditionalStep becomeRoyalty6 = new ConditionalStep(this, courting);
+		ConditionalStep becomeRoyalty7 = new ConditionalStep(this, courting);
+		ConditionalStep becomeRoyalty8 = new ConditionalStep(this, courting);
+		becomeRoyalty1.addStep(hasCourted, establishPeace1);
+		becomeRoyalty2.addStep(hasCourted, establishPeace2);
+		becomeRoyalty3.addStep(hasCourted, establishPeace3);
+		becomeRoyalty4.addStep(hasCourted, establishPeace4);
+		becomeRoyalty5.addStep(hasCourted, establishPeace5);
+		becomeRoyalty6.addStep(hasCourted, establishPeace6);
+		becomeRoyalty7.addStep(hasCourted, establishPeace7);
+		becomeRoyalty8.addStep(hasCourted, establishPeace8);
+
+		steps.put(10, becomeRoyalty1);
+		steps.put(20, becomeRoyalty2);
+		steps.put(30, becomeRoyalty3);
+		steps.put(40, becomeRoyalty4);
+		steps.put(50, becomeRoyalty5);
+		steps.put(60, becomeRoyalty6);
+		steps.put(70, becomeRoyalty7);
+		steps.put(80, becomeRoyalty8);
+
+		ConditionalStep finishOff = new ConditionalStep(this, get75Support);
+		finishOff.addStep(new Conditions(inMiscCastleFirstFloor, has75Support), finishQuest);
+		finishOff.addStep(has75Support, goUpMiscForSupport);
+		finishOff.addStep(inMiscCastleFirstFloor, goDownMiscForSupport);
+
+		steps.put(90, finishOff);
+
+		return steps;
 	}
 }

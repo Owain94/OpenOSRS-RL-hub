@@ -86,101 +86,6 @@ public class EnakhrasLament extends BasicQuestHelper
 
 	Zone templeEntranceRoom, templeGroundFloor, centreRoom, puzzleFloor, northPuzzleRoom, topRoom, lastRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToLazim);
-
-		ConditionalStep makeAndPlaceBase = new ConditionalStep(this, bringLazim32Sandstone);
-		makeAndPlaceBase.addStep(new Conditions(hasHead, hasGranite), giveLazimHead);
-		makeAndPlaceBase.addStep(new Conditions(has2Granite, canChooseHead), craftHead);
-		makeAndPlaceBase.addStep(canChooseHead, getGranite);
-		makeAndPlaceBase.addStep(chiseledStatue, talkToLazimToChooseHead);
-		makeAndPlaceBase.addStep(hasPlacedBody, chiselStatue);
-		makeAndPlaceBase.addStep(hasBody, placeBody);
-		makeAndPlaceBase.addStep(has20, useChiselOn20Sandstone);
-		makeAndPlaceBase.addStep(hasTalkedToLazimAfterBase, bringLazim20Sandstone);
-		makeAndPlaceBase.addStep(hasPlacedBase, talkToLazimAboutBody);
-		makeAndPlaceBase.addStep(hasBase, placeBase);
-		makeAndPlaceBase.addStep(has32, useChiselOn32Sandstone);
-
-		steps.put(10, makeAndPlaceBase);
-
-		ConditionalStep exploreBottomLayer = new ConditionalStep(this, enterTemple);
-		exploreBottomLayer.addStep(new Conditions(hasCamelHead, inPuzzleFloor), useStoneHeadOnPedestal);
-		exploreBottomLayer.addStep(hasCamelMould, useChiselOnGranite);
-		exploreBottomLayer.addStep(inPuzzleFloor, useSoftClayOnPedestal);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, openedDoor3, openedDoor4), goUpToPuzzles);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, openedDoor3, hasKSigil), enterDoor4);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, openedDoor3), takeK);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, hasRSigil), enterDoor3);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2), takeR);
-		// It's possible to skip the rest of this, but it skips some of the quest story and leaves doors locked after you finish, so this encourages players to explore
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, hasZSigil), enterDoor2);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1), takeZ);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, hasMSigil), enterDoor1);
-		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor), takeM);
-		exploreBottomLayer.addStep(new Conditions(startedTemple, inTempleGroundFloor), cutOffLimb);
-		exploreBottomLayer.addStep(inTempleGroundFloor, talkToLazimInTemple);
-		exploreBottomLayer.addStep(inTempleEntranceRoom, enterTempleDownLadder);
-
-		steps.put(20, exploreBottomLayer);
-
-		ConditionalStep puzzles = new ConditionalStep(this, enterTemple);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak, litWillow, litMaple, litCandle), useCoal);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak, litWillow, litMaple), useCandle);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak, litWillow), useMapleLog);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak), useWillowLog);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog), useOakLog);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace), useLog);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain), castAirSpell);
-		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor), castFireSpell);
-		puzzles.addStep(inPuzzleFloor, useBread);
-		puzzles.addStep(inTempleGroundFloor, goUpToPuzzles);
-		puzzles.addStep(inTempleEntranceRoom, enterTempleDownLadder);
-
-		steps.put(30, puzzles);
-
-		ConditionalStep topFloorPuzzle = new ConditionalStep(this, enterTemple);
-		topFloorPuzzle.addStep(inTopRoom, castCrumbleUndead);
-		topFloorPuzzle.addStep(inNorthPuzzleRoom, goUpFromPuzzleRoom);
-		topFloorPuzzle.addStep(inPuzzleFloor, passBarrier);
-		topFloorPuzzle.addStep(inTempleGroundFloor, goUpToPuzzles);
-		topFloorPuzzle.addStep(inTempleEntranceRoom, enterTempleDownLadder);
-
-		steps.put(40, topFloorPuzzle);
-
-		ConditionalStep protectMeleePuzzle = new ConditionalStep(this, enterTemple);
-		protectMeleePuzzle.addStep(inLastRoom, protectThenTalk);
-		protectMeleePuzzle.addStep(inTopRoom, goDownToFinalRoom);
-		protectMeleePuzzle.addStep(inNorthPuzzleRoom, goUpFromPuzzleRoom);
-		protectMeleePuzzle.addStep(inPuzzleFloor, passBarrier);
-		protectMeleePuzzle.addStep(inTempleGroundFloor, goUpToPuzzles);
-		protectMeleePuzzle.addStep(inTempleEntranceRoom, enterTempleDownLadder);
-
-		steps.put(50, protectMeleePuzzle);
-
-		ConditionalStep repairWallForAkthankos = new ConditionalStep(this, enterTemple);
-		repairWallForAkthankos.addStep(new Conditions(inLastRoom, wallNeedsChisel), useChiselOnWall);
-		repairWallForAkthankos.addStep(new Conditions(inLastRoom, finishedWall), talkToAkthankos);
-		repairWallForAkthankos.addStep(inLastRoom, repairWall);
-		repairWallForAkthankos.addStep(inTopRoom, goDownToFinalRoom);
-		repairWallForAkthankos.addStep(inNorthPuzzleRoom, goUpFromPuzzleRoom);
-		repairWallForAkthankos.addStep(inPuzzleFloor, passBarrier);
-		repairWallForAkthankos.addStep(inTempleGroundFloor, goUpToPuzzles);
-		repairWallForAkthankos.addStep(inTempleEntranceRoom, enterTempleDownLadder);
-
-		steps.put(60, repairWallForAkthankos);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.getPickaxes());
@@ -487,5 +392,100 @@ public class EnakhrasLament extends BasicQuestHelper
 
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToLazim);
+
+		ConditionalStep makeAndPlaceBase = new ConditionalStep(this, bringLazim32Sandstone);
+		makeAndPlaceBase.addStep(new Conditions(hasHead, hasGranite), giveLazimHead);
+		makeAndPlaceBase.addStep(new Conditions(has2Granite, canChooseHead), craftHead);
+		makeAndPlaceBase.addStep(canChooseHead, getGranite);
+		makeAndPlaceBase.addStep(chiseledStatue, talkToLazimToChooseHead);
+		makeAndPlaceBase.addStep(hasPlacedBody, chiselStatue);
+		makeAndPlaceBase.addStep(hasBody, placeBody);
+		makeAndPlaceBase.addStep(has20, useChiselOn20Sandstone);
+		makeAndPlaceBase.addStep(hasTalkedToLazimAfterBase, bringLazim20Sandstone);
+		makeAndPlaceBase.addStep(hasPlacedBase, talkToLazimAboutBody);
+		makeAndPlaceBase.addStep(hasBase, placeBase);
+		makeAndPlaceBase.addStep(has32, useChiselOn32Sandstone);
+
+		steps.put(10, makeAndPlaceBase);
+
+		ConditionalStep exploreBottomLayer = new ConditionalStep(this, enterTemple);
+		exploreBottomLayer.addStep(new Conditions(hasCamelHead, inPuzzleFloor), useStoneHeadOnPedestal);
+		exploreBottomLayer.addStep(hasCamelMould, useChiselOnGranite);
+		exploreBottomLayer.addStep(inPuzzleFloor, useSoftClayOnPedestal);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, openedDoor3, openedDoor4), goUpToPuzzles);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, openedDoor3, hasKSigil), enterDoor4);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, openedDoor3), takeK);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2, hasRSigil), enterDoor3);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, openedDoor2), takeR);
+		// It's possible to skip the rest of this, but it skips some of the quest story and leaves doors locked after you finish, so this encourages players to explore
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1, hasZSigil), enterDoor2);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, openedDoor1), takeZ);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor, hasMSigil), enterDoor1);
+		exploreBottomLayer.addStep(new Conditions(gottenLimbs, inTempleGroundFloor), takeM);
+		exploreBottomLayer.addStep(new Conditions(startedTemple, inTempleGroundFloor), cutOffLimb);
+		exploreBottomLayer.addStep(inTempleGroundFloor, talkToLazimInTemple);
+		exploreBottomLayer.addStep(inTempleEntranceRoom, enterTempleDownLadder);
+
+		steps.put(20, exploreBottomLayer);
+
+		ConditionalStep puzzles = new ConditionalStep(this, enterTemple);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak, litWillow, litMaple, litCandle), useCoal);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak, litWillow, litMaple), useCandle);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak, litWillow), useMapleLog);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog, litOak), useWillowLog);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace, litLog), useOakLog);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain, cleanedFurnace), useLog);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor, meltedFountain), castAirSpell);
+		puzzles.addStep(new Conditions(fedBread, inPuzzleFloor), castFireSpell);
+		puzzles.addStep(inPuzzleFloor, useBread);
+		puzzles.addStep(inTempleGroundFloor, goUpToPuzzles);
+		puzzles.addStep(inTempleEntranceRoom, enterTempleDownLadder);
+
+		steps.put(30, puzzles);
+
+		ConditionalStep topFloorPuzzle = new ConditionalStep(this, enterTemple);
+		topFloorPuzzle.addStep(inTopRoom, castCrumbleUndead);
+		topFloorPuzzle.addStep(inNorthPuzzleRoom, goUpFromPuzzleRoom);
+		topFloorPuzzle.addStep(inPuzzleFloor, passBarrier);
+		topFloorPuzzle.addStep(inTempleGroundFloor, goUpToPuzzles);
+		topFloorPuzzle.addStep(inTempleEntranceRoom, enterTempleDownLadder);
+
+		steps.put(40, topFloorPuzzle);
+
+		ConditionalStep protectMeleePuzzle = new ConditionalStep(this, enterTemple);
+		protectMeleePuzzle.addStep(inLastRoom, protectThenTalk);
+		protectMeleePuzzle.addStep(inTopRoom, goDownToFinalRoom);
+		protectMeleePuzzle.addStep(inNorthPuzzleRoom, goUpFromPuzzleRoom);
+		protectMeleePuzzle.addStep(inPuzzleFloor, passBarrier);
+		protectMeleePuzzle.addStep(inTempleGroundFloor, goUpToPuzzles);
+		protectMeleePuzzle.addStep(inTempleEntranceRoom, enterTempleDownLadder);
+
+		steps.put(50, protectMeleePuzzle);
+
+		ConditionalStep repairWallForAkthankos = new ConditionalStep(this, enterTemple);
+		repairWallForAkthankos.addStep(new Conditions(inLastRoom, wallNeedsChisel), useChiselOnWall);
+		repairWallForAkthankos.addStep(new Conditions(inLastRoom, finishedWall), talkToAkthankos);
+		repairWallForAkthankos.addStep(inLastRoom, repairWall);
+		repairWallForAkthankos.addStep(inTopRoom, goDownToFinalRoom);
+		repairWallForAkthankos.addStep(inNorthPuzzleRoom, goUpFromPuzzleRoom);
+		repairWallForAkthankos.addStep(inPuzzleFloor, passBarrier);
+		repairWallForAkthankos.addStep(inTempleGroundFloor, goUpToPuzzles);
+		repairWallForAkthankos.addStep(inTempleEntranceRoom, enterTempleDownLadder);
+
+		steps.put(60, repairWallForAkthankos);
+
+		return steps;
 	}
 }

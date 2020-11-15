@@ -40,8 +40,8 @@ import net.runelite.client.util.ImageUtil;
 
 public class NpcEmoteStep extends NpcStep
 {
-	private boolean hasScrolled;
 	private final QuestEmote emote;
+	private boolean hasScrolled;
 
 	public NpcEmoteStep(QuestHelper questHelper, int npcID, QuestEmote emote, String text, Requirement... requirements)
 	{

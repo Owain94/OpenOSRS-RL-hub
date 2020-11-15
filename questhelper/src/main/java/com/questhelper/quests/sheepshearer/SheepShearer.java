@@ -49,6 +49,24 @@ public class SheepShearer extends BasicQuestHelper
 	QuestStep startStep;
 
 	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(twentyBallsOfWool);
+		reqs.add(shears);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+
+		allSteps.add(new PanelDetails("Bring Fred some wool", new ArrayList<>(Collections.singletonList(startStep))));
+		return allSteps;
+	}
+
+	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
 		Map<Integer, QuestStep> steps = new HashMap<>();
@@ -126,23 +144,5 @@ public class SheepShearer extends BasicQuestHelper
 		steps.get(0).addDialogStep("I'm looking for a quest.");
 		steps.get(0).addDialogStep("Yes, okay. I can do that.");
 		return steps;
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(twentyBallsOfWool);
-		reqs.add(shears);
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-
-		allSteps.add(new PanelDetails("Bring Fred some wool", new ArrayList<>(Collections.singletonList(startStep))));
-		return allSteps;
 	}
 }

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020, Zoinkwiz <https://github.com/Zoinkwiz>
  * Copyright (c) 2019, Trevor <https://github.com/Trevor159>
  * All rights reserved.
  *
@@ -39,36 +40,29 @@ import java.util.Collection;
 import javax.inject.Inject;
 import lombok.Setter;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class NpcStep extends DetailedQuestStep
 {
-	@Inject
-	EventBus eventBus;
-
-	@Inject
-	protected Client client;
-
 	private final int npcID;
 	private final ArrayList<Integer> alternateNpcIDs = new ArrayList<>();
-
+	@Inject
+	protected Client client;
+	protected BufferedImage npcIcon;
 	private boolean allowMultipleHighlights;
-
 	private NPC npc;
 	private ArrayList<NPC> otherNpcs = new ArrayList<>();
-
-	protected BufferedImage npcIcon;
-
 	@Setter
 	private int maxRoamRange = 48;
 
@@ -95,11 +89,6 @@ public class NpcStep extends DetailedQuestStep
 		this(questHelper, npcID, null, text, allowMultipleHighlights, requirements);
 	}
 
-	public void subscribe()
-	{
-
-	}
-
 	@Override
 	public void startUp()
 	{
@@ -120,12 +109,6 @@ public class NpcStep extends DetailedQuestStep
 				}
 			}
 		}
-		subscribe();
-	}
-
-	public void addAlternateNpcs(Integer... alternateNpcIDs)
-	{
-		this.alternateNpcIDs.addAll(Arrays.asList(alternateNpcIDs));
 	}
 
 	@Override
@@ -137,50 +120,15 @@ public class NpcStep extends DetailedQuestStep
 	}
 
 	@Subscribe
-	public void onNpcSpawned(NpcSpawned event)
+	@Override
+	public void onGameStateChanged(GameStateChanged event)
 	{
-		if (event.getNpc().getId() == npcID || alternateNpcIDs.contains(event.getNpc().getId()))
-		{
-			WorldPoint npcPoint = WorldPoint.fromLocalInstance(client, event.getNpc().getLocalLocation());
-			if (npc == null)
-			{
-				if (worldPoint == null)
-				{
-					npc = event.getNpc();
-				}
-				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
-				{
-					npc = event.getNpc();
-				}
-			}
-			else if (allowMultipleHighlights)
-			{
-				if (worldPoint == null)
-				{
-					npc = event.getNpc();
-				}
-				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
-				{
-					otherNpcs.add(event.getNpc());
-				}
-			}
-		}
-	}
-
-	@Subscribe
-	public void onNpcDespawned(NpcDespawned event)
-	{
-		if (event.getNpc().equals(npc))
+		super.onGameStateChanged(event);
+		if (event.getGameState() == GameState.HOPPING)
 		{
 			npc = null;
-			if (allowMultipleHighlights && !otherNpcs.isEmpty())
-			{
-				npc = otherNpcs.get(0);
-				otherNpcs.remove(0);
-			}
+			otherNpcs.clear();
 		}
-
-		otherNpcs.remove(event.getNpc());
 	}
 
 	@Override
@@ -291,5 +239,57 @@ public class NpcStep extends DetailedQuestStep
 		}
 
 		graphics.drawImage(getSmallArrow(), posOnMinimap.getX() - 5, posOnMinimap.getY() - 14, null);
+	}
+
+	public void addAlternateNpcs(Integer... alternateNpcIDs)
+	{
+		this.alternateNpcIDs.addAll(Arrays.asList(alternateNpcIDs));
+	}
+
+	@Subscribe
+	public void onNpcSpawned(NpcSpawned event)
+	{
+		if (event.getNpc().getId() == npcID || alternateNpcIDs.contains(event.getNpc().getId()))
+		{
+			WorldPoint npcPoint = WorldPoint.fromLocalInstance(client, event.getNpc().getLocalLocation());
+			if (npc == null)
+			{
+				if (worldPoint == null)
+				{
+					npc = event.getNpc();
+				}
+				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
+				{
+					npc = event.getNpc();
+				}
+			}
+			else if (allowMultipleHighlights)
+			{
+				if (worldPoint == null)
+				{
+					npc = event.getNpc();
+				}
+				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
+				{
+					otherNpcs.add(event.getNpc());
+				}
+			}
+		}
+	}
+
+	@Subscribe
+	public void onNpcDespawned(NpcDespawned event)
+	{
+		if (event.getNpc().equals(npc))
+		{
+			npc = null;
+			if (allowMultipleHighlights && !otherNpcs.isEmpty())
+			{
+				npc = otherNpcs.get(0);
+				otherNpcs.remove(0);
+			}
+		}
+
+		otherNpcs.remove(event.getNpc());
 	}
 }

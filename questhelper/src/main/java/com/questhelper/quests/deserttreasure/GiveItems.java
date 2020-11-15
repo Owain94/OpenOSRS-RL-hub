@@ -4,20 +4,14 @@ import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.NpcStep;
 import java.util.ArrayList;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullItemID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class GiveItems extends NpcStep
 {
-
-	@Inject
-	EventBus eventbus;
-
 	int magicLogId = 365;
 	int steelBarsId = 366;
 	int moltenGlassId = 367;
@@ -49,7 +43,6 @@ public class GiveItems extends NpcStep
 	{
 		super.startUp();
 		itemQuantitiesLeft();
-		eventbus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Subscribe

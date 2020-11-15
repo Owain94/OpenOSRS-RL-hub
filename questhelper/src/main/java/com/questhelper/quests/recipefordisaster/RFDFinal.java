@@ -62,38 +62,6 @@ public class RFDFinal extends BasicQuestHelper
 
 	Zone fightArena;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupRequirements();
-		setupConditions();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep defeatAll = new ConditionalStep(this, enterPortal);
-		defeatAll.addStep(new Conditions(killedMother, inFightArena), killCulinaromancer);
-		defeatAll.addStep(new Conditions(killedMother), enterPortalCulinaromancer);
-
-		defeatAll.addStep(new Conditions(killedDessourt, inFightArena), killMother);
-		defeatAll.addStep(new Conditions(killedDessourt), enterPortalMother);
-
-		defeatAll.addStep(new Conditions(killedKaramel, inFightArena), killDessourt);
-		defeatAll.addStep(new Conditions(killedKaramel), enterPortalDessourt);
-
-		defeatAll.addStep(new Conditions(killedFlambeed, inFightArena), killKaramel);
-		defeatAll.addStep(new Conditions(killedFlambeed), enterPortalKaramel);
-
-		defeatAll.addStep(new Conditions(killedAgrith, inFightArena), killFlambeed);
-		defeatAll.addStep(new Conditions(killedAgrith), enterPortalFlambeed);
-
-		defeatAll.addStep(inFightArena, killAgrith);
-		steps.put(4, defeatAll);
-
-		return steps;
-	}
-
 	public void setupRequirements()
 	{
 		iceGloves = new ItemRequirement("Ice gloves", ItemID.ICE_GLOVES);
@@ -146,6 +114,52 @@ public class RFDFinal extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+		allSteps.add(new PanelDetails("Defeating the Culinaromancer", new ArrayList<>(Arrays.asList(enterPortal, killAgrith, killFlambeed, killKaramel, killDessourt, killMother, killCulinaromancer))));
+		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupRequirements();
+		setupConditions();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep defeatAll = new ConditionalStep(this, enterPortal);
+		defeatAll.addStep(new Conditions(killedMother, inFightArena), killCulinaromancer);
+		defeatAll.addStep(new Conditions(killedMother), enterPortalCulinaromancer);
+
+		defeatAll.addStep(new Conditions(killedDessourt, inFightArena), killMother);
+		defeatAll.addStep(new Conditions(killedDessourt), enterPortalMother);
+
+		defeatAll.addStep(new Conditions(killedKaramel, inFightArena), killDessourt);
+		defeatAll.addStep(new Conditions(killedKaramel), enterPortalDessourt);
+
+		defeatAll.addStep(new Conditions(killedFlambeed, inFightArena), killKaramel);
+		defeatAll.addStep(new Conditions(killedFlambeed), enterPortalKaramel);
+
+		defeatAll.addStep(new Conditions(killedAgrith, inFightArena), killFlambeed);
+		defeatAll.addStep(new Conditions(killedAgrith), enterPortalFlambeed);
+
+		defeatAll.addStep(inFightArena, killAgrith);
+		steps.put(4, defeatAll);
+
+		return steps;
+	}
+
+	@Override
+	public boolean isCompleted()
+	{
+		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 4 || super.isCompleted());
+	}
+
+	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		return new ArrayList<>(Arrays.asList(iceGloves, restorePotions, combatGear));
@@ -155,19 +169,5 @@ public class RFDFinal extends BasicQuestHelper
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Arrays.asList("Agrith-Na-Na (level 146)", "Flambeed (level 149)", "Karamel (level 136)", "Dessourt (level 121)", "Gelatinnoth Mother (level 130)", "Culinaromancer (level 75)"));
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Defeating the Culinaromancer", new ArrayList<>(Arrays.asList(enterPortal, killAgrith, killFlambeed, killKaramel, killDessourt, killMother, killCulinaromancer))));
-		return allSteps;
-	}
-
-	@Override
-	public boolean isCompleted()
-	{
-		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 4 || super.isCompleted());
 	}
 }

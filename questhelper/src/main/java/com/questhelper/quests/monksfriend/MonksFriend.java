@@ -63,34 +63,6 @@ public class MonksFriend extends BasicQuestHelper
 
 	Zone dungeon;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToOmad);
-
-		ConditionalStep getBlanket = new ConditionalStep(this, goDownLadder);
-		getBlanket.addStep(new Conditions(inDungeon, hasBlanket), goUpLadder);
-		getBlanket.addStep(hasBlanket, returnToOmadWithBlanket);
-		getBlanket.addStep(inDungeon, grabBlanket);
-
-		steps.put(10, getBlanket);
-
-		steps.put(20, talkToOmadAgain);
-		steps.put(30, talkToCedric);
-		steps.put(40, talkToCedricWithJug);
-		steps.put(50, continueTalkingToCedric);
-		steps.put(60, talkToCedricWithLog);
-		steps.put(70, finishQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		log = new ItemRequirement("Logs", ItemID.LOGS);
@@ -158,5 +130,33 @@ public class MonksFriend extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Help Cedric", new ArrayList<>(Arrays.asList(talkToOmadAgain, talkToCedric, talkToCedricWithJug, talkToCedricWithLog, finishQuest))));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToOmad);
+
+		ConditionalStep getBlanket = new ConditionalStep(this, goDownLadder);
+		getBlanket.addStep(new Conditions(inDungeon, hasBlanket), goUpLadder);
+		getBlanket.addStep(hasBlanket, returnToOmadWithBlanket);
+		getBlanket.addStep(inDungeon, grabBlanket);
+
+		steps.put(10, getBlanket);
+
+		steps.put(20, talkToOmadAgain);
+		steps.put(30, talkToCedric);
+		steps.put(40, talkToCedricWithJug);
+		steps.put(50, continueTalkingToCedric);
+		steps.put(60, talkToCedricWithLog);
+		steps.put(70, finishQuest);
+
+		return steps;
 	}
 }

@@ -66,41 +66,6 @@ public class RovingElves extends BasicQuestHelper
 
 	Zone glarialTomb, deadTreeIsland, ledge, hudonIsland, falls, throneRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToIslwyn);
-		steps.put(1, talkToIslwyn);
-		steps.put(2, talkToEluned);
-
-		ConditionalStep getTheSeed = new ConditionalStep(this, enterGlarialsTombstone);
-		getTheSeed.addStep(hasSeed, returnSeedToEluned);
-		getTheSeed.addStep(seedNearby, pickUpSeed);
-		getTheSeed.addStep(inGlarialsTomb, killGuardian);
-
-		steps.put(3, getTheSeed);
-
-		ConditionalStep plantingTheSeed = new ConditionalStep(this, boardRaft);
-		plantingTheSeed.addStep(inThroneRoom, plantSeed);
-		plantingTheSeed.addStep(new Conditions(inFalls, hasKey), useKeyOnFallsDoor);
-		plantingTheSeed.addStep(inFalls, searchFallsCrate);
-		plantingTheSeed.addStep(onLedge, enterFalls);
-		plantingTheSeed.addStep(onDeadTreeIsland, useRopeOnTree);
-		plantingTheSeed.addStep(onHudonIsland, useRopeOnRock);
-
-		steps.put(4, plantingTheSeed);
-
-		steps.put(5, returnToIslwyn);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		seed = new ItemRequirement("Consecration seed", ItemID.CONSECRATION_SEED);
@@ -215,5 +180,40 @@ public class RovingElves extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Plant the seed",
 			new ArrayList<>(Arrays.asList(boardRaft, useRopeOnRock, useRopeOnTree, enterFalls, searchFallsCrate, useKeyOnFallsDoor, plantSeed, returnToIslwyn)), spade, rope, blessedSeed));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToIslwyn);
+		steps.put(1, talkToIslwyn);
+		steps.put(2, talkToEluned);
+
+		ConditionalStep getTheSeed = new ConditionalStep(this, enterGlarialsTombstone);
+		getTheSeed.addStep(hasSeed, returnSeedToEluned);
+		getTheSeed.addStep(seedNearby, pickUpSeed);
+		getTheSeed.addStep(inGlarialsTomb, killGuardian);
+
+		steps.put(3, getTheSeed);
+
+		ConditionalStep plantingTheSeed = new ConditionalStep(this, boardRaft);
+		plantingTheSeed.addStep(inThroneRoom, plantSeed);
+		plantingTheSeed.addStep(new Conditions(inFalls, hasKey), useKeyOnFallsDoor);
+		plantingTheSeed.addStep(inFalls, searchFallsCrate);
+		plantingTheSeed.addStep(onLedge, enterFalls);
+		plantingTheSeed.addStep(onDeadTreeIsland, useRopeOnTree);
+		plantingTheSeed.addStep(onHudonIsland, useRopeOnRock);
+
+		steps.put(4, plantingTheSeed);
+
+		steps.put(5, returnToIslwyn);
+
+		return steps;
 	}
 }

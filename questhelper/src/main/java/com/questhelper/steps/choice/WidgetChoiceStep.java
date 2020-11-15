@@ -34,18 +34,14 @@ public class WidgetChoiceStep
 {
 	@Getter
 	private final String choice;
-
-	private String excludedString;
-	private int excludedGroupId;
-	private int excludedChildId;
-
 	private final int choiceById;
-
 	@Getter
 	private final int groupId;
 	private final int childId;
-
 	private final int TEXT_HIGHLIGHT_COLOR = Color.CYAN.darker().getRGB();
+	private String excludedString;
+	private int excludedGroupId;
+	private int excludedChildId;
 
 	public WidgetChoiceStep(String choice, int groupId, int childId)
 	{

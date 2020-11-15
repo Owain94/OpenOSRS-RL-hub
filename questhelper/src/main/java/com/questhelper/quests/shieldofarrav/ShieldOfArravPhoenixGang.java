@@ -65,46 +65,6 @@ public class ShieldOfArravPhoenixGang extends BasicQuestHelper
 
 	Zone phoenixEntry, phoenixBase;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, startQuest);
-		steps.put(1, searchBookcase);
-		steps.put(2, talkToReldoAgain);
-		steps.put(3, talkToBaraek);
-
-		ConditionalStep getPhoenixTask = new ConditionalStep(this, goDownToPhoenixGang);
-		getPhoenixTask.addStep(inPhoenixEntry, talkToStraven);
-
-		steps.put(4, getPhoenixTask);
-
-		ConditionalStep goToKillJonny = new ConditionalStep(this, killJonny);
-		goToKillJonny.addStep(new Conditions(hasIntelReport, inPhoenixEntry), talkToStravenAgain);
-		goToKillJonny.addStep(hasIntelReport, returnDownLadder);
-		goToKillJonny.addStep(intelReportNearby, pickupIntelReport);
-		goToKillJonny.addStep(inPhoenixEntry, goUpFromPhoenixGang);
-
-		steps.put(5, goToKillJonny);
-
-		ConditionalStep completeQuest = new ConditionalStep(this, returnDownLadder);
-		completeQuest.addStep(hasCertificate, talkToRoald);
-		completeQuest.addStep(new Conditions(hasCertificateHalf, hasBlackArmCertificateHalf), combineCertificate);
-		completeQuest.addStep(hasCertificateHalf, tradeCertificateHalf);
-		completeQuest.addStep(new Conditions(inPhoenixBase, hasShieldHalf), leaveAfterGettingShieldHalf);
-		completeQuest.addStep(hasShieldHalf, talkToHaig);
-		completeQuest.addStep(new Conditions(inPhoenixBase, chestOpen), getShieldHalf1);
-		completeQuest.addStep(inPhoenixBase, getShieldHalf);
-
-		steps.put(6, completeQuest);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		book = new ItemRequirement("Book", ItemID.BOOK);
@@ -169,14 +129,6 @@ public class ShieldOfArravPhoenixGang extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(twentyCoins);
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -184,6 +136,61 @@ public class ShieldOfArravPhoenixGang extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Joining the gang", new ArrayList<>(Arrays.asList(goUpFromPhoenixGang, killJonny, pickupIntelReport, returnDownLadder, talkToStravenAgain))));
 		allSteps.add(new PanelDetails("Returning the shield", new ArrayList<>(Arrays.asList(getShieldHalf, talkToHaig, tradeCertificateHalf, combineCertificate, talkToRoald))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, startQuest);
+		steps.put(1, searchBookcase);
+		steps.put(2, talkToReldoAgain);
+		steps.put(3, talkToBaraek);
+
+		ConditionalStep getPhoenixTask = new ConditionalStep(this, goDownToPhoenixGang);
+		getPhoenixTask.addStep(inPhoenixEntry, talkToStraven);
+
+		steps.put(4, getPhoenixTask);
+
+		ConditionalStep goToKillJonny = new ConditionalStep(this, killJonny);
+		goToKillJonny.addStep(new Conditions(hasIntelReport, inPhoenixEntry), talkToStravenAgain);
+		goToKillJonny.addStep(hasIntelReport, returnDownLadder);
+		goToKillJonny.addStep(intelReportNearby, pickupIntelReport);
+		goToKillJonny.addStep(inPhoenixEntry, goUpFromPhoenixGang);
+
+		steps.put(5, goToKillJonny);
+
+		ConditionalStep completeQuest = new ConditionalStep(this, returnDownLadder);
+		completeQuest.addStep(hasCertificate, talkToRoald);
+		completeQuest.addStep(new Conditions(hasCertificateHalf, hasBlackArmCertificateHalf), combineCertificate);
+		completeQuest.addStep(hasCertificateHalf, tradeCertificateHalf);
+		completeQuest.addStep(new Conditions(inPhoenixBase, hasShieldHalf), leaveAfterGettingShieldHalf);
+		completeQuest.addStep(hasShieldHalf, talkToHaig);
+		completeQuest.addStep(new Conditions(inPhoenixBase, chestOpen), getShieldHalf1);
+		completeQuest.addStep(inPhoenixBase, getShieldHalf);
+
+		steps.put(6, completeQuest);
+		return steps;
+	}
+
+	@Override
+	public boolean isCompleted()
+	{
+		boolean partComplete = super.isCompleted();
+		return (partComplete || QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getVar(client) >= 3);
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(twentyCoins);
+		return reqs;
 	}
 
 	@Override
@@ -199,12 +206,5 @@ public class ShieldOfArravPhoenixGang extends BasicQuestHelper
 			"Once you're accepted into one of the gangs, you CANNOT change gang.",
 			"This quest requires you to swap items with another player who's in the other gang, so it's recommended to either find a friend to help you, or you can use the friend's chat 'OSRS SOA' and find someone to help there."));
 
-	}
-
-	@Override
-	public boolean isCompleted()
-	{
-		boolean partComplete = super.isCompleted();
-		return (partComplete || QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getVar(client) >= 3);
 	}
 }

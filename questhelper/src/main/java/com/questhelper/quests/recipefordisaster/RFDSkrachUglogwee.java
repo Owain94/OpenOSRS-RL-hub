@@ -72,60 +72,6 @@ public class RFDSkrachUglogwee extends BasicQuestHelper
 
 	Zone diningRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupRequirements();
-		setupConditions();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goInspectSkrach = new ConditionalStep(this, enterDiningRoom);
-		goInspectSkrach.addStep(inDiningRoom, inspectSkrach);
-		steps.put(0, goInspectSkrach);
-		steps.put(10, talkToRantz);
-		steps.put(20, talkToRantz);
-
-		steps.put(30, talkToRantzOnCoast);
-		steps.put(40, talkToRantzOnCoast);
-
-		steps.put(50, useAxeOnTree);
-		steps.put(60, useAxeOnTreeAgain);
-
-		steps.put(70, talkToRantzOnCoastAgain);
-
-		ConditionalStep getChildrenToKaramja = new ConditionalStep(this, useSpitOnChompy);
-		getChildrenToKaramja.addStep(hasSpitChompy, lightFire);
-
-		steps.put(80, getChildrenToKaramja);
-
-		steps.put(90, talkToRantzAfterReturn);
-		steps.put(100, talkToRantzAfterReturn);
-
-		ConditionalStep getJubbly = new ConditionalStep(this, fillUpBellows);
-		getJubbly.addStep(hasRawJubbly, cookJubbly);
-		getJubbly.addStep(rawJubblyOnFloor, pickUpRawJubbly);
-		getJubbly.addStep(jubblyCarcassNearby, lootJubbly);
-		getJubbly.addStep(jubblyNearby, killJubbly);
-		getJubbly.addStep(hasBalloonToad, dropBalloonToad);
-		getJubbly.addStep(new Conditions(hasToad, hasRock, hasFilledBellows), useBellowOnToadInInv);
-		getJubbly.addStep(new Conditions(hasToad, hasFilledBellows), getRock);
-		getJubbly.addStep(hasFilledBellows, getToad);
-		steps.put(110, getJubbly);
-		steps.put(120, getJubbly);
-		steps.put(130, getJubbly);
-		steps.put(140, getJubbly);
-		steps.put(150, getJubbly);
-
-		ConditionalStep saveSkrach = new ConditionalStep(this, enterDiningRoomAgain);
-		saveSkrach.addStep(inDiningRoom, useJubblyOnSkrach);
-		steps.put(160, saveSkrach);
-
-		return steps;
-	}
-
 	public void setupRequirements()
 	{
 		rawJubbly = new ItemRequirement("Raw jubbly", ItemID.RAW_JUBBLY);
@@ -228,6 +174,79 @@ public class RFDSkrachUglogwee extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Arrays.asList(inspectSkrach))));
+		allSteps.add(new PanelDetails("Help Rantz", new ArrayList<>(Arrays.asList(talkToRantz, talkToRantzOnCoast, useAxeOnTree, useAxeOnTreeAgain,
+			talkToRantzOnCoastAgain, useSpitOnChompy, lightFire, talkToRantzAfterReturn)), axeHighlighted, log, tinderbox, chompy, ironSpit, ogreBowAndArrows, pickaxe, ogreBellowsFilled, ballOfWool));
+		allSteps.add(new PanelDetails("Save Skrach", new ArrayList<>(Arrays.asList(getToad, getRock, useBellowOnToadInInv, dropBalloonToad, killJubbly, lootJubbly, pickUpRawJubbly, cookJubbly,
+			useJubblyOnSkrach)), ogreBowAndArrows, pickaxe, ogreBellowsFilled, ballOfWool));
+
+		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupRequirements();
+		setupConditions();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goInspectSkrach = new ConditionalStep(this, enterDiningRoom);
+		goInspectSkrach.addStep(inDiningRoom, inspectSkrach);
+		steps.put(0, goInspectSkrach);
+		steps.put(10, talkToRantz);
+		steps.put(20, talkToRantz);
+
+		steps.put(30, talkToRantzOnCoast);
+		steps.put(40, talkToRantzOnCoast);
+
+		steps.put(50, useAxeOnTree);
+		steps.put(60, useAxeOnTreeAgain);
+
+		steps.put(70, talkToRantzOnCoastAgain);
+
+		ConditionalStep getChildrenToKaramja = new ConditionalStep(this, useSpitOnChompy);
+		getChildrenToKaramja.addStep(hasSpitChompy, lightFire);
+
+		steps.put(80, getChildrenToKaramja);
+
+		steps.put(90, talkToRantzAfterReturn);
+		steps.put(100, talkToRantzAfterReturn);
+
+		ConditionalStep getJubbly = new ConditionalStep(this, fillUpBellows);
+		getJubbly.addStep(hasRawJubbly, cookJubbly);
+		getJubbly.addStep(rawJubblyOnFloor, pickUpRawJubbly);
+		getJubbly.addStep(jubblyCarcassNearby, lootJubbly);
+		getJubbly.addStep(jubblyNearby, killJubbly);
+		getJubbly.addStep(hasBalloonToad, dropBalloonToad);
+		getJubbly.addStep(new Conditions(hasToad, hasRock, hasFilledBellows), useBellowOnToadInInv);
+		getJubbly.addStep(new Conditions(hasToad, hasFilledBellows), getRock);
+		getJubbly.addStep(hasFilledBellows, getToad);
+		steps.put(110, getJubbly);
+		steps.put(120, getJubbly);
+		steps.put(130, getJubbly);
+		steps.put(140, getJubbly);
+		steps.put(150, getJubbly);
+
+		ConditionalStep saveSkrach = new ConditionalStep(this, enterDiningRoomAgain);
+		saveSkrach.addStep(inDiningRoom, useJubblyOnSkrach);
+		steps.put(160, saveSkrach);
+
+		return steps;
+	}
+
+	@Override
+	public boolean isCompleted()
+	{
+		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER_SKRACH_UGLOGWEE.getId()) >= 170 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
+	}
+
+	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		return new ArrayList<>(Arrays.asList(axeHighlighted, chompy, ironSpit, log, tinderbox, pickaxe, ogreBellows, ballOfWool, ogreBowAndArrows));
@@ -237,24 +256,5 @@ public class RFDSkrachUglogwee extends BasicQuestHelper
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Arrays.asList("Jubbly (level 9)"));
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Arrays.asList(inspectSkrach))));
-		allSteps.add(new PanelDetails("Help Rantz", new ArrayList<>(Arrays.asList(talkToRantz, talkToRantzOnCoast, useAxeOnTree, useAxeOnTreeAgain,
-			talkToRantzOnCoastAgain, lightFire, talkToRantzAfterReturn)), axeHighlighted, log, tinderbox, chompy, ironSpit, ogreBowAndArrows, pickaxe, ogreBellowsFilled, ballOfWool));
-		allSteps.add(new PanelDetails("Save Skrach", new ArrayList<>(Arrays.asList(getToad, getRock, useBellowOnToadInInv, dropBalloonToad, killJubbly, lootJubbly, cookJubbly,
-			useJubblyOnSkrach)), ogreBowAndArrows, pickaxe, ogreBellowsFilled, ballOfWool));
-
-		return allSteps;
-	}
-
-	@Override
-	public boolean isCompleted()
-	{
-		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER_SKRACH_UGLOGWEE.getId()) >= 170 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
 	}
 }

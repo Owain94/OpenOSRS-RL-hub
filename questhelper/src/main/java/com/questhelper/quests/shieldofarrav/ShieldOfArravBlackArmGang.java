@@ -65,40 +65,6 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 
 	Zone storeRoom, upstairsInBase;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToCharlie);
-		steps.put(1, talkToKatrine);
-
-		ConditionalStep gettingTheCrossbows = new ConditionalStep(this, getWeaponStoreKey);
-		gettingTheCrossbows.addStep(new Conditions(hasTwoPhoenixCrossbow, inStoreRoom), goDownFromWeaponStore);
-		gettingTheCrossbows.addStep(hasTwoPhoenixCrossbow, returnToKatrine);
-		gettingTheCrossbows.addStep(new Conditions(weaponMasterAlive, inStoreRoom), killWeaponsMaster);
-		gettingTheCrossbows.addStep(inStoreRoom, pickupTwoCrossbows);
-		gettingTheCrossbows.addStep(hasStoreRoomKey, goUpToWeaponStore);
-
-		steps.put(2, gettingTheCrossbows);
-
-		ConditionalStep completeQuest = new ConditionalStep(this, goUpstairsInBase);
-		completeQuest.addStep(hasCertificate, talkToRoald);
-		completeQuest.addStep(new Conditions(hasCertificateHalf, hasPhoenixCertificateHalf), combineCertificate);
-		completeQuest.addStep(hasCertificateHalf, tradeCertificateHalf);
-		completeQuest.addStep(new Conditions(hasShieldHalf, isUpstairsInBase), goDownstairsInBase);
-		completeQuest.addStep(hasShieldHalf, talkToHaig);
-		completeQuest.addStep(new Conditions(isUpstairsInBase, cupboardOpen), getShieldFromCupboard1);
-		completeQuest.addStep(isUpstairsInBase, getShieldFromCupboard);
-
-		steps.put(3, completeQuest);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		storeRoomKey = new ItemRequirement("Weapon store key", ItemID.WEAPON_STORE_KEY);
@@ -186,6 +152,47 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 	}
 
 	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToCharlie);
+		steps.put(1, talkToKatrine);
+
+		ConditionalStep gettingTheCrossbows = new ConditionalStep(this, getWeaponStoreKey);
+		gettingTheCrossbows.addStep(new Conditions(hasTwoPhoenixCrossbow, inStoreRoom), goDownFromWeaponStore);
+		gettingTheCrossbows.addStep(hasTwoPhoenixCrossbow, returnToKatrine);
+		gettingTheCrossbows.addStep(new Conditions(weaponMasterAlive, inStoreRoom), killWeaponsMaster);
+		gettingTheCrossbows.addStep(inStoreRoom, pickupTwoCrossbows);
+		gettingTheCrossbows.addStep(hasStoreRoomKey, goUpToWeaponStore);
+
+		steps.put(2, gettingTheCrossbows);
+
+		ConditionalStep completeQuest = new ConditionalStep(this, goUpstairsInBase);
+		completeQuest.addStep(hasCertificate, talkToRoald);
+		completeQuest.addStep(new Conditions(hasCertificateHalf, hasPhoenixCertificateHalf), combineCertificate);
+		completeQuest.addStep(hasCertificateHalf, tradeCertificateHalf);
+		completeQuest.addStep(new Conditions(hasShieldHalf, isUpstairsInBase), goDownstairsInBase);
+		completeQuest.addStep(hasShieldHalf, talkToHaig);
+		completeQuest.addStep(new Conditions(isUpstairsInBase, cupboardOpen), getShieldFromCupboard1);
+		completeQuest.addStep(isUpstairsInBase, getShieldFromCupboard);
+
+		steps.put(3, completeQuest);
+		return steps;
+	}
+
+	@Override
+	public boolean isCompleted()
+	{
+		boolean partComplete = super.isCompleted();
+		return (partComplete || QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getVar(client) >= 6);
+	}
+
+	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Arrays.asList("Weaponsmaster (level 23), or a friend to kill him for you"));
@@ -198,12 +205,5 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 			Arrays.asList("You can also do this quest by joining the Phoenix Gang, which instead requires you to kill Jonny the beard (level 2).",
 				"Once you're accepted into one of the gangs, you CANNOT change gang.",
 				"This quest requires you to swap items with another player who's in the other gang, so it's recommended to either find a friend to help you, or you can use the friend's chat 'OSRS SOA' and find someone to help there."));
-	}
-
-	@Override
-	public boolean isCompleted()
-	{
-		boolean partComplete = super.isCompleted();
-		return (partComplete || QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getVar(client) >= 6);
 	}
 }

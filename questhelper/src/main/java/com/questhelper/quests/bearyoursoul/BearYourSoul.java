@@ -61,28 +61,6 @@ public class BearYourSoul extends BasicQuestHelper
 
 	Zone inTaverleyDungeonZone, inKeyMasterZone;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, findSoulJourneyAndRead);
-		steps.put(1, talkToAretha);
-
-		ConditionalStep repairSoulBearer = new ConditionalStep(this, arceuusChurchDig);
-		repairSoulBearer.addStep(inKeyMaster, speakKeyMaster);
-		repairSoulBearer.addStep(inTaverleyDungeon, enterCaveToKeyMaster);
-		repairSoulBearer.addStep(hasSoulBearer, goToTaverleyDungeon);
-
-		steps.put(2, repairSoulBearer);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		dustyKeyOr70AgilOrKeyMasterTeleport = new ItemRequirement("Dusty key, or another way to get into the deep Taverley Dungeon", ItemID.DUSTY_KEY);
@@ -140,5 +118,27 @@ public class BearYourSoul extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Dig up the Soul Bearer", new ArrayList<>(Arrays.asList(arceuusChurchDig)), spade));
 		allSteps.add(new PanelDetails("Have the Soul Bearer repaired", new ArrayList<>(Arrays.asList(goToTaverleyDungeon, enterCaveToKeyMaster, speakKeyMaster)), dustyKeyOr70AgilOrKeyMasterTeleport));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, findSoulJourneyAndRead);
+		steps.put(1, talkToAretha);
+
+		ConditionalStep repairSoulBearer = new ConditionalStep(this, arceuusChurchDig);
+		repairSoulBearer.addStep(inKeyMaster, speakKeyMaster);
+		repairSoulBearer.addStep(inTaverleyDungeon, enterCaveToKeyMaster);
+		repairSoulBearer.addStep(hasSoulBearer, goToTaverleyDungeon);
+
+		steps.put(2, repairSoulBearer);
+
+		return steps;
 	}
 }

@@ -72,53 +72,6 @@ public class DemonSlayer extends BasicQuestHelper
 
 	Zone varrockSewer, castleNWFloor1, castleNWFloor2, castleNEFloor1, towerFloor1;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToAris);
-		steps.put(1, talkToPrysin);
-
-		getFirstKey = new ConditionalStep(this, goUpToRovin);
-		getFirstKey.addStep(inCastleNWFloor2, talkToRovin);
-		getFirstKey.addStep(inCastleNWFloor1, goUpToRovin2);
-		getFirstKey.setLockingCondition(new Conditions(LogicType.OR, obtainedSilverlight, hasFirstKey));
-
-		getSecondKey = new ConditionalStep(this, goUpToBucket);
-		getSecondKey.addStep(inVarrockSewer, pickupSecondKey);
-		getSecondKey.addStep(hasPouredWaterIntoDrain, goDownManhole);
-		getSecondKey.addStep(inCastleNWFloor1, goDownstairsFromRovin2);
-		getSecondKey.addStep(inCastleNWFloor2, goDownstairsFromRovin);
-		getSecondKey.addStep(hasFilledBucket, useFilledBucketOnDrain);
-		getSecondKey.addStep(new Conditions(inCastleNEFloor1, hasBucket), goDownFromBucket);
-		getSecondKey.addStep(hasBucket, fillBucket);
-		getSecondKey.addStep(inCastleNEFloor1, pickupBucket);
-		getSecondKey.setLockingCondition(new Conditions(LogicType.OR, obtainedSilverlight, hasSecondKey));
-
-		getThirdKey = new ConditionalStep(this, goUpstairsWizard);
-		getThirdKey.addStep(inTowerFloor1, talkToTraiborn);
-		getThirdKey.addStep(inVarrockSewer, goUpManhole);
-		getThirdKey.setLockingCondition(new Conditions(LogicType.OR, obtainedSilverlight, hasThirdKey));
-
-		goAndKillDelrith = new ConditionalStep(this, getSilverlightBack);
-		goAndKillDelrith.addStep(hasSilverlight, killDelrith);
-
-		ConditionalStep getKeys = new ConditionalStep(this, getFirstKey);
-		getKeys.addStep(obtainedSilverlight, goAndKillDelrith);
-		getKeys.addStep(new Conditions(hasFirstKey, hasSecondKey, hasThirdKey), returnToPrysin);
-		getKeys.addStep(new Conditions(hasFirstKey, hasSecondKey), getThirdKey);
-		getKeys.addStep(hasFirstKey, getSecondKey);
-
-		steps.put(2, getKeys);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		bucket = new ItemRequirement("Bucket", ItemID.BUCKET);
@@ -261,5 +214,52 @@ public class DemonSlayer extends BasicQuestHelper
 		PanelDetails killDelrithPanel = new PanelDetails("Kill Delrith", new ArrayList<>(Arrays.asList(returnToPrysin, killDelrithStep)), silverlight, combatGear, food);
 		allSteps.add(killDelrithPanel);
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToAris);
+		steps.put(1, talkToPrysin);
+
+		getFirstKey = new ConditionalStep(this, goUpToRovin);
+		getFirstKey.addStep(inCastleNWFloor2, talkToRovin);
+		getFirstKey.addStep(inCastleNWFloor1, goUpToRovin2);
+		getFirstKey.setLockingCondition(new Conditions(LogicType.OR, obtainedSilverlight, hasFirstKey));
+
+		getSecondKey = new ConditionalStep(this, goUpToBucket);
+		getSecondKey.addStep(inVarrockSewer, pickupSecondKey);
+		getSecondKey.addStep(hasPouredWaterIntoDrain, goDownManhole);
+		getSecondKey.addStep(inCastleNWFloor1, goDownstairsFromRovin2);
+		getSecondKey.addStep(inCastleNWFloor2, goDownstairsFromRovin);
+		getSecondKey.addStep(hasFilledBucket, useFilledBucketOnDrain);
+		getSecondKey.addStep(new Conditions(inCastleNEFloor1, hasBucket), goDownFromBucket);
+		getSecondKey.addStep(hasBucket, fillBucket);
+		getSecondKey.addStep(inCastleNEFloor1, pickupBucket);
+		getSecondKey.setLockingCondition(new Conditions(LogicType.OR, obtainedSilverlight, hasSecondKey));
+
+		getThirdKey = new ConditionalStep(this, goUpstairsWizard);
+		getThirdKey.addStep(inTowerFloor1, talkToTraiborn);
+		getThirdKey.addStep(inVarrockSewer, goUpManhole);
+		getThirdKey.setLockingCondition(new Conditions(LogicType.OR, obtainedSilverlight, hasThirdKey));
+
+		goAndKillDelrith = new ConditionalStep(this, getSilverlightBack);
+		goAndKillDelrith.addStep(hasSilverlight, killDelrith);
+
+		ConditionalStep getKeys = new ConditionalStep(this, getFirstKey);
+		getKeys.addStep(obtainedSilverlight, goAndKillDelrith);
+		getKeys.addStep(new Conditions(hasFirstKey, hasSecondKey, hasThirdKey), returnToPrysin);
+		getKeys.addStep(new Conditions(hasFirstKey, hasSecondKey), getThirdKey);
+		getKeys.addStep(hasFirstKey, getSecondKey);
+
+		steps.put(2, getKeys);
+
+		return steps;
 	}
 }

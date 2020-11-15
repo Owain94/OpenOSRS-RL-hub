@@ -71,49 +71,6 @@ public class MakingHistory extends BasicQuestHelper
 
 	Zone castle;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToJorral);
-
-		keySteps = new ConditionalStep(this, talkToSilverMerchant);
-		keySteps.addStep(hasChest, openChest);
-		keySteps.addStep(gotKey, dig);
-		keySteps.setLockingCondition(finishedKey);
-
-		dronSteps = new ConditionalStep(this, talkToBlanin);
-		dronSteps.addStep(talkedtoBlanin, talkToDron);
-		dronSteps.setLockingCondition(finishedFrem);
-
-		ghostSteps = new ConditionalStep(this, talkToDroalak);
-		ghostSteps.addStep(talkedToMelina, returnToDroalak);
-		ghostSteps.addStep(talkedToDroalak, talkToMelina);
-		ghostSteps.setLockingCondition(finishedGhost);
-
-		ConditionalStep getItems = new ConditionalStep(this, keySteps);
-		getItems.addStep(handedInEverything, continueTalkingToJorral);
-		getItems.addStep(new Conditions(finishedKey, finishedFrem, finishedGhost), returnToJorral);
-		getItems.addStep(new Conditions(finishedKey, finishedFrem), ghostSteps);
-		getItems.addStep(finishedKey, dronSteps);
-
-		steps.put(1, getItems);
-
-		ConditionalStep goTalkToLathas = new ConditionalStep(this, goUpToLathas);
-		goTalkToLathas.addStep(inCastle, talkToLathas);
-
-		steps.put(2, goTalkToLathas);
-
-		steps.put(3, finishQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		spade = new ItemRequirement("Spade", ItemID.SPADE);
@@ -250,5 +207,48 @@ public class MakingHistory extends BasicQuestHelper
 		allSteps.add(ghostPanel);
 		allSteps.add(finishingPanel);
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToJorral);
+
+		keySteps = new ConditionalStep(this, talkToSilverMerchant);
+		keySteps.addStep(hasChest, openChest);
+		keySteps.addStep(gotKey, dig);
+		keySteps.setLockingCondition(finishedKey);
+
+		dronSteps = new ConditionalStep(this, talkToBlanin);
+		dronSteps.addStep(talkedtoBlanin, talkToDron);
+		dronSteps.setLockingCondition(finishedFrem);
+
+		ghostSteps = new ConditionalStep(this, talkToDroalak);
+		ghostSteps.addStep(talkedToMelina, returnToDroalak);
+		ghostSteps.addStep(talkedToDroalak, talkToMelina);
+		ghostSteps.setLockingCondition(finishedGhost);
+
+		ConditionalStep getItems = new ConditionalStep(this, keySteps);
+		getItems.addStep(handedInEverything, continueTalkingToJorral);
+		getItems.addStep(new Conditions(finishedKey, finishedFrem, finishedGhost), returnToJorral);
+		getItems.addStep(new Conditions(finishedKey, finishedFrem), ghostSteps);
+		getItems.addStep(finishedKey, dronSteps);
+
+		steps.put(1, getItems);
+
+		ConditionalStep goTalkToLathas = new ConditionalStep(this, goUpToLathas);
+		goTalkToLathas.addStep(inCastle, talkToLathas);
+
+		steps.put(2, goTalkToLathas);
+
+		steps.put(3, finishQuest);
+
+		return steps;
 	}
 }

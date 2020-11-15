@@ -29,18 +29,12 @@ import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.QuestStep;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import javax.inject.Inject;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class LockpickPuzzle extends QuestStep
 {
-
-	@Inject
-	EventBus eventbus;
-
 	int[] TUMBLER_ANSWERS = new int[]{3894, 3895, 3896, 3897};
 	int[] TUMBLER_WIDGETS = new int[]{20, 21, 22, 23};
 	int[] TUMBLER_CURRENT = new int[]{3901, 3902, 3903, 3904};
@@ -66,7 +60,20 @@ public class LockpickPuzzle extends QuestStep
 		this.addText("Tumbler 2: " + client.getVarbitValue(TUMBLER_ANSWERS[1]) + ".");
 		this.addText("Tumbler 3: " + client.getVarbitValue(TUMBLER_ANSWERS[2]) + ".");
 		this.addText("Tumbler 4: " + client.getVarbitValue(TUMBLER_ANSWERS[3]) + ".");
-		eventbus.subscribe(GameTick.class, this, this::onGameTick);
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		Widget widgetWrapper = client.getWidget(588, highlightChildID);
+		if (widgetWrapper != null)
+		{
+			graphics.setColor(new Color(0, 255, 255, 65));
+			graphics.fill(widgetWrapper.getBounds());
+			graphics.setColor(Color.CYAN);
+			graphics.draw(widgetWrapper.getBounds());
+		}
 	}
 
 	@Subscribe
@@ -124,20 +131,6 @@ public class LockpickPuzzle extends QuestStep
 		else
 		{
 			highlightChildID = UP_WIDGET;
-		}
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		Widget widgetWrapper = client.getWidget(588, highlightChildID);
-		if (widgetWrapper != null)
-		{
-			graphics.setColor(new Color(0, 255, 255, 65));
-			graphics.fill(widgetWrapper.getBounds());
-			graphics.setColor(Color.CYAN);
-			graphics.draw(widgetWrapper.getBounds());
 		}
 	}
 }

@@ -73,73 +73,6 @@ public class MerlinsCrystal extends BasicQuestHelper
 
 	Zone fayeGround, faye1, faye2, camelotGround1, camelotGround2, camelotGround3, camelot1, camelot2, star, camelotTower1, camelotTower2;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, startQuest);
-		steps.put(1, talkToGawain);
-
-		ConditionalStep findLancelot = new ConditionalStep(this, goUpstairsInCamelot);
-		findLancelot.addStep(inCamelot1, talkToLancelot);
-
-		steps.put(2, findLancelot);
-
-		ConditionalStep discoverHowToFreeMerlin = new ConditionalStep(this, hideInArheinCrate);
-		discoverHowToFreeMerlin.addStep(new Conditions(inFaye2, morganNearby), talkToMorgan);
-		discoverHowToFreeMerlin.addStep(inFaye2, attackMordred);
-		discoverHowToFreeMerlin.addStep(inFaye1, goToSecondFloor);
-		discoverHowToFreeMerlin.addStep(inFayeGround, goToFirstFloor);
-		discoverHowToFreeMerlin.addStep(inCamelot1, goBackDownStairsCamelot);
-
-		steps.put(3, discoverHowToFreeMerlin);
-
-		getBlackCandle = new ConditionalStep(this, optionalGetRepellent);
-		getBlackCandle.addStep(inFaye, goToCatherbyAfterFortress);
-		getBlackCandle.addStep(hasWax, talkToCandleMaker);
-		getBlackCandle.addStep(new Conditions(hasRepellent, hasBucket), optionalUseRepellent);
-		getBlackCandle.addStep(hasRepellent, optionalGetBucket);
-		getBlackCandle.setLockingCondition(hasAnyBlackCandle);
-
-		getExcalabur = new ConditionalStep(this, talkToLadyOfLake);
-		getExcalabur.addStep(beggarNearby, talkToBeggar);
-		getExcalabur.addStep(talkedToLady, enterSarimShopAndTalk);
-		getExcalabur.setLockingCondition(hasExcalabur);
-
-		ConditionalStep performSpell = new ConditionalStep(this, returnToCamelot);
-		performSpell.addStep(thrantaxNearby, sayWords);
-		performSpell.addStep(new Conditions(inStar, hasLitBlackCandle), dropBatBones);
-		performSpell.addStep(inStar, lightCandle);
-		performSpell.addStep(inCamelot, goStandInStar);
-		performSpell.addStep(hasLitBlackCandle, returnToCamelotLit);
-
-		ConditionalStep completeAllTasks = new ConditionalStep(this, getBlackCandle);
-		completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, hasExcalabur, hasReadSpell), performSpell);
-		completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, hasExcalabur), goReadMagicWords);
-		completeAllTasks.addStep(hasAnyBlackCandle, getExcalabur);
-
-		steps.put(4, completeAllTasks);
-
-		ConditionalStep goFreeMerlin = new ConditionalStep(this, goUpLadder1Camelot);
-		goFreeMerlin.addStep(inCamelotTower2, smashCrystal);
-		goFreeMerlin.addStep(inCamelotTower1, goUpLadder2Camelot);
-
-		steps.put(5, goFreeMerlin);
-
-		ConditionalStep goTellArthur = new ConditionalStep(this, finishQuest);
-		goTellArthur.addStep(inCamelotTower1, goDownLadder1Camelot);
-		goTellArthur.addStep(inCamelotTower2, goDownLadder2Camelot);
-
-		steps.put(6, goTellArthur);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		bread = new ItemRequirement("Bread", ItemID.BREAD);
@@ -275,14 +208,6 @@ public class MerlinsCrystal extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Sir Mordred (level 39)");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
@@ -300,6 +225,14 @@ public class MerlinsCrystal extends BasicQuestHelper
 		reqs.add(varrockTeleport);
 		reqs.add(camelotTeleport);
 		reqs.add(twoFaladorTeleports);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Sir Mordred (level 39)");
 		return reqs;
 	}
 
@@ -338,5 +271,72 @@ public class MerlinsCrystal extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Free Merlin", new ArrayList<>(Arrays.asList(goUpLadder1Camelot, goUpLadder2Camelot, smashCrystal, finishQuest))));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, startQuest);
+		steps.put(1, talkToGawain);
+
+		ConditionalStep findLancelot = new ConditionalStep(this, goUpstairsInCamelot);
+		findLancelot.addStep(inCamelot1, talkToLancelot);
+
+		steps.put(2, findLancelot);
+
+		ConditionalStep discoverHowToFreeMerlin = new ConditionalStep(this, hideInArheinCrate);
+		discoverHowToFreeMerlin.addStep(new Conditions(inFaye2, morganNearby), talkToMorgan);
+		discoverHowToFreeMerlin.addStep(inFaye2, attackMordred);
+		discoverHowToFreeMerlin.addStep(inFaye1, goToSecondFloor);
+		discoverHowToFreeMerlin.addStep(inFayeGround, goToFirstFloor);
+		discoverHowToFreeMerlin.addStep(inCamelot1, goBackDownStairsCamelot);
+
+		steps.put(3, discoverHowToFreeMerlin);
+
+		getBlackCandle = new ConditionalStep(this, optionalGetRepellent);
+		getBlackCandle.addStep(inFaye, goToCatherbyAfterFortress);
+		getBlackCandle.addStep(hasWax, talkToCandleMaker);
+		getBlackCandle.addStep(new Conditions(hasRepellent, hasBucket), optionalUseRepellent);
+		getBlackCandle.addStep(hasRepellent, optionalGetBucket);
+		getBlackCandle.setLockingCondition(hasAnyBlackCandle);
+
+		getExcalabur = new ConditionalStep(this, talkToLadyOfLake);
+		getExcalabur.addStep(beggarNearby, talkToBeggar);
+		getExcalabur.addStep(talkedToLady, enterSarimShopAndTalk);
+		getExcalabur.setLockingCondition(hasExcalabur);
+
+		ConditionalStep performSpell = new ConditionalStep(this, returnToCamelot);
+		performSpell.addStep(thrantaxNearby, sayWords);
+		performSpell.addStep(new Conditions(inStar, hasLitBlackCandle), dropBatBones);
+		performSpell.addStep(inStar, lightCandle);
+		performSpell.addStep(inCamelot, goStandInStar);
+		performSpell.addStep(hasLitBlackCandle, returnToCamelotLit);
+
+		ConditionalStep completeAllTasks = new ConditionalStep(this, getBlackCandle);
+		completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, hasExcalabur, hasReadSpell), performSpell);
+		completeAllTasks.addStep(new Conditions(hasAnyBlackCandle, hasExcalabur), goReadMagicWords);
+		completeAllTasks.addStep(hasAnyBlackCandle, getExcalabur);
+
+		steps.put(4, completeAllTasks);
+
+		ConditionalStep goFreeMerlin = new ConditionalStep(this, goUpLadder1Camelot);
+		goFreeMerlin.addStep(inCamelotTower2, smashCrystal);
+		goFreeMerlin.addStep(inCamelotTower1, goUpLadder2Camelot);
+
+		steps.put(5, goFreeMerlin);
+
+		ConditionalStep goTellArthur = new ConditionalStep(this, finishQuest);
+		goTellArthur.addStep(inCamelotTower1, goDownLadder1Camelot);
+		goTellArthur.addStep(inCamelotTower2, goDownLadder2Camelot);
+
+		steps.put(6, goTellArthur);
+
+		return steps;
 	}
 }

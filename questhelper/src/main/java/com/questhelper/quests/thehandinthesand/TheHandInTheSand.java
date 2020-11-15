@@ -67,50 +67,6 @@ public class TheHandInTheSand extends BasicQuestHelper
 
 	Zone yanille, lightSpot;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToBert);
-		// 1528, 1529, 1530 0->1
-		steps.put(10, giveCaptainABeer);
-		steps.put(20, ringBell);
-		steps.put(30, talkToBertAboutRota);
-		steps.put(40, searchSandysDesk);
-
-		ConditionalStep goGetScroll = new ConditionalStep(this, pickpocketSandy);
-		goGetScroll.addStep(hasSand, talkToBertAboutScroll);
-		steps.put(50, goGetScroll);
-		steps.put(60, ringBellAgain);
-
-		ConditionalStep goToBetty = new ConditionalStep(this, talkToBetty);
-		goToBetty.addStep(madeTruthSerum, talkToBettyOnceMore);
-		goToBetty.addStep(new Conditions(hasRoseLens, vialPlaced, inLightSpot), useLensOnCounter);
-		goToBetty.addStep(new Conditions(hasRoseLens, vialPlaced), standInDoorway);
-		goToBetty.addStep(hasRoseLens, talkToBettyAgain);
-		goToBetty.addStep(hasPinkDye, useDyeOnLanternLens);
-		goToBetty.addStep(hasRedberryJuice, addWhiteberries);
-		goToBetty.addStep(receivedBottledWater, addRedberries);
-		goToBetty.addStep(new Conditions(inYanille, notTeleportedToSarim), talkToRarveAgain);
-
-		steps.put(70, goToBetty);
-		steps.put(80, talkToSandyWithPotion);
-		steps.put(90, useSerumOnCoffee);
-		steps.put(100, activateMagicalOrb);
-		steps.put(110, interrogateSandy);
-		steps.put(120, ringBellAfterInterrogation);
-		steps.put(130, ringBellWithItems);
-		steps.put(140, talkToMazion);
-		steps.put(150, ringBellEnd);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		beer = new ItemRequirement("Beer", ItemID.BEER);
@@ -278,5 +234,49 @@ public class TheHandInTheSand extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Uncover the truth", new ArrayList<>(Arrays.asList(talkToSandyWithPotion, useSerumOnCoffee, activateMagicalOrb, interrogateSandy)), truthSerum, magicalOrb));
 		allSteps.add(new PanelDetails("Finishing off", new ArrayList<>(Arrays.asList(ringBellAfterInterrogation, talkToMazion, ringBellEnd)), earthRunes5, bucketOfSand));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToBert);
+		// 1528, 1529, 1530 0->1
+		steps.put(10, giveCaptainABeer);
+		steps.put(20, ringBell);
+		steps.put(30, talkToBertAboutRota);
+		steps.put(40, searchSandysDesk);
+
+		ConditionalStep goGetScroll = new ConditionalStep(this, pickpocketSandy);
+		goGetScroll.addStep(hasSand, talkToBertAboutScroll);
+		steps.put(50, goGetScroll);
+		steps.put(60, ringBellAgain);
+
+		ConditionalStep goToBetty = new ConditionalStep(this, talkToBetty);
+		goToBetty.addStep(madeTruthSerum, talkToBettyOnceMore);
+		goToBetty.addStep(new Conditions(hasRoseLens, vialPlaced, inLightSpot), useLensOnCounter);
+		goToBetty.addStep(new Conditions(hasRoseLens, vialPlaced), standInDoorway);
+		goToBetty.addStep(hasRoseLens, talkToBettyAgain);
+		goToBetty.addStep(hasPinkDye, useDyeOnLanternLens);
+		goToBetty.addStep(hasRedberryJuice, addWhiteberries);
+		goToBetty.addStep(receivedBottledWater, addRedberries);
+		goToBetty.addStep(new Conditions(inYanille, notTeleportedToSarim), talkToRarveAgain);
+
+		steps.put(70, goToBetty);
+		steps.put(80, talkToSandyWithPotion);
+		steps.put(90, useSerumOnCoffee);
+		steps.put(100, activateMagicalOrb);
+		steps.put(110, interrogateSandy);
+		steps.put(120, ringBellAfterInterrogation);
+		steps.put(130, ringBellWithItems);
+		steps.put(140, talkToMazion);
+		steps.put(150, ringBellEnd);
+
+		return steps;
 	}
 }

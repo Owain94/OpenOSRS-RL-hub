@@ -79,130 +79,6 @@ public class RoyalTrouble extends BasicQuestHelper
 
 	Zone miscFloor1, etcFloor1, islands, dungeon, liftRoom, plankRoom, path1, path2p1, path2p2, path3p1, path3p2, path3p3, path4p1, path4p2, jumpIsland1, jumpIsland2, jumpIsland3, bossRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startQuest = new ConditionalStep(this, travelToMisc);
-		startQuest.addStep(inMiscFloor1, talkToGhrim);
-		startQuest.addStep(onIslands, goUpToGhrim);
-		steps.put(0, startQuest);
-
-		ConditionalStep talkWithPartner = new ConditionalStep(this, travelToMisc);
-		talkWithPartner.addStep(inMiscFloor1, talkToPartner);
-		talkWithPartner.addStep(onIslands, goUpToPartner);
-		steps.put(10, talkWithPartner);
-
-		ConditionalStep investigateForSigrid = new ConditionalStep(this, goUpToSigrid);
-		investigateForSigrid.addStep(new Conditions(talkedToMiscSubject, talkedToSigrid, inEtcFloor1), goDownFromSigridToMatilda);
-		investigateForSigrid.addStep(new Conditions(talkedToMiscSubject, talkedToSigrid), talkToMatilda);
-		investigateForSigrid.addStep(new Conditions(talkedToMiscSubject, inEtcFloor1), talkToSigrid);
-
-		ConditionalStep continueInvestigationForVargas = new ConditionalStep(this, getCoalOrPickaxe);
-		continueInvestigationForVargas.addStep(new Conditions(enteredDungeon, new Conditions(LogicType.OR, hasCoalOrPickaxe, hasFullEngine)), goDownToDungeonNoScroll);
-		continueInvestigationForVargas.addStep(new Conditions(gottenScrollFromVargas, inMiscFloor1), goDownStairsToDungeon);
-		continueInvestigationForVargas.addStep(new Conditions(gottenScrollFromVargas, hasCoalOrPickaxe), goDownLadderToDungeon);
-		continueInvestigationForVargas.addStep(new Conditions(gottenScrollFromVargas), getCoalOrPickaxe);
-		continueInvestigationForVargas.addStep(new Conditions(talkedToSailor, inMiscFloor1), talkToVargasAfterSailor);
-		continueInvestigationForVargas.addStep(new Conditions(talkedToSailor), goUpToVargasAfterSailor);
-		continueInvestigationForVargas.addStep(new Conditions(talkedToGhrimInInvestigation, inMiscFloor1), goDownToSailor);
-		continueInvestigationForVargas.addStep(new Conditions(talkedToGhrimInInvestigation), talkToSailor);
-		continueInvestigationForVargas.addStep(new Conditions(reportedToVargas, inMiscFloor1), talkToGhrim2);
-		continueInvestigationForVargas.addStep(new Conditions(reportedToVargas), goUpToGhrim2);
-		continueInvestigationForVargas.addStep(new Conditions(inMiscFloor1), talkToVargasAfterSigrid);
-		continueInvestigationForVargas.addStep(new Conditions(hasCoalOrPickaxe), goBackUpToVargasFromSigrid);
-		continueInvestigationForVargas.addStep(new Conditions(inEtcFloor1), goDownFromSigridToVargas);
-
-		ConditionalStep repairLift = new ConditionalStep(this, takePulley);
-		repairLift.addStep(new Conditions(hasRepairedScaffold, new Conditions(LogicType.OR, hasRope, attachedRope)), useLift);
-		repairLift.addStep(new Conditions(inLiftOrPlankOrTunnel1Room, hasRepairedScaffold), takeRope2);
-
-		repairLift.addStep(new Conditions(hasUsedEngine, has4CoalInEngine), putCoalIntoEnginePlaced5);
-		repairLift.addStep(new Conditions(hasUsedEngine, has3CoalInEngine), putCoalIntoEnginePlaced4);
-		repairLift.addStep(new Conditions(hasUsedEngine, has2CoalInEngine), putCoalIntoEnginePlaced3);
-		repairLift.addStep(new Conditions(hasUsedEngine, has1CoalInEngine), putCoalIntoEnginePlaced2);
-		repairLift.addStep(new Conditions(hasUsedEngine, hasEngine), putCoalIntoEnginePlaced);
-
-		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, hasFullEngine), useEngineOnPlatform);
-		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has4CoalInEngine), putCoalIntoEngine5);
-		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has3CoalInEngine), putCoalIntoEngine4);
-		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has2CoalInEngine), putCoalIntoEngine3);
-		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has1CoalInEngine), putCoalIntoEngine2);
-		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine), putCoalIntoEngine);
-		repairLift.addStep(new Conditions(hasUsedBeam), pickUpEngine);
-
-		repairLift.addStep(new Conditions(hasUsedRope, hasBeam), useBeamOnPlatform);
-		repairLift.addStep(new Conditions(hasUsedRope), takeBeam3);
-		repairLift.addStep(new Conditions(hasUsedPulley2, hasRope), useRopeOnScaffold);
-		repairLift.addStep(new Conditions(hasUsedPulley2), takeRope);
-		repairLift.addStep(new Conditions(hasUsedLongerPulley, hasPulley), usePulleyOnScaffold2);
-		repairLift.addStep(new Conditions(hasUsedLongerPulley), takePulley3);
-		repairLift.addStep(new Conditions(hasUsedPulley, hasLongerPulley), useLongerPulleyOnScaffold);
-		repairLift.addStep(new Conditions(hasUsedPulley, hasLongPulley, hasBeam), useBeamOnLongPulley);
-		repairLift.addStep(new Conditions(hasUsedPulley, hasLongPulley), takeBeam2);
-		repairLift.addStep(new Conditions(hasUsedPulley, hasPulley, hasBeam), useBeamOnPulley);
-		repairLift.addStep(new Conditions(hasUsedPulley, hasPulley), takeBeam);
-		repairLift.addStep(hasUsedPulley, takePulley2);
-		repairLift.addStep(hasPulley, usePulleyOnScaffold);
-
-		ConditionalStep dungeonExplore = new ConditionalStep(this, talkToDonal);
-		dungeonExplore.addStep(inBossRoom, killBoss);
-		dungeonExplore.addStep(new Conditions(inPath4, talkedToKids), enterBossRoom);
-		dungeonExplore.addStep(inPath4, talkToArmod);
-		dungeonExplore.addStep(new Conditions(searchedFire5, hasReadDiary, inPath3), enterSnakesRoom);
-		dungeonExplore.addStep(new Conditions(searchedFire5, inPath3, hasDiary5), readDiary);
-		dungeonExplore.addStep(new Conditions(searchedFire4, inPath3), searchFire5);
-		dungeonExplore.addStep(new Conditions(searchedFire3, inPath3), searchFire4);
-		dungeonExplore.addStep(new Conditions(searchedFire2, inPath3), searchFire3);
-		dungeonExplore.addStep(new Conditions(searchedFire1, inPath3), searchFire2);
-		dungeonExplore.addStep(new Conditions(searchedFire1, onJumpIsland3), plankRock4);
-		dungeonExplore.addStep(new Conditions(searchedFire1, onJumpIsland2), plankRock3);
-		dungeonExplore.addStep(new Conditions(searchedFire1, onJumpIsland1), plankRock2);
-		dungeonExplore.addStep(new Conditions(searchedFire1, inPath2), plankRock1);
-		dungeonExplore.addStep(new Conditions(LogicType.OR, inPath2, inPath3), searchFire1);
-		dungeonExplore.addStep(new Conditions(inPath1, attachedRope, hasPlank), swingOverRope);
-		dungeonExplore.addStep(new Conditions(inPath1, hasRope, hasPlank), attachRope);
-		dungeonExplore.addStep(new Conditions(inPlankRoom, new Conditions(LogicType.OR, hasRope, attachedRope), hasPlank), enterTunnelFromPlankRoom);
-		dungeonExplore.addStep(new Conditions(inPath1, new Conditions(LogicType.OR, hasRope, attachedRope)), goBackToPlank);
-		dungeonExplore.addStep(new Conditions(inPlankRoom, new Conditions(LogicType.OR, hasRope, attachedRope)), takePlank);
-		dungeonExplore.addStep(inLiftRoom, repairLift);
-
-		dungeonExplore.addStep(usedProp, enterCrevice);
-		dungeonExplore.addStep(talkedToDonal, usePropOnCrevice);
-
-		ConditionalStep reportBackToSigrid = new ConditionalStep(this, travelToMisc);
-		reportBackToSigrid.addStep(inEtcFloor1, talkToSigridToFinish);
-		reportBackToSigrid.addStep(onIslands, goUpToSigridToFinish);
-		reportBackToSigrid.addStep(inPath4, goUpRope);
-		reportBackToSigrid.addStep(new Conditions(inBossRoom, hasBox), leaveBossRoom);
-		reportBackToSigrid.addStep(inBossRoom, pickUpBox);
-
-		ConditionalStep finishingOffVargas = new ConditionalStep(this, travelToMisc);
-		finishingOffVargas.addStep(inEtcFloor1, goDownFromSigridToFinish);
-		finishingOffVargas.addStep(inMiscFloor1, talkToVargasToFinish);
-		finishingOffVargas.addStep(onIslands, goUpToVargasToFinish);
-
-		ConditionalStep doQuest = new ConditionalStep(this, travelToMisc);
-		doQuest.addStep(finishedFinalConvoWithSigrid, finishingOffVargas);
-		doQuest.addStep(killedBoss, reportBackToSigrid);
-		doQuest.addStep(new Conditions(inDungeon), dungeonExplore);
-		doQuest.addStep(new Conditions(onIslands, talkedToMiscSubject, talkedToEtcSubject), continueInvestigationForVargas);
-		doQuest.addStep(new Conditions(onIslands, talkedToMiscSubject), investigateForSigrid);
-		doQuest.addStep(new Conditions(startedInvestigation, inMiscFloor1), goDownFromVargas);
-		doQuest.addStep(new Conditions(startedInvestigation, onIslands), talkToGunnhild);
-		doQuest.addStep(inMiscFloor1, talkToVargas);
-		doQuest.addStep(onIslands, goUpToVargas);
-
-		steps.put(20, doQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		coal5 = new ItemRequirement("Coal", ItemID.COAL, 5);
@@ -564,18 +440,18 @@ public class RoyalTrouble extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Giant Sea Snake (level 149)");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRecommended()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
 		reqs.add(antipoison);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Giant Sea Snake (level 149)");
 		return reqs;
 	}
 
@@ -598,5 +474,129 @@ public class RoyalTrouble extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Investigate the caves", new ArrayList<>(Arrays.asList(talkToArmod, enterBossRoom, killBoss, pickUpBox, leaveBossRoom, goUpRope, talkToSigridToFinish, talkToVargasToFinish))));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startQuest = new ConditionalStep(this, travelToMisc);
+		startQuest.addStep(inMiscFloor1, talkToGhrim);
+		startQuest.addStep(onIslands, goUpToGhrim);
+		steps.put(0, startQuest);
+
+		ConditionalStep talkWithPartner = new ConditionalStep(this, travelToMisc);
+		talkWithPartner.addStep(inMiscFloor1, talkToPartner);
+		talkWithPartner.addStep(onIslands, goUpToPartner);
+		steps.put(10, talkWithPartner);
+
+		ConditionalStep investigateForSigrid = new ConditionalStep(this, goUpToSigrid);
+		investigateForSigrid.addStep(new Conditions(talkedToMiscSubject, talkedToSigrid, inEtcFloor1), goDownFromSigridToMatilda);
+		investigateForSigrid.addStep(new Conditions(talkedToMiscSubject, talkedToSigrid), talkToMatilda);
+		investigateForSigrid.addStep(new Conditions(talkedToMiscSubject, inEtcFloor1), talkToSigrid);
+
+		ConditionalStep continueInvestigationForVargas = new ConditionalStep(this, getCoalOrPickaxe);
+		continueInvestigationForVargas.addStep(new Conditions(enteredDungeon, new Conditions(LogicType.OR, hasCoalOrPickaxe, hasFullEngine)), goDownToDungeonNoScroll);
+		continueInvestigationForVargas.addStep(new Conditions(gottenScrollFromVargas, inMiscFloor1), goDownStairsToDungeon);
+		continueInvestigationForVargas.addStep(new Conditions(gottenScrollFromVargas, hasCoalOrPickaxe), goDownLadderToDungeon);
+		continueInvestigationForVargas.addStep(new Conditions(gottenScrollFromVargas), getCoalOrPickaxe);
+		continueInvestigationForVargas.addStep(new Conditions(talkedToSailor, inMiscFloor1), talkToVargasAfterSailor);
+		continueInvestigationForVargas.addStep(new Conditions(talkedToSailor), goUpToVargasAfterSailor);
+		continueInvestigationForVargas.addStep(new Conditions(talkedToGhrimInInvestigation, inMiscFloor1), goDownToSailor);
+		continueInvestigationForVargas.addStep(new Conditions(talkedToGhrimInInvestigation), talkToSailor);
+		continueInvestigationForVargas.addStep(new Conditions(reportedToVargas, inMiscFloor1), talkToGhrim2);
+		continueInvestigationForVargas.addStep(new Conditions(reportedToVargas), goUpToGhrim2);
+		continueInvestigationForVargas.addStep(new Conditions(inMiscFloor1), talkToVargasAfterSigrid);
+		continueInvestigationForVargas.addStep(new Conditions(hasCoalOrPickaxe), goBackUpToVargasFromSigrid);
+		continueInvestigationForVargas.addStep(new Conditions(inEtcFloor1), goDownFromSigridToVargas);
+
+		ConditionalStep repairLift = new ConditionalStep(this, takePulley);
+		repairLift.addStep(new Conditions(hasRepairedScaffold, new Conditions(LogicType.OR, hasRope, attachedRope)), useLift);
+		repairLift.addStep(new Conditions(inLiftOrPlankOrTunnel1Room, hasRepairedScaffold), takeRope2);
+
+		repairLift.addStep(new Conditions(hasUsedEngine, has4CoalInEngine), putCoalIntoEnginePlaced5);
+		repairLift.addStep(new Conditions(hasUsedEngine, has3CoalInEngine), putCoalIntoEnginePlaced4);
+		repairLift.addStep(new Conditions(hasUsedEngine, has2CoalInEngine), putCoalIntoEnginePlaced3);
+		repairLift.addStep(new Conditions(hasUsedEngine, has1CoalInEngine), putCoalIntoEnginePlaced2);
+		repairLift.addStep(new Conditions(hasUsedEngine, hasEngine), putCoalIntoEnginePlaced);
+
+		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, hasFullEngine), useEngineOnPlatform);
+		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has4CoalInEngine), putCoalIntoEngine5);
+		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has3CoalInEngine), putCoalIntoEngine4);
+		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has2CoalInEngine), putCoalIntoEngine3);
+		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine, has1CoalInEngine), putCoalIntoEngine2);
+		repairLift.addStep(new Conditions(hasUsedBeam, hasEngine), putCoalIntoEngine);
+		repairLift.addStep(new Conditions(hasUsedBeam), pickUpEngine);
+
+		repairLift.addStep(new Conditions(hasUsedRope, hasBeam), useBeamOnPlatform);
+		repairLift.addStep(new Conditions(hasUsedRope), takeBeam3);
+		repairLift.addStep(new Conditions(hasUsedPulley2, hasRope), useRopeOnScaffold);
+		repairLift.addStep(new Conditions(hasUsedPulley2), takeRope);
+		repairLift.addStep(new Conditions(hasUsedLongerPulley, hasPulley), usePulleyOnScaffold2);
+		repairLift.addStep(new Conditions(hasUsedLongerPulley), takePulley3);
+		repairLift.addStep(new Conditions(hasUsedPulley, hasLongerPulley), useLongerPulleyOnScaffold);
+		repairLift.addStep(new Conditions(hasUsedPulley, hasLongPulley, hasBeam), useBeamOnLongPulley);
+		repairLift.addStep(new Conditions(hasUsedPulley, hasLongPulley), takeBeam2);
+		repairLift.addStep(new Conditions(hasUsedPulley, hasPulley, hasBeam), useBeamOnPulley);
+		repairLift.addStep(new Conditions(hasUsedPulley, hasPulley), takeBeam);
+		repairLift.addStep(hasUsedPulley, takePulley2);
+		repairLift.addStep(hasPulley, usePulleyOnScaffold);
+
+		ConditionalStep dungeonExplore = new ConditionalStep(this, talkToDonal);
+		dungeonExplore.addStep(inBossRoom, killBoss);
+		dungeonExplore.addStep(new Conditions(inPath4, talkedToKids), enterBossRoom);
+		dungeonExplore.addStep(inPath4, talkToArmod);
+		dungeonExplore.addStep(new Conditions(searchedFire5, hasReadDiary, inPath3), enterSnakesRoom);
+		dungeonExplore.addStep(new Conditions(searchedFire5, inPath3, hasDiary5), readDiary);
+		dungeonExplore.addStep(new Conditions(searchedFire4, inPath3), searchFire5);
+		dungeonExplore.addStep(new Conditions(searchedFire3, inPath3), searchFire4);
+		dungeonExplore.addStep(new Conditions(searchedFire2, inPath3), searchFire3);
+		dungeonExplore.addStep(new Conditions(searchedFire1, inPath3), searchFire2);
+		dungeonExplore.addStep(new Conditions(searchedFire1, onJumpIsland3), plankRock4);
+		dungeonExplore.addStep(new Conditions(searchedFire1, onJumpIsland2), plankRock3);
+		dungeonExplore.addStep(new Conditions(searchedFire1, onJumpIsland1), plankRock2);
+		dungeonExplore.addStep(new Conditions(searchedFire1, inPath2), plankRock1);
+		dungeonExplore.addStep(new Conditions(LogicType.OR, inPath2, inPath3), searchFire1);
+		dungeonExplore.addStep(new Conditions(inPath1, attachedRope, hasPlank), swingOverRope);
+		dungeonExplore.addStep(new Conditions(inPath1, hasRope, hasPlank), attachRope);
+		dungeonExplore.addStep(new Conditions(inPlankRoom, new Conditions(LogicType.OR, hasRope, attachedRope), hasPlank), enterTunnelFromPlankRoom);
+		dungeonExplore.addStep(new Conditions(inPath1, new Conditions(LogicType.OR, hasRope, attachedRope)), goBackToPlank);
+		dungeonExplore.addStep(new Conditions(inPlankRoom, new Conditions(LogicType.OR, hasRope, attachedRope)), takePlank);
+		dungeonExplore.addStep(inLiftRoom, repairLift);
+
+		dungeonExplore.addStep(usedProp, enterCrevice);
+		dungeonExplore.addStep(talkedToDonal, usePropOnCrevice);
+
+		ConditionalStep reportBackToSigrid = new ConditionalStep(this, travelToMisc);
+		reportBackToSigrid.addStep(inEtcFloor1, talkToSigridToFinish);
+		reportBackToSigrid.addStep(onIslands, goUpToSigridToFinish);
+		reportBackToSigrid.addStep(inPath4, goUpRope);
+		reportBackToSigrid.addStep(new Conditions(inBossRoom, hasBox), leaveBossRoom);
+		reportBackToSigrid.addStep(inBossRoom, pickUpBox);
+
+		ConditionalStep finishingOffVargas = new ConditionalStep(this, travelToMisc);
+		finishingOffVargas.addStep(inEtcFloor1, goDownFromSigridToFinish);
+		finishingOffVargas.addStep(inMiscFloor1, talkToVargasToFinish);
+		finishingOffVargas.addStep(onIslands, goUpToVargasToFinish);
+
+		ConditionalStep doQuest = new ConditionalStep(this, travelToMisc);
+		doQuest.addStep(finishedFinalConvoWithSigrid, finishingOffVargas);
+		doQuest.addStep(killedBoss, reportBackToSigrid);
+		doQuest.addStep(new Conditions(inDungeon), dungeonExplore);
+		doQuest.addStep(new Conditions(onIslands, talkedToMiscSubject, talkedToEtcSubject), continueInvestigationForVargas);
+		doQuest.addStep(new Conditions(onIslands, talkedToMiscSubject), investigateForSigrid);
+		doQuest.addStep(new Conditions(startedInvestigation, inMiscFloor1), goDownFromVargas);
+		doQuest.addStep(new Conditions(startedInvestigation, onIslands), talkToGunnhild);
+		doQuest.addStep(inMiscFloor1, talkToVargas);
+		doQuest.addStep(onIslands, goUpToVargas);
+
+		steps.put(20, doQuest);
+
+		return steps;
 	}
 }

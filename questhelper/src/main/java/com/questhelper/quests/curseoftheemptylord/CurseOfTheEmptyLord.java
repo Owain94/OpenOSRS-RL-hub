@@ -43,13 +43,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 @QuestDescriptor(
@@ -57,65 +55,15 @@ import net.runelite.client.eventbus.Subscribe;
 )
 public class CurseOfTheEmptyLord extends BasicQuestHelper
 {
-	@Inject
-	EventBus eventBus;
-
 	private final int PATH_VARBIT = 815;
-	private int currentPath = 0;
-
 	ItemRequirement ringOfVis, ghostspeak;
-
 	ConditionForStep talkedToValdez, talkedToRennard, talkedToKharrim, talkedToLennissa, talkedToDhalak, talkedToViggora, inRoguesCastle, inEdgevilleDungeon, inSlayerTower,
 		inEdgevilleMonastery, inPartyRoom, onPath1, onPath2, onPath3;
-
 	DetailedQuestStep talkToValdez, talkToRennard, talkToKharrim, talkToLennissa, talkToDhalak, talkToViggora,
 		goUpstairsRoguesCastle, goUpstairsSlayerTower, goUpstairsMonastery, goUpstairsPartyRoom;
-
 	ObjectStep goDownIntoEdgevilleDungeon;
-
 	Zone roguesCastleFirstFloor, edgevilleDungeon, slayerTowerFirstFloor, edgevilleMonastery, partyRoom;
-
-	public CurseOfTheEmptyLord()
-	{
-
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep dhalakSteps = new ConditionalStep(this, talkToDhalak);
-		dhalakSteps.addStep(new Conditions(onPath3, inPartyRoom), talkToDhalak);
-		dhalakSteps.addStep(onPath3, goUpstairsPartyRoom);
-		dhalakSteps.addStep(new Conditions(onPath2, inEdgevilleMonastery), talkToDhalak);
-		dhalakSteps.addStep(onPath2, goUpstairsMonastery);
-
-		ConditionalStep viggoraSteps = new ConditionalStep(this, talkToViggora);
-		viggoraSteps.addStep(new Conditions(onPath3, inEdgevilleDungeon), talkToViggora);
-		viggoraSteps.addStep(onPath3, goDownIntoEdgevilleDungeon);
-		viggoraSteps.addStep(new Conditions(onPath2, inSlayerTower), talkToViggora);
-		viggoraSteps.addStep(onPath2, goUpstairsSlayerTower);
-		viggoraSteps.addStep(new Conditions(onPath1, inRoguesCastle), talkToViggora);
-		viggoraSteps.addStep(onPath1, goUpstairsRoguesCastle);
-
-		ConditionalStep questSteps = new ConditionalStep(this, talkToValdez);
-		questSteps.addStep(talkedToDhalak, viggoraSteps);
-		questSteps.addStep(talkedToLennissa, dhalakSteps);
-		questSteps.addStep(talkedToKharrim, talkToLennissa);
-		questSteps.addStep(talkedToRennard, talkToKharrim);
-		questSteps.addStep(talkedToValdez, talkToRennard);
-
-		steps.put(0, questSteps);
-
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
-
-		return steps;
-	}
+	private int currentPath = 0;
 
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged varbitChanged)
@@ -272,5 +220,40 @@ public class CurseOfTheEmptyLord extends BasicQuestHelper
 			new ArrayList<>(Arrays.asList(talkToValdez, talkToRennard, talkToKharrim, talkToLennissa, talkToDhalak, talkToViggora)), ghostspeak, ringOfVis));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep dhalakSteps = new ConditionalStep(this, talkToDhalak);
+		dhalakSteps.addStep(new Conditions(onPath3, inPartyRoom), talkToDhalak);
+		dhalakSteps.addStep(onPath3, goUpstairsPartyRoom);
+		dhalakSteps.addStep(new Conditions(onPath2, inEdgevilleMonastery), talkToDhalak);
+		dhalakSteps.addStep(onPath2, goUpstairsMonastery);
+
+		ConditionalStep viggoraSteps = new ConditionalStep(this, talkToViggora);
+		viggoraSteps.addStep(new Conditions(onPath3, inEdgevilleDungeon), talkToViggora);
+		viggoraSteps.addStep(onPath3, goDownIntoEdgevilleDungeon);
+		viggoraSteps.addStep(new Conditions(onPath2, inSlayerTower), talkToViggora);
+		viggoraSteps.addStep(onPath2, goUpstairsSlayerTower);
+		viggoraSteps.addStep(new Conditions(onPath1, inRoguesCastle), talkToViggora);
+		viggoraSteps.addStep(onPath1, goUpstairsRoguesCastle);
+
+		ConditionalStep questSteps = new ConditionalStep(this, talkToValdez);
+		questSteps.addStep(talkedToDhalak, viggoraSteps);
+		questSteps.addStep(talkedToLennissa, dhalakSteps);
+		questSteps.addStep(talkedToKharrim, talkToLennissa);
+		questSteps.addStep(talkedToRennard, talkToKharrim);
+		questSteps.addStep(talkedToValdez, talkToRennard);
+
+		steps.put(0, questSteps);
+
+		return steps;
 	}
 }

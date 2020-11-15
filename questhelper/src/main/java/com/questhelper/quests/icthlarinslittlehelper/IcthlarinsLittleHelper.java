@@ -85,6 +85,234 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 
 	Zone soph, pyramid, northPyramid, northPyramid2, eastRoom;
 
+	public void setupItemRequirements()
+	{
+		cat = new ItemRequirement("Any cat", ItemID.PET_CAT);
+		cat.addAlternates(ItemCollections.getCats());
+
+		catFollower = new FollowerRequirement("Any cat following you", NpcCollections.getCats());
+		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX);
+		waterskin4 = new ItemRequirement("Waterskin(4), bring a few to avoid drinking it", ItemID.WATERSKIN4);
+		coins600 = new ItemRequirement("600 coins or more for various payments", ItemID.COINS_995, 600);
+		bagOfSaltOrBucket = new ItemRequirement("Bag of Salt from a Slayer Master, or an empty bucket to get some", ItemID.BAG_OF_SALT);
+		bagOfSaltOrBucket.addAlternates(ItemID.PILE_OF_SALT);
+
+		coinsOrLinen = new ItemRequirement("Linen or 30 coins to buy some", ItemID.LINEN);
+
+		coins30 = new ItemRequirement("30 coins", ItemID.COINS_995, 30);
+
+		willowLog = new ItemRequirement("Willow logs", ItemID.WILLOW_LOGS);
+		bucketOfSap = new ItemRequirement("Bucket of sap", ItemID.BUCKET_OF_SAP);
+
+		food = new ItemRequirement("Combat gear, food + prayer potions", -1, -1);
+
+		sphinxsToken = new ItemRequirement("Sphinx's token", ItemID.SPHINXS_TOKEN);
+		sphinxsToken.setTip("You can get another from the Sphinx");
+		jar = new ItemRequirement("Canopic jar", ItemID.CANOPIC_JAR);
+		jar.addAlternates(ItemID.CANOPIC_JAR_4679, ItemID.CANOPIC_JAR_4680, ItemID.CANOPIC_JAR_4681);
+		jar.setHighlightInInventory(true);
+
+		linen = new ItemRequirement("Linen", ItemID.LINEN);
+
+		holySymbol = new ItemRequirement("Holy symbol", ItemID.HOLY_SYMBOL_4682);
+		holySymbol.setTip("You can get another from the Carpenter in Sophenham");
+
+		unholySymbol = new ItemRequirement("Unholy symbol", ItemID.UNHOLY_SYMBOL_4683);
+		unholySymbol.setHighlightInInventory(true);
+	}
+
+	public void setupConditions()
+	{
+		inSoph = new ZoneCondition(soph);
+		inPyramid = new ZoneCondition(pyramid);
+		inNorthPyramid = new ZoneCondition(northPyramid, northPyramid2, eastRoom);
+		inEastRoom = new ZoneCondition(eastRoom);
+
+		puzzleOpen = new WidgetModelCondition(147, 3, 6474);
+		givenToken = new VarbitCondition(450, 1);
+
+
+		hasCrondisJar = new VarbitCondition(397, 4);
+
+		// TODO: Verify varbit values for apmeken/het/scarabas
+		hasApmekenJar = new VarbitCondition(397, 3);
+		hasHetJar = new VarbitCondition(397, 2);
+		hasScarabasJar = new VarbitCondition(397, 1);
+
+		killedGuardian = new VarbitCondition(418, 11, Operation.GREATER_EQUAL);
+
+		hasJar = new VarbitCondition(405, 1);
+		talkedToEmbalmer = new VarbitCondition(399, 1);
+
+		hasLinen = new ItemRequirementCondition(linen);
+
+		givenSalt = new VarbitCondition(401, 1);
+		givenSap = new VarbitCondition(402, 1);
+		givenLinen = new VarbitCondition(403, 1);
+		givenEmbalmerAllItems = new VarbitCondition(400, 7);
+
+		talkedToCarpenter = new VarbitCondition(412, 1);
+		givenCarpenterLogs = new VarbitCondition(398, 1);
+
+		posessedPriestNearby = new NpcCondition(NpcID.POSSESSED_PRIEST);
+	}
+
+	public void loadZones()
+	{
+		soph = new Zone(new WorldPoint(3262, 2751, 0), new WorldPoint(3322, 2809, 0));
+		pyramid = new Zone(new WorldPoint(3273, 9170, 0), new WorldPoint(3311, 9204, 0));
+		northPyramid = new Zone(new WorldPoint(3276, 9194, 0), new WorldPoint(3311, 9204, 0));
+		northPyramid2 = new Zone(new WorldPoint(3276, 9192, 0), new WorldPoint(3287, 9193, 0));
+		eastRoom = new Zone(new WorldPoint(3300, 9192, 0), new WorldPoint(3311, 9199, 0));
+	}
+
+	public void setupSteps()
+	{
+		talkToWanderer = new NpcStep(this, NpcID.WANDERER_4194, new WorldPoint(3316, 2849, 0), "Talk to the Wanderer west of the Agility Pyramid.", catFollower, waterskin4, tinderbox);
+		talkToWanderer.addDialogStep("Why? What's your problem with it?");
+		talkToWanderer.addDialogStep("Ok I'll get your supplies.");
+
+		talkToWandererAgain = new NpcStep(this, NpcID.WANDERER_4194, new WorldPoint(3316, 2849, 0), "Talk to the Wanderer again with the required items.", waterskin4, tinderbox);
+		talkToWandererAgain.addDialogStep("Yes. I have them all here.");
+
+		enterRock = new ObjectStep(this, NullObjectID.NULL_6621, new WorldPoint(3324, 2858, 0), "Enter the rock west of the Agility Pyramid to re-enter Sophanhem.");
+
+		touchPyramidDoor = new ObjectStep(this, ObjectID.DOOR_6614, new WorldPoint(3295, 2779, 0), "Touch the south pyramid door in Sophanem.");
+
+		jumpPit = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path until you reach a pit, and jump it. Move using the minimap to avoid all the traps.");
+
+		openWestDoor = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3280, 9199, 0), "Attempt to open the west door.");
+
+		solveDoorPuzzle = new DoorPuzzleStep(this);
+
+		talkToSphinx = new NpcStep(this, NpcID.SPHINX_4209, new WorldPoint(3301, 2785, 0), "Talk to the Sphinx in Sophanem with your cat, and answer its riddle with '9.'.", catFollower);
+		talkToSphinx.addDialogStep("I need help.");
+		talkToSphinx.addDialogStep("Okay, that sounds fair.");
+		talkToSphinx.addDialogStep("9.");
+		talkToSphinx.addDialogStep("Totally positive.");
+
+		talkToHighPriest = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Talk to the High Priest in the south west of Sophanem.", sphinxsToken);
+		talkToHighPriestWithoutToken = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Talk to the High Priest in the south west of Sophanem.");
+		talkToHighPriest.addSubSteps(talkToHighPriestWithoutToken);
+
+		openPyramidDoor = new ObjectStep(this, ObjectID.DOOR_6614, new WorldPoint(3295, 2779, 0), "Right-click open the south pyramid's door in Sophanem.", catFollower);
+
+		jumpPitAgain = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path again until you reach a pit, and jump it. Move using the minimap to avoid all the traps.");
+
+		pickUpAnyJar = new ObjectStep(this, NullObjectID.NULL_6634, "Try picking up the canopic jars in the north west room until a level 75-81 enemy spawns. Kill them.");
+		pickUpAnyJar.addAlternateObjects(NullObjectID.NULL_6636, NullObjectID.NULL_6638, NullObjectID.NULL_6640);
+
+		pickUpCrondisJar = new ObjectStep(this, NullObjectID.NULL_6636, new WorldPoint(3286, 9195, 0), "Attempt to pick up the Crondis Canopic Jar, and kill Crondis (level 75) when they appear.");
+		pickUpScarabasJar = new ObjectStep(this, NullObjectID.NULL_6638, new WorldPoint(3286, 9196, 0), "Attempt to pick up the Scarabas Canopic Jar, and kill Scarabas (level 75) when they appear.");
+		pickUpApmekenJar = new ObjectStep(this, NullObjectID.NULL_6640, new WorldPoint(3286, 9193, 0), "Attempt to pick up the Apmeken Canopic Jar, and kill Apmeken (level 75) when they appear.");
+		pickUpHetJar = new ObjectStep(this, NullObjectID.NULL_6634, new WorldPoint(3286, 9194, 0), "Attempt to pick up the Het Canopic Jar, and kill Het (level 75) when they appear.");
+
+		pickUpAnyJarAgain = new ObjectStep(this, NullObjectID.NULL_6634, "Try picking up the canopic jars in the north west room again.");
+		pickUpAnyJarAgain.addAlternateObjects(NullObjectID.NULL_6636, NullObjectID.NULL_6638, NullObjectID.NULL_6640);
+
+		pickUpCrondisJarAgain = new ObjectStep(this, NullObjectID.NULL_6636, new WorldPoint(3286, 9195, 0), "Pick up the Crondis Canopic Jar.");
+		pickUpScarabasJarAgain = new ObjectStep(this, NullObjectID.NULL_6638, new WorldPoint(3286, 9196, 0), "Pick up the Scarabas Canopic Jar.");
+		pickUpApmekenJarAgain = new ObjectStep(this, NullObjectID.NULL_6640, new WorldPoint(3286, 9193, 0), "Pick up the Apmeken Canopic Jar.");
+		pickUpHetJarAgain = new ObjectStep(this, NullObjectID.NULL_6634, new WorldPoint(3286, 9194, 0), "Pick up the Het Canopic Jar.");
+
+		returnOverPit = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9196, 0), "Jump back over the pit with the jar.");
+		jumpOverPitAgain = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path again until you reach a pit, and jump it. Move using the minimap to avoid all the traps.");
+
+		dropJar = new DetailedQuestStep(this, "Drop the canopic jar in the spot you took it from.", jar);
+		dropCrondisJar = new DetailedQuestStep(this, new WorldPoint(3286, 9195, 0), "Drop the canopic jar in the spot you took it from.", jar);
+		dropApmekenJar = new DetailedQuestStep(this, new WorldPoint(3286, 9193, 0), "Drop the canopic jar in the spot you took it from.", jar);
+		dropHetJar = new DetailedQuestStep(this, new WorldPoint(3286, 9194, 0), "Drop the canopic jar in the spot you took it from.", jar);
+		dropScarabasJar = new DetailedQuestStep(this, new WorldPoint(3286, 9196, 0), "Drop the canopic jar in the spot you took it from.", jar);
+
+		solvePuzzleAgain = new DoorPuzzleStep(this);
+
+		leavePyramid = new ObjectStep(this, ObjectID.LADDER_6645, new WorldPoint(3277, 9172, 0), "Leave the pyramid and return to the High Priest.");
+		returnToHighPriest = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Return to the High Priest in the south west of Sophanem.");
+		returnToHighPriest.addDialogStep("Sure, no problem.");
+		leavePyramid.addSubSteps(returnToHighPriest);
+
+		talkToEmbalmer = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer just south of the High Priest.", bagOfSaltOrBucket, linen, bucketOfSap);
+		talkToEmbalmerAgain = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket, linen, bucketOfSap);
+		talkToEmbalmerAgainNoLinen = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0),
+			"Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket, bucketOfSap);
+		talkToEmbalmerAgainNoSalt = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", linen, bucketOfSap);
+		talkToEmbalmerAgainNoSap = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket, linen);
+		talkToEmbalmerAgainNoLinenNoSalt = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bucketOfSap);
+		talkToEmbalmerAgainNoLinenNoSap = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket);
+		talkToEmbalmerAgainNoSaltNoSap = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", linen);
+		talkToEmbalmerAgain.addSubSteps(talkToEmbalmerAgainNoLinen, talkToEmbalmerAgainNoLinenNoSalt, talkToEmbalmerAgainNoLinenNoSap, talkToEmbalmerAgainNoSalt, talkToEmbalmerAgainNoLinenNoSap, talkToEmbalmerAgainNoSaltNoSap);
+
+		talkToCarpenter = new NpcStep(this, NpcID.CARPENTER, new WorldPoint(3313, 2770, 0), "Talk to the Carpenter in the east of Sophanem.", willowLog);
+		talkToCarpenter.addDialogStep("Alright, I'll get the wood for you.");
+		talkToCarpenterAgain = new NpcStep(this, NpcID.CARPENTER, new WorldPoint(3313, 2770, 0), "Talk to the Carpenter again in the east of Sophanem.");
+		talkToCarpenterOnceMore = new NpcStep(this, NpcID.CARPENTER, new WorldPoint(3313, 2770, 0), "Talk to the Carpenter again in the east of Sophanem once more.");
+
+		buyLinen = new NpcStep(this, NpcID.RAETUL, new WorldPoint(3311, 2787, 0), "Get some linen. You can buy some from Raetul in east Sophanem for 30 coins.", coinsOrLinen);
+
+		enterRockWithItems = new ObjectStep(this, NullObjectID.NULL_6621, new WorldPoint(3324, 2858, 0),
+			"Enter the rock west of the Agility Pyramid to re-enter Sophanhem. Make sure to bring the items you need.", bucketOfSap, bagOfSaltOrBucket, coinsOrLinen, willowLog, catFollower);
+
+		openPyramidDoorWithSymbol = new ObjectStep(this, ObjectID.DOOR_6614, new WorldPoint(3295, 2779, 0), "Right-click open the south pyramid's door in Sophanem.", catFollower, holySymbol);
+
+		jumpPitWithSymbol = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path again until you reach a pit, and jump it. Move using the minimap to avoid all the traps.", holySymbol);
+
+		enterEastRoom = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3306, 9199, 0), "Enter the east room.");
+		useSymbolOnSarcopagus = new ObjectStep(this, ObjectID.SARCOPHAGUS_6630, new WorldPoint(3312, 9197, 0), "Use the unholy symbol on a sarcophagus.", unholySymbol);
+
+		leaveEastRoom = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3306, 9199, 0), "Leave the east room.");
+
+		jumpPitWithSymbolAgain = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Jump over the pit.", holySymbol);
+
+		enterEastRoomAgain = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3306, 9199, 0), "Enter the east room again.");
+
+		killPriest = new NpcStep(this, NpcID.POSSESSED_PRIEST, new WorldPoint(3306, 9196, 0), "Kill the posessed priest.");
+
+		talkToHighPriestInPyramid = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3306, 9196, 0), "Talk to the High Priest in the north east room of the pyramid.");
+
+		leavePyramidToFinish = new ObjectStep(this, ObjectID.LADDER_6645, new WorldPoint(3277, 9172, 0), "Leave the pyramid and return to the High Priest.");
+		talkToHighPriestToFinish = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Return to the High Priest in the south west of Sophanem to finish the quest.");
+		leavePyramidToFinish.addSubSteps(talkToHighPriestToFinish);
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		return new ArrayList<>(Arrays.asList(cat, tinderbox, coins600, bagOfSaltOrBucket, willowLog, bucketOfSap, waterskin4));
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		return new ArrayList<>(Collections.singletonList(food));
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		return new ArrayList<>(Arrays.asList("Level 75 or 81 guardian", "Possessed priest (level 91)"));
+	}
+
+	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+		allSteps.add(new PanelDetails("Starting off",
+			new ArrayList<>(Arrays.asList(talkToWanderer, talkToWandererAgain)), cat, waterskin4, tinderbox, coins600, bagOfSaltOrBucket, willowLog, bucketOfSap));
+		allSteps.add(new PanelDetails("Remembering",
+			new ArrayList<>(Arrays.asList(touchPyramidDoor, jumpPit, openWestDoor))));
+
+		allSteps.add(new PanelDetails("Returning the jar",
+			new ArrayList<>(Arrays.asList(talkToSphinx, talkToHighPriest, openPyramidDoor, jumpPitAgain, pickUpAnyJar, pickUpAnyJarAgain, returnOverPit, jumpOverPitAgain, solvePuzzleAgain, dropJar, leavePyramid)), cat));
+
+		allSteps.add(new PanelDetails("Prepare the ritual",
+			new ArrayList<>(Arrays.asList(buyLinen, talkToEmbalmer, talkToEmbalmerAgain, talkToCarpenter, talkToCarpenterAgain, talkToCarpenterOnceMore)), bucketOfSap, bagOfSaltOrBucket, coinsOrLinen, willowLog));
+
+		allSteps.add(new PanelDetails("Save the ritual",
+			new ArrayList<>(Arrays.asList(openPyramidDoorWithSymbol, jumpPitWithSymbol, enterEastRoom, useSymbolOnSarcopagus, leaveEastRoom, jumpPitWithSymbolAgain, enterEastRoomAgain, killPriest, talkToHighPriestInPyramid, leavePyramidToFinish)), cat));
+
+		return allSteps;
+	}
+
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
@@ -196,233 +424,5 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 
 		steps.put(25, finishTheQuest);
 		return steps;
-	}
-
-	public void setupItemRequirements()
-	{
-		cat = new ItemRequirement("Any cat", ItemID.PET_CAT);
-		cat.addAlternates(ItemCollections.getCats());
-
-		catFollower = new FollowerRequirement("Any cat following you", NpcCollections.getCats());
-		tinderbox = new ItemRequirement("Tinderbox", ItemID.TINDERBOX);
-		waterskin4 = new ItemRequirement("Waterskin(4), bring a few to avoid drinking it", ItemID.WATERSKIN4);
-		coins600 = new ItemRequirement("600 coins or more for various payments", ItemID.COINS_995, 600);
-		bagOfSaltOrBucket = new ItemRequirement("Bag of Salt from a Slayer Master, or an empty bucket to get some", ItemID.BAG_OF_SALT);
-		bagOfSaltOrBucket.addAlternates(ItemID.PILE_OF_SALT);
-
-		coinsOrLinen = new ItemRequirement("Linen or 30 coins to buy some", ItemID.LINEN);
-
-		coins30 = new ItemRequirement("30 coins", ItemID.COINS_995, 30);
-
-		willowLog = new ItemRequirement("Willow logs", ItemID.WILLOW_LOGS);
-		bucketOfSap = new ItemRequirement("Bucket of sap", ItemID.BUCKET_OF_SAP);
-
-		food = new ItemRequirement("Combat gear, food + prayer potions", -1, -1);
-
-		sphinxsToken = new ItemRequirement("Sphinx's token", ItemID.SPHINXS_TOKEN);
-		sphinxsToken.setTip("You can get another from the Sphinx");
-		jar = new ItemRequirement("Canopic jar", ItemID.CANOPIC_JAR);
-		jar.addAlternates(ItemID.CANOPIC_JAR_4679, ItemID.CANOPIC_JAR_4680, ItemID.CANOPIC_JAR_4681);
-		jar.setHighlightInInventory(true);
-
-		linen = new ItemRequirement("Linen", ItemID.LINEN);
-
-		holySymbol = new ItemRequirement("Holy symbol", ItemID.HOLY_SYMBOL_4682);
-		holySymbol.setTip("You can get another from the Carpenter in Sophenham");
-
-		unholySymbol = new ItemRequirement("Unholy symbol", ItemID.UNHOLY_SYMBOL_4683);
-		unholySymbol.setHighlightInInventory(true);
-	}
-
-	public void setupConditions()
-	{
-		inSoph = new ZoneCondition(soph);
-		inPyramid = new ZoneCondition(pyramid);
-		inNorthPyramid = new ZoneCondition(northPyramid, northPyramid2, eastRoom);
-		inEastRoom = new ZoneCondition(eastRoom);
-
-		puzzleOpen = new WidgetModelCondition(147, 3, 6474);
-		givenToken = new VarbitCondition(450, 1);
-
-
-		hasCrondisJar = new VarbitCondition(397, 4);
-
-		// TODO: Verify varbit values for apmeken/het/scarabas
-		hasApmekenJar = new VarbitCondition(397, 3);
-		hasHetJar = new VarbitCondition(397, 2);
-		hasScarabasJar = new VarbitCondition(397, 1);
-
-		killedGuardian = new VarbitCondition(418, 11, Operation.GREATER_EQUAL);
-
-		hasJar = new VarbitCondition(405, 1);
-		talkedToEmbalmer = new VarbitCondition(399, 1);
-
-		hasLinen = new ItemRequirementCondition(linen);
-
-		givenSalt = new VarbitCondition(401, 1);
-		givenSap = new VarbitCondition(402, 1);
-		givenLinen = new VarbitCondition(403, 1);
-		givenEmbalmerAllItems = new VarbitCondition(400, 7);
-
-		talkedToCarpenter = new VarbitCondition(412, 1);
-		givenCarpenterLogs = new VarbitCondition(398, 1);
-
-		posessedPriestNearby = new NpcCondition(NpcID.POSSESSED_PRIEST);
-	}
-
-	public void loadZones()
-	{
-		soph = new Zone(new WorldPoint(3262, 2751, 0), new WorldPoint(3322, 2809, 0));
-		pyramid = new Zone(new WorldPoint(3273, 9170, 0), new WorldPoint(3311, 9204, 0));
-		northPyramid = new Zone(new WorldPoint(3276, 9194, 0), new WorldPoint(3311, 9204, 0));
-		northPyramid2 = new Zone(new WorldPoint(3276, 9192, 0), new WorldPoint(3287, 9193, 0));
-		eastRoom = new Zone(new WorldPoint(3300, 9192, 0), new WorldPoint(3311, 9199, 0));
-	}
-
-	public void setupSteps()
-	{
-		talkToWanderer = new NpcStep(this, NpcID.WANDERER_4194, new WorldPoint(3316, 2849, 0), "Talk to the Wanderer west of the Agility Pyramid.", catFollower, waterskin4, tinderbox);
-		talkToWanderer.addDialogStep("Why? What's your problem with it?");
-		talkToWanderer.addDialogStep("Ok I'll get your supplies.");
-
-		talkToWandererAgain = new NpcStep(this, NpcID.WANDERER_4194, new WorldPoint(3316, 2849, 0), "Talk to the Wanderer again with the required items.", waterskin4, tinderbox);
-		talkToWandererAgain.addDialogStep("Yes. I have them all here.");
-
-		enterRock = new ObjectStep(this, NullObjectID.NULL_6621, new WorldPoint(3324, 2858, 0), "Enter the rock west of the Agility Pyramid to re-enter Sophanhem.");
-
-		touchPyramidDoor = new ObjectStep(this, ObjectID.DOOR_6614, new WorldPoint(3295, 2779, 0), "Touch the south pyramid door in Sophanem.");
-
-		jumpPit = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path until you reach a pit, and jump it. Move using the minimap to avoid all the traps.");
-
-		openWestDoor = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3280, 9199, 0), "Attempt to open the west door.");
-
-		solveDoorPuzzle = new DoorPuzzleStep(this);
-
-		talkToSphinx = new NpcStep(this, NpcID.SPHINX_4209, new WorldPoint(3301, 2785, 0), "Talk to the Sphinx in Sophenham with your cat, and answer its riddle with '9.'.", catFollower);
-		talkToSphinx.addDialogStep("I need help.");
-		talkToSphinx.addDialogStep("Okay, that sounds fair.");
-		talkToSphinx.addDialogStep("9.");
-		talkToSphinx.addDialogStep("Totally positive.");
-
-		talkToHighPriest = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Talk to the High Priest in the south west of Sophanem.", sphinxsToken);
-		talkToHighPriestWithoutToken = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Talk to the High Priest in the south west of Sophanem.");
-		talkToHighPriest.addSubSteps(talkToHighPriestWithoutToken);
-
-		openPyramidDoor = new ObjectStep(this, ObjectID.DOOR_6614, new WorldPoint(3295, 2779, 0), "Right-click open the south pyramid's door in Sophanem.", catFollower);
-
-		jumpPitAgain = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path again until you reach a pit, and jump it. Move using the minimap to avoid all the traps.");
-
-		pickUpAnyJar = new ObjectStep(this, NullObjectID.NULL_6634, "Try picking up the canopic jars in the north west room until a level 75-81 enemy spawns. Kill them.");
-		pickUpAnyJar.addAlternateObjects(NullObjectID.NULL_6636, NullObjectID.NULL_6638, NullObjectID.NULL_6640);
-
-		pickUpCrondisJar = new ObjectStep(this, NullObjectID.NULL_6636, new WorldPoint(3286, 9195, 0), "Attempt to pick up the Crondis Canopic Jar, and kill Crondis (level 75) when they appear.");
-		pickUpScarabasJar = new ObjectStep(this, NullObjectID.NULL_6638, new WorldPoint(3286, 9196, 0), "Attempt to pick up the Scarabas Canopic Jar, and kill Scarabas (level 75) when they appear.");
-		pickUpApmekenJar = new ObjectStep(this, NullObjectID.NULL_6640, new WorldPoint(3286, 9193, 0), "Attempt to pick up the Apmeken Canopic Jar, and kill Apmeken (level 75) when they appear.");
-		pickUpHetJar = new ObjectStep(this, NullObjectID.NULL_6634, new WorldPoint(3286, 9194, 0), "Attempt to pick up the Het Canopic Jar, and kill Het (level 75) when they appear.");
-
-		pickUpAnyJarAgain = new ObjectStep(this, NullObjectID.NULL_6634, "Try picking up the canopic jars in the north west room again.");
-		pickUpAnyJarAgain.addAlternateObjects(NullObjectID.NULL_6636, NullObjectID.NULL_6638, NullObjectID.NULL_6640);
-
-		pickUpCrondisJarAgain = new ObjectStep(this, NullObjectID.NULL_6636, new WorldPoint(3286, 9195, 0), "Pick up the Crondis Canopic Jar.");
-		pickUpScarabasJarAgain = new ObjectStep(this, NullObjectID.NULL_6638, new WorldPoint(3286, 9196, 0), "Pick up the Scarabas Canopic Jar.");
-		pickUpApmekenJarAgain = new ObjectStep(this, NullObjectID.NULL_6640, new WorldPoint(3286, 9193, 0), "Pick up the Apmeken Canopic Jar.");
-		pickUpHetJarAgain = new ObjectStep(this, NullObjectID.NULL_6634, new WorldPoint(3286, 9194, 0), "Pick up the Het Canopic Jar.");
-
-		returnOverPit = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9196, 0), "Jump back over the pit with the jar.");
-		jumpOverPitAgain = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path again until you reach a pit, and jump it. Move using the minimap to avoid all the traps.");
-
-		dropJar = new DetailedQuestStep(this, "Drop the canopic jar in the spot you took it from.", jar);
-		dropCrondisJar = new DetailedQuestStep(this, new WorldPoint(3286, 9195, 0), "Drop the canopic jar in the spot you took it from.", jar);
-		dropApmekenJar = new DetailedQuestStep(this, new WorldPoint(3286, 9193, 0), "Drop the canopic jar in the spot you took it from.", jar);
-		dropHetJar = new DetailedQuestStep(this, new WorldPoint(3286, 9194, 0), "Drop the canopic jar in the spot you took it from.", jar);
-		dropScarabasJar = new DetailedQuestStep(this, new WorldPoint(3286, 9196, 0), "Drop the canopic jar in the spot you took it from.", jar);
-
-		solvePuzzleAgain = new DoorPuzzleStep(this);
-
-		leavePyramid = new ObjectStep(this, ObjectID.LADDER_6645, new WorldPoint(3277, 9172, 0), "Leave the pyramid and return to the High Priest.");
-		returnToHighPriest = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Return to the High Priest in the south west of Sophanem.");
-		returnToHighPriest.addDialogStep("Sure, no problem.");
-		leavePyramid.addSubSteps(returnToHighPriest);
-
-		talkToEmbalmer = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer just south of the High Priest.", bagOfSaltOrBucket, linen, bucketOfSap);
-		talkToEmbalmerAgain = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket, linen, bucketOfSap);
-		talkToEmbalmerAgainNoLinen = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0),
-			"Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket, bucketOfSap);
-		talkToEmbalmerAgainNoSalt = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", linen, bucketOfSap);
-		talkToEmbalmerAgainNoSap = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket, linen);
-		talkToEmbalmerAgainNoLinenNoSalt = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bucketOfSap);
-		talkToEmbalmerAgainNoLinenNoSap = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", bagOfSaltOrBucket);
-		talkToEmbalmerAgainNoSaltNoSap = new NpcStep(this, NpcID.EMBALMER, new WorldPoint(3287, 2755, 0), "Talk to the Embalmer again just south of the High Priest.", linen);
-		talkToEmbalmerAgain.addSubSteps(talkToEmbalmerAgainNoLinen, talkToEmbalmerAgainNoLinenNoSalt, talkToEmbalmerAgainNoLinenNoSap, talkToEmbalmerAgainNoSalt, talkToEmbalmerAgainNoLinenNoSap, talkToEmbalmerAgainNoSaltNoSap);
-
-		talkToCarpenter = new NpcStep(this, NpcID.CARPENTER, new WorldPoint(3313, 2770, 0), "Talk to the Carpenter in the east of Sophanem.", willowLog);
-		talkToCarpenter.addDialogStep("Alright, I'll get the wood for you.");
-		talkToCarpenterAgain = new NpcStep(this, NpcID.CARPENTER, new WorldPoint(3313, 2770, 0), "Talk to the Carpenter again in the east of Sophanem.");
-		talkToCarpenterOnceMore = new NpcStep(this, NpcID.CARPENTER, new WorldPoint(3313, 2770, 0), "Talk to the Carpenter again in the east of Sophanem once more.");
-
-		buyLinen = new NpcStep(this, NpcID.RAETUL, new WorldPoint(3311, 2787, 0), "Get some linen. You can buy some from Raetul in east Sophanem for 30 coins.", coinsOrLinen);
-
-		enterRockWithItems = new ObjectStep(this, NullObjectID.NULL_6621, new WorldPoint(3324, 2858, 0),
-			"Enter the rock west of the Agility Pyramid to re-enter Sophanhem. Make sure to bring the items you need.", bucketOfSap, bagOfSaltOrBucket, coinsOrLinen, willowLog, catFollower);
-
-		openPyramidDoorWithSymbol = new ObjectStep(this, ObjectID.DOOR_6614, new WorldPoint(3295, 2779, 0), "Right-click open the south pyramid's door in Sophanem.", catFollower, holySymbol);
-
-		jumpPitWithSymbol = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Follow the path again until you reach a pit, and jump it. Move using the minimap to avoid all the traps.", holySymbol);
-
-		enterEastRoom = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3306, 9199, 0), "Enter the east room.");
-		useSymbolOnSarcopagus = new ObjectStep(this, ObjectID.SARCOPHAGUS_6630, new WorldPoint(3312, 9197, 0), "Use the unholy symbol on a sarcophagus.", unholySymbol);
-
-		leaveEastRoom = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3306, 9199, 0), "Leave the east room.");
-
-		jumpPitWithSymbolAgain = new ObjectStep(this, ObjectID.PIT, new WorldPoint(3292, 9194, 0), "Jump over the pit.", holySymbol);
-
-		enterEastRoomAgain = new ObjectStep(this, ObjectID.DOORWAY_6643, new WorldPoint(3306, 9199, 0), "Enter the east room again.");
-
-		killPriest = new NpcStep(this, NpcID.POSSESSED_PRIEST, new WorldPoint(3306, 9196, 0), "Kill the posessed priest.");
-
-		talkToHighPriestInPyramid = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3306, 9196, 0), "Talk to the High Priest in the north east room of the pyramid.");
-
-		leavePyramidToFinish = new ObjectStep(this, ObjectID.LADDER_6645, new WorldPoint(3277, 9172, 0), "Leave the pyramid and return to the High Priest.");
-		talkToHighPriestToFinish = new NpcStep(this, NpcID.HIGH_PRIEST_4206, new WorldPoint(3281, 2772, 0), "Return to the High Priest in the south west of Sophanem to finish the quest.");
-		leavePyramidToFinish.addSubSteps(talkToHighPriestToFinish);
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		return new ArrayList<>(Arrays.asList(cat, tinderbox, coins600, bagOfSaltOrBucket, willowLog, bucketOfSap, waterskin4));
-	}
-
-	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		return new ArrayList<>(Arrays.asList("Level 75 or 81 guardian", "Possessed priest (level 91)"));
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		return new ArrayList<>(Collections.singletonList(food));
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off",
-			new ArrayList<>(Arrays.asList(talkToWanderer, talkToWandererAgain)), cat, waterskin4, tinderbox, coins600, bagOfSaltOrBucket, willowLog, bucketOfSap));
-		allSteps.add(new PanelDetails("Remembering",
-			new ArrayList<>(Arrays.asList(touchPyramidDoor, jumpPit, openWestDoor))));
-
-		allSteps.add(new PanelDetails("Returning the jar",
-			new ArrayList<>(Arrays.asList(talkToSphinx, talkToHighPriest, openPyramidDoor, jumpPitAgain, pickUpAnyJar, pickUpAnyJarAgain, returnOverPit, jumpOverPitAgain, solvePuzzleAgain, dropJar, leavePyramid)), cat));
-
-		allSteps.add(new PanelDetails("Prepare the ritual",
-			new ArrayList<>(Arrays.asList(buyLinen, talkToEmbalmer, talkToEmbalmerAgain, talkToCarpenter, talkToCarpenterAgain, talkToCarpenterOnceMore)), bucketOfSap, bagOfSaltOrBucket, coinsOrLinen, willowLog));
-
-		allSteps.add(new PanelDetails("Save the ritual",
-			new ArrayList<>(Arrays.asList(openPyramidDoorWithSymbol, jumpPitWithSymbol, enterEastRoom, useSymbolOnSarcopagus, leaveEastRoom, jumpPitWithSymbolAgain, enterEastRoomAgain, killPriest, talkToHighPriestInPyramid, leavePyramidToFinish)), cat));
-
-		return allSteps;
 	}
 }

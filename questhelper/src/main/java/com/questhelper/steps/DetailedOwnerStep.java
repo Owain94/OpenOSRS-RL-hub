@@ -43,10 +43,10 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 	protected Requirement[] requirements;
 
 	@Inject
-	public EventBus eventBus;
+	protected EventBus eventBus;
 
 	@Inject
-	public Client client;
+	protected Client client;
 
 	public DetailedOwnerStep(QuestHelper questHelper, Requirement... requirements)
 	{
@@ -75,37 +75,6 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 	{
 		shutDownStep();
 		currentStep = null;
-	}
-
-	protected void startUpStep(QuestStep step)
-	{
-		if (currentStep == null)
-		{
-			currentStep = step;
-			currentStep.startUp();
-			return;
-		}
-
-		if (!step.equals(currentStep))
-		{
-			shutDownStep();
-			step.startUp();
-			currentStep = step;
-		}
-	}
-
-	protected void shutDownStep()
-	{
-		if (currentStep != null)
-		{
-			eventBus.unregister(currentStep);
-			currentStep.shutDown();
-			currentStep = null;
-		}
-	}
-
-	protected void updateSteps()
-	{
 	}
 
 	@Override
@@ -160,6 +129,36 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 		}
 	}
 
+	protected void startUpStep(QuestStep step)
+	{
+		if (currentStep == null)
+		{
+			currentStep = step;
+			currentStep.startUp();
+			return;
+		}
+
+		if (!step.equals(currentStep))
+		{
+			shutDownStep();
+			step.startUp();
+			currentStep = step;
+		}
+	}
+
+	protected void shutDownStep()
+	{
+		if (currentStep != null)
+		{
+			eventBus.unregister(currentStep);
+			currentStep.shutDown();
+			currentStep = null;
+		}
+	}
+
+	protected void updateSteps()
+	{
+	}
 
 	protected void setupSteps()
 	{

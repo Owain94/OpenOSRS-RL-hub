@@ -61,35 +61,6 @@ public class VampyreSlayer extends BasicQuestHelper
 
 	Zone manor, basement, upstairsInMorgans;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToMorgan);
-
-		ConditionalStep getGarlicAndStake = new ConditionalStep(this, goUpstairsMorgan);
-		getGarlicAndStake.addStep(hasGarlic, talkToHarlow);
-		getGarlicAndStake.addStep(isUpstairsInMorgans, getGarlic);
-
-		steps.put(1, getGarlicAndStake);
-
-		ConditionalStep prepareAndKillDraynor = new ConditionalStep(this, getGarlicAndStake);
-		prepareAndKillDraynor.addStep(draynorNearby, killDraynor);
-		prepareAndKillDraynor.addStep(inBasement, openCoffin);
-		prepareAndKillDraynor.addStep(inManor, goDownToBasement);
-		prepareAndKillDraynor.addStep(hasStake, enterDraynorManor);
-
-		steps.put(2, prepareAndKillDraynor);
-
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		varrockTeleport = new ItemRequirement("A teleport to Varrock", ItemID.VARROCK_TELEPORT);
@@ -177,5 +148,34 @@ public class VampyreSlayer extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Get a stake", new ArrayList<>(Arrays.asList(talkToHarlow, talkToHarlowAgain)), beer));
 		allSteps.add(new PanelDetails("Kill Count Draynor", new ArrayList<>(Arrays.asList(enterDraynorManor, goDownToBasement, openCoffin)), hammer, stake, garlic, combatGear));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToMorgan);
+
+		ConditionalStep getGarlicAndStake = new ConditionalStep(this, goUpstairsMorgan);
+		getGarlicAndStake.addStep(hasGarlic, talkToHarlow);
+		getGarlicAndStake.addStep(isUpstairsInMorgans, getGarlic);
+
+		steps.put(1, getGarlicAndStake);
+
+		ConditionalStep prepareAndKillDraynor = new ConditionalStep(this, getGarlicAndStake);
+		prepareAndKillDraynor.addStep(draynorNearby, killDraynor);
+		prepareAndKillDraynor.addStep(inBasement, openCoffin);
+		prepareAndKillDraynor.addStep(inManor, goDownToBasement);
+		prepareAndKillDraynor.addStep(hasStake, enterDraynorManor);
+
+		steps.put(2, prepareAndKillDraynor);
+
+
+		return steps;
 	}
 }

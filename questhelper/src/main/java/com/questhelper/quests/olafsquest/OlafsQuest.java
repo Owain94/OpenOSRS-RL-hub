@@ -71,65 +71,13 @@ public class OlafsQuest extends BasicQuestHelper
 		keyInterfaceOpen, hasCrossKey, hasSquareKey, hasTriangleKey, hasCircleKey, hasStarKey, ulfricNearby, killedUlfric;
 
 	QuestStep talkToOlaf, chopTree, giveLogToOlaf, talkToIngrid, talkToVolf, returnToOlaf, useDampPlanks, talkToOlafAfterPlanks, digHole, pickUpKey, searchPainting, doPuzzle, pickUpItems,
-		pickupItems2, useBarrel, useBarrel2, openGate, chooseSquare, chooseCross, chooseTriangle, chooseCircle, chooseStar, killUlfric;
+		pickUpItems2, useBarrel, useBarrel2, openGate, chooseSquare, chooseCross, chooseTriangle, chooseCircle, chooseStar, killUlfric;
 
 	NpcStep killSkeleton;
 
 	ObjectStep searchChest, searchChestAgain;
 
 	Zone firstArea, firstArea2, secondArea, secondArea2, thirdArea;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToOlaf);
-
-		ConditionalStep getLogs = new ConditionalStep(this, chopTree);
-		getLogs.addStep(hasWindsweptLogs, giveLogToOlaf);
-
-		steps.put(10, getLogs);
-
-		ConditionalStep bringCarvings = new ConditionalStep(this, talkToIngrid);
-		bringCarvings.addStep(givenIngridCarving, talkToVolf);
-
-		steps.put(20, bringCarvings);
-
-		steps.put(30, returnToOlaf);
-
-		steps.put(40, useDampPlanks);
-
-		steps.put(50, talkToOlafAfterPlanks);
-
-		ConditionalStep solvePuzzleSteps = new ConditionalStep(this, digHole);
-		solvePuzzleSteps.addStep(new Conditions(inThirdArea, killedUlfric), searchChestAgain);
-		solvePuzzleSteps.addStep(new Conditions(ulfricNearby, inThirdArea), killUlfric);
-		solvePuzzleSteps.addStep(inThirdArea, searchChest);
-		solvePuzzleSteps.addStep(new Conditions(hasStarKey, keyInterfaceOpen), chooseStar);
-		solvePuzzleSteps.addStep(new Conditions(hasCircleKey, keyInterfaceOpen), chooseCircle);
-		solvePuzzleSteps.addStep(new Conditions(hasTriangleKey, keyInterfaceOpen), chooseTriangle);
-		solvePuzzleSteps.addStep(new Conditions(hasSquareKey, keyInterfaceOpen), chooseSquare);
-		solvePuzzleSteps.addStep(new Conditions(hasCrossKey, keyInterfaceOpen), chooseCross);
-		solvePuzzleSteps.addStep(new Conditions(hasKey, placedBarrel2), openGate);
-		solvePuzzleSteps.addStep(new Conditions(hasKey, placedBarrel1, hasBarrel3Ropes), useBarrel2);
-		solvePuzzleSteps.addStep(new Conditions(placedBarrel1, inSecondArea, hasKey), pickupItems2);
-		solvePuzzleSteps.addStep(new Conditions(has2Barrels6Ropes, hasKey), useBarrel);
-		solvePuzzleSteps.addStep(new Conditions(inSecondArea, hasKey), pickUpItems);
-		solvePuzzleSteps.addStep(puzzleOpen, doPuzzle);
-		solvePuzzleSteps.addStep(hasKey, searchPainting);
-		solvePuzzleSteps.addStep(keyNearby, pickUpKey);
-		solvePuzzleSteps.addStep(inFirstArea, killSkeleton);
-
-		steps.put(60, solvePuzzleSteps);
-		steps.put(70, solvePuzzleSteps);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -229,6 +177,8 @@ public class OlafsQuest extends BasicQuestHelper
 		doPuzzle = new PaintingWall(this);
 
 		pickUpItems = new DetailedQuestStep(this, "Pick up 2 rotten barrels and 6 ropes from around the room.", rottenBarrels2, ropes6);
+		pickUpItems2 = new DetailedQuestStep(this, "Pick up 1 rotten barrels and 3 ropes from around the room.", rottenBarrel, ropes3);
+		pickUpItems.addSubSteps(pickUpItems2);
 
 		useBarrel = new ObjectStep(this, ObjectID.WALKWAY, new WorldPoint(2722, 10168, 0), "WALK onto the walkway to the east, and use a barrel on it to repair it.", rottenBarrel, ropes3);
 		useBarrel.addIcon(ItemID.ROTTEN_BARREL_11045);
@@ -281,5 +231,57 @@ public class OlafsQuest extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Finding treasure",
 			new ArrayList<>(Arrays.asList(digHole, killSkeleton, searchPainting, doPuzzle, pickUpItems, useBarrel, useBarrel2, openGate, searchChest, killUlfric, searchChestAgain))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToOlaf);
+
+		ConditionalStep getLogs = new ConditionalStep(this, chopTree);
+		getLogs.addStep(hasWindsweptLogs, giveLogToOlaf);
+
+		steps.put(10, getLogs);
+
+		ConditionalStep bringCarvings = new ConditionalStep(this, talkToIngrid);
+		bringCarvings.addStep(givenIngridCarving, talkToVolf);
+
+		steps.put(20, bringCarvings);
+
+		steps.put(30, returnToOlaf);
+
+		steps.put(40, useDampPlanks);
+
+		steps.put(50, talkToOlafAfterPlanks);
+
+		ConditionalStep solvePuzzleSteps = new ConditionalStep(this, digHole);
+		solvePuzzleSteps.addStep(new Conditions(inThirdArea, killedUlfric), searchChestAgain);
+		solvePuzzleSteps.addStep(new Conditions(ulfricNearby, inThirdArea), killUlfric);
+		solvePuzzleSteps.addStep(inThirdArea, searchChest);
+		solvePuzzleSteps.addStep(new Conditions(hasStarKey, keyInterfaceOpen), chooseStar);
+		solvePuzzleSteps.addStep(new Conditions(hasCircleKey, keyInterfaceOpen), chooseCircle);
+		solvePuzzleSteps.addStep(new Conditions(hasTriangleKey, keyInterfaceOpen), chooseTriangle);
+		solvePuzzleSteps.addStep(new Conditions(hasSquareKey, keyInterfaceOpen), chooseSquare);
+		solvePuzzleSteps.addStep(new Conditions(hasCrossKey, keyInterfaceOpen), chooseCross);
+		solvePuzzleSteps.addStep(new Conditions(hasKey, placedBarrel2), openGate);
+		solvePuzzleSteps.addStep(new Conditions(hasKey, placedBarrel1, hasBarrel3Ropes), useBarrel2);
+		solvePuzzleSteps.addStep(new Conditions(placedBarrel1, inSecondArea, hasKey), pickUpItems2);
+		solvePuzzleSteps.addStep(new Conditions(has2Barrels6Ropes, hasKey), useBarrel);
+		solvePuzzleSteps.addStep(new Conditions(inSecondArea, hasKey), pickUpItems);
+		solvePuzzleSteps.addStep(puzzleOpen, doPuzzle);
+		solvePuzzleSteps.addStep(hasKey, searchPainting);
+		solvePuzzleSteps.addStep(keyNearby, pickUpKey);
+		solvePuzzleSteps.addStep(inFirstArea, killSkeleton);
+
+		steps.put(60, solvePuzzleSteps);
+		steps.put(70, solvePuzzleSteps);
+
+		return steps;
 	}
 }

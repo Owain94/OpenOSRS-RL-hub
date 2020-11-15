@@ -47,22 +47,6 @@ public class ImpCatcher extends BasicQuestHelper
 {
 	ItemRequirement blackBead, whiteBead, redBead, yellowBead;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		setupRequirements();
-
-		steps.put(0, new NpcStep(this, NpcID.WIZARD_MIZGOG, new WorldPoint(3103, 3163, 2),
-			"Talk to Wizard Mizgog on the top floor of the Wizards' Tower with the required items to finish the quest.",
-			blackBead, whiteBead, redBead, yellowBead));
-
-		steps.put(1, steps.get(0));
-
-		return steps;
-	}
-
 	private void setupRequirements()
 	{
 		blackBead = new ItemRequirement("Black bead", ItemID.BLACK_BEAD);
@@ -84,6 +68,12 @@ public class ImpCatcher extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		return new ArrayList<>(Arrays.asList("Imps (level 8) if you plan on collecting the beads yourself"));
+	}
+
+	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -92,8 +82,18 @@ public class ImpCatcher extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
+	public Map<Integer, QuestStep> loadSteps()
 	{
-		return new ArrayList<>(Arrays.asList("Imps (level 8) if you plan on collecting the beads yourself"));
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		setupRequirements();
+
+		steps.put(0, new NpcStep(this, NpcID.WIZARD_MIZGOG, new WorldPoint(3103, 3163, 2),
+			"Talk to Wizard Mizgog on the top floor of the Wizards' Tower with the required items to finish the quest.",
+			blackBead, whiteBead, redBead, yellowBead));
+
+		steps.put(1, steps.get(0));
+
+		return steps;
 	}
 }

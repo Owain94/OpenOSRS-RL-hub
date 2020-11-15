@@ -6,19 +6,14 @@ import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.VarbitCondition;
 import java.util.ArrayList;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class BringLunarItems extends NpcStep
 {
-	@Inject
-	EventBus eventBus;
-
 	ConditionForStep handedInHelm, handedInCape, handedInAmulet, handedInTorso, handedInGloves, handedInBoots, handedInLegs, handedInRing;
 
 	ItemRequirement helm, cape, amulet, torso, gloves, boots, legs, ring, sealOfPassage;
@@ -63,7 +58,6 @@ public class BringLunarItems extends NpcStep
 	{
 		super.startUp();
 		updateStep();
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Subscribe

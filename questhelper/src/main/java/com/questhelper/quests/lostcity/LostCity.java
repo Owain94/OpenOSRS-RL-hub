@@ -66,50 +66,6 @@ public class LostCity extends BasicQuestHelper
 
 	Zone entrana, entranaDungeon;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToWarrior);
-
-		ConditionalStep findShamus = new ConditionalStep(this, chopTree);
-		findShamus.addStep(shamusNearby, talkToShamus);
-
-		steps.put(1, findShamus);
-
-		ConditionalStep killingTheSpirit = new ConditionalStep(this, goToEntrana);
-		killingTheSpirit.addStep(new Conditions(inDungeon, dramenSpiritNearby), killDramenSpirit);
-		killingTheSpirit.addStep(new Conditions(inDungeon, hasBronzeAxe), attemptToCutDramen);
-		killingTheSpirit.addStep(new Conditions(inDungeon, bronzeAxeNearby), pickupAxe);
-		killingTheSpirit.addStep(inDungeon, getAxe);
-		killingTheSpirit.addStep(onEntrana, goDownHole);
-
-		steps.put(2, killingTheSpirit);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, getAnotherBranch);
-		finishQuest.addStep(new Conditions(inDungeon, hasStaff), teleportAway);
-		finishQuest.addStep(hasStaff, enterZanaris);
-		finishQuest.addStep(new Conditions(inDungeon, hasBranch), teleportAway);
-		finishQuest.addStep(hasBranch, craftBranch);
-		finishQuest.addStep(new Conditions(inDungeon, hasBronzeAxe), cutDramenBranch);
-		finishQuest.addStep(new Conditions(inDungeon, bronzeAxeNearby), pickupAxe);
-		finishQuest.addStep(inDungeon, getAxe);
-		finishQuest.addStep(onEntrana, goDownHole);
-
-		steps.put(3, finishQuest);
-
-		steps.put(4, finishQuest);
-
-		steps.put(5, finishQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		knife = new ItemRequirement("Knife", ItemID.KNIFE);
@@ -167,15 +123,6 @@ public class LostCity extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Multiple zombies (level 25) (can be safespotted)");
-		reqs.add("Dramen Tree Spirit (level 101) (can be safespotted)");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
@@ -193,6 +140,15 @@ public class LostCity extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Multiple zombies (level 25) (can be safespotted)");
+		reqs.add("Dramen Tree Spirit (level 101) (can be safespotted)");
+		return reqs;
+	}
+
+	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -202,5 +158,49 @@ public class LostCity extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Entering Zanaris", new ArrayList<>(Arrays.asList(craftBranch, enterZanaris)), knife));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToWarrior);
+
+		ConditionalStep findShamus = new ConditionalStep(this, chopTree);
+		findShamus.addStep(shamusNearby, talkToShamus);
+
+		steps.put(1, findShamus);
+
+		ConditionalStep killingTheSpirit = new ConditionalStep(this, goToEntrana);
+		killingTheSpirit.addStep(new Conditions(inDungeon, dramenSpiritNearby), killDramenSpirit);
+		killingTheSpirit.addStep(new Conditions(inDungeon, hasBronzeAxe), attemptToCutDramen);
+		killingTheSpirit.addStep(new Conditions(inDungeon, bronzeAxeNearby), pickupAxe);
+		killingTheSpirit.addStep(inDungeon, getAxe);
+		killingTheSpirit.addStep(onEntrana, goDownHole);
+
+		steps.put(2, killingTheSpirit);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, getAnotherBranch);
+		finishQuest.addStep(new Conditions(inDungeon, hasStaff), teleportAway);
+		finishQuest.addStep(hasStaff, enterZanaris);
+		finishQuest.addStep(new Conditions(inDungeon, hasBranch), teleportAway);
+		finishQuest.addStep(hasBranch, craftBranch);
+		finishQuest.addStep(new Conditions(inDungeon, hasBronzeAxe), cutDramenBranch);
+		finishQuest.addStep(new Conditions(inDungeon, bronzeAxeNearby), pickupAxe);
+		finishQuest.addStep(inDungeon, getAxe);
+		finishQuest.addStep(onEntrana, goDownHole);
+
+		steps.put(3, finishQuest);
+
+		steps.put(4, finishQuest);
+
+		steps.put(5, finishQuest);
+
+		return steps;
 	}
 }

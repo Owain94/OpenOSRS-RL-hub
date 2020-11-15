@@ -77,83 +77,6 @@ public class HauntedMine extends BasicQuestHelper
 		level3South1, level3South2, level3South3, cartRoom, collectRoom, level1North, floodedRoom, daythRoom1, daythRoom2, crystalRoom1,
 		crystalRoom2, crystalRoom3, crystalEntrance, crystalEntranceDark, daythRoomDark;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToZealot);
-
-		ConditionalStep solveMineCarts = new ConditionalStep(this, readPanel);
-		solveMineCarts.addStep(leverAWrong, pullLeverA);
-		solveMineCarts.addStep(leverBWrong, pullLeverB);
-		solveMineCarts.addStep(leverCWrong, pullLeverC);
-		solveMineCarts.addStep(leverDWrong, pullLeverD);
-		solveMineCarts.addStep(leverEWrong, pullLeverE);
-		solveMineCarts.addStep(leverFWrong, pullLeverF);
-		solveMineCarts.addStep(leverGWrong, pullLeverG);
-		solveMineCarts.addStep(leverHWrong, pullLeverH);
-
-		ConditionalStep exploreMine = new ConditionalStep(this, talkToZealot);
-		exploreMine.addStep(inCrystalRoom, cutCrystal);
-		exploreMine.addStep(inDarkCrystalRoom, leaveDarkCrystalRoom);
-		exploreMine.addStep(inDarkDaythRoom, leaveDarkDaythRoom);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inCrystalEntrance, hasCrystalMineKey, hasChisel), cutCrystal);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inFloodedRoom, hasCrystalMineKey, hasChisel), goDownToCrystals);
-		exploreMine.addStep(new Conditions(inFloodedRoom, hasCrystalMineKey), goBackUpLift);
-		exploreMine.addStep(new Conditions(inDaythRoom, hasCrystalMineKey), goUpFromDayth);
-		exploreMine.addStep(new Conditions(inDaythRoom, killedDayth), pickUpKey);
-		exploreMine.addStep(new Conditions(daythNearby), killDayth);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inDaythRoom), tryToPickUpKey);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inFloodedRoom), goDownToDayth);
-		exploreMine.addStep(new Conditions(inCrystalEntrance), leaveCrystalRoom);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, valveOpen, hasChisel), goDownLift);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, valveOpened, hasChisel), openValve);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, hasKey, hasChisel), useKeyOnValve);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, hasKeyOrOpenedValve), pickUpChisel);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inCollectRoom, hasKeyOrOpenedValve), goUpFromCollectRoom);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inLevel3North, hasKeyOrOpenedValve), goDownFromLevel3NorthEast);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inLevel2North, hasKeyOrOpenedValve), goDownLevel2North);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inLevel1North, hasKeyOrOpenedValve), goDownLevel1North);
-
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inCollectRoom, hasKeyOrOpenedValve), collectFungus);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel3North, hasKeyOrOpenedValve), goDownToCollectFungus);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLiftRoom, hasKeyOrOpenedValve), goUpFromLiftRoom); // Wrong way catch
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel2North, hasKeyOrOpenedValve), goDownLevel2North);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel1North, hasKeyOrOpenedValve), goDownLevel1North);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel1South, hasKeyOrOpenedValve), leaveLevel1South);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel2South, hasKeyOrOpenedValve), goUpFromLevel2South);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel3South, hasKeyOrOpenedValve), goUpFromLevel3South);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, inCartRoom, hasKeyOrOpenedValve), goUpFromFungusRoom);
-		exploreMine.addStep(new Conditions(fungusOnOtherSide, hasKeyOrOpenedValve), enterMineNorth);
-
-		exploreMine.addStep(new Conditions(fungusInCart, inCartRoom), solveMineCarts);
-		exploreMine.addStep(new Conditions(hasGlowingFungus, inCartRoom), putFungusInCart);
-		exploreMine.addStep(inCartRoom, pickFungus);
-
-		exploreMine.addStep(inLevel3South, goDownToFungusRoom);
-		exploreMine.addStep(inLevel2South, goDownFromLevel2South);
-		exploreMine.addStep(inLevel1South, goDownFromLevel1South);
-		exploreMine.addStep(hasKeyOrOpenedValve, enterMine);
-		exploreMine.addStep(askedAboutKey, pickpocketZealot);
-
-		steps.put(1, exploreMine);
-		steps.put(2, exploreMine);
-		steps.put(3, exploreMine);
-		steps.put(4, exploreMine);
-		steps.put(5, exploreMine);
-		steps.put(6, exploreMine);
-		steps.put(7, exploreMine);
-		steps.put(8, exploreMine);
-		steps.put(9, exploreMine);
-		steps.put(10, exploreMine);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		zealotsKey = new ItemRequirement("Zealot's key", ItemID.ZEALOTS_KEY);
@@ -367,7 +290,6 @@ public class HauntedMine extends BasicQuestHelper
 		return reqs;
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -387,5 +309,82 @@ public class HauntedMine extends BasicQuestHelper
 			new ArrayList<>(Arrays.asList(enterMineNorth, goDownLevel1North, goDownLevel2North, goDownToCollectFungus,
 				collectFungus, goUpFromCollectRoom, goDownFromLevel3NorthEast, pickUpChisel, useKeyOnValve, goDownLift, goDownToDayth, tryToPickUpKey, pickUpKey, goUpFromDayth, goDownToCrystals, cutCrystal))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToZealot);
+
+		ConditionalStep solveMineCarts = new ConditionalStep(this, readPanel);
+		solveMineCarts.addStep(leverAWrong, pullLeverA);
+		solveMineCarts.addStep(leverBWrong, pullLeverB);
+		solveMineCarts.addStep(leverCWrong, pullLeverC);
+		solveMineCarts.addStep(leverDWrong, pullLeverD);
+		solveMineCarts.addStep(leverEWrong, pullLeverE);
+		solveMineCarts.addStep(leverFWrong, pullLeverF);
+		solveMineCarts.addStep(leverGWrong, pullLeverG);
+		solveMineCarts.addStep(leverHWrong, pullLeverH);
+
+		ConditionalStep exploreMine = new ConditionalStep(this, talkToZealot);
+		exploreMine.addStep(inCrystalRoom, cutCrystal);
+		exploreMine.addStep(inDarkCrystalRoom, leaveDarkCrystalRoom);
+		exploreMine.addStep(inDarkDaythRoom, leaveDarkDaythRoom);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inCrystalEntrance, hasCrystalMineKey, hasChisel), cutCrystal);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inFloodedRoom, hasCrystalMineKey, hasChisel), goDownToCrystals);
+		exploreMine.addStep(new Conditions(inFloodedRoom, hasCrystalMineKey), goBackUpLift);
+		exploreMine.addStep(new Conditions(inDaythRoom, hasCrystalMineKey), goUpFromDayth);
+		exploreMine.addStep(new Conditions(inDaythRoom, killedDayth), pickUpKey);
+		exploreMine.addStep(new Conditions(daythNearby), killDayth);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inDaythRoom), tryToPickUpKey);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inFloodedRoom), goDownToDayth);
+		exploreMine.addStep(new Conditions(inCrystalEntrance), leaveCrystalRoom);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, valveOpen, hasChisel), goDownLift);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, valveOpened, hasChisel), openValve);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, hasKey, hasChisel), useKeyOnValve);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inLiftRoom, hasKeyOrOpenedValve), pickUpChisel);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inCollectRoom, hasKeyOrOpenedValve), goUpFromCollectRoom);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inLevel3North, hasKeyOrOpenedValve), goDownFromLevel3NorthEast);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inLevel2North, hasKeyOrOpenedValve), goDownLevel2North);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inLevel1North, hasKeyOrOpenedValve), goDownLevel1North);
+
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inCollectRoom, hasKeyOrOpenedValve), collectFungus);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel3North, hasKeyOrOpenedValve), goDownToCollectFungus);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLiftRoom, hasKeyOrOpenedValve), goUpFromLiftRoom); // Wrong way catch
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel2North, hasKeyOrOpenedValve), goDownLevel2North);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel1North, hasKeyOrOpenedValve), goDownLevel1North);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel1South, hasKeyOrOpenedValve), leaveLevel1South);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel2South, hasKeyOrOpenedValve), goUpFromLevel2South);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inLevel3South, hasKeyOrOpenedValve), goUpFromLevel3South);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, inCartRoom, hasKeyOrOpenedValve), goUpFromFungusRoom);
+		exploreMine.addStep(new Conditions(fungusOnOtherSide, hasKeyOrOpenedValve), enterMineNorth);
+
+		exploreMine.addStep(new Conditions(fungusInCart, inCartRoom), solveMineCarts);
+		exploreMine.addStep(new Conditions(hasGlowingFungus, inCartRoom), putFungusInCart);
+		exploreMine.addStep(inCartRoom, pickFungus);
+
+		exploreMine.addStep(inLevel3South, goDownToFungusRoom);
+		exploreMine.addStep(inLevel2South, goDownFromLevel2South);
+		exploreMine.addStep(inLevel1South, goDownFromLevel1South);
+		exploreMine.addStep(hasKeyOrOpenedValve, enterMine);
+		exploreMine.addStep(askedAboutKey, pickpocketZealot);
+
+		steps.put(1, exploreMine);
+		steps.put(2, exploreMine);
+		steps.put(3, exploreMine);
+		steps.put(4, exploreMine);
+		steps.put(5, exploreMine);
+		steps.put(6, exploreMine);
+		steps.put(7, exploreMine);
+		steps.put(8, exploreMine);
+		steps.put(9, exploreMine);
+		steps.put(10, exploreMine);
+		return steps;
 	}
 }

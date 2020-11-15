@@ -1,3 +1,27 @@
+/*
+ * Copyright (c) 2020, Zoinkwiz
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.questhelper.quests.theforsakentower;
 
 import com.google.inject.Inject;
@@ -35,33 +59,26 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 
 public class PotionPuzzle extends QuestStep implements OwnerStep
 {
-	EventBus eventBus;
-
 	// Potion 1
 	private static final Pattern LINE1 = Pattern.compile("^(.*) blend is directly");
 	// Potion 2, potion 3
 	private static final Pattern LINE2 = Pattern.compile("^(.*) is next to (.*)[.]");
 	// Potion 5, potion 4
 	private static final Pattern LINE3 = Pattern.compile("^(.*) is directly right of (.*)[.]");
-
 	private static final String CLEANSING_FLUID = "Cleansing fluid";
-
+	@Inject
+	protected EventBus eventBus;
+	@Inject
+	protected Client client;
+	protected QuestStep currentStep;
+	ItemRequirement oldNotes, fluid1, fluid2, fluid3, fluid4, fluid5;
+	ItemRequirement[] fluids;
+	ConditionForStep hasOldNotes, inFirstFloor, inBasement, triedToActivate, cleanedRefinery, hasFluid1, hasFluid2, hasFluid3, hasFluid4, hasFluid5, inSecondFloor;
+	ConditionForStep[] hasFluids;
+	DetailedQuestStep goUpLadder, goUpStairs, goDownToFirstFloor, searchPotionCupboard, inspectRefinery, readNote, getFluid, useFluidOnRefinery, activateRefinery;
+	Zone firstFloor, basement, secondFloor;
 	private boolean fluidFound;
 	private int correctFluid = -1;
-
-	protected QuestStep currentStep;
-
-	ItemRequirement oldNotes, fluid1, fluid2, fluid3, fluid4, fluid5;
-
-	ItemRequirement[] fluids;
-
-	ConditionForStep hasOldNotes, inFirstFloor, inBasement, triedToActivate, cleanedRefinery, hasFluid1, hasFluid2, hasFluid3, hasFluid4, hasFluid5, inSecondFloor;
-
-	ConditionForStep[] hasFluids;
-
-	DetailedQuestStep goUpLadder, goUpStairs, goDownToFirstFloor, searchPotionCupboard, inspectRefinery, readNote, getFluid, useFluidOnRefinery, activateRefinery;
-
-	Zone firstFloor, basement, secondFloor;
 
 	public PotionPuzzle(QuestHelper questHelper)
 	{
@@ -70,12 +87,6 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		setupZones();
 		setupConditions();
 		setupSteps();
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 	}
 
 	@Override
@@ -89,6 +100,89 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 	{
 		shutDownStep();
 		currentStep = null;
+	}
+
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded widgetLoaded)
+	{
+		if (widgetLoaded.getGroupId() == 627)
+		{
+			Widget line1Widget = client.getWidget(627, 4);
+			if (line1Widget != null)
+			{
+				Matcher matcher = LINE1.matcher(line1Widget.getText());
+				if (matcher.find())
+				{
+					if (matcher.group(1).equals(CLEANSING_FLUID))
+					{
+						correctFluid = 1;
+					}
+				}
+			}
+			Widget line2Widget = client.getWidget(627, 5);
+			if (line2Widget != null)
+			{
+				Matcher matcher = LINE2.matcher(line2Widget.getText());
+				if (matcher.find())
+				{
+					if (matcher.group(1).equals(CLEANSING_FLUID))
+					{
+						correctFluid = 2;
+					}
+					else if (matcher.group(2).equals(CLEANSING_FLUID))
+					{
+						correctFluid = 3;
+					}
+				}
+			}
+			Widget line3Widget = client.getWidget(627, 6);
+			if (line3Widget != null)
+			{
+				Matcher matcher = LINE3.matcher(line3Widget.getText());
+				if (matcher.find())
+				{
+					if (matcher.group(1).equals(CLEANSING_FLUID))
+					{
+						correctFluid = 5;
+					}
+					else if (matcher.group(2).equals(CLEANSING_FLUID))
+					{
+						correctFluid = 4;
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
+		}
+	}
+
+	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeWorldOverlayHint(graphics, plugin);
+		}
+	}
+
+	@Override
+	public QuestStep getActiveStep()
+	{
+		if (currentStep != this)
+		{
+			return currentStep.getActiveStep();
+		}
+		else
+		{
+			return this;
+		}
 	}
 
 	@Subscribe
@@ -181,37 +275,6 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		}
 	}
 
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
-		}
-	}
-
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldOverlayHint(graphics, plugin);
-		}
-	}
-
-	@Override
-	public QuestStep getActiveStep()
-	{
-		if (currentStep != this)
-		{
-			return currentStep.getActiveStep();
-		}
-		else
-		{
-			return this;
-		}
-	}
-
 	private void setupItemRequirements()
 	{
 		oldNotes = new ItemRequirement("Old notes", ItemID.OLD_NOTES_22774);
@@ -226,6 +289,7 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		fluid4.setHighlightInInventory(true);
 		fluid5 = new ItemRequirement("Unknown fluid 5", ItemID.UNKNOWN_FLUID_5);
 		fluid5.setHighlightInInventory(true);
+
 		fluids = new ItemRequirement[]{null, fluid1, fluid2, fluid3, fluid4, fluid5};
 	}
 
@@ -281,62 +345,9 @@ public class PotionPuzzle extends QuestStep implements OwnerStep
 		return allSteps;
 	}
 
-
 	@Override
 	public Collection<QuestStep> getSteps()
 	{
 		return Arrays.asList(goUpLadder, goUpStairs, goDownToFirstFloor, inspectRefinery, searchPotionCupboard, readNote, getFluid, useFluidOnRefinery, activateRefinery);
-	}
-
-	@Subscribe
-	public void onWidgetLoaded(WidgetLoaded widgetLoaded)
-	{
-		if (widgetLoaded.getGroupId() == 627)
-		{
-			Widget line1Widget = client.getWidget(627, 4);
-			if (line1Widget != null)
-			{
-				Matcher matcher = LINE1.matcher(line1Widget.getText());
-				if (matcher.find())
-				{
-					if (matcher.group(1).equals(CLEANSING_FLUID))
-					{
-						correctFluid = 1;
-					}
-				}
-			}
-			Widget line2Widget = client.getWidget(627, 5);
-			if (line2Widget != null)
-			{
-				Matcher matcher = LINE2.matcher(line2Widget.getText());
-				if (matcher.find())
-				{
-					if (matcher.group(1).equals(CLEANSING_FLUID))
-					{
-						correctFluid = 2;
-					}
-					else if (matcher.group(2).equals(CLEANSING_FLUID))
-					{
-						correctFluid = 3;
-					}
-				}
-			}
-			Widget line3Widget = client.getWidget(627, 6);
-			if (line3Widget != null)
-			{
-				Matcher matcher = LINE3.matcher(line3Widget.getText());
-				if (matcher.find())
-				{
-					if (matcher.group(1).equals(CLEANSING_FLUID))
-					{
-						correctFluid = 5;
-					}
-					else if (matcher.group(2).equals(CLEANSING_FLUID))
-					{
-						correctFluid = 4;
-					}
-				}
-			}
-		}
 	}
 }

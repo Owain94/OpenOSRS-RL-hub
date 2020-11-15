@@ -74,54 +74,10 @@ public class TheLostTribe extends BasicQuestHelper
 
 	Zone basement, lumbridgeF0, lumbridgeF1, lumbridgeF2, tunnels, mines, hamBase;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		setupConditionalSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, goTalkToSigmundToStart);
-		steps.put(1, findGoblinWitnessSteps);
-		steps.put(2, goTalkToDukeAfterHans);
-		steps.put(3, goMineRubble);
-
-		ConditionalStep goGrabBrooch = new ConditionalStep(this, enterTunnels);
-		goGrabBrooch.addStep(hasBrooch, goShowBroochToDuke);
-		goGrabBrooch.addStep(inTunnels, grabBrooch);
-		steps.put(4, goGrabBrooch);
-
-		ConditionalStep getBook = new ConditionalStep(this, searchBookcase);
-		getBook.addStep(hasBook, readBook);
-		steps.put(5, getBook);
-
-		steps.put(6, talkToGenerals);
-
-		ConditionalStep makeContactSteps = new ConditionalStep(this, goTravelToMistag);
-		makeContactSteps.addStep(inMines, emoteAtMistag);
-		makeContactSteps.addStep(inTunnels, walkToMistag);
-
-		steps.put(7, makeContactSteps);
-		steps.put(8, goTalkToDukeAfterEmote);
-
-		ConditionalStep revealSigmund = new ConditionalStep(this, goGetKey);
-		revealSigmund.addStep(foundSilverware, goToDukeWithSilverware);
-		revealSigmund.addStep(foundRobes, goIntoHamLair);
-		revealSigmund.addStep(hasKey, goOpenRobeChest);
-		steps.put(9, revealSigmund);
-
-		steps.put(10, travelToMakePeace);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		pickaxe = new ItemRequirement("Any pickaxe", ItemCollections.getPickaxes());
-		lightSource = new ItemRequirement("A light source", -1, -1);
+		lightSource = new ItemRequirement("A light source", ItemCollections.getLightSources());
 		brooch = new ItemRequirement("Brooch", ItemID.BROOCH);
 		book = new ItemRequirement("Goblin symbol book", ItemID.GOBLIN_SYMBOL_BOOK);
 		book.setHighlightInInventory(true);
@@ -192,7 +148,7 @@ public class TheLostTribe extends BasicQuestHelper
 
 		talkToAllAboutCellar = new NpcStep(this, NpcID.COOK_4626, "Talk to the Cook, Hans, Father Aereck, and Bob in Lumbridge until one tells you about seeing a goblin.");
 		((NpcStep) (talkToAllAboutCellar)).addAlternateNpcs(NpcID.FATHER_AERECK);
-		talkToAllAboutCellar.addDialogSteps("Ask about what happened in the castle cellar");
+		talkToAllAboutCellar.addDialogSteps("Do you know what happened in the castle cellar?");
 		talkToAllAboutCellar.addSubSteps(talkToHans, talkToBob);
 
 		talkToDuke = new NpcStep(this, NpcID.DUKE_HORACIO, new WorldPoint(3210, 3222, 1), "");
@@ -356,5 +312,49 @@ public class TheLostTribe extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Resolving tensions", new ArrayList<>(Arrays.asList(goGetKey, goOpenRobeChest, goIntoHamLair, goToDukeWithSilverware, travelToMakePeace)), lightSource));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		setupConditionalSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, goTalkToSigmundToStart);
+		steps.put(1, findGoblinWitnessSteps);
+		steps.put(2, goTalkToDukeAfterHans);
+		steps.put(3, goMineRubble);
+
+		ConditionalStep goGrabBrooch = new ConditionalStep(this, enterTunnels);
+		goGrabBrooch.addStep(hasBrooch, goShowBroochToDuke);
+		goGrabBrooch.addStep(inTunnels, grabBrooch);
+		steps.put(4, goGrabBrooch);
+
+		ConditionalStep getBook = new ConditionalStep(this, searchBookcase);
+		getBook.addStep(hasBook, readBook);
+		steps.put(5, getBook);
+
+		steps.put(6, talkToGenerals);
+
+		ConditionalStep makeContactSteps = new ConditionalStep(this, goTravelToMistag);
+		makeContactSteps.addStep(inMines, emoteAtMistag);
+		makeContactSteps.addStep(inTunnels, walkToMistag);
+
+		steps.put(7, makeContactSteps);
+		steps.put(8, goTalkToDukeAfterEmote);
+
+		ConditionalStep revealSigmund = new ConditionalStep(this, goGetKey);
+		revealSigmund.addStep(foundSilverware, goToDukeWithSilverware);
+		revealSigmund.addStep(foundRobes, goIntoHamLair);
+		revealSigmund.addStep(hasKey, goOpenRobeChest);
+		steps.put(9, revealSigmund);
+
+		steps.put(10, travelToMakePeace);
+
+		return steps;
 	}
 }

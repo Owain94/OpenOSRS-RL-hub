@@ -27,20 +27,13 @@ package com.questhelper.quests.recipefordisaster;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.choice.DialogChoiceSteps;
-import javax.inject.Inject;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class AskAboutFishCake extends NpcStep
 {
-	@Inject
-	EventBus eventBus;
-
-	private final boolean hasSubscribed = false;
-
 	public AskAboutFishCake(QuestHelper questHelper)
 	{
 		super(questHelper, NpcID.COOK_4626, new WorldPoint(3209, 3215, 0),
@@ -55,11 +48,6 @@ public class AskAboutFishCake extends NpcStep
 
 	private void updateCorrectChoice()
 	{
-		if (!hasSubscribed)
-		{
-			eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		}
-
 		boolean askedAboutKelp = client.getVarbitValue(1873) == 1; // And 1874 = 1
 		boolean askedAboutCrab = client.getVarbitValue(1874) == 1;
 		boolean askedAboutBread = client.getVarbitValue(1876) == 1;

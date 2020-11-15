@@ -43,56 +43,6 @@ public class BlackKnightFortress extends BasicQuestHelper
 		returnToAmik, exitBasement, exitTopOfFortress, exitEastTurret, exitWestRoomFirstFloor, goBackDownFromCabbageZone, goUpLadderToCabbageZone;
 	ObjectStep useCabbageOnHole;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-
-		steps.put(0, speakToAmik);
-
-		ConditionalStep infiltrateTheFortress = new ConditionalStep(this, enterFortress);
-		infiltrateTheFortress.addStep(inListeningRoom, listenAtGrill);
-		infiltrateTheFortress.addStep(inEastRoomFloor1, climbDownLadder6);
-		infiltrateTheFortress.addStep(inEastRoomFloor2, climbDownLadder5);
-		infiltrateTheFortress.addStep(inCentralAreaFloor1, climbUpLadder4);
-		infiltrateTheFortress.addStep(inSecretRoomSecondFloor, climbDownLadder3);
-		infiltrateTheFortress.addStep(inSecretRoomFirstFloor, climbUpLadder2);
-		infiltrateTheFortress.addStep(inSecretRoomGroundFloor, climbUpLadder1);
-		infiltrateTheFortress.addStep(new Conditions(false, LogicType.OR, inMainEntrance, inEastRoomFloor0), pushWall);
-		infiltrateTheFortress.addStep(inWestRoomFloor1, exitWestRoomFirstFloor);
-		infiltrateTheFortress.addStep(inBasement, exitBasement);
-		infiltrateTheFortress.addStep(onTopOfFortress, exitTopOfFortress);
-		infiltrateTheFortress.addStep(inEastTurret, exitEastTurret);
-		infiltrateTheFortress.addStep(new Conditions(false, LogicType.OR, inCabbageHoleRoom, inPathToCabbageRoom), goBackDownFromCabbageZone);
-
-		steps.put(1, infiltrateTheFortress);
-
-		ConditionalStep sabotageThePotion = new ConditionalStep(this, enterFortress);
-		sabotageThePotion.addStep(new Conditions(false, LogicType.OR, inSecretRoomGroundFloor, inMainEntrance, inEastRoomFloor0), goUpLadderToCabbageZone);
-		sabotageThePotion.addStep(inCabbageHoleRoom, useCabbageOnHole);
-		sabotageThePotion.addStep(inPathToCabbageRoom, pushWall2);
-		sabotageThePotion.addStep(inSecretRoomFirstFloor, climbDownLadder1);
-		sabotageThePotion.addStep(inSecretRoomSecondFloor, climbDownLadder2);
-		sabotageThePotion.addStep(inCentralAreaFloor1, climbUpLadder3);
-		sabotageThePotion.addStep(inEastRoomFloor2, climbDownLadder4);
-		sabotageThePotion.addStep(inEastRoomFloor1, climbUpLadder5);
-		sabotageThePotion.addStep(inListeningRoom, climbUpLadder6);
-		sabotageThePotion.addStep(inWestRoomFloor1, exitWestRoomFirstFloor);
-		sabotageThePotion.addStep(inBasement, exitBasement);
-		sabotageThePotion.addStep(onTopOfFortress, exitTopOfFortress);
-		sabotageThePotion.addStep(inEastTurret, exitEastTurret);
-
-		steps.put(2, sabotageThePotion);
-
-		steps.put(3, returnToAmik);
-
-		return steps;
-	}
-
 	private void setupZones()
 	{
 		secretRoomFloor0 = new Zone(new WorldPoint(3015, 3517, 0), new WorldPoint(3016, 3519, 0));
@@ -262,5 +212,55 @@ public class BlackKnightFortress extends BasicQuestHelper
 				goUpLadderToCabbageZone, pushWall2, useCabbageOnHole))));
 		allSteps.add(new PanelDetails("Return to Sir Amik Varze", new ArrayList<>(Collections.singletonList(returnToAmik))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		Map<Integer, QuestStep> steps = new HashMap<>();
+		setupZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+
+		steps.put(0, speakToAmik);
+
+		ConditionalStep infiltrateTheFortress = new ConditionalStep(this, enterFortress);
+		infiltrateTheFortress.addStep(inListeningRoom, listenAtGrill);
+		infiltrateTheFortress.addStep(inEastRoomFloor1, climbDownLadder6);
+		infiltrateTheFortress.addStep(inEastRoomFloor2, climbDownLadder5);
+		infiltrateTheFortress.addStep(inCentralAreaFloor1, climbUpLadder4);
+		infiltrateTheFortress.addStep(inSecretRoomSecondFloor, climbDownLadder3);
+		infiltrateTheFortress.addStep(inSecretRoomFirstFloor, climbUpLadder2);
+		infiltrateTheFortress.addStep(inSecretRoomGroundFloor, climbUpLadder1);
+		infiltrateTheFortress.addStep(new Conditions(false, LogicType.OR, inMainEntrance, inEastRoomFloor0), pushWall);
+		infiltrateTheFortress.addStep(inWestRoomFloor1, exitWestRoomFirstFloor);
+		infiltrateTheFortress.addStep(inBasement, exitBasement);
+		infiltrateTheFortress.addStep(onTopOfFortress, exitTopOfFortress);
+		infiltrateTheFortress.addStep(inEastTurret, exitEastTurret);
+		infiltrateTheFortress.addStep(new Conditions(false, LogicType.OR, inCabbageHoleRoom, inPathToCabbageRoom), goBackDownFromCabbageZone);
+
+		steps.put(1, infiltrateTheFortress);
+
+		ConditionalStep sabotageThePotion = new ConditionalStep(this, enterFortress);
+		sabotageThePotion.addStep(new Conditions(false, LogicType.OR, inSecretRoomGroundFloor, inMainEntrance, inEastRoomFloor0), goUpLadderToCabbageZone);
+		sabotageThePotion.addStep(inCabbageHoleRoom, useCabbageOnHole);
+		sabotageThePotion.addStep(inPathToCabbageRoom, pushWall2);
+		sabotageThePotion.addStep(inSecretRoomFirstFloor, climbDownLadder1);
+		sabotageThePotion.addStep(inSecretRoomSecondFloor, climbDownLadder2);
+		sabotageThePotion.addStep(inCentralAreaFloor1, climbUpLadder3);
+		sabotageThePotion.addStep(inEastRoomFloor2, climbDownLadder4);
+		sabotageThePotion.addStep(inEastRoomFloor1, climbUpLadder5);
+		sabotageThePotion.addStep(inListeningRoom, climbUpLadder6);
+		sabotageThePotion.addStep(inWestRoomFloor1, exitWestRoomFirstFloor);
+		sabotageThePotion.addStep(inBasement, exitBasement);
+		sabotageThePotion.addStep(onTopOfFortress, exitTopOfFortress);
+		sabotageThePotion.addStep(inEastTurret, exitEastTurret);
+
+		steps.put(2, sabotageThePotion);
+
+		steps.put(3, returnToAmik);
+
+		return steps;
 	}
 }

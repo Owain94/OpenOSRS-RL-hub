@@ -74,47 +74,6 @@ public class TrollStronghold extends BasicQuestHelper
 	Zone strongholdFloor1, strongholdFloor2, tenzingHut, mountainPath1, mountainPath2, mountainPath3, mountainPath4, mountainPath5, trollArea1, arena, northArena,
 		arenaCave, trollheimArea, prisonStairsRoom, prison;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToDenulth);
-
-		ConditionalStep enterTheStronghold = new ConditionalStep(this, getCoinsOrBoots);
-		enterTheStronghold.addStep(new Conditions(freedEadgar, freedGodric), goToDunstan);
-		enterTheStronghold.addStep(new Conditions(inPrison, freedEadgar, hasCellKey1), freeGodric);
-		enterTheStronghold.addStep(new Conditions(inPrison, freedEadgar), getTwigKey);
-		enterTheStronghold.addStep(new Conditions(inPrison, hasCellKey2), freeEadgar);
-		enterTheStronghold.addStep(inPrison, getBerryKey);
-		enterTheStronghold.addStep(inPrisonStairsRoom, goDownToPrison);
-		enterTheStronghold.addStep(new Conditions(new Conditions(LogicType.OR, prisonDoorUnlocked, hasPrisonKey), inStrongholdFloor1), goThroughPrisonDoor);
-		enterTheStronghold.addStep(new Conditions(new Conditions(LogicType.OR, prisonDoorUnlocked, hasPrisonKey), inStrongholdFloor2), goDownInStronghold);
-		enterTheStronghold.addStep(prisonKeyNearby, pickupPrisonKey);
-		enterTheStronghold.addStep(inStrongholdFloor2, killGeneral);
-		enterTheStronghold.addStep(inStrongholdFloor1, goUpTo2ndFloor);
-		enterTheStronghold.addStep(inTrollheimArea, enterStronghold);
-		enterTheStronghold.addStep(inArenaCave, leaveArenaCavern);
-		enterTheStronghold.addStep(inNorthArena, enterArenaCavern);
-		enterTheStronghold.addStep(new Conditions(inArena, beatenDad), leaveArena);
-		enterTheStronghold.addStep(inArena, fightDad);
-		enterTheStronghold.addStep(inTrollArea1, enterArena);
-		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
-		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
-		enterTheStronghold.addStep(hasClimbingBoots, travelToTenzing);
-		enterTheStronghold.addStep(hasCoins, buyClimbingBoots);
-
-		steps.put(10, enterTheStronghold);
-		steps.put(20, enterTheStronghold);
-		steps.put(30, enterTheStronghold);
-		steps.put(40, enterTheStronghold);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		climbingBoots = new ItemRequirement("Climbing boots", ItemID.CLIMBING_BOOTS);
@@ -237,21 +196,21 @@ public class TrollStronghold extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Dad (level 101) (safespottable)");
-		reqs.add("Troll Generall (level 113) (safespottable)");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRecommended()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
 		reqs.add(gamesNecklace);
 		reqs.add(foodAndPotions);
 		reqs.add(mageRangedGear);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Dad (level 101) (safespottable)");
+		reqs.add("Troll Generall (level 113) (safespottable)");
 		return reqs;
 	}
 
@@ -264,5 +223,46 @@ public class TrollStronghold extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Free the prisoners", new ArrayList<>(Arrays.asList(killGeneral, goDownInStronghold, goThroughPrisonDoor, goDownToPrison, getBerryKey, freeEadgar, getTwigKey, freeGodric))));
 		allSteps.add(new PanelDetails("Finish off", new ArrayList<>(Collections.singletonList(goToDunstan))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToDenulth);
+
+		ConditionalStep enterTheStronghold = new ConditionalStep(this, getCoinsOrBoots);
+		enterTheStronghold.addStep(new Conditions(freedEadgar, freedGodric), goToDunstan);
+		enterTheStronghold.addStep(new Conditions(inPrison, freedEadgar, hasCellKey1), freeGodric);
+		enterTheStronghold.addStep(new Conditions(inPrison, freedEadgar), getTwigKey);
+		enterTheStronghold.addStep(new Conditions(inPrison, hasCellKey2), freeEadgar);
+		enterTheStronghold.addStep(inPrison, getBerryKey);
+		enterTheStronghold.addStep(inPrisonStairsRoom, goDownToPrison);
+		enterTheStronghold.addStep(new Conditions(new Conditions(LogicType.OR, prisonDoorUnlocked, hasPrisonKey), inStrongholdFloor1), goThroughPrisonDoor);
+		enterTheStronghold.addStep(new Conditions(new Conditions(LogicType.OR, prisonDoorUnlocked, hasPrisonKey), inStrongholdFloor2), goDownInStronghold);
+		enterTheStronghold.addStep(prisonKeyNearby, pickupPrisonKey);
+		enterTheStronghold.addStep(inStrongholdFloor2, killGeneral);
+		enterTheStronghold.addStep(inStrongholdFloor1, goUpTo2ndFloor);
+		enterTheStronghold.addStep(inTrollheimArea, enterStronghold);
+		enterTheStronghold.addStep(inArenaCave, leaveArenaCavern);
+		enterTheStronghold.addStep(inNorthArena, enterArenaCavern);
+		enterTheStronghold.addStep(new Conditions(inArena, beatenDad), leaveArena);
+		enterTheStronghold.addStep(inArena, fightDad);
+		enterTheStronghold.addStep(inTrollArea1, enterArena);
+		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
+		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
+		enterTheStronghold.addStep(hasClimbingBoots, travelToTenzing);
+		enterTheStronghold.addStep(hasCoins, buyClimbingBoots);
+
+		steps.put(10, enterTheStronghold);
+		steps.put(20, enterTheStronghold);
+		steps.put(30, enterTheStronghold);
+		steps.put(40, enterTheStronghold);
+		return steps;
 	}
 }

@@ -4,18 +4,15 @@ import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.DetailedQuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.inject.Inject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class MemoryChallenge extends DetailedQuestStep
 {
-	public MemoryChallenge(QuestHelper questHelper, EventBus eventBus)
+	public MemoryChallenge(QuestHelper questHelper)
 	{
 		super(questHelper, "Follow the path to the end.");
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Override

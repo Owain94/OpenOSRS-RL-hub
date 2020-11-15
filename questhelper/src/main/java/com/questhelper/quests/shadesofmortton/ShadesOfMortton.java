@@ -64,70 +64,6 @@ public class ShadesOfMortton extends BasicQuestHelper
 	QuestStep searchShelf, readDiary, addAshes, use207OnRazmire, talkToRazmire, kill5Shades, kill4Shades, kill3Shades, kill2Shades, kill1Shades, use207OnRazmireAgain, talkToRazmireAgain, buyTimberLimeAndSwamp,
 		use207OnUlsquire, talkToUlsquire, talkToUlsquireAgain, repairTemple, lightAltar, useOilOnFlame, use207OnFlame, useOilOnLog, burnCorpse, repairTo20Sanctity, use208OnRazmire, use208OnUlsquire, talkToUlsquireToFinish;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goReadDiary = new ConditionalStep(this, searchShelf);
-		goReadDiary.addStep(hasDiary, readDiary);
-		steps.put(0, goReadDiary);
-
-		steps.put(5, addAshes);
-
-		ConditionalStep goTalkToRazmire = new ConditionalStep(this, use207OnRazmire);
-		goTalkToRazmire.addStep(razmirePartlyCured, talkToRazmire);
-		steps.put(10, goTalkToRazmire);
-
-		steps.put(15, kill5Shades);
-		steps.put(20, kill4Shades);
-		steps.put(25, kill3Shades);
-		steps.put(30, kill2Shades);
-		steps.put(35, kill1Shades);
-
-		ConditionalStep goTalkToRazmireAgain = new ConditionalStep(this, use207OnRazmireAgain);
-		goTalkToRazmireAgain.addStep(razmirePartlyCured, talkToRazmireAgain);
-		steps.put(40, goTalkToRazmireAgain);
-
-		ConditionalStep goTalkToUlsquire = new ConditionalStep(this, use207OnUlsquire);
-		goTalkToUlsquire.addStep(ulsquirePartlyCured, talkToUlsquire);
-		steps.put(45, goTalkToUlsquire);
-
-		ConditionalStep goTalkToUlsquireAgain = new ConditionalStep(this, use207OnUlsquire);
-		goTalkToUlsquireAgain.addStep(ulsquirePartlyCured, talkToUlsquireAgain);
-		steps.put(47, goTalkToUlsquireAgain);
-
-		ConditionalStep makeSacredOil = new ConditionalStep(this, repairTemple);
-		makeSacredOil.addStep(new Conditions(litFire, has20Sanctity, hasSacredOil), use207OnFlame);
-		makeSacredOil.addStep(new Conditions(litFire, has20Sanctity), useOilOnFlame);
-		makeSacredOil.addStep(litFire, repairTo20Sanctity);
-		makeSacredOil.addStep(repairedTemple, lightAltar);
-		steps.put(50, makeSacredOil);
-		steps.put(55, makeSacredOil);
-		steps.put(60, makeSacredOil);
-
-		ConditionalStep saveRemains = new ConditionalStep(this, repairTemple);
-		saveRemains.addStep(new Conditions(hadSerum208, hasSacredOil), useOilOnLog);
-		saveRemains.addStep(new Conditions(litFire, has20Sanctity, hasSacredOil), use207OnFlame);
-		saveRemains.addStep(new Conditions(litFire, has20Sanctity), useOilOnFlame);
-		saveRemains.addStep(litFire, repairTo20Sanctity);
-		saveRemains.addStep(repairedTemple, lightAltar);
-		steps.put(65, saveRemains);
-
-		steps.put(70, burnCorpse);
-		steps.put(75, burnCorpse);
-
-		ConditionalStep goCureProperly = new ConditionalStep(this, use208OnRazmire);
-		goCureProperly.addStep(new Conditions(curedRazmire, curedUlsquire), talkToUlsquireToFinish);
-		goCureProperly.addStep(curedRazmire, use208OnUlsquire);
-		steps.put(80, goCureProperly);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		combatGear = new ItemRequirement("Combat gear", -1, -1);
@@ -288,15 +224,15 @@ public class ShadesOfMortton extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getNotes()
-	{
-		return new ArrayList<>(Arrays.asList("Whilst in Mort Myre, the Ghasts will occasionally rot the food in your inventory and steal charges from your Druid Pouch.", "It's strongly recommended to bring a Flamtaer hammer and Flamtaer bracelets, as they speed up the temple repair section massively."));
-	}
-
-	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Collections.singletonList("5 Loar Shades (level 40)"));
+	}
+
+	@Override
+	public ArrayList<String> getNotes()
+	{
+		return new ArrayList<>(Arrays.asList("Whilst in Mort Myre, the Ghasts will occasionally rot the food in your inventory and steal charges from your Druid Pouch.", "It's strongly recommended to bring a Flamtaer hammer and Flamtaer bracelets, as they speed up the temple repair section massively."));
 	}
 
 	@Override
@@ -309,5 +245,69 @@ public class ShadesOfMortton extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Helping Ulsquire",
 			new ArrayList<>(Arrays.asList(use207OnUlsquire, talkToUlsquire, talkToUlsquireAgain, repairTemple, lightAltar, repairTo20Sanctity, useOilOnFlame, use207OnFlame, useOilOnLog, burnCorpse, use208OnRazmire, use208OnUlsquire, talkToUlsquireToFinish)), serum207Highlighted, tinderbox, log, coins5000, hammerOrFlam));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goReadDiary = new ConditionalStep(this, searchShelf);
+		goReadDiary.addStep(hasDiary, readDiary);
+		steps.put(0, goReadDiary);
+
+		steps.put(5, addAshes);
+
+		ConditionalStep goTalkToRazmire = new ConditionalStep(this, use207OnRazmire);
+		goTalkToRazmire.addStep(razmirePartlyCured, talkToRazmire);
+		steps.put(10, goTalkToRazmire);
+
+		steps.put(15, kill5Shades);
+		steps.put(20, kill4Shades);
+		steps.put(25, kill3Shades);
+		steps.put(30, kill2Shades);
+		steps.put(35, kill1Shades);
+
+		ConditionalStep goTalkToRazmireAgain = new ConditionalStep(this, use207OnRazmireAgain);
+		goTalkToRazmireAgain.addStep(razmirePartlyCured, talkToRazmireAgain);
+		steps.put(40, goTalkToRazmireAgain);
+
+		ConditionalStep goTalkToUlsquire = new ConditionalStep(this, use207OnUlsquire);
+		goTalkToUlsquire.addStep(ulsquirePartlyCured, talkToUlsquire);
+		steps.put(45, goTalkToUlsquire);
+
+		ConditionalStep goTalkToUlsquireAgain = new ConditionalStep(this, use207OnUlsquire);
+		goTalkToUlsquireAgain.addStep(ulsquirePartlyCured, talkToUlsquireAgain);
+		steps.put(47, goTalkToUlsquireAgain);
+
+		ConditionalStep makeSacredOil = new ConditionalStep(this, repairTemple);
+		makeSacredOil.addStep(new Conditions(litFire, has20Sanctity, hasSacredOil), use207OnFlame);
+		makeSacredOil.addStep(new Conditions(litFire, has20Sanctity), useOilOnFlame);
+		makeSacredOil.addStep(litFire, repairTo20Sanctity);
+		makeSacredOil.addStep(repairedTemple, lightAltar);
+		steps.put(50, makeSacredOil);
+		steps.put(55, makeSacredOil);
+		steps.put(60, makeSacredOil);
+
+		ConditionalStep saveRemains = new ConditionalStep(this, repairTemple);
+		saveRemains.addStep(new Conditions(hadSerum208, hasSacredOil), useOilOnLog);
+		saveRemains.addStep(new Conditions(litFire, has20Sanctity, hasSacredOil), use207OnFlame);
+		saveRemains.addStep(new Conditions(litFire, has20Sanctity), useOilOnFlame);
+		saveRemains.addStep(litFire, repairTo20Sanctity);
+		saveRemains.addStep(repairedTemple, lightAltar);
+		steps.put(65, saveRemains);
+
+		steps.put(70, burnCorpse);
+		steps.put(75, burnCorpse);
+
+		ConditionalStep goCureProperly = new ConditionalStep(this, use208OnRazmire);
+		goCureProperly.addStep(new Conditions(curedRazmire, curedUlsquire), talkToUlsquireToFinish);
+		goCureProperly.addStep(curedRazmire, use208OnUlsquire);
+		steps.put(80, goCureProperly);
+
+		return steps;
 	}
 }

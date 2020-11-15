@@ -24,6 +24,7 @@
  */
 package com.questhelper.quests.contact;
 
+import com.questhelper.ItemCollections;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
@@ -65,56 +66,9 @@ public class Contact extends BasicQuestHelper
 
 	Zone bank, dungeon, chasm;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToHighPriest);
-		steps.put(10, talkToHighPriest);
-		steps.put(20, talkToHighPriest);
-		steps.put(30, talkToJex);
-
-		ConditionalStep goInvestigate = new ConditionalStep(this, goDownToBank);
-		goInvestigate.addStep(new Conditions(inChasm, hasReadParchment), talkToMaisa);
-		goInvestigate.addStep(hasParchment, readParchment);
-		goInvestigate.addStep(inChasm, searchKaleef);
-		goInvestigate.addStep(inDungeon, goDownToChasm);
-		goInvestigate.addStep(inBank, goDownToDungeon);
-
-		steps.put(40, goInvestigate);
-
-		steps.put(50, goInvestigate);
-
-		steps.put(60, talkToOsman);
-
-		steps.put(70, talkToOsmanOutsideSoph);
-
-		ConditionalStep scarabBattle = new ConditionalStep(this, goDownToBankAgain);
-		scarabBattle.addStep(inChasm, killGiantScarab);
-		scarabBattle.addStep(inDungeon, goDownToChasmAgain);
-		scarabBattle.addStep(inBank, goDownToDungeonAgain);
-
-		steps.put(80, scarabBattle);
-		steps.put(90, scarabBattle);
-		steps.put(100, scarabBattle);
-
-		ConditionalStep finishOff = new ConditionalStep(this, returnToHighPriest);
-		finishOff.addStep(kerisNearby, pickUpKeris);
-
-		steps.put(110, finishOff);
-		steps.put(120, finishOff);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
-		lightSource = new ItemRequirement("A light source", -1, -1);
+		lightSource = new ItemRequirement("A light source", ItemCollections.getLightSources());
 		parchment = new ItemRequirement("Parchment", ItemID.PARCHMENT);
 		parchment.setHighlightInInventory(true);
 
@@ -202,5 +156,52 @@ public class Contact extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Help Osman", new ArrayList<>(Arrays.asList(talkToOsmanOutsideSoph, goDownToBankAgain, goDownToDungeonAgain, goDownToChasmAgain, killGiantScarab, returnToHighPriest)), combatGear, lightSource));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToHighPriest);
+		steps.put(10, talkToHighPriest);
+		steps.put(20, talkToHighPriest);
+		steps.put(30, talkToJex);
+
+		ConditionalStep goInvestigate = new ConditionalStep(this, goDownToBank);
+		goInvestigate.addStep(new Conditions(inChasm, hasReadParchment), talkToMaisa);
+		goInvestigate.addStep(hasParchment, readParchment);
+		goInvestigate.addStep(inChasm, searchKaleef);
+		goInvestigate.addStep(inDungeon, goDownToChasm);
+		goInvestigate.addStep(inBank, goDownToDungeon);
+
+		steps.put(40, goInvestigate);
+
+		steps.put(50, goInvestigate);
+
+		steps.put(60, talkToOsman);
+
+		steps.put(70, talkToOsmanOutsideSoph);
+
+		ConditionalStep scarabBattle = new ConditionalStep(this, goDownToBankAgain);
+		scarabBattle.addStep(inChasm, killGiantScarab);
+		scarabBattle.addStep(inDungeon, goDownToChasmAgain);
+		scarabBattle.addStep(inBank, goDownToDungeonAgain);
+
+		steps.put(80, scarabBattle);
+		steps.put(90, scarabBattle);
+		steps.put(100, scarabBattle);
+
+		ConditionalStep finishOff = new ConditionalStep(this, returnToHighPriest);
+		finishOff.addStep(kerisNearby, pickUpKeris);
+
+		steps.put(110, finishOff);
+		steps.put(120, finishOff);
+
+		return steps;
 	}
 }

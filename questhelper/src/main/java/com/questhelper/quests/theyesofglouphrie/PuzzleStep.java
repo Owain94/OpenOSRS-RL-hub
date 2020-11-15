@@ -106,6 +106,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		clickDiscHole3 = new WidgetStep(getQuestHelper(), "Insert the disc.", 447, 84);
 		clickDiscHole4 = new WidgetStep(getQuestHelper(), "Insert the disc.", 447, 86);
 		setupShapes();
+
 	}
 
 	@Override
@@ -118,9 +119,6 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		answer4 = client.getVarbitValue(2513); // 4 input
 
 		updateSteps();
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		eventBus.subscribe(ItemContainerChanged.class, this, this::onItemContainerChanged);
 	}
 
 	@Override
@@ -128,6 +126,37 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 	{
 		shutDownStep();
 		currentStep = null;
+	}
+
+	@Override
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
+		}
+	}
+
+	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeWorldOverlayHint(graphics, plugin);
+		}
+	}
+
+	@Override
+	public QuestStep getActiveStep()
+	{
+		if (currentStep != null)
+		{
+			return currentStep.getActiveStep();
+		}
+		else
+		{
+			return this;
+		}
 	}
 
 	@Subscribe
@@ -463,7 +492,6 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		return ids;
 	}
 
-
 	public int checkForItems(ArrayList<Item> items, int potentialMatch)
 	{
 		for (int i = 0; i < items.size(); i++)
@@ -614,37 +642,6 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 			eventBus.unregister(currentStep);
 			currentStep.shutDown();
 			currentStep = null;
-		}
-	}
-
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
-		}
-	}
-
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldOverlayHint(graphics, plugin);
-		}
-	}
-
-	@Override
-	public QuestStep getActiveStep()
-	{
-		if (currentStep != null)
-		{
-			return currentStep.getActiveStep();
-		}
-		else
-		{
-			return this;
 		}
 	}
 

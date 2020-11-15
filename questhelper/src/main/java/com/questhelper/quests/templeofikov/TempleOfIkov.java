@@ -24,6 +24,7 @@
  */
 package com.questhelper.quests.templeofikov;
 
+import com.questhelper.ItemCollections;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
@@ -78,99 +79,6 @@ public class TempleOfIkov extends BasicQuestHelper
 	Zone entryRoom1, entryRoom2, northRoom1, northRoom2, bootsRoom, arrowRoom1, arrowRoom2, arrowRoom3, lesRoom, witchRoom, demonArea1, demonArea2, demonArea3,
 		demonArea4, armaRoom1, armaRoom2;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToLucien);
-
-		ConditionalStep getLeverPiece = new ConditionalStep(this, prepare);
-		getLeverPiece.addStep(new Conditions(hasArrows, inMainOrNorthRoom), goSearchThievingLever);
-		getLeverPiece.addStep(new Conditions(hasEnoughArrows, inArrowRoom), returnToMainRoom);
-		getLeverPiece.addStep(inArrowRoom, collectArrows);
-		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, pulledLever), enterArrowRoom);
-		getLeverPiece.addStep(leverNearby, pullLever);
-		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, hasLever), useLeverOnHole);
-		getLeverPiece.addStep(new Conditions(inBootsRoom, hasLever), goUpFromBoots);
-		getLeverPiece.addStep(hasLever, enterDungeon);
-
-		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, belowMinus1Weight), pickUpLever);
-		getLeverPiece.addStep(new Conditions(inBootsRoom, new Conditions(LogicType.OR, belowMinus1Weight, hasBootsOfLightness)), goUpFromBoots);
-		getLeverPiece.addStep(inBootsRoom, getBoots);
-		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, below4Weight, dontHaveBoots), goDownToBoots);
-		getLeverPiece.addStep(belowMinus1Weight, enterDungeon);
-		getLeverPiece.addStep(new Conditions(below4Weight, hasBootsOfLightness), prepareBelow0);
-		getLeverPiece.addStep(below4Weight, enterDungeonForBoots);
-
-		steps.put(10, getLeverPiece);
-
-		ConditionalStep pullLeverForLes = new ConditionalStep(this, prepare);
-		pullLeverForLes.addStep(new Conditions(hasArrows, inMainOrNorthRoom), goPullThievingLever);
-		pullLeverForLes.addStep(new Conditions(hasEnoughArrows, inArrowRoom), returnToMainRoom);
-		pullLeverForLes.addStep(inArrowRoom, collectArrows);
-		pullLeverForLes.addStep(leverNearby, pullLever);
-		pullLeverForLes.addStep(new Conditions(inMainOrNorthRoom, hasLever), useLeverOnHole);
-		pullLeverForLes.addStep(new Conditions(inBootsRoom, hasLever), goUpFromBoots);
-		pullLeverForLes.addStep(hasLever, enterDungeon);
-
-		pullLeverForLes.addStep(new Conditions(inMainOrNorthRoom, belowMinus1Weight), pickUpLever);
-		pullLeverForLes.addStep(new Conditions(inBootsRoom, new Conditions(LogicType.OR, belowMinus1Weight, hasBootsOfLightness)), goUpFromBoots);
-		pullLeverForLes.addStep(inBootsRoom, getBoots);
-		pullLeverForLes.addStep(new Conditions(inMainOrNorthRoom, below4Weight, dontHaveBoots), goDownToBoots);
-		pullLeverForLes.addStep(belowMinus1Weight, enterDungeon);
-		pullLeverForLes.addStep(new Conditions(below4Weight, hasBootsOfLightness), prepareBelow0);
-		pullLeverForLes.addStep(below4Weight, enterDungeonForBoots);
-
-		steps.put(20, pullLeverForLes);
-
-		ConditionalStep goFightLes = new ConditionalStep(this, prepare);
-		goFightLes.addStep(new Conditions(inLesRoom, lesNearby), fightLes);
-		goFightLes.addStep(new Conditions(hasArrows, inMainOrNorthRoom), tryToEnterWitchRoom);
-		goFightLes.addStep(new Conditions(hasEnoughArrows, inArrowRoom), returnToMainRoom);
-		goFightLes.addStep(inArrowRoom, collectArrows);
-		goFightLes.addStep(leverNearby, pullLever);
-		goFightLes.addStep(new Conditions(inMainOrNorthRoom, hasLever), useLeverOnHole);
-		goFightLes.addStep(new Conditions(inBootsRoom, hasLever), goUpFromBoots);
-		goFightLes.addStep(hasLever, enterDungeon);
-
-		goFightLes.addStep(new Conditions(inMainOrNorthRoom, belowMinus1Weight), pickUpLever);
-		goFightLes.addStep(new Conditions(inBootsRoom, new Conditions(LogicType.OR, belowMinus1Weight, hasBootsOfLightness)), goUpFromBoots);
-		goFightLes.addStep(inBootsRoom, getBoots);
-		goFightLes.addStep(new Conditions(inMainOrNorthRoom, below4Weight, dontHaveBoots), goDownToBoots);
-		goFightLes.addStep(belowMinus1Weight, enterDungeon);
-		goFightLes.addStep(new Conditions(below4Weight, hasBootsOfLightness), prepareBelow0);
-		goFightLes.addStep(below4Weight, enterDungeonForBoots);
-
-		steps.put(30, goFightLes);
-
-		ConditionalStep goToWitch = new ConditionalStep(this, enterDungeonKilledLes);
-		goToWitch.addStep(inWitchRoom, giveWineldaLimps);
-		goToWitch.addStep(inMainOrNorthRoom, enterLesDoor);
-		steps.put(40, goToWitch);
-		steps.put(50, goToWitch);
-
-		// TODO: Verify taking staff doesn't progress quest beyond varp 26 = 60
-		ConditionalStep goodOrBadPath = new ConditionalStep(this, enterDungeonGivenLimps);
-		goodOrBadPath.addStep(hasStaffOfArmadyl, bringStaffToLucien);
-		goodOrBadPath.addStep(new Conditions(inArmaRoom, hasShinyKey), makeChoice);
-		goodOrBadPath.addStep(new Conditions(inDemonArea, hasShinyKey), pushWall);
-		goodOrBadPath.addStep(new Conditions(LogicType.OR, inArmaRoom, inDemonArea), pickUpKey);
-		goodOrBadPath.addStep(new Conditions(LogicType.OR, inMainOrNorthRoom, inWitchRoom), talkToWinelda);
-		goodOrBadPath.addStep(hasShinyKey, enterFromMcgrubbors);
-
-		steps.put(60, goodOrBadPath);
-
-		steps.put(70, killLucien);
-		// Sided against Lucien, quest ends at varp 80
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		pendantOfLucien = new ItemRequirement("Pendant of lucien", ItemID.PENDANT_OF_LUCIEN);
@@ -181,7 +89,7 @@ public class TempleOfIkov extends BasicQuestHelper
 		yewOrBetterBow = new ItemRequirement("Yew, magic, or dark bow", ItemID.YEW_SHORTBOW);
 		yewOrBetterBow.addAlternates(ItemID.YEW_LONGBOW, ItemID.YEW_COMP_BOW, ItemID.MAGIC_SHORTBOW, ItemID.MAGIC_SHORTBOW_I, ItemID.MAGIC_LONGBOW, ItemID.DARK_BOW);
 		knife = new ItemRequirement("Knife to get the boots of lightness", ItemID.KNIFE);
-		lightSource = new ItemRequirement("A light source to get the boots of lightness", -1, -1);
+		lightSource = new ItemRequirement("A light source to get the boots of lightness", ItemCollections.getLightSources());
 
 		iceArrows20 = new ItemRequirement("Ice arrows", ItemID.ICE_ARROWS, 20);
 
@@ -357,7 +265,6 @@ public class TempleOfIkov extends BasicQuestHelper
 		return reqs;
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -376,5 +283,98 @@ public class TempleOfIkov extends BasicQuestHelper
 				pullLever, enterArrowRoom, collectArrows, returnToMainRoom, goSearchThievingLever, tryToEnterWitchRoom, fightLes)), yewOrBetterBow, knife, lightSource, limpwurt20));
 		allSteps.add(new PanelDetails("Explore deeper", new ArrayList<>(Arrays.asList(enterLesDoor, giveWineldaLimps, pickUpKey, pushWall, makeChoice, returnToLucien))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToLucien);
+
+		ConditionalStep getLeverPiece = new ConditionalStep(this, prepare);
+		getLeverPiece.addStep(new Conditions(hasArrows, inMainOrNorthRoom), goSearchThievingLever);
+		getLeverPiece.addStep(new Conditions(hasEnoughArrows, inArrowRoom), returnToMainRoom);
+		getLeverPiece.addStep(inArrowRoom, collectArrows);
+		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, pulledLever), enterArrowRoom);
+		getLeverPiece.addStep(leverNearby, pullLever);
+		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, hasLever), useLeverOnHole);
+		getLeverPiece.addStep(new Conditions(inBootsRoom, hasLever), goUpFromBoots);
+		getLeverPiece.addStep(hasLever, enterDungeon);
+
+		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, belowMinus1Weight), pickUpLever);
+		getLeverPiece.addStep(new Conditions(inBootsRoom, new Conditions(LogicType.OR, belowMinus1Weight, hasBootsOfLightness)), goUpFromBoots);
+		getLeverPiece.addStep(inBootsRoom, getBoots);
+		getLeverPiece.addStep(new Conditions(inMainOrNorthRoom, below4Weight, dontHaveBoots), goDownToBoots);
+		getLeverPiece.addStep(belowMinus1Weight, enterDungeon);
+		getLeverPiece.addStep(new Conditions(below4Weight, hasBootsOfLightness), prepareBelow0);
+		getLeverPiece.addStep(below4Weight, enterDungeonForBoots);
+
+		steps.put(10, getLeverPiece);
+
+		ConditionalStep pullLeverForLes = new ConditionalStep(this, prepare);
+		pullLeverForLes.addStep(new Conditions(hasArrows, inMainOrNorthRoom), goPullThievingLever);
+		pullLeverForLes.addStep(new Conditions(hasEnoughArrows, inArrowRoom), returnToMainRoom);
+		pullLeverForLes.addStep(inArrowRoom, collectArrows);
+		pullLeverForLes.addStep(leverNearby, pullLever);
+		pullLeverForLes.addStep(new Conditions(inMainOrNorthRoom, hasLever), useLeverOnHole);
+		pullLeverForLes.addStep(new Conditions(inBootsRoom, hasLever), goUpFromBoots);
+		pullLeverForLes.addStep(hasLever, enterDungeon);
+
+		pullLeverForLes.addStep(new Conditions(inMainOrNorthRoom, belowMinus1Weight), pickUpLever);
+		pullLeverForLes.addStep(new Conditions(inBootsRoom, new Conditions(LogicType.OR, belowMinus1Weight, hasBootsOfLightness)), goUpFromBoots);
+		pullLeverForLes.addStep(inBootsRoom, getBoots);
+		pullLeverForLes.addStep(new Conditions(inMainOrNorthRoom, below4Weight, dontHaveBoots), goDownToBoots);
+		pullLeverForLes.addStep(belowMinus1Weight, enterDungeon);
+		pullLeverForLes.addStep(new Conditions(below4Weight, hasBootsOfLightness), prepareBelow0);
+		pullLeverForLes.addStep(below4Weight, enterDungeonForBoots);
+
+		steps.put(20, pullLeverForLes);
+
+		ConditionalStep goFightLes = new ConditionalStep(this, prepare);
+		goFightLes.addStep(new Conditions(inLesRoom, lesNearby), fightLes);
+		goFightLes.addStep(new Conditions(hasArrows, inMainOrNorthRoom), tryToEnterWitchRoom);
+		goFightLes.addStep(new Conditions(hasEnoughArrows, inArrowRoom), returnToMainRoom);
+		goFightLes.addStep(inArrowRoom, collectArrows);
+		goFightLes.addStep(leverNearby, pullLever);
+		goFightLes.addStep(new Conditions(inMainOrNorthRoom, hasLever), useLeverOnHole);
+		goFightLes.addStep(new Conditions(inBootsRoom, hasLever), goUpFromBoots);
+		goFightLes.addStep(hasLever, enterDungeon);
+
+		goFightLes.addStep(new Conditions(inMainOrNorthRoom, belowMinus1Weight), pickUpLever);
+		goFightLes.addStep(new Conditions(inBootsRoom, new Conditions(LogicType.OR, belowMinus1Weight, hasBootsOfLightness)), goUpFromBoots);
+		goFightLes.addStep(inBootsRoom, getBoots);
+		goFightLes.addStep(new Conditions(inMainOrNorthRoom, below4Weight, dontHaveBoots), goDownToBoots);
+		goFightLes.addStep(belowMinus1Weight, enterDungeon);
+		goFightLes.addStep(new Conditions(below4Weight, hasBootsOfLightness), prepareBelow0);
+		goFightLes.addStep(below4Weight, enterDungeonForBoots);
+
+		steps.put(30, goFightLes);
+
+		ConditionalStep goToWitch = new ConditionalStep(this, enterDungeonKilledLes);
+		goToWitch.addStep(inWitchRoom, giveWineldaLimps);
+		goToWitch.addStep(inMainOrNorthRoom, enterLesDoor);
+		steps.put(40, goToWitch);
+		steps.put(50, goToWitch);
+
+		// TODO: Verify taking staff doesn't progress quest beyond varp 26 = 60
+		ConditionalStep goodOrBadPath = new ConditionalStep(this, enterDungeonGivenLimps);
+		goodOrBadPath.addStep(hasStaffOfArmadyl, bringStaffToLucien);
+		goodOrBadPath.addStep(new Conditions(inArmaRoom, hasShinyKey), makeChoice);
+		goodOrBadPath.addStep(new Conditions(inDemonArea, hasShinyKey), pushWall);
+		goodOrBadPath.addStep(new Conditions(LogicType.OR, inArmaRoom, inDemonArea), pickUpKey);
+		goodOrBadPath.addStep(new Conditions(LogicType.OR, inMainOrNorthRoom, inWitchRoom), talkToWinelda);
+		goodOrBadPath.addStep(hasShinyKey, enterFromMcgrubbors);
+
+		steps.put(60, goodOrBadPath);
+
+		steps.put(70, killLucien);
+		// Sided against Lucien, quest ends at varp 80
+
+		return steps;
 	}
 }

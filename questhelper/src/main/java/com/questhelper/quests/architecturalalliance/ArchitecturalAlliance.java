@@ -51,30 +51,6 @@ public class ArchitecturalAlliance extends BasicQuestHelper
 
 	DetailedQuestStep talkToHosa, talkToHosaAsArchitect, talkToArcis, talkToLovada, talkToPiliar, talkToShayda, talkToHosaToFinish;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep repairStatue = new ConditionalStep(this, talkToHosa);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada, talkedToShayda), talkToHosaToFinish);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada), talkToShayda);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar), talkToLovada);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis), talkToPiliar);
-		repairStatue.addStep(talkedToHosa, talkToArcis);
-		repairStatue.addStep(talkedToHosaStart, talkToHosaAsArchitect);
-
-		steps.put(0, repairStatue);
-		steps.put(1, talkToHosaAsArchitect);
-		steps.put(2, talkToHosaAsArchitect);
-		steps.put(3, talkToHosaAsArchitect);
-		steps.put(4, talkToHosaAsArchitect);
-
-		return steps;
-	}
-
 	public void setupConditions()
 	{
 		talkedToArcis = new VarbitCondition(4971, 1);
@@ -106,6 +82,30 @@ public class ArchitecturalAlliance extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Repairing the statue", new ArrayList<>(Arrays.asList(talkToHosa, talkToArcis, talkToPiliar, talkToShayda, talkToLovada, talkToHosaToFinish))));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep repairStatue = new ConditionalStep(this, talkToHosa);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada, talkedToShayda), talkToHosaToFinish);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada), talkToShayda);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar), talkToLovada);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis), talkToPiliar);
+		repairStatue.addStep(talkedToHosa, talkToArcis);
+		repairStatue.addStep(talkedToHosaStart, talkToHosaAsArchitect);
+
+		steps.put(0, repairStatue);
+		steps.put(1, talkToHosaAsArchitect);
+		steps.put(2, talkToHosaAsArchitect);
+		steps.put(3, talkToHosaAsArchitect);
+		steps.put(4, talkToHosaAsArchitect);
+
+		return steps;
 	}
 }
 

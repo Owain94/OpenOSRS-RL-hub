@@ -45,22 +45,6 @@ public class EnchantedKey extends BasicQuestHelper
 
 	QuestStep solvePuzzle;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupRequirements();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		for (int i = 0; i < 2047; i++)
-		{
-			steps.put(i, solvePuzzle);
-		}
-
-		return steps;
-	}
-
 	private void setupRequirements()
 	{
 		spade = new ItemRequirement("Spade", ItemID.SPADE);
@@ -96,5 +80,21 @@ public class EnchantedKey extends BasicQuestHelper
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Dig for treasure", new ArrayList<>(Arrays.asList(solvePuzzle)), key, spade));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupRequirements();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		for (int i = 0; i < 2047; i++)
+		{
+			steps.put(i, solvePuzzle);
+		}
+
+		return steps;
 	}
 }

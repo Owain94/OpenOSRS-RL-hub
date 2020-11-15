@@ -75,51 +75,6 @@ public class LairOfTarnRazorlor extends BasicQuestHelper
 	Zone hauntedMine, room1, room1PastTrap1, room1PastTrap2, room2, room3, room4, room5P1, room5P2, room6P1, room6P2, room6P3, pillar1, pillar2, pillar3,
 		pillar4, switch1, pillar5, pillar6, room6PastTrap1, room6PastTrap2P1, room6PastTrap2P2, extraRoom1, extraRoom2, room7, room8, bossRoom, finalRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep fullQuest = new ConditionalStep(this, enterHauntedMine);
-		fullQuest.addStep(inFinalRoom, pickUpDiary);
-		fullQuest.addStep(new Conditions(inBossRoom, killedTarn), enterFinalRoom);
-		fullQuest.addStep(new Conditions(inBossRoom, tarnInSecondForm), killTarn2);
-		fullQuest.addStep(inBossRoom, killTarn1);
-		fullQuest.addStep(inRoom8, enterBossRoom);
-		fullQuest.addStep(inRoom7, goThroughRoom7);
-		fullQuest.addStep(inRoom6PastTrap2, goThroughRoom6);
-		fullQuest.addStep(inRoom6PastTrap1, searchWall2Room6);
-		fullQuest.addStep(inRoom6P2, searchWallRoom6);
-		fullQuest.addStep(onPillar6, jumpToNorthLedge);
-		fullQuest.addStep(onPillar5, jumpToPillar6);
-		fullQuest.addStep(new Conditions(onPillar3, switchPressed), jumpToPillar5);
-		fullQuest.addStep(new Conditions(onPillar4, switchPressed), jumpBackToPillar3);
-		fullQuest.addStep(new Conditions(atSwitch1, switchPressed), jumpBackToPillar4);
-		fullQuest.addStep(atSwitch1, pressSwitch);
-		fullQuest.addStep(onPillar4, jumpToSwitch);
-		fullQuest.addStep(onPillar3, jumpToPillar4);
-		fullQuest.addStep(onPillar2, jumpToPillar3);
-		fullQuest.addStep(onPillar1, jumpToPillar2);
-		fullQuest.addStep(inRoom6P1, jumpToPillar1);
-		fullQuest.addStep(inRoom5, goThroughRoom5);
-		fullQuest.addStep(inRoom4, goThroughRoom4);
-		fullQuest.addStep(inRoom3, goThroughRoom3);
-		fullQuest.addStep(inRoom2, goThroughRoom2);
-		fullQuest.addStep(inRoom1PastTrap2, goThroughRoom1);
-		fullQuest.addStep(inRoom1PastTrap1, searchWall2Room1);
-		fullQuest.addStep(inRoom1, searchWallRoom1);
-		fullQuest.addStep(inHauntedMine, enterLair);
-
-		steps.put(0, fullQuest);
-		steps.put(1, fullQuest);
-		steps.put(2, fullQuest);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		combatGear = new ItemRequirement("Combat gear", -1, -1);
@@ -308,6 +263,51 @@ public class LairOfTarnRazorlor extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Traversing the dungeon", new ArrayList<>(Arrays.asList(enterHauntedMine, enterLair, goThroughRoom1, goThroughRoom2, goThroughRoom3,
 			goThroughRoom4, goThroughRoom5, jumpToPillar1, pressSwitch, jumpToNorthLedge, goThroughRoom6, goThroughRoom7, enterBossRoom, killTarn1, killTarn2, enterFinalRoom, pickUpDiary)), combatGear));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep fullQuest = new ConditionalStep(this, enterHauntedMine);
+		fullQuest.addStep(inFinalRoom, pickUpDiary);
+		fullQuest.addStep(new Conditions(inBossRoom, killedTarn), enterFinalRoom);
+		fullQuest.addStep(new Conditions(inBossRoom, tarnInSecondForm), killTarn2);
+		fullQuest.addStep(inBossRoom, killTarn1);
+		fullQuest.addStep(inRoom8, enterBossRoom);
+		fullQuest.addStep(inRoom7, goThroughRoom7);
+		fullQuest.addStep(inRoom6PastTrap2, goThroughRoom6);
+		fullQuest.addStep(inRoom6PastTrap1, searchWall2Room6);
+		fullQuest.addStep(inRoom6P2, searchWallRoom6);
+		fullQuest.addStep(onPillar6, jumpToNorthLedge);
+		fullQuest.addStep(onPillar5, jumpToPillar6);
+		fullQuest.addStep(new Conditions(onPillar3, switchPressed), jumpToPillar5);
+		fullQuest.addStep(new Conditions(onPillar4, switchPressed), jumpBackToPillar3);
+		fullQuest.addStep(new Conditions(atSwitch1, switchPressed), jumpBackToPillar4);
+		fullQuest.addStep(atSwitch1, pressSwitch);
+		fullQuest.addStep(onPillar4, jumpToSwitch);
+		fullQuest.addStep(onPillar3, jumpToPillar4);
+		fullQuest.addStep(onPillar2, jumpToPillar3);
+		fullQuest.addStep(onPillar1, jumpToPillar2);
+		fullQuest.addStep(inRoom6P1, jumpToPillar1);
+		fullQuest.addStep(inRoom5, goThroughRoom5);
+		fullQuest.addStep(inRoom4, goThroughRoom4);
+		fullQuest.addStep(inRoom3, goThroughRoom3);
+		fullQuest.addStep(inRoom2, goThroughRoom2);
+		fullQuest.addStep(inRoom1PastTrap2, goThroughRoom1);
+		fullQuest.addStep(inRoom1PastTrap1, searchWall2Room1);
+		fullQuest.addStep(inRoom1, searchWallRoom1);
+		fullQuest.addStep(inHauntedMine, enterLair);
+
+		steps.put(0, fullQuest);
+		steps.put(1, fullQuest);
+		steps.put(2, fullQuest);
+		return steps;
 	}
 }
 

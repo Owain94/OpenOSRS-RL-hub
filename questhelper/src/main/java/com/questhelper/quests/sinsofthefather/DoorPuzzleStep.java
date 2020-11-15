@@ -38,64 +38,25 @@ import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 
 public class DoorPuzzleStep extends DetailedQuestStep
 {
-	EventBus eventBus;
-
 	private final int UNKNOWN_VALUE = 0;
 	private final int EMPTY = 1;
 	private final int FILLED = 2;
-
 	private final int SIZE = 5;
-
+	@Inject
+	Client client;
 	private PuzzleLine[] result = null;
 
 	private boolean solving = false;
 
-	static class PuzzleLine
-	{
-		public int[] cells;
-
-		PuzzleLine(int... cells)
-		{
-			this.cells = cells;
-		}
-
-		PuzzleLine(int size)
-		{
-			this.cells = new int[size];
-		}
-	}
-
-	static class PuzzleState
-	{
-		PuzzleLine[][] rowSolutions;
-		PuzzleLine[][] columnSolutions;
-		PuzzleLine[] grid;
-		int numberOfGray;
-
-		PuzzleState(PuzzleLine[][] row, PuzzleLine[][] column, PuzzleLine[] grid, int numberOfGray)
-		{
-			this.rowSolutions = row;
-			this.columnSolutions = column;
-			this.grid = grid;
-			this.numberOfGray = numberOfGray;
-		}
-	}
-
 	public DoorPuzzleStep(BasicQuestHelper questHelper)
 	{
 		super(questHelper, "Solve the puzzle by marking the highlighted squares.");
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	private PuzzleLine[] solve()
@@ -258,7 +219,6 @@ public class DoorPuzzleStep extends DetailedQuestStep
 		return c;
 	}
 
-
 	private PuzzleState checkSolutionOverlaps(PuzzleState oldPuzzleState)
 	{
 		boolean hasFoundASolution = true;
@@ -343,6 +303,11 @@ public class DoorPuzzleStep extends DetailedQuestStep
 	}
 
 	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+	}
+
+	@Override
 	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 		Widget panels = client.getWidget(665, 32);
@@ -363,11 +328,6 @@ public class DoorPuzzleStep extends DetailedQuestStep
 				}
 			}
 		}
-	}
-
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
 	}
 
 	@Override
@@ -430,10 +390,40 @@ public class DoorPuzzleStep extends DetailedQuestStep
 		return allSolutions;
 	}
 
-
 	private PuzzleLine[] getSolutions(PuzzleLine... solution)
 	{
 
 		return solution;
+	}
+
+	static class PuzzleLine
+	{
+		public int[] cells;
+
+		PuzzleLine(int... cells)
+		{
+			this.cells = cells;
+		}
+
+		PuzzleLine(int size)
+		{
+			this.cells = new int[size];
+		}
+	}
+
+	static class PuzzleState
+	{
+		PuzzleLine[][] rowSolutions;
+		PuzzleLine[][] columnSolutions;
+		PuzzleLine[] grid;
+		int numberOfGray;
+
+		PuzzleState(PuzzleLine[][] row, PuzzleLine[][] column, PuzzleLine[] grid, int numberOfGray)
+		{
+			this.rowSolutions = row;
+			this.columnSolutions = column;
+			this.grid = grid;
+			this.numberOfGray = numberOfGray;
+		}
 	}
 }

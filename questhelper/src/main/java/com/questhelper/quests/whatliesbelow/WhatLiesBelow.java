@@ -66,57 +66,6 @@ public class WhatLiesBelow extends BasicQuestHelper
 
 	Zone chaosAltar;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToRat);
-
-		ConditionalStep getIntel = new ConditionalStep(this, killOutlaws);
-		getIntel.addStep(hasFullFolder, bringFolderToRat);
-
-		steps.put(10, getIntel);
-
-		steps.put(20, talkToRatAfterFolder);
-
-		steps.put(25, talkToSurok);
-
-		steps.put(30, talkToSurokNoLetter);
-		steps.put(40, talkToSurokNoLetter);
-		steps.put(45, talkToSurokNoLetter);
-		steps.put(46, talkToSurokNoLetter);
-
-		ConditionalStep chargeWand = new ConditionalStep(this, enterChaosAltar);
-		chargeWand.addStep(inChaosAltar, useWandOnAltar);
-
-		steps.put(50, chargeWand);
-
-		steps.put(55, bringWandToSurok);
-
-		steps.put(60, talkToRatAfterSurok);
-
-		steps.put(70, talkToRatAfterSurokNoLetter);
-		steps.put(71, talkToRatAfterSurokNoLetter);
-		steps.put(72, talkToRatAfterSurokNoLetter);
-
-		steps.put(80, talkToZaff);
-		steps.put(81, talkToZaff);
-		ConditionalStep defeatSurok = new ConditionalStep(this, talkToSurokToFight);
-		defeatSurok.addStep(inBattle, fightRoald);
-
-		steps.put(110, defeatSurok);
-		steps.put(115, defeatSurok);
-		steps.put(120, defeatSurok);
-		steps.put(140, talkToRatToFinish);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		intel5 = new ItemRequirement("Rat's paper", ItemID.RATS_PAPER, 5);
@@ -238,5 +187,56 @@ public class WhatLiesBelow extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Help Surok", new ArrayList<>(Arrays.asList(talkToSurok, enterChaosAltar, useWandOnAltar, bringWandToSurok)), chaosRunes15, chaosTalismanOrAbyss, bowl));
 		allSteps.add(new PanelDetails("Defeat Surok", new ArrayList<>(Arrays.asList(talkToRatAfterSurok, talkToZaff, talkToSurokToFight, fightRoald, talkToRatToFinish))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToRat);
+
+		ConditionalStep getIntel = new ConditionalStep(this, killOutlaws);
+		getIntel.addStep(hasFullFolder, bringFolderToRat);
+
+		steps.put(10, getIntel);
+
+		steps.put(20, talkToRatAfterFolder);
+
+		steps.put(25, talkToSurok);
+
+		steps.put(30, talkToSurokNoLetter);
+		steps.put(40, talkToSurokNoLetter);
+		steps.put(45, talkToSurokNoLetter);
+		steps.put(46, talkToSurokNoLetter);
+
+		ConditionalStep chargeWand = new ConditionalStep(this, enterChaosAltar);
+		chargeWand.addStep(inChaosAltar, useWandOnAltar);
+
+		steps.put(50, chargeWand);
+
+		steps.put(55, bringWandToSurok);
+
+		steps.put(60, talkToRatAfterSurok);
+
+		steps.put(70, talkToRatAfterSurokNoLetter);
+		steps.put(71, talkToRatAfterSurokNoLetter);
+		steps.put(72, talkToRatAfterSurokNoLetter);
+
+		steps.put(80, talkToZaff);
+		steps.put(81, talkToZaff);
+		ConditionalStep defeatSurok = new ConditionalStep(this, talkToSurokToFight);
+		defeatSurok.addStep(inBattle, fightRoald);
+
+		steps.put(110, defeatSurok);
+		steps.put(115, defeatSurok);
+		steps.put(120, defeatSurok);
+		steps.put(140, talkToRatToFinish);
+
+		return steps;
 	}
 }

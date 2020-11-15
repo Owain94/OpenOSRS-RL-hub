@@ -75,145 +75,6 @@ public class ATasteOfHope extends BasicQuestHelper
 
 	Zone myrequeBase, theatreP1, theatreP2, theatreP3, theatreP4, theatreP5, theatreP6, serafinaHouse, newBase, ranisFight;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToGarth);
-		steps.put(5, talkToGarth);
-		steps.put(10, talkToGarth);
-
-		ConditionalStep goTalkToSafalaan = new ConditionalStep(this, enterBase);
-		goTalkToSafalaan.addStep(inMyrequeBase, talkToSafalaan);
-		steps.put(15, goTalkToSafalaan);
-
-		steps.put(20, climbRubbleAtBank);
-		steps.put(25, climbRubbleAtBank);
-		steps.put(30, talkToHarpert);
-		steps.put(35, talkToHarpert);
-
-		ConditionalStep spy = new ConditionalStep(this, climbRubbleAfterHarpert);
-		spy.addStep(inTheatreP6, lookThroughWindow);
-		spy.addStep(inTheatreP5, climbDownFromRoof);
-		spy.addStep(inTheatreP4, climbUpToRoof);
-		spy.addStep(inTheatreP3, climbSecondVent);
-		spy.addStep(inTheatreP2, jumpOffRoof);
-		spy.addStep(inTheatreP1, climbSteamVent);
-
-		steps.put(40, spy);
-
-		ConditionalStep goReturnToSafalaan = new ConditionalStep(this, returnToBase);
-		goReturnToSafalaan.addStep(inMyrequeBase, talkToSafalaanAfterSpying);
-		steps.put(45, goReturnToSafalaan);
-		steps.put(50, goReturnToSafalaan);
-
-		ConditionalStep goTalkToFlaygian = new ConditionalStep(this, returnToBase);
-		goTalkToFlaygian.addStep(inMyrequeBase, talkToFlaygian);
-		steps.put(55, goTalkToFlaygian);
-		steps.put(60, goTalkToFlaygian);
-
-		ConditionalStep goTalkToSaflaanAfterFlaygian = new ConditionalStep(this, returnToBase);
-		goTalkToSaflaanAfterFlaygian.addStep(inMyrequeBase, talkToSafalaanAfterFlaygian);
-		steps.put(65, goTalkToSaflaanAfterFlaygian);
-		steps.put(70, goTalkToSaflaanAfterFlaygian);
-
-		ConditionalStep goToSerafinaHouse = new ConditionalStep(this, enterSerafinaHouse);
-		goToSerafinaHouse.addStep(inSerafinaHouse, talkToSafalaanInSerafinaHouse);
-		goToSerafinaHouse.addStep(inMyrequeBase, goUpToSerafinaHouse);
-		steps.put(75, goToSerafinaHouse);
-
-		ConditionalStep tryFirstPotion = new ConditionalStep(this, enterSerafinaHouse);
-		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasPotion), usePotionOnDoor);
-		tryFirstPotion.addStep(new Conditions(hasPotion), enterSerafinaHouse);
-		tryFirstPotion.addStep(new Conditions(hasCrushedMeat, hasUnfinishedPotion), useMeatOnPotion);
-		tryFirstPotion.addStep(new Conditions(hasMeat, hasPestle, hasUnfinishedPotion), usePestleOnMeat);
-		tryFirstPotion.addStep(new Conditions(hasHerb, hasMeat, hasPestle, hasVialOrVialOfWater), useHerbOnVial);
-		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasMeat, hasPestle), searchForVial);
-		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasMeat), searchForPestle);
-		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasHerb), searchForMeat);
-		tryFirstPotion.addStep(inSerafinaHouse, searchForHerb);
-		steps.put(80, tryFirstPotion);
-		steps.put(81, tryFirstPotion);
-
-		ConditionalStep trySecondPotion = new ConditionalStep(this, enterSerafinaHouse);
-		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasBloodPotion), useBloodOnDoor);
-		trySecondPotion.addStep(new Conditions(hasBloodPotion), enterSerafinaHouse);
-		trySecondPotion.addStep(new Conditions(hasCrushedMeat, hasUnfinishedBloodPotion), useMeatOnBlood);
-		trySecondPotion.addStep(new Conditions(hasMeat, hasPestle, hasUnfinishedBloodPotion), usePestleOnMeat);
-		trySecondPotion.addStep(new Conditions(hasHerb, hasMeat, hasPestle, hasBloodVial), useHerbOnBlood);
-		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasMeat, hasBloodVial), searchForPestle);
-		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasBloodVial), searchForMeat);
-		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasBloodVial), searchForHerb);
-		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasVial), talkToSafalaanAfterPotion);
-		trySecondPotion.addStep(new Conditions(inSerafinaHouse), searchForVial);
-		steps.put(83, trySecondPotion);
-		steps.put(84, trySecondPotion);
-
-		ConditionalStep goGetNotes = new ConditionalStep(this, enterSerafinaHouse);
-		goGetNotes.addStep(new Conditions(inSerafinaHouse, hasOldNotes), talkToSafalaanWithNotes);
-		goGetNotes.addStep(inSerafinaHouse, getOldNotes);
-		steps.put(85, goGetNotes);
-		steps.put(86, goGetNotes);
-
-		ConditionalStep goStartAbominationFight = new ConditionalStep(this, enterBaseAfterSerafina);
-		goStartAbominationFight.addStep(inMyrequeBase, talkToSafalaanForAbominationFight);
-		steps.put(90, goStartAbominationFight);
-
-		ConditionalStep goKillAbomination = new ConditionalStep(this, enterBaseAfterSerafina);
-		goKillAbomination.addStep(inMyrequeBase, killAbomination);
-		steps.put(95, goKillAbomination);
-		steps.put(100, goKillAbomination);
-
-		ConditionalStep goTalkToSafalaanAfterAbomination = new ConditionalStep(this, enterBaseAfterSerafina);
-		goTalkToSafalaanAfterAbomination.addStep(inMyrequeBase, talkToSafalaanAfterAbominationFight);
-		steps.put(105, goTalkToSafalaanAfterAbomination);
-
-		ConditionalStep goToNewBase = new ConditionalStep(this, enterOldManRalBasement);
-		goToNewBase.addStep(inNewBase, talkToSafalaanInRalBasement);
-		steps.put(110, goToNewBase);
-		steps.put(115, goToNewBase);
-
-		ConditionalStep goTalkToVertida = new ConditionalStep(this, enterOldManRalBasement);
-		goTalkToVertida.addStep(hasFlaygianNotes, readFlaygianNotes);
-		goTalkToVertida.addStep(inNewBase, talkToVertidaInRalBasement);
-		steps.put(120, goTalkToVertida);
-
-		ConditionalStep makeFlail = new ConditionalStep(this, enterOldManRalBasement);
-		makeFlail.addStep(new Conditions(inNewBase, hasFlail), talkToSafalaanAfterFlail);
-		makeFlail.addStep(new Conditions(hasFlail), enterRalWithFlail);
-		makeFlail.addStep(new Conditions(hasEnchantedEmeraldSickle, hasChain), addSickleToRod);
-		makeFlail.addStep(new Conditions(hasEmeraldSickle, hasChain), enchantSickle);
-		makeFlail.addStep(new Conditions(hasSickle, hasChain), useEmeraldOnSickle);
-		makeFlail.addStep(new Conditions(inNewBase, hasSickle), getChain);
-		makeFlail.addStep(inNewBase, getSickle);
-		steps.put(125, makeFlail);
-
-		ConditionalStep goTalkToSafalaanAfterFlail = new ConditionalStep(this, enterRalWithFlail);
-		goTalkToSafalaanAfterFlail.addStep(inNewBase, talkToSafalaanAfterFlail);
-		steps.put(130, makeFlail);
-
-		steps.put(135, talkToKael);
-
-		ConditionalStep goFightRanis = new ConditionalStep(this, talkToKael);
-		goFightRanis.addStep(inRanisFight, killRanis);
-		steps.put(140, goFightRanis);
-
-		steps.put(145, talkToKaelAgain);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, enterRalForEnd);
-		finishQuest.addStep(inNewBase, talkToSafalaanForEnd);
-		steps.put(150, finishQuest);
-		steps.put(155, finishQuest);
-		steps.put(160, finishQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		coins1000 = new ItemRequirement("Coins", ItemID.COINS_995, 1000);
@@ -513,5 +374,145 @@ public class ATasteOfHope extends BasicQuestHelper
 			enchantSickle, addSickleToRod, talkToSafalaanAfterFlail)), emerald, chisel, enchantEmeraldRunesOrTablet));
 		allSteps.add(new PanelDetails("Rising up", new ArrayList<>(Arrays.asList(talkToKaelSidebar, killRanis, talkToKaelAgain, enterRalForEnd, talkToSafalaanForEnd)), combatGear, ivandisFlail));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToGarth);
+		steps.put(5, talkToGarth);
+		steps.put(10, talkToGarth);
+
+		ConditionalStep goTalkToSafalaan = new ConditionalStep(this, enterBase);
+		goTalkToSafalaan.addStep(inMyrequeBase, talkToSafalaan);
+		steps.put(15, goTalkToSafalaan);
+
+		steps.put(20, climbRubbleAtBank);
+		steps.put(25, climbRubbleAtBank);
+		steps.put(30, talkToHarpert);
+		steps.put(35, talkToHarpert);
+
+		ConditionalStep spy = new ConditionalStep(this, climbRubbleAfterHarpert);
+		spy.addStep(inTheatreP6, lookThroughWindow);
+		spy.addStep(inTheatreP5, climbDownFromRoof);
+		spy.addStep(inTheatreP4, climbUpToRoof);
+		spy.addStep(inTheatreP3, climbSecondVent);
+		spy.addStep(inTheatreP2, jumpOffRoof);
+		spy.addStep(inTheatreP1, climbSteamVent);
+
+		steps.put(40, spy);
+
+		ConditionalStep goReturnToSafalaan = new ConditionalStep(this, returnToBase);
+		goReturnToSafalaan.addStep(inMyrequeBase, talkToSafalaanAfterSpying);
+		steps.put(45, goReturnToSafalaan);
+		steps.put(50, goReturnToSafalaan);
+
+		ConditionalStep goTalkToFlaygian = new ConditionalStep(this, returnToBase);
+		goTalkToFlaygian.addStep(inMyrequeBase, talkToFlaygian);
+		steps.put(55, goTalkToFlaygian);
+		steps.put(60, goTalkToFlaygian);
+
+		ConditionalStep goTalkToSaflaanAfterFlaygian = new ConditionalStep(this, returnToBase);
+		goTalkToSaflaanAfterFlaygian.addStep(inMyrequeBase, talkToSafalaanAfterFlaygian);
+		steps.put(65, goTalkToSaflaanAfterFlaygian);
+		steps.put(70, goTalkToSaflaanAfterFlaygian);
+
+		ConditionalStep goToSerafinaHouse = new ConditionalStep(this, enterSerafinaHouse);
+		goToSerafinaHouse.addStep(inSerafinaHouse, talkToSafalaanInSerafinaHouse);
+		goToSerafinaHouse.addStep(inMyrequeBase, goUpToSerafinaHouse);
+		steps.put(75, goToSerafinaHouse);
+
+		ConditionalStep tryFirstPotion = new ConditionalStep(this, enterSerafinaHouse);
+		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasPotion), usePotionOnDoor);
+		tryFirstPotion.addStep(new Conditions(hasPotion), enterSerafinaHouse);
+		tryFirstPotion.addStep(new Conditions(hasCrushedMeat, hasUnfinishedPotion), useMeatOnPotion);
+		tryFirstPotion.addStep(new Conditions(hasMeat, hasPestle, hasUnfinishedPotion), usePestleOnMeat);
+		tryFirstPotion.addStep(new Conditions(hasHerb, hasMeat, hasPestle, hasVialOrVialOfWater), useHerbOnVial);
+		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasMeat, hasPestle), searchForVial);
+		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasMeat), searchForPestle);
+		tryFirstPotion.addStep(new Conditions(inSerafinaHouse, hasHerb), searchForMeat);
+		tryFirstPotion.addStep(inSerafinaHouse, searchForHerb);
+		steps.put(80, tryFirstPotion);
+		steps.put(81, tryFirstPotion);
+
+		ConditionalStep trySecondPotion = new ConditionalStep(this, enterSerafinaHouse);
+		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasBloodPotion), useBloodOnDoor);
+		trySecondPotion.addStep(new Conditions(hasBloodPotion), enterSerafinaHouse);
+		trySecondPotion.addStep(new Conditions(hasCrushedMeat, hasUnfinishedBloodPotion), useMeatOnBlood);
+		trySecondPotion.addStep(new Conditions(hasMeat, hasPestle, hasUnfinishedBloodPotion), usePestleOnMeat);
+		trySecondPotion.addStep(new Conditions(hasHerb, hasMeat, hasPestle, hasBloodVial), useHerbOnBlood);
+		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasMeat, hasBloodVial), searchForPestle);
+		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasHerb, hasBloodVial), searchForMeat);
+		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasBloodVial), searchForHerb);
+		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasVial), talkToSafalaanAfterPotion);
+		trySecondPotion.addStep(new Conditions(inSerafinaHouse), searchForVial);
+		steps.put(82, trySecondPotion);
+		steps.put(83, trySecondPotion);
+		steps.put(84, trySecondPotion);
+
+		ConditionalStep goGetNotes = new ConditionalStep(this, enterSerafinaHouse);
+		goGetNotes.addStep(new Conditions(inSerafinaHouse, hasOldNotes), talkToSafalaanWithNotes);
+		goGetNotes.addStep(inSerafinaHouse, getOldNotes);
+		steps.put(85, goGetNotes);
+		steps.put(86, goGetNotes);
+
+		ConditionalStep goStartAbominationFight = new ConditionalStep(this, enterBaseAfterSerafina);
+		goStartAbominationFight.addStep(inMyrequeBase, talkToSafalaanForAbominationFight);
+		steps.put(90, goStartAbominationFight);
+
+		ConditionalStep goKillAbomination = new ConditionalStep(this, enterBaseAfterSerafina);
+		goKillAbomination.addStep(inMyrequeBase, killAbomination);
+		steps.put(95, goKillAbomination);
+		steps.put(100, goKillAbomination);
+
+		ConditionalStep goTalkToSafalaanAfterAbomination = new ConditionalStep(this, enterBaseAfterSerafina);
+		goTalkToSafalaanAfterAbomination.addStep(inMyrequeBase, talkToSafalaanAfterAbominationFight);
+		steps.put(105, goTalkToSafalaanAfterAbomination);
+
+		ConditionalStep goToNewBase = new ConditionalStep(this, enterOldManRalBasement);
+		goToNewBase.addStep(inNewBase, talkToSafalaanInRalBasement);
+		steps.put(110, goToNewBase);
+		steps.put(115, goToNewBase);
+
+		ConditionalStep goTalkToVertida = new ConditionalStep(this, enterOldManRalBasement);
+		goTalkToVertida.addStep(hasFlaygianNotes, readFlaygianNotes);
+		goTalkToVertida.addStep(inNewBase, talkToVertidaInRalBasement);
+		steps.put(120, goTalkToVertida);
+
+		ConditionalStep makeFlail = new ConditionalStep(this, enterOldManRalBasement);
+		makeFlail.addStep(new Conditions(inNewBase, hasFlail), talkToSafalaanAfterFlail);
+		makeFlail.addStep(new Conditions(hasFlail), enterRalWithFlail);
+		makeFlail.addStep(new Conditions(hasEnchantedEmeraldSickle, hasChain), addSickleToRod);
+		makeFlail.addStep(new Conditions(hasEmeraldSickle, hasChain), enchantSickle);
+		makeFlail.addStep(new Conditions(hasSickle, hasChain), useEmeraldOnSickle);
+		makeFlail.addStep(new Conditions(inNewBase, hasSickle), getChain);
+		makeFlail.addStep(inNewBase, getSickle);
+		steps.put(125, makeFlail);
+
+		ConditionalStep goTalkToSafalaanAfterFlail = new ConditionalStep(this, enterRalWithFlail);
+		goTalkToSafalaanAfterFlail.addStep(inNewBase, talkToSafalaanAfterFlail);
+		steps.put(130, makeFlail);
+
+		steps.put(135, talkToKael);
+
+		ConditionalStep goFightRanis = new ConditionalStep(this, talkToKael);
+		goFightRanis.addStep(inRanisFight, killRanis);
+		steps.put(140, goFightRanis);
+
+		steps.put(145, talkToKaelAgain);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, enterRalForEnd);
+		finishQuest.addStep(inNewBase, talkToSafalaanForEnd);
+		steps.put(150, finishQuest);
+		steps.put(155, finishQuest);
+		steps.put(160, finishQuest);
+
+		return steps;
 	}
 }

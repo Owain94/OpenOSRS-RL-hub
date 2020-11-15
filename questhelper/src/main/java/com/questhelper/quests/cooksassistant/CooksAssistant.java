@@ -47,22 +47,6 @@ public class CooksAssistant extends BasicQuestHelper
 {
 	ItemRequirement egg, milk, flour;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, new NpcStep(this, NpcID.COOK_4626, new WorldPoint(3206, 3214, 0),
-			"Give the Cook in Lumbridge Castle's kitchen the required items to finish the quest.",
-			egg, milk, flour));
-		steps.get(0).addDialogStep("I'll get right on it.");
-
-		steps.put(1, steps.get(0));
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		egg = new ItemRequirement("Egg", ItemID.EGG);
@@ -89,5 +73,21 @@ public class CooksAssistant extends BasicQuestHelper
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Bring the cook cake ingredients", new ArrayList<>(Arrays.asList(new DetailedQuestStep(this, "Bring the cook the ingredients he needs."))), egg, flour, milk));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, new NpcStep(this, NpcID.COOK_4626, new WorldPoint(3206, 3214, 0),
+			"Give the Cook in Lumbridge Castle's kitchen the required items to finish the quest.",
+			egg, milk, flour));
+		steps.get(0).addDialogStep("I'll get right on it.");
+
+		steps.put(1, steps.get(0));
+
+		return steps;
 	}
 }

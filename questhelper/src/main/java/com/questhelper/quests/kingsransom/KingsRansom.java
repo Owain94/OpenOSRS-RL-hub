@@ -80,104 +80,6 @@ public class KingsRansom extends BasicQuestHelper
 	Zone upstairsManor, downstairsManor, downstairsManor2, trialRoom, prison, basement, keepF0, keepF1, keepF2, secretRoomFloor0, mainEntrance1, mainEntrance2,
 		mainEntrance3, mainEntrance4, secretBasement;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToGossip);
-		steps.put(5, talkToGuard);
-
-		ConditionalStep collectItems = new ConditionalStep(this, breakWindow);
-		collectItems.addStep(new Conditions(inDownstairsManor, hasScrapPaper, hasForm, hasBlackHelm), leaveWindow);
-		collectItems.addStep(new Conditions(inUpstairsManor, hasScrapPaper, hasForm, hasBlackHelm), goDownstairsManor);
-		collectItems.addStep(new Conditions(hasScrapPaper, hasForm, hasBlackHelm), returnToGuard);
-		collectItems.addStep(new Conditions(inUpstairsManor, hasScrapPaper, hasForm), searchBookcase);
-		collectItems.addStep(new Conditions(inUpstairsManor, hasScrapPaper), takeForm);
-		collectItems.addStep(inUpstairsManor, goDownstairsForPaper);
-		collectItems.addStep(new Conditions(inDownstairsManor, hasScrapPaper), goUpstairsManor);
-		collectItems.addStep(inDownstairsManor, grabPaper);
-
-		steps.put(10, collectItems);
-
-		steps.put(15, talkToGossipAgain);
-		steps.put(20, talkToGossipAgain);
-
-		steps.put(25, talkToAnna);
-
-		ConditionalStep trialsSteps = new ConditionalStep(this, talkToAnna);
-		trialsSteps.addStep(new Conditions(askedAboutPoison, askedAboutDagger, askedAboutNight, askedAboutThread), waitForVerdict);
-		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, askedAboutDagger, askedAboutNight), callAboutThread);
-		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, askedAboutDagger, maidInRoom), talkToMaidAboutNight);
-		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, askedAboutDagger), callMaidAboutNight);
-		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, butlerInRoom), talkToButlerAboutDagger);
-		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison), callButlerAboutDagger);
-		trialsSteps.addStep(new Conditions(hasCriminalsThread, handlerInRoom), talkToHandlerAboutPoison);
-		trialsSteps.addStep(new Conditions(hasCriminalsThread, inTrialRoom), callHandlerAboutPoison);
-		trialsSteps.addStep(hasCriminalsThread, goIntoTrial);
-
-		steps.put(30, trialsSteps);
-
-		ConditionalStep talkToAnnaAfterTrialSteps = new ConditionalStep(this, talkToAnnaAfterTrial);
-		talkToAnnaAfterTrialSteps.addStep(inTrialRoom, leaveCourt);
-
-		steps.put(35, talkToAnnaAfterTrialSteps);
-
-		steps.put(40, enterStatue);
-
-		ConditionalStep goTalkToMerlin = new ConditionalStep(this, enterStatue);
-		goTalkToMerlin.addStep(inPrison, talkToMerlin);
-
-		steps.put(45, goTalkToMerlin);
-
-		ConditionalStep findMerlinEscape = new ConditionalStep(this, enterStatue);
-		findMerlinEscape.addStep(inPrison, reachForVent);
-
-		steps.put(50, findMerlinEscape);
-
-		ConditionalStep freeKnights = new ConditionalStep(this, enterStatue);
-		freeKnights.addStep(inPuzzle, solvePuzzle);
-		freeKnights.addStep(new Conditions(inPrison, hasLockpickOrHairpin), useHairClipOnOnDoor);
-		freeKnights.addStep(new Conditions(inPrison, hasTelegrabItems), useGrabOnGuard);
-		freeKnights.addStep(inPrison, getLockpickOrRunes);
-
-		steps.put(55, freeKnights);
-		steps.put(60, freeKnights);
-
-		ConditionalStep getGrail = new ConditionalStep(this, enterStatueForGrail);
-		getGrail.addStep(inBoxWidget, selectPurpleBox);
-		getGrail.addStep(inKeepF2, searchTable);
-		getGrail.addStep(inKeepF1, climbF1ToF2);
-		getGrail.addStep(inKeepF0, climbF0ToF1);
-		getGrail.addStep(inPrison, openMetalDoor);
-
-		steps.put(65, getGrail);
-
-		steps.put(70, talkToCromperty);
-
-		ConditionalStep goFreeArthur = new ConditionalStep(this, enterFortress);
-		goFreeArthur.addStep(inBasement, freeArthur);
-		goFreeArthur.addStep(inSecretRoom, goDownToArthur);
-		goFreeArthur.addStep(inFortressEntrance, enterWallInFortress);
-
-		steps.put(75, goFreeArthur);
-
-		ConditionalStep talkToArthurInBasement = new ConditionalStep(this, enterFortressAfterFreeing);
-		talkToArthurInBasement.addStep(inBasement, talkToArthur);
-		talkToArthurInBasement.addStep(inSecretRoom, enterBasementAfterFreeing);
-		talkToArthurInBasement.addStep(inFortressEntrance, enterWallInFortressAfterFreeing);
-
-		steps.put(80, talkToArthurInBasement);
-
-		steps.put(85, talkToArthurInCamelot);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		scrapPaper = new ItemRequirement("Scrap paper", ItemID.SCRAP_PAPER);
@@ -421,5 +323,103 @@ public class KingsRansom extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Saving Arthur", new ArrayList<>(Arrays.asList(talkToCromperty, enterFortress, enterWallInFortress, goDownToArthur, freeArthur, talkToArthur, talkToArthurInCamelot)), bronzeMed, ironChain, blackKnightHelm, blackKnightBody, blackKnightLeg, granite));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToGossip);
+		steps.put(5, talkToGuard);
+
+		ConditionalStep collectItems = new ConditionalStep(this, breakWindow);
+		collectItems.addStep(new Conditions(inDownstairsManor, hasScrapPaper, hasForm, hasBlackHelm), leaveWindow);
+		collectItems.addStep(new Conditions(inUpstairsManor, hasScrapPaper, hasForm, hasBlackHelm), goDownstairsManor);
+		collectItems.addStep(new Conditions(hasScrapPaper, hasForm, hasBlackHelm), returnToGuard);
+		collectItems.addStep(new Conditions(inUpstairsManor, hasScrapPaper, hasForm), searchBookcase);
+		collectItems.addStep(new Conditions(inUpstairsManor, hasScrapPaper), takeForm);
+		collectItems.addStep(inUpstairsManor, goDownstairsForPaper);
+		collectItems.addStep(new Conditions(inDownstairsManor, hasScrapPaper), goUpstairsManor);
+		collectItems.addStep(inDownstairsManor, grabPaper);
+
+		steps.put(10, collectItems);
+
+		steps.put(15, talkToGossipAgain);
+		steps.put(20, talkToGossipAgain);
+
+		steps.put(25, talkToAnna);
+
+		ConditionalStep trialsSteps = new ConditionalStep(this, talkToAnna);
+		trialsSteps.addStep(new Conditions(askedAboutPoison, askedAboutDagger, askedAboutNight, askedAboutThread), waitForVerdict);
+		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, askedAboutDagger, askedAboutNight), callAboutThread);
+		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, askedAboutDagger, maidInRoom), talkToMaidAboutNight);
+		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, askedAboutDagger), callMaidAboutNight);
+		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison, butlerInRoom), talkToButlerAboutDagger);
+		trialsSteps.addStep(new Conditions(hasCriminalsThread, askedAboutPoison), callButlerAboutDagger);
+		trialsSteps.addStep(new Conditions(hasCriminalsThread, handlerInRoom), talkToHandlerAboutPoison);
+		trialsSteps.addStep(new Conditions(hasCriminalsThread, inTrialRoom), callHandlerAboutPoison);
+		trialsSteps.addStep(hasCriminalsThread, goIntoTrial);
+
+		steps.put(30, trialsSteps);
+
+		ConditionalStep talkToAnnaAfterTrialSteps = new ConditionalStep(this, talkToAnnaAfterTrial);
+		talkToAnnaAfterTrialSteps.addStep(inTrialRoom, leaveCourt);
+
+		steps.put(35, talkToAnnaAfterTrialSteps);
+
+		steps.put(40, enterStatue);
+
+		ConditionalStep goTalkToMerlin = new ConditionalStep(this, enterStatue);
+		goTalkToMerlin.addStep(inPrison, talkToMerlin);
+
+		steps.put(45, goTalkToMerlin);
+
+		ConditionalStep findMerlinEscape = new ConditionalStep(this, enterStatue);
+		findMerlinEscape.addStep(inPrison, reachForVent);
+
+		steps.put(50, findMerlinEscape);
+
+		ConditionalStep freeKnights = new ConditionalStep(this, enterStatue);
+		freeKnights.addStep(inPuzzle, solvePuzzle);
+		freeKnights.addStep(new Conditions(inPrison, hasLockpickOrHairpin), useHairClipOnOnDoor);
+		freeKnights.addStep(new Conditions(inPrison, hasTelegrabItems), useGrabOnGuard);
+		freeKnights.addStep(inPrison, getLockpickOrRunes);
+
+		steps.put(55, freeKnights);
+		steps.put(60, freeKnights);
+
+		ConditionalStep getGrail = new ConditionalStep(this, enterStatueForGrail);
+		getGrail.addStep(inBoxWidget, selectPurpleBox);
+		getGrail.addStep(inKeepF2, searchTable);
+		getGrail.addStep(inKeepF1, climbF1ToF2);
+		getGrail.addStep(inKeepF0, climbF0ToF1);
+		getGrail.addStep(inPrison, openMetalDoor);
+
+		steps.put(65, getGrail);
+
+		steps.put(70, talkToCromperty);
+
+		ConditionalStep goFreeArthur = new ConditionalStep(this, enterFortress);
+		goFreeArthur.addStep(inBasement, freeArthur);
+		goFreeArthur.addStep(inSecretRoom, goDownToArthur);
+		goFreeArthur.addStep(inFortressEntrance, enterWallInFortress);
+
+		steps.put(75, goFreeArthur);
+
+		ConditionalStep talkToArthurInBasement = new ConditionalStep(this, enterFortressAfterFreeing);
+		talkToArthurInBasement.addStep(inBasement, talkToArthur);
+		talkToArthurInBasement.addStep(inSecretRoom, enterBasementAfterFreeing);
+		talkToArthurInBasement.addStep(inFortressEntrance, enterWallInFortressAfterFreeing);
+
+		steps.put(80, talkToArthurInBasement);
+
+		steps.put(85, talkToArthurInCamelot);
+
+		return steps;
 	}
 }

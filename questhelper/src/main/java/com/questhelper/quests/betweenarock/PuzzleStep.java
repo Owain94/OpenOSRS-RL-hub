@@ -8,18 +8,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Inject;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class PuzzleStep extends DetailedQuestStep
 {
-
-	@Inject
-	EventBus eventBus;
-
 	private final int DOWN_BUTTON = 34;
 	private final int LEFT_BUTTON = 33;
 	private final int RIGHT_BUTTON = 32;
@@ -33,12 +27,9 @@ public class PuzzleStep extends DetailedQuestStep
 	private final int SELECTED = 4;
 	private final int SELECT_BUTTON = 5;
 	private final int PIECE_ID = 6;
-
-	private HashMap<Integer, Integer> highlightButtons = new HashMap<>();
-
 	private final HashMap<Integer, Integer>[] pieces = new HashMap[3];
-
 	private final HashMap<Integer, Integer>[] solvedPieces = new HashMap[3];
+	private HashMap<Integer, Integer> highlightButtons = new HashMap<>();
 
 	public PuzzleStep(QuestHelper questHelper, ItemRequirement item)
 	{
@@ -91,7 +82,28 @@ public class PuzzleStep extends DetailedQuestStep
 	public void startUp()
 	{
 		updateSolvedPositionState();
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
+		{
+			if (entry.getValue() == 0)
+			{
+				continue;
+			}
+
+			Widget widget = client.getWidget(114, entry.getKey());
+			if (widget != null)
+			{
+				graphics.setColor(new Color(0, 255, 255, 65));
+				graphics.fill(widget.getBounds());
+				graphics.setColor(Color.CYAN);
+				graphics.draw(widget.getBounds());
+			}
+		}
 	}
 
 	@Subscribe
@@ -201,28 +213,6 @@ public class PuzzleStep extends DetailedQuestStep
 		}
 
 		highlightButtons = highlightButtonsTmp;
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
-		{
-			if (entry.getValue() == 0)
-			{
-				continue;
-			}
-
-			Widget widget = client.getWidget(114, entry.getKey());
-			if (widget != null)
-			{
-				graphics.setColor(new Color(0, 255, 255, 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(Color.CYAN);
-				graphics.draw(widget.getBounds());
-			}
-		}
 	}
 }
 

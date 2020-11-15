@@ -85,94 +85,6 @@ public class GhostsAhoy extends BasicQuestHelper
 
 	boolean canUseCharos;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		// TODO: Verify specific step which unlocks the ring of charos
-		canUseCharos = client.getVarbitValue(QuestVarbits.QUEST_GARDEN_OF_TRANQUILLITY.getId()) > 2;
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startQuest = new ConditionalStep(this, enterPhas);
-		startQuest.addStep(inPhas, talkToVelorina);
-		steps.put(0, startQuest);
-
-		steps.put(1, talkToNecrovarus);
-
-		ConditionalStep goReturnToVelorina = new ConditionalStep(this, enterPhasAfterNecro);
-		goReturnToVelorina.addStep(inPhas, talkToVelorinaAfterNecro);
-		steps.put(2, goReturnToVelorina);
-
-		ConditionalStep makeCroneTea = new ConditionalStep(this, talkToCrone);
-		makeCroneTea.addStep(hasCupOfMilkyTea, talkToCroneAgain);
-		makeCroneTea.addStep(hasCupOfTea, useMilkOnTea);
-		makeCroneTea.addStep(hasCup, useTeaOnCup);
-		steps.put(3, makeCroneTea);
-
-		getBookSteps = new ConditionalStep(this, talkToCroneAgainForShip);
-		getBookSteps.addStep(new Conditions(hasBook, inPhas), returnToPhas);
-		getBookSteps.addStep(new Conditions(hasBook, onDragontooth), returnToPhas);
-		getBookSteps.addStep(new Conditions(hasBook, onDragontooth), returnToPhas);
-		getBookSteps.addStep(new Conditions(hasMap, onDragontooth), digForBook);
-		getBookSteps.addStep(new Conditions(hasMap, inPhas), takeRowingBoat);
-		getBookSteps.addStep(new Conditions(hasMap), enterPhasForDigging);
-		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, hasPiece3), useMapsTogether);
-		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, onRocks), openThirdChest);
-		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, onDeck), goAcrossPlank);
-		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, onTopOfShip), goDownFromMast);
-		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2), goUpToDeck);
-		getBookSteps.addStep(new Conditions(hasPiece1, unlockedChest2, onDeck), openSecondChest);
-		getBookSteps.addStep(new Conditions(hasPiece1, hadChestKey, onDeck), useKeyOnChest);
-		getBookSteps.addStep(new Conditions(hasPiece1, hadChestKey, onTopOfShip), goDownFromMast);
-		getBookSteps.addStep(new Conditions(hasPiece1, hadChestKey), goUpToDeck);
-		getBookSteps.addStep(new Conditions(hasRepairedShip, hasPiece1), dyeFlags);
-		getBookSteps.addStep(new Conditions(hasRepairedShip, killedLobster), searchChestAfterLobster);
-		getBookSteps.addStep(new Conditions(hasRepairedShip, lobsterNearby), killLobster);
-		getBookSteps.addStep(hasRepairedShip, searchChestForLobster);
-		getBookSteps.addStep(hasModelShip, repairShip);
-		getBookSteps.setLockingCondition(hasBook);
-
-		getManualSteps = new ConditionalStep(this, enterPhasForManual);
-		getManualSteps.addStep(onDragontooth, returnToPhas);
-		getManualSteps.addStep(new Conditions(inPhas, hasSignedOakBow), bringBowToAkHaranu);
-		getManualSteps.addStep(new Conditions(inPhas, talkedToAkHaranu), talkToRobin);
-		getManualSteps.addStep(inPhas, talkToAkHaranu);
-		getManualSteps.setLockingCondition(hasManual);
-
-		getRobesSteps = new ConditionalStep(this, enterPhasForRobe);
-		getRobesSteps.addStep(onDragontooth, returnToPhas);
-		getRobesSteps.addStep(new Conditions(inUpstairsEcto, doorUnlocked), takeRobes);
-		getRobesSteps.addStep(new Conditions(inUpstairsEcto, hasBoneKey), useKeyOnDoor);
-		getRobesSteps.addStep(new Conditions(hasBoneKey), goUpFromNecro);
-		getRobesSteps.addStep(new Conditions(boneKeyNearby), takeKey);
-		getRobesSteps.addStep(new Conditions(givenPetitionToNecro), talkToNecroForKey);
-		getRobesSteps.addStep(new Conditions(hasSignatures), showPetitionToNecro);
-		getRobesSteps.addStep(new Conditions(hasEctoSheet, inPhas, hasPetition), talkToVillagers);
-		getRobesSteps.addStep(new Conditions(hasEctoSheet, inPhas), talkToGravingas);
-		getRobesSteps.addStep(hasSheet, useSlimeOnSheet);
-		getRobesSteps.addStep(inPhas, talkToInnkeeper);
-		getRobesSteps.setLockingCondition(hasMysticalRobes);
-
-		ConditionalStep getItemSteps = new ConditionalStep(this, getBookSteps);
-		getItemSteps.addStep(new Conditions(hasBook, hasManual, hasMysticalRobes), returnToCrone);
-		getItemSteps.addStep(new Conditions(hasBook, hasManual), getRobesSteps);
-		getItemSteps.addStep(hasBook, getManualSteps);
-		steps.put(4, getItemSteps);
-
-		steps.put(5, bringCroneAmulet);
-
-		steps.put(6, talkToNecroAfterCurse);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, enterPhasFinal);
-		finishQuest.addStep(inPhas, talkToVelorinaFinal);
-		steps.put(7, finishQuest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		ectoToken2 = new ItemRequirement("Ecto-token, or travel by Charter Ship", ItemID.ECTOTOKEN, 2);
@@ -362,7 +274,7 @@ public class GhostsAhoy extends BasicQuestHelper
 		if (canUseCharos)
 		{
 			enterPhasForDigging = new ObjectStep(this, ObjectID.ENERGY_BARRIER_16105, new WorldPoint(3660, 3508, 0), "Enter Port Phasmatys.", charos, ectoToken12, spade, map, ghostspeak);
-			takeRowingBoat = new NpcStep(this, NpcID.GHOST_CAPTAIN, new WorldPoint(3703, 3487, 0), "Talk to the Ghost captain at the rowing boat on the docks with your Ring of Charos (e) equipped.", charos, ectoToken10, spade, map);
+			takeRowingBoat = new NpcStep(this, NpcID.GHOST_CAPTAIN, new WorldPoint(3703, 3487, 0), "Talk to the Ghost captain at the rowing boat on the docks with your Ring of Charos (a) equipped.", charos, ectoToken10, spade, map);
 		}
 		else
 		{
@@ -462,5 +374,93 @@ public class GhostsAhoy extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Undoing the curse", new ArrayList<>(Arrays.asList(returnToCrone, talkToNecroAfterCurse, talkToVelorinaFinal)), ghostspeak, book, manual, robes));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		// TODO: Verify specific step which unlocks the ring of charos
+		canUseCharos = client.getVarbitValue(QuestVarbits.QUEST_GARDEN_OF_TRANQUILLITY.getId()) > 2;
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startQuest = new ConditionalStep(this, enterPhas);
+		startQuest.addStep(inPhas, talkToVelorina);
+		steps.put(0, startQuest);
+
+		steps.put(1, talkToNecrovarus);
+
+		ConditionalStep goReturnToVelorina = new ConditionalStep(this, enterPhasAfterNecro);
+		goReturnToVelorina.addStep(inPhas, talkToVelorinaAfterNecro);
+		steps.put(2, goReturnToVelorina);
+
+		ConditionalStep makeCroneTea = new ConditionalStep(this, talkToCrone);
+		makeCroneTea.addStep(hasCupOfMilkyTea, talkToCroneAgain);
+		makeCroneTea.addStep(hasCupOfTea, useMilkOnTea);
+		makeCroneTea.addStep(hasCup, useTeaOnCup);
+		steps.put(3, makeCroneTea);
+
+		getBookSteps = new ConditionalStep(this, talkToCroneAgainForShip);
+		getBookSteps.addStep(new Conditions(hasBook, inPhas), returnToPhas);
+		getBookSteps.addStep(new Conditions(hasBook, onDragontooth), returnToPhas);
+		getBookSteps.addStep(new Conditions(hasBook, onDragontooth), returnToPhas);
+		getBookSteps.addStep(new Conditions(hasMap, onDragontooth), digForBook);
+		getBookSteps.addStep(new Conditions(hasMap, inPhas), takeRowingBoat);
+		getBookSteps.addStep(new Conditions(hasMap), enterPhasForDigging);
+		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, hasPiece3), useMapsTogether);
+		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, onRocks), openThirdChest);
+		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, onDeck), goAcrossPlank);
+		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2, onTopOfShip), goDownFromMast);
+		getBookSteps.addStep(new Conditions(hasPiece1, hasPiece2), goUpToDeck);
+		getBookSteps.addStep(new Conditions(hasPiece1, unlockedChest2, onDeck), openSecondChest);
+		getBookSteps.addStep(new Conditions(hasPiece1, hadChestKey, onDeck), useKeyOnChest);
+		getBookSteps.addStep(new Conditions(hasPiece1, hadChestKey, onTopOfShip), goDownFromMast);
+		getBookSteps.addStep(new Conditions(hasPiece1, hadChestKey), goUpToDeck);
+		getBookSteps.addStep(new Conditions(hasRepairedShip, hasPiece1), dyeFlags);
+		getBookSteps.addStep(new Conditions(hasRepairedShip, killedLobster), searchChestAfterLobster);
+		getBookSteps.addStep(new Conditions(hasRepairedShip, lobsterNearby), killLobster);
+		getBookSteps.addStep(hasRepairedShip, searchChestForLobster);
+		getBookSteps.addStep(hasModelShip, repairShip);
+		getBookSteps.setLockingCondition(hasBook);
+
+		getManualSteps = new ConditionalStep(this, enterPhasForManual);
+		getManualSteps.addStep(onDragontooth, returnToPhas);
+		getManualSteps.addStep(new Conditions(inPhas, hasSignedOakBow), bringBowToAkHaranu);
+		getManualSteps.addStep(new Conditions(inPhas, talkedToAkHaranu), talkToRobin);
+		getManualSteps.addStep(inPhas, talkToAkHaranu);
+		getManualSteps.setLockingCondition(hasManual);
+
+		getRobesSteps = new ConditionalStep(this, enterPhasForRobe);
+		getRobesSteps.addStep(onDragontooth, returnToPhas);
+		getRobesSteps.addStep(new Conditions(inUpstairsEcto, doorUnlocked), takeRobes);
+		getRobesSteps.addStep(new Conditions(inUpstairsEcto, hasBoneKey), useKeyOnDoor);
+		getRobesSteps.addStep(new Conditions(hasBoneKey), goUpFromNecro);
+		getRobesSteps.addStep(new Conditions(boneKeyNearby), takeKey);
+		getRobesSteps.addStep(new Conditions(givenPetitionToNecro), talkToNecroForKey);
+		getRobesSteps.addStep(new Conditions(hasSignatures), showPetitionToNecro);
+		getRobesSteps.addStep(new Conditions(hasEctoSheet, inPhas, hasPetition), talkToVillagers);
+		getRobesSteps.addStep(new Conditions(hasEctoSheet, inPhas), talkToGravingas);
+		getRobesSteps.addStep(hasSheet, useSlimeOnSheet);
+		getRobesSteps.addStep(inPhas, talkToInnkeeper);
+		getRobesSteps.setLockingCondition(hasMysticalRobes);
+
+		ConditionalStep getItemSteps = new ConditionalStep(this, getBookSteps);
+		getItemSteps.addStep(new Conditions(hasBook, hasManual, hasMysticalRobes), returnToCrone);
+		getItemSteps.addStep(new Conditions(hasBook, hasManual), getRobesSteps);
+		getItemSteps.addStep(hasBook, getManualSteps);
+		steps.put(4, getItemSteps);
+
+		steps.put(5, bringCroneAmulet);
+
+		steps.put(6, talkToNecroAfterCurse);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, enterPhasFinal);
+		finishQuest.addStep(inPhas, talkToVelorinaFinal);
+		steps.put(7, finishQuest);
+
+		return steps;
 	}
 }

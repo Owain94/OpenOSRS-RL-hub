@@ -1,6 +1,29 @@
+/*
+ * Copyright (c) 2020, Zoinkwiz <https://github.com/Zoinkwiz>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.questhelper.steps;
 
-import com.google.inject.Inject;
 import com.questhelper.QuestHelperPlugin;
 import static com.questhelper.QuestHelperWorldOverlay.CLICKBOX_BORDER_COLOR;
 import static com.questhelper.QuestHelperWorldOverlay.CLICKBOX_FILL_COLOR;
@@ -22,31 +45,30 @@ import net.runelite.api.Tile;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.DecorativeObjectChanged;
 import net.runelite.api.events.DecorativeObjectDespawned;
 import net.runelite.api.events.DecorativeObjectSpawned;
+import net.runelite.api.events.GameObjectChanged;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.GroundObjectChanged;
 import net.runelite.api.events.GroundObjectDespawned;
 import net.runelite.api.events.GroundObjectSpawned;
+import net.runelite.api.events.WallObjectChanged;
 import net.runelite.api.events.WallObjectDespawned;
 import net.runelite.api.events.WallObjectSpawned;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class ObjectStep extends DetailedQuestStep
 {
-	@Inject
-	EventBus eventBus;
-
 	private final int objectID;
 	private final ArrayList<Integer> alternateObjectIDs = new ArrayList<>();
-	private TileObject object;
-
-	private boolean shouldShowArrow = true;
-
 	private final List<TileObject> objects = new ArrayList<>();
+	private TileObject object;
+	private boolean shouldShowArrow = true;
 
 	public ObjectStep(QuestHelper questHelper, int objectID, WorldPoint worldPoint, String text, Requirement... requirements)
 	{
@@ -60,19 +82,6 @@ public class ObjectStep extends DetailedQuestStep
 		this.objectID = objectID;
 	}
 
-	public void subscribe()
-	{
-		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
-		eventBus.subscribe(GameObjectSpawned.class, this, this::onGameObjectSpawned);
-		eventBus.subscribe(GameObjectDespawned.class, this, this::onGameObjectDespawned);
-		eventBus.subscribe(GroundObjectSpawned.class, this, this::onGroundObjectSpawned);
-		eventBus.subscribe(GroundObjectDespawned.class, this, this::onGroundObjectDespawned);
-		eventBus.subscribe(DecorativeObjectSpawned.class, this, this::onDecorativeObjectSpawned);
-		eventBus.subscribe(DecorativeObjectDespawned.class, this, this::onDecorativeObjectDespawned);
-		eventBus.subscribe(WallObjectSpawned.class, this, this::onWallObjectSpawned);
-		eventBus.subscribe(WallObjectDespawned.class, this, this::onWallObjectDespawned);
-	}
-
 	@Override
 	public void startUp()
 	{
@@ -80,29 +89,7 @@ public class ObjectStep extends DetailedQuestStep
 
 		if (worldPoint != null)
 		{
-			Collection<WorldPoint> localWorldPoints = toLocalInstance(client, worldPoint);
-
-			for (WorldPoint point : localWorldPoints)
-			{
-				LocalPoint localPoint = LocalPoint.fromWorld(client, point);
-				if (localPoint == null)
-				{
-					return;
-				}
-
-				Tile tile = client.getScene().getTiles()[client.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
-				if (tile != null)
-				{
-					for (GameObject object : tile.getGameObjects())
-					{
-						handleObjects(object);
-					}
-
-					handleObjects(tile.getDecorativeObject());
-					handleObjects(tile.getGroundObject());
-					handleObjects(tile.getWallObject());
-				}
-			}
+			checkTileForObject(worldPoint);
 		}
 		else
 		{
@@ -125,14 +112,13 @@ public class ObjectStep extends DetailedQuestStep
 				}
 			}
 		}
-		subscribe();
 	}
 
 	@Override
 	public void shutDown()
 	{
 		super.shutDown();
-		this.objects.clear();
+		objects.clear();
 	}
 
 	@Subscribe
@@ -144,80 +130,6 @@ public class ObjectStep extends DetailedQuestStep
 		{
 			object = null;
 			objects.clear();
-		}
-	}
-
-	public void showArrow(boolean shouldShowArrow)
-	{
-		this.shouldShowArrow = shouldShowArrow;
-	}
-
-	public void addAlternateObjects(Integer... alternateObjectIDs)
-	{
-		this.alternateObjectIDs.addAll(Arrays.asList(alternateObjectIDs));
-	}
-
-	@Subscribe
-	public void onGameObjectSpawned(GameObjectSpawned event)
-	{
-		handleObjects(event.getGameObject());
-	}
-
-	@Subscribe
-	public void onGameObjectDespawned(GameObjectDespawned event)
-	{
-		if (event.getGameObject().equals(object))
-		{
-			object = null;
-			clearArrow();
-		}
-	}
-
-	@Subscribe
-	public void onGroundObjectSpawned(GroundObjectSpawned event)
-	{
-		handleObjects(event.getGroundObject());
-	}
-
-	@Subscribe
-	public void onGroundObjectDespawned(GroundObjectDespawned event)
-	{
-		if (event.getGroundObject().equals(object))
-		{
-			object = null;
-			clearArrow();
-		}
-	}
-
-	@Subscribe
-	public void onDecorativeObjectSpawned(DecorativeObjectSpawned event)
-	{
-		handleObjects(event.getDecorativeObject());
-	}
-
-	@Subscribe
-	public void onDecorativeObjectDespawned(DecorativeObjectDespawned event)
-	{
-		if (event.getDecorativeObject().equals(object))
-		{
-			object = null;
-			clearArrow();
-		}
-	}
-
-	@Subscribe
-	public void onWallObjectSpawned(WallObjectSpawned event)
-	{
-		handleObjects(event.getWallObject());
-	}
-
-	@Subscribe
-	public void onWallObjectDespawned(WallObjectDespawned event)
-	{
-		if (event.getWallObject().equals(object))
-		{
-			object = null;
-			clearArrow();
 		}
 	}
 
@@ -274,6 +186,147 @@ public class ObjectStep extends DetailedQuestStep
 
 			OverlayUtil.renderImageLocation(graphics, point, arrow);
 		}
+	}
+
+	@Subscribe
+	public void onGameTick(final GameTick event)
+	{
+		if (worldPoint == null)
+		{
+			return;
+		}
+		object = null;
+		objects.clear();
+		checkTileForObject(worldPoint);
+	}
+
+	public void checkTileForObject(WorldPoint wp)
+	{
+		Collection<WorldPoint> localWorldPoints = toLocalInstance(client, wp);
+
+		for (WorldPoint point : localWorldPoints)
+		{
+			LocalPoint localPoint = LocalPoint.fromWorld(client, point);
+			if (localPoint == null)
+			{
+				continue;
+			}
+			Tile[][][] tiles = client.getScene().getTiles();
+			if (tiles == null)
+			{
+				continue;
+			}
+
+			Tile tile = tiles[client.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
+			if (tile != null)
+			{
+				for (GameObject object : tile.getGameObjects())
+				{
+					handleObjects(object);
+				}
+
+				handleObjects(tile.getDecorativeObject());
+				handleObjects(tile.getGroundObject());
+				handleObjects(tile.getWallObject());
+			}
+		}
+	}
+
+	public void showArrow(boolean shouldShowArrow)
+	{
+		this.shouldShowArrow = shouldShowArrow;
+	}
+
+	public void addAlternateObjects(Integer... alternateObjectIDs)
+	{
+		this.alternateObjectIDs.addAll(Arrays.asList(alternateObjectIDs));
+	}
+
+	@Subscribe
+	public void onGameObjectSpawned(GameObjectSpawned event)
+	{
+		handleObjects(event.getGameObject());
+	}
+
+	@Subscribe
+	public void onGameObjectDespawned(GameObjectDespawned event)
+	{
+		handleRemoveObjects(event.getGameObject());
+	}
+
+	@Subscribe
+	public void onGameObjectChanged(GameObjectChanged event)
+	{
+		handleRemoveObjects(event.getPrevious());
+		handleObjects(event.getGameObject());
+	}
+
+	@Subscribe
+	public void onGroundObjectSpawned(GroundObjectSpawned event)
+	{
+		handleObjects(event.getGroundObject());
+	}
+
+	@Subscribe
+	public void onGroundObjectDespawned(GroundObjectDespawned event)
+	{
+		handleRemoveObjects(event.getGroundObject());
+	}
+
+	@Subscribe
+	public void onGroundObjectChanged(GroundObjectChanged event)
+	{
+		handleRemoveObjects(event.getPrevious());
+		handleObjects(event.getGroundObject());
+	}
+
+	@Subscribe
+	public void onDecorativeObjectSpawned(DecorativeObjectSpawned event)
+	{
+		handleObjects(event.getDecorativeObject());
+	}
+
+	@Subscribe
+	public void onDecorativeObjectDespawned(DecorativeObjectDespawned event)
+	{
+		handleRemoveObjects(event.getDecorativeObject());
+	}
+
+	@Subscribe
+	public void onDecorativeObjectChanged(DecorativeObjectChanged event)
+	{
+		handleRemoveObjects(event.getPrevious());
+		handleObjects(event.getDecorativeObject());
+	}
+
+	@Subscribe
+	public void onWallObjectSpawned(WallObjectSpawned event)
+	{
+		handleObjects(event.getWallObject());
+	}
+
+	@Subscribe
+	public void onWallObjectDespawned(WallObjectDespawned event)
+	{
+		handleRemoveObjects(event.getWallObject());
+	}
+
+	@Subscribe
+	public void onWallObjectChanged(WallObjectChanged event)
+	{
+		handleRemoveObjects(event.getPrevious());
+		handleObjects(event.getWallObject());
+	}
+
+	private void handleRemoveObjects(TileObject object)
+	{
+		if (object.equals(this.object))
+		{
+			this.object = null;
+			clearArrow();
+		}
+
+		objects.remove(object);
 	}
 
 	private void handleObjects(TileObject object)

@@ -67,74 +67,6 @@ public class MountainDaughter extends BasicQuestHelper
 		talkToJokul, talkToSvidi, speakToBrundt, getRockFragment, returnToBrundt, returnToSvidi, getFruit, eatFruit, returnToSpirit, returnToHamalAboutFood,
 		returnToHamalAboutDiplomacy, talkToKendal, noPlankRocksReturn, enterCave, grabCorpse, bringCorpseToHamal, collectRocks, createCairn, buryCorpseOnIsland, speakRagnar;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		loadItemRequirements();
-		loadConditions();
-		loadQuestSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep enteringTheCamp = new ConditionalStep(this, enterCamp);
-		enteringTheCamp.addStep(inTheCamp, talkToHamal);
-
-		steps.put(0, enteringTheCamp);
-
-		ConditionalStep speakToSpirit = new ConditionalStep(this, enterCampOverRocks);
-		speakToSpirit.addStep(onIsland3, listenToSpirit);
-		speakToSpirit.addStep(onIsland2, plankRocks);
-		speakToSpirit.addStep(onIsland1, poleVaultRocks);
-		speakToSpirit.addStep(inTheCamp, rubMudIntoTree);
-
-		steps.put(10, speakToSpirit);
-
-		ConditionalStep helpTheCamp = new ConditionalStep(this, enterCampOverRocks);
-		helpTheCamp.addStep(finishedFoodAndDiplomacy, returnToSpirit);
-		helpTheCamp.addStep(finishedDiplomacy, returnToHamalAboutFood);
-		helpTheCamp.addStep(gottenSeed, returnToHamalAboutDiplomacy);
-		helpTheCamp.addStep(gottenFruit, eatFruit);
-		helpTheCamp.addStep(givenGuaranteeToSvidi, getFruit);
-		helpTheCamp.addStep(gottenGuarantee, returnToSvidi);
-		helpTheCamp.addStep(minedRock, returnToBrundt);
-		helpTheCamp.addStep(spokenToBrundt, getRockFragment);
-		helpTheCamp.addStep(spokenToSvidi, speakToBrundt);
-		helpTheCamp.addStep(askedAboutFoodAndDiplomacy, talkToSvidi);
-		helpTheCamp.addStep(askedAboutDiplomacy, talkToJokul);
-		helpTheCamp.addStep(onIsland3, plankRocksReturn);
-		helpTheCamp.addStep(inTheCamp, talkToHamalAfterSpirit);
-
-		steps.put(20, helpTheCamp);
-
-		ConditionalStep talkKendal = new ConditionalStep(this, enterCave);
-		talkKendal.addStep(onIsland3, noPlankRocksReturn);
-		talkKendal.addStep(inKendalCave, talkToKendal);
-
-		steps.put(30, talkKendal);
-
-		ConditionalStep killKendalStep = new ConditionalStep(this, enterCave);
-		killKendalStep.addStep(inKendalCave, talkToKendal);
-
-		steps.put(40, killKendalStep);
-
-		ConditionalStep returnTheCorpse = new ConditionalStep(this, enterCave);
-		returnTheCorpse.addStep(hasCorpse, bringCorpseToHamal);
-		returnTheCorpse.addStep(inKendalCave, grabCorpse);
-
-		steps.put(50, returnTheCorpse);
-
-		ConditionalStep buryCorpse = new ConditionalStep(this, enterCampOverRocks);
-		buryCorpse.addStep(hasBuried, createCairn);
-		buryCorpse.addStep(hasNecklace, buryCorpseOnIsland);
-		buryCorpse.addStep(hasRocks, speakRagnar);
-		buryCorpse.addStep(inTheCamp, collectRocks);
-
-		steps.put(60, buryCorpse);
-
-		return steps;
-	}
-
 	private void loadZones()
 	{
 		CAMP_ZONE_1 = new Zone(new WorldPoint(2758, 3660, 0), new WorldPoint(2821, 3664, 0));
@@ -381,5 +313,73 @@ public class MountainDaughter extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Bury Asleif", new ArrayList<>(Arrays.asList(collectRocks, speakRagnar, buryCorpseOnIsland, createCairn))));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		loadItemRequirements();
+		loadConditions();
+		loadQuestSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep enteringTheCamp = new ConditionalStep(this, enterCamp);
+		enteringTheCamp.addStep(inTheCamp, talkToHamal);
+
+		steps.put(0, enteringTheCamp);
+
+		ConditionalStep speakToSpirit = new ConditionalStep(this, enterCampOverRocks);
+		speakToSpirit.addStep(onIsland3, listenToSpirit);
+		speakToSpirit.addStep(onIsland2, plankRocks);
+		speakToSpirit.addStep(onIsland1, poleVaultRocks);
+		speakToSpirit.addStep(inTheCamp, rubMudIntoTree);
+
+		steps.put(10, speakToSpirit);
+
+		ConditionalStep helpTheCamp = new ConditionalStep(this, enterCampOverRocks);
+		helpTheCamp.addStep(finishedFoodAndDiplomacy, returnToSpirit);
+		helpTheCamp.addStep(finishedDiplomacy, returnToHamalAboutFood);
+		helpTheCamp.addStep(gottenSeed, returnToHamalAboutDiplomacy);
+		helpTheCamp.addStep(gottenFruit, eatFruit);
+		helpTheCamp.addStep(givenGuaranteeToSvidi, getFruit);
+		helpTheCamp.addStep(gottenGuarantee, returnToSvidi);
+		helpTheCamp.addStep(minedRock, returnToBrundt);
+		helpTheCamp.addStep(spokenToBrundt, getRockFragment);
+		helpTheCamp.addStep(spokenToSvidi, speakToBrundt);
+		helpTheCamp.addStep(askedAboutFoodAndDiplomacy, talkToSvidi);
+		helpTheCamp.addStep(askedAboutDiplomacy, talkToJokul);
+		helpTheCamp.addStep(onIsland3, plankRocksReturn);
+		helpTheCamp.addStep(inTheCamp, talkToHamalAfterSpirit);
+
+		steps.put(20, helpTheCamp);
+
+		ConditionalStep talkKendal = new ConditionalStep(this, enterCave);
+		talkKendal.addStep(onIsland3, noPlankRocksReturn);
+		talkKendal.addStep(inKendalCave, talkToKendal);
+
+		steps.put(30, talkKendal);
+
+		ConditionalStep killKendalStep = new ConditionalStep(this, enterCave);
+		killKendalStep.addStep(inKendalCave, talkToKendal);
+
+		steps.put(40, killKendalStep);
+
+		ConditionalStep returnTheCorpse = new ConditionalStep(this, enterCave);
+		returnTheCorpse.addStep(hasCorpse, bringCorpseToHamal);
+		returnTheCorpse.addStep(inKendalCave, grabCorpse);
+
+		steps.put(50, returnTheCorpse);
+
+		ConditionalStep buryCorpse = new ConditionalStep(this, enterCampOverRocks);
+		buryCorpse.addStep(hasBuried, createCairn);
+		buryCorpse.addStep(hasNecklace, buryCorpseOnIsland);
+		buryCorpse.addStep(hasRocks, speakRagnar);
+		buryCorpse.addStep(inTheCamp, collectRocks);
+
+		steps.put(60, buryCorpse);
+
+		return steps;
 	}
 }

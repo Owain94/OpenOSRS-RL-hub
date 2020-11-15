@@ -54,26 +54,6 @@ public class SkippyAndTheMogres extends BasicQuestHelper
 
 	QuestStep soberSkippy, useTeaOnSkippy, useChocolateDustOnMilk, useSnapeGrassOnMilk, useHangoverCure;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, soberSkippy);
-		steps.put(1, useTeaOnSkippy);
-
-		ConditionalStep makeAndUseCure = new ConditionalStep(this, useChocolateDustOnMilk);
-		makeAndUseCure.addStep(hasHangoverCure, useHangoverCure);
-		makeAndUseCure.addStep(hasChocolateMilk, useSnapeGrassOnMilk);
-
-		steps.put(2, makeAndUseCure);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		bucketOfMilk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
@@ -128,5 +108,25 @@ public class SkippyAndTheMogres extends BasicQuestHelper
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Help Skippy", new ArrayList<>(Arrays.asList(soberSkippy, useTeaOnSkippy, useChocolateDustOnMilk, useSnapeGrassOnMilk, useHangoverCure)), bucketOfWater, nettleTea, bucketOfMilk, chocolateDust, snapeGrass));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, soberSkippy);
+		steps.put(1, useTeaOnSkippy);
+
+		ConditionalStep makeAndUseCure = new ConditionalStep(this, useChocolateDustOnMilk);
+		makeAndUseCure.addStep(hasHangoverCure, useHangoverCure);
+		makeAndUseCure.addStep(hasChocolateMilk, useSnapeGrassOnMilk);
+
+		steps.put(2, makeAndUseCure);
+
+		return steps;
 	}
 }

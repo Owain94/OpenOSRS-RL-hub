@@ -32,21 +32,16 @@ import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.InteractingChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
 	DetailedQuestStep giveHopsBroline, giveVinciEthenea, giveChancyHoney;
 
 	ItemRequirement ethenea, liquidHoney, sulphuricBroline;
@@ -73,6 +68,30 @@ public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 		{
 			startUpStep(giveVinciEthenea);
 		}
+	}
+
+	@Override
+	protected void setupSteps()
+	{
+		ethenea = new ItemRequirement("Ethenea", ItemID.ETHENEA);
+		ethenea.setTip("You can get another from Elena in East Ardougne.");
+		liquidHoney = new ItemRequirement("Liquid honey", ItemID.LIQUID_HONEY);
+		liquidHoney.setTip("You can get another from Elena in East Ardougne.");
+		sulphuricBroline = new ItemRequirement("Sulphuric broline", ItemID.SULPHURIC_BROLINE);
+		sulphuricBroline.setTip("You can get another from Elena in East Ardougne.");
+
+		giveHopsBroline = new NpcStep(getQuestHelper(), NpcID.HOPS, new WorldPoint(2930, 3220, 0), "Give Hops the Sulphuric Broline.", sulphuricBroline);
+		giveHopsBroline.addDialogStep("You give him the vial of sulphuric broline...");
+		giveChancyHoney = new NpcStep(getQuestHelper(), NpcID.CHANCY, new WorldPoint(2930, 3220, 0), "Give Chancy the Liquid honey.", liquidHoney);
+		giveChancyHoney.addDialogStep("You give him the vial of liquid honey...");
+		giveVinciEthenea = new NpcStep(getQuestHelper(), NpcID.DA_VINCI, new WorldPoint(2930, 3220, 0), "Give Da Vinci the Ethenea.", ethenea);
+		giveVinciEthenea.addDialogStep("You give him the vial of ethenea...");
+	}
+
+	@Override
+	public Collection<QuestStep> getSteps()
+	{
+		return Arrays.asList(giveHopsBroline, giveChancyHoney, giveVinciEthenea);
 	}
 
 	@Subscribe
@@ -110,33 +129,6 @@ public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 				startUpStep(giveVinciEthenea);
 			}
 		}
-	}
-
-	@Override
-	protected void setupSteps()
-	{
-		ethenea = new ItemRequirement("Ethenea", ItemID.ETHENEA);
-		ethenea.setTip("You can get another from Elena in East Ardougne.");
-		liquidHoney = new ItemRequirement("Liquid honey", ItemID.LIQUID_HONEY);
-		liquidHoney.setTip("You can get another from Elena in East Ardougne.");
-		sulphuricBroline = new ItemRequirement("Sulphuric broline", ItemID.SULPHURIC_BROLINE);
-		sulphuricBroline.setTip("You can get another from Elena in East Ardougne.");
-
-		giveHopsBroline = new NpcStep(getQuestHelper(), NpcID.HOPS, new WorldPoint(2930, 3220, 0), "Give Hops the Sulphuric Broline.", sulphuricBroline);
-		giveHopsBroline.addDialogStep("You give him the vial of sulphuric broline...");
-		giveChancyHoney = new NpcStep(getQuestHelper(), NpcID.CHANCY, new WorldPoint(2930, 3220, 0), "Give Chancy the Liquid honey.", liquidHoney);
-		giveChancyHoney.addDialogStep("You give him the vial of liquid honey...");
-		giveVinciEthenea = new NpcStep(getQuestHelper(), NpcID.DA_VINCI, new WorldPoint(2930, 3220, 0), "Give Da Vinci the Ethenea.", ethenea);
-		giveVinciEthenea.addDialogStep("You give him the vial of ethenea...");
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		eventBus.subscribe(InteractingChanged.class, this, this::onInteractingChanged);
-	}
-
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(giveHopsBroline, giveChancyHoney, giveVinciEthenea);
 	}
 
 	public Collection<DetailedQuestStep> getDisplaySteps()

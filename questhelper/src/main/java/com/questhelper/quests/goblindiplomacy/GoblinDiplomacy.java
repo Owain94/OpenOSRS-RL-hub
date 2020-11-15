@@ -64,47 +64,6 @@ public class GoblinDiplomacy extends BasicQuestHelper
 
 	Zone upstairs;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep lootArmour = new ConditionalStep(this, goUpLadder);
-		lootArmour.addStep(new Conditions(isUpstairs, hasUpstairsArmour), goDownLadder);
-		lootArmour.addStep(new Conditions(hasUpstairsArmour, hasWestArmour), searchBehindGenerals);
-		lootArmour.addStep(hasUpstairsArmour, searchWestHut);
-		lootArmour.addStep(isUpstairs, searchUpLadder);
-
-		ConditionalStep prepareForQuest = new ConditionalStep(this, lootArmour);
-		prepareForQuest.addStep(new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour, hasBlueArmour), dyeOrange);
-		prepareForQuest.addStep(new Conditions(LogicType.OR, hasThreeMail, new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour)), dyeBlue);
-
-		ConditionalStep step1 = new ConditionalStep(this, prepareForQuest);
-		step1.addStep(new Conditions(hasMail, hasBlueArmour, hasOrangeArmour), talkToGeneral1);
-
-		steps.put(0, step1);
-		steps.put(3, step1);
-
-		ConditionalStep prepareBlueArmour = new ConditionalStep(this, lootArmour);
-		prepareBlueArmour.addStep(new Conditions(LogicType.OR, hasTwoMail, new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour)), dyeBlue);
-
-		ConditionalStep step2 = new ConditionalStep(this, prepareBlueArmour);
-		step2.addStep(hasBlueArmour, talkToGeneral2);
-
-		steps.put(4, step2);
-
-		ConditionalStep step3 = new ConditionalStep(this, lootArmour);
-		step3.addStep(new Conditions(LogicType.OR, hasMail, new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour)), talkToGeneral3);
-
-		steps.put(5, step3);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		blueDye = new ItemRequirement("Blue dye", ItemID.BLUE_DYE);
@@ -185,7 +144,6 @@ public class GoblinDiplomacy extends BasicQuestHelper
 		return reqs;
 	}
 
-
 	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
@@ -196,5 +154,46 @@ public class GoblinDiplomacy extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Present the armours", new ArrayList<>(Arrays.asList(talkToGeneral1, talkToGeneral2, talkToGeneral3))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep lootArmour = new ConditionalStep(this, goUpLadder);
+		lootArmour.addStep(new Conditions(isUpstairs, hasUpstairsArmour), goDownLadder);
+		lootArmour.addStep(new Conditions(hasUpstairsArmour, hasWestArmour), searchBehindGenerals);
+		lootArmour.addStep(hasUpstairsArmour, searchWestHut);
+		lootArmour.addStep(isUpstairs, searchUpLadder);
+
+		ConditionalStep prepareForQuest = new ConditionalStep(this, lootArmour);
+		prepareForQuest.addStep(new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour, hasBlueArmour), dyeOrange);
+		prepareForQuest.addStep(new Conditions(LogicType.OR, hasThreeMail, new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour)), dyeBlue);
+
+		ConditionalStep step1 = new ConditionalStep(this, prepareForQuest);
+		step1.addStep(new Conditions(hasMail, hasBlueArmour, hasOrangeArmour), talkToGeneral1);
+
+		steps.put(0, step1);
+		steps.put(3, step1);
+
+		ConditionalStep prepareBlueArmour = new ConditionalStep(this, lootArmour);
+		prepareBlueArmour.addStep(new Conditions(LogicType.OR, hasTwoMail, new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour)), dyeBlue);
+
+		ConditionalStep step2 = new ConditionalStep(this, prepareBlueArmour);
+		step2.addStep(hasBlueArmour, talkToGeneral2);
+
+		steps.put(4, step2);
+
+		ConditionalStep step3 = new ConditionalStep(this, lootArmour);
+		step3.addStep(new Conditions(LogicType.OR, hasMail, new Conditions(hasUpstairsArmour, hasWestArmour, hasNorthArmour)), talkToGeneral3);
+
+		steps.put(5, step3);
+
+		return steps;
 	}
 }

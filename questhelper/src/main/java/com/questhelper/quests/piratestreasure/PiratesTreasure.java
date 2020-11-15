@@ -60,6 +60,45 @@ public class PiratesTreasure extends BasicQuestHelper
 	private QuestStep digUpTreasure;
 
 	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(sixtyCoins);
+		reqs.add(spade);
+
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(new ItemRequirement("A teleport to Varrock", ItemID.VARROCK_TELEPORT));
+		reqs.add(new ItemRequirement("A teleport to Falador", ItemID.FALADOR_TELEPORT));
+		reqs.add(new ItemRequirement("Bananas (obtainable in quest)", ItemID.BANANA, 10));
+
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		return new ArrayList<>(Arrays.asList("Gardener (level 4)"));
+	}
+
+	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+
+		allSteps.add(new PanelDetails("Talk to Redbeard Frank", new ArrayList<>(Collections.singletonList(speakToRedbeard)), sixtyCoins));
+		allSteps.addAll(smuggleRum.panelDetails());
+		allSteps.add(new PanelDetails("Discover the treasure", new ArrayList<>(Arrays.asList(openChest, readPirateMessage, digUpTreasure)), spade));
+
+		return allSteps;
+	}
+
+	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
 		sixtyCoins = new ItemRequirement("Coins", ItemID.COINS_995, 60);
@@ -101,44 +140,5 @@ public class PiratesTreasure extends BasicQuestHelper
 
 		steps.put(3, digUpTreasure);
 		return steps;
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(sixtyCoins);
-		reqs.add(spade);
-
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(new ItemRequirement("A teleport to Varrock", ItemID.VARROCK_TELEPORT));
-		reqs.add(new ItemRequirement("A teleport to Falador", ItemID.FALADOR_TELEPORT));
-		reqs.add(new ItemRequirement("Bananas (obtainable in quest)", ItemID.BANANA, 10));
-
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		return new ArrayList<>(Arrays.asList("Gardener (level 4)"));
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-
-		allSteps.add(new PanelDetails("Talk to Redbeard Frank", new ArrayList<>(Collections.singletonList(speakToRedbeard)), sixtyCoins));
-		allSteps.addAll(smuggleRum.panelDetails());
-		allSteps.add(new PanelDetails("Discover the treasure", new ArrayList<>(Arrays.asList(openChest, readPirateMessage, digUpTreasure)), spade));
-
-		return allSteps;
 	}
 }

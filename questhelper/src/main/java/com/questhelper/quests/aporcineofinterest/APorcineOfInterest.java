@@ -63,40 +63,6 @@ public class APorcineOfInterest extends BasicQuestHelper
 
 	Zone cave;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, readNotice);
-		steps.put(5, talkToSarah);
-		steps.put(10, useRopeOnHole);
-
-		ConditionalStep investigateCave = new ConditionalStep(this, enterHole);
-		investigateCave.addStep(inCave, investigateSkeleton);
-
-		steps.put(15, investigateCave);
-
-		steps.put(20, talkToSpria);
-
-		ConditionalStep goKillSourhog = new ConditionalStep(this, enterHoleAgain);
-		goKillSourhog.addStep(inCave, killSourhog);
-
-		steps.put(25, goKillSourhog);
-
-		ConditionalStep getFootSteps = new ConditionalStep(this, enterHoleForFoot);
-		getFootSteps.addStep(hasFoot, returnToSarah);
-		getFootSteps.addStep(inCave, cutOffFoot);
-
-		steps.put(30, getFootSteps);
-		steps.put(35, returnToSpria);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		rope = new ItemRequirement("Rope", ItemID.ROPE);
@@ -179,6 +145,40 @@ public class APorcineOfInterest extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Arrays.asList(readNotice, talkToSarah, useRopeOnHole, enterHole, investigateSkeleton, talkToSpria, enterHoleAgain,
 			killSourhog, cutOffFoot, returnToSarah, returnToSpria)), rope, slashItem, combatGear));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, readNotice);
+		steps.put(5, talkToSarah);
+		steps.put(10, useRopeOnHole);
+
+		ConditionalStep investigateCave = new ConditionalStep(this, enterHole);
+		investigateCave.addStep(inCave, investigateSkeleton);
+
+		steps.put(15, investigateCave);
+
+		steps.put(20, talkToSpria);
+
+		ConditionalStep goKillSourhog = new ConditionalStep(this, enterHoleAgain);
+		goKillSourhog.addStep(inCave, killSourhog);
+
+		steps.put(25, goKillSourhog);
+
+		ConditionalStep getFootSteps = new ConditionalStep(this, enterHoleForFoot);
+		getFootSteps.addStep(hasFoot, returnToSarah);
+		getFootSteps.addStep(inCave, cutOffFoot);
+
+		steps.put(30, getFootSteps);
+		steps.put(35, returnToSpria);
+		return steps;
 	}
 }
 

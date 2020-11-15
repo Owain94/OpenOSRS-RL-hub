@@ -70,67 +70,6 @@ public class WaterfallQuest extends BasicQuestHelper
 
 	Zone gnomeBasement, glarialTomb, falls, endRoom, end2, hudonIsland, deadTreeIsland, ledge, upstairsInHouse, golrieRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToAlmera);
-
-		ConditionalStep goTalkToHudon = new ConditionalStep(this, boardRaft);
-		goTalkToHudon.addStep(onHudonIsland, talkToHudon);
-
-		steps.put(1, goTalkToHudon);
-
-		ConditionalStep goReadBook = new ConditionalStep(this, goUpstairsHadley);
-		goReadBook.addStep(hasBook, readBook);
-		goReadBook.addStep(inUpstairsInHouse, searchBookcase);
-		goReadBook.addStep(onLedge, getInBarrel);
-		goReadBook.addStep(onDeadTreeIsland, useRopeOnTree);
-		goReadBook.addStep(onHudonIsland, useRopeOnRock);
-
-		steps.put(2, goReadBook);
-
-		// TODO: Add lines to guide through maze
-		goGetPebble = new ConditionalStep(this, enterGnomeDungeon);
-		goGetPebble.addStep(inGolrieRoom, talkToGolrie);
-		goGetPebble.addStep(new Conditions(inGnomeBasement, hasKey), enterGnomeDoor);
-		goGetPebble.addStep(inGnomeBasement, searchGnomeCrate);
-		goGetPebble.setLockingCondition(gotPebble);
-
-		getGlarialStuff = new ConditionalStep(this, usePebble);
-		getGlarialStuff.addStep(new Conditions(hasGlarialsAmulet, inGlarialTomb), searchGlarialCoffin);
-		getGlarialStuff.addStep(inGlarialTomb, searchGlarialChest);
-		getGlarialStuff.setLockingCondition(new Conditions(new Conditions(hasGlarialsAmulet, hasGlarialsUrn)));
-
-		ConditionalStep puttingToRest = new ConditionalStep(this, getFinalItems);
-		puttingToRest.addStep(inEnd2, useUrnOnChalice);
-		puttingToRest.addStep(inEndRoom, useRunes);
-		puttingToRest.addStep(new Conditions(inFalls, hasBaxKey), useKeyOnFallsDoor);
-		puttingToRest.addStep(inFalls, searchFallsCrate);
-		puttingToRest.addStep(onLedge, enterFalls);
-		puttingToRest.addStep(onDeadTreeIsland, useRopeOnTreeFinal);
-		puttingToRest.addStep(onHudonIsland, useRopeOnRockFinal);
-		puttingToRest.addStep(new Conditions(hasGlarialsUrn, hasGlarialsAmulet, hasAirRunes, hasEarthRunes, hasWaterRunes, hasRope), boardRaftFinal);
-
-		ConditionalStep finishingSteps = new ConditionalStep(this, goGetPebble);
-		finishingSteps.addStep(new Conditions(hasGlarialsUrn, hasGlarialsAmulet), puttingToRest);
-		finishingSteps.addStep(gotPebble, getGlarialStuff);
-
-		steps.put(3, finishingSteps);
-		steps.put(4, finishingSteps);
-		steps.put(5, puttingToRest);
-		steps.put(6, puttingToRest);
-		steps.put(7, puttingToRest); // 7 didn't occur during testing
-		steps.put(8, puttingToRest);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		highlightRope = new ItemRequirement("Rope", ItemID.ROPE);
@@ -143,9 +82,9 @@ public class WaterfallQuest extends BasicQuestHelper
 		glarialsPebble.setHighlightInInventory(true);
 		glarialsPebble.setTip("You can get another from Golrie under the Tree Gnome Village");
 		glarialsUrn = new ItemRequirement("Glarial's urn", ItemID.GLARIALS_URN);
-		glarialsUrn.setTip("You can get another from Glarial's tomb");
+		glarialsUrn.setTip("You can get another from the chest in Glarial's tomb");
 		glarialsAmulet = new ItemRequirement("Glarial's amulet", ItemID.GLARIALS_AMULET, 1, true);
-		glarialsAmulet.setTip("You can get another from Glarial's tomb");
+		glarialsAmulet.setTip("You can get another from the chest in Glarial's tomb");
 		unequippedAmulet = new ItemRequirement("Glarial's amulet", ItemID.GLARIALS_AMULET);
 		key = new ItemRequirement("Key", ItemID.KEY_293);
 		baxKey = new ItemRequirement("Key", ItemID.KEY_298);
@@ -258,19 +197,19 @@ public class WaterfallQuest extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Able to survive enemies up to level 86 attacking you");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRecommended()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
 		reqs.add(gamesNecklace);
 		reqs.add(food);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Able to survive enemies up to level 86 attacking you");
 		return reqs;
 	}
 
@@ -293,5 +232,66 @@ public class WaterfallQuest extends BasicQuestHelper
 		PanelDetails finishOffPanel = new PanelDetails("Put Glarial to rest", new ArrayList<>(Arrays.asList(getFinalItems, boardRaftFinal, useRopeOnRockFinal, useRopeOnTreeFinal, enterFalls, searchFallsCrate, useKeyOnFallsDoor, useRunes, useUrnOnChalice)), rope, airRunes, earthRunes, waterRunes, glarialsUrn, glarialsAmulet);
 		allSteps.add(finishOffPanel);
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToAlmera);
+
+		ConditionalStep goTalkToHudon = new ConditionalStep(this, boardRaft);
+		goTalkToHudon.addStep(onHudonIsland, talkToHudon);
+
+		steps.put(1, goTalkToHudon);
+
+		ConditionalStep goReadBook = new ConditionalStep(this, goUpstairsHadley);
+		goReadBook.addStep(hasBook, readBook);
+		goReadBook.addStep(inUpstairsInHouse, searchBookcase);
+		goReadBook.addStep(onLedge, getInBarrel);
+		goReadBook.addStep(onDeadTreeIsland, useRopeOnTree);
+		goReadBook.addStep(onHudonIsland, useRopeOnRock);
+
+		steps.put(2, goReadBook);
+
+		// TODO: Add lines to guide through maze
+		goGetPebble = new ConditionalStep(this, enterGnomeDungeon);
+		goGetPebble.addStep(inGolrieRoom, talkToGolrie);
+		goGetPebble.addStep(new Conditions(inGnomeBasement, hasKey), enterGnomeDoor);
+		goGetPebble.addStep(inGnomeBasement, searchGnomeCrate);
+		goGetPebble.setLockingCondition(gotPebble);
+
+		getGlarialStuff = new ConditionalStep(this, usePebble);
+		getGlarialStuff.addStep(new Conditions(hasGlarialsAmulet, inGlarialTomb), searchGlarialCoffin);
+		getGlarialStuff.addStep(inGlarialTomb, searchGlarialChest);
+		getGlarialStuff.setLockingCondition(new Conditions(new Conditions(hasGlarialsAmulet, hasGlarialsUrn)));
+
+		ConditionalStep puttingToRest = new ConditionalStep(this, getFinalItems);
+		puttingToRest.addStep(inEnd2, useUrnOnChalice);
+		puttingToRest.addStep(inEndRoom, useRunes);
+		puttingToRest.addStep(new Conditions(inFalls, hasBaxKey), useKeyOnFallsDoor);
+		puttingToRest.addStep(inFalls, searchFallsCrate);
+		puttingToRest.addStep(onLedge, enterFalls);
+		puttingToRest.addStep(onDeadTreeIsland, useRopeOnTreeFinal);
+		puttingToRest.addStep(onHudonIsland, useRopeOnRockFinal);
+		puttingToRest.addStep(new Conditions(hasGlarialsUrn, hasGlarialsAmulet, hasAirRunes, hasEarthRunes, hasWaterRunes, hasRope), boardRaftFinal);
+
+		ConditionalStep finishingSteps = new ConditionalStep(this, goGetPebble);
+		finishingSteps.addStep(new Conditions(hasGlarialsUrn, hasGlarialsAmulet), puttingToRest);
+		finishingSteps.addStep(gotPebble, getGlarialStuff);
+
+		steps.put(3, finishingSteps);
+		steps.put(4, finishingSteps);
+		steps.put(5, puttingToRest);
+		steps.put(6, puttingToRest);
+		steps.put(7, puttingToRest); // 7 didn't occur during testing
+		steps.put(8, puttingToRest);
+
+		return steps;
 	}
 }

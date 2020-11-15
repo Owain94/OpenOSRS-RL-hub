@@ -74,93 +74,6 @@ public class NatureSpirit extends BasicQuestHelper
 
 	Zone underground, orangeStone, grotto;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startQuest = new ConditionalStep(this, goDownToDrezel);
-		startQuest.addStep(inUnderground, talkToDrezel);
-
-		steps.put(0, startQuest);
-
-		ConditionalStep goEnterSwamp = new ConditionalStep(this, enterSwamp);
-		goEnterSwamp.addStep(inUnderground, leaveDrezel);
-		steps.put(1, goEnterSwamp);
-		steps.put(2, goEnterSwamp);
-		steps.put(3, goEnterSwamp);
-		steps.put(4, goEnterSwamp);
-		steps.put(5, goEnterSwamp);
-
-		ConditionalStep goTalkToFilliman = new ConditionalStep(this, tryToEnterGrotto);
-		goTalkToFilliman.addStep(fillimanNearby, talkToFilliman);
-		steps.put(10, goTalkToFilliman);
-		steps.put(15, goTalkToFilliman);
-
-		ConditionalStep showFillimanReflection = new ConditionalStep(this, takeWashingBowl);
-		showFillimanReflection.addStep(new Conditions(hasMirror, fillimanNearby), useMirrorOnFilliman);
-		showFillimanReflection.addStep(hasMirror, tryToEnterGrotto);
-		showFillimanReflection.addStep(mirrorNearby, takeMirror);
-		steps.put(20, showFillimanReflection);
-
-		ConditionalStep goGetJournal = new ConditionalStep(this, searchGrotto);
-		goGetJournal.addStep(new Conditions(hasJournal, fillimanNearby), useJournalOnFilliman);
-		goGetJournal.addStep(hasJournal, tryToEnterGrotto);
-		steps.put(25, goGetJournal);
-
-		ConditionalStep goOfferHelp = new ConditionalStep(this, tryToEnterGrotto);
-		goOfferHelp.addStep(fillimanNearby, useJournalOnFilliman);
-		steps.put(30, goOfferHelp);
-
-		ConditionalStep getBlessed = new ConditionalStep(this, goBackDownToDrezel);
-		getBlessed.addStep(inUnderground, talkToDrezelForBlessing);
-		steps.put(35, getBlessed);
-
-		ConditionalStep performRitual = new ConditionalStep(this, castSpellAndGetMushroom);
-		performRitual.addStep(new Conditions(usedMushroom, usedCard, fillimanNearby, onOrange), tellFillimanToCast);
-		performRitual.addStep(new Conditions(usedMushroom, usedCard, fillimanNearby), standOnOrange);
-		performRitual.addStep(new Conditions(usedMushroom, usedCard), spawnFillimanForRitual);
-		performRitual.addStep(usedMushroom, useSpellCard);
-		performRitual.addStep(hasMushroom, useMushroom);
-		steps.put(40, performRitual);
-		steps.put(45, performRitual);
-		steps.put(50, performRitual);
-		steps.put(55, performRitual);
-
-		ConditionalStep goTalkInGrotto = new ConditionalStep(this, enterGrotto);
-		goTalkInGrotto.addStep(new Conditions(inGrotto, fillimanNearby), talkToFillimanInGrotto);
-		goTalkInGrotto.addStep(inGrotto, searchAltar);
-		steps.put(60, goTalkInGrotto);
-
-		ConditionalStep goBlessSickle = new ConditionalStep(this, enterGrotto);
-		goBlessSickle.addStep(new Conditions(inGrotto, natureSpiritNearby), blessSickle);
-		goBlessSickle.addStep(inGrotto, searchAltar);
-		steps.put(65, goBlessSickle);
-		steps.put(70, goBlessSickle);
-
-		ConditionalStep goKillGhasts = new ConditionalStep(this, fillPouches);
-		// TODO: Fix ghast changing form not counting towards becoming nearby
-		goKillGhasts.addStep(ghastNearby, killGhast);
-		goKillGhasts.addStep(hasFullPouch, killGhasts);
-		steps.put(75, goKillGhasts);
-		steps.put(80, goKillGhasts);
-		steps.put(85, goKillGhasts);
-		steps.put(90, goKillGhasts);
-		steps.put(95, goKillGhasts);
-		steps.put(100, goKillGhasts);
-
-		ConditionalStep finishOff = new ConditionalStep(this, enterGrottoAgain);
-		finishOff.addStep(new Conditions(inGrotto, natureSpiritNearby), talkToNatureSpiritToFinish);
-		finishOff.addStep(inGrotto, touchAltarAgain);
-		steps.put(105, finishOff);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		ghostspeak = new ItemRequirement("Ghostspeak amulet", ItemID.GHOSTSPEAK_AMULET, 1, true);
@@ -286,15 +199,15 @@ public class NatureSpirit extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getNotes()
-	{
-		return new ArrayList<>(Collections.singletonList("Whilst in Mort Myre, the Ghasts will occasionally rot the food in your inventory."));
-	}
-
-	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Collections.singletonList("3 Ghasts (level 30)"));
+	}
+
+	@Override
+	public ArrayList<String> getNotes()
+	{
+		return new ArrayList<>(Collections.singletonList("Whilst in Mort Myre, the Ghasts will occasionally rot the food in your inventory."));
 	}
 
 	@Override
@@ -311,5 +224,92 @@ public class NatureSpirit extends BasicQuestHelper
 			new ArrayList<>(Arrays.asList(blessSickle, fillPouches, killGhasts, enterGrottoAgain, talkToNatureSpiritToFinish)), ghostspeak, silverSickle));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startQuest = new ConditionalStep(this, goDownToDrezel);
+		startQuest.addStep(inUnderground, talkToDrezel);
+
+		steps.put(0, startQuest);
+
+		ConditionalStep goEnterSwamp = new ConditionalStep(this, enterSwamp);
+		goEnterSwamp.addStep(inUnderground, leaveDrezel);
+		steps.put(1, goEnterSwamp);
+		steps.put(2, goEnterSwamp);
+		steps.put(3, goEnterSwamp);
+		steps.put(4, goEnterSwamp);
+		steps.put(5, goEnterSwamp);
+
+		ConditionalStep goTalkToFilliman = new ConditionalStep(this, tryToEnterGrotto);
+		goTalkToFilliman.addStep(fillimanNearby, talkToFilliman);
+		steps.put(10, goTalkToFilliman);
+		steps.put(15, goTalkToFilliman);
+
+		ConditionalStep showFillimanReflection = new ConditionalStep(this, takeWashingBowl);
+		showFillimanReflection.addStep(new Conditions(hasMirror, fillimanNearby), useMirrorOnFilliman);
+		showFillimanReflection.addStep(hasMirror, tryToEnterGrotto);
+		showFillimanReflection.addStep(mirrorNearby, takeMirror);
+		steps.put(20, showFillimanReflection);
+
+		ConditionalStep goGetJournal = new ConditionalStep(this, searchGrotto);
+		goGetJournal.addStep(new Conditions(hasJournal, fillimanNearby), useJournalOnFilliman);
+		goGetJournal.addStep(hasJournal, tryToEnterGrotto);
+		steps.put(25, goGetJournal);
+
+		ConditionalStep goOfferHelp = new ConditionalStep(this, tryToEnterGrotto);
+		goOfferHelp.addStep(fillimanNearby, useJournalOnFilliman);
+		steps.put(30, goOfferHelp);
+
+		ConditionalStep getBlessed = new ConditionalStep(this, goBackDownToDrezel);
+		getBlessed.addStep(inUnderground, talkToDrezelForBlessing);
+		steps.put(35, getBlessed);
+
+		ConditionalStep performRitual = new ConditionalStep(this, castSpellAndGetMushroom);
+		performRitual.addStep(new Conditions(usedMushroom, usedCard, fillimanNearby, onOrange), tellFillimanToCast);
+		performRitual.addStep(new Conditions(usedMushroom, usedCard, fillimanNearby), standOnOrange);
+		performRitual.addStep(new Conditions(usedMushroom, usedCard), spawnFillimanForRitual);
+		performRitual.addStep(usedMushroom, useSpellCard);
+		performRitual.addStep(hasMushroom, useMushroom);
+		steps.put(40, performRitual);
+		steps.put(45, performRitual);
+		steps.put(50, performRitual);
+		steps.put(55, performRitual);
+
+		ConditionalStep goTalkInGrotto = new ConditionalStep(this, enterGrotto);
+		goTalkInGrotto.addStep(new Conditions(inGrotto, fillimanNearby), talkToFillimanInGrotto);
+		goTalkInGrotto.addStep(inGrotto, searchAltar);
+		steps.put(60, goTalkInGrotto);
+
+		ConditionalStep goBlessSickle = new ConditionalStep(this, enterGrotto);
+		goBlessSickle.addStep(new Conditions(inGrotto, natureSpiritNearby), blessSickle);
+		goBlessSickle.addStep(inGrotto, searchAltar);
+		steps.put(65, goBlessSickle);
+		steps.put(70, goBlessSickle);
+
+		ConditionalStep goKillGhasts = new ConditionalStep(this, fillPouches);
+		// TODO: Fix ghast changing form not counting towards becoming nearby
+		goKillGhasts.addStep(ghastNearby, killGhast);
+		goKillGhasts.addStep(hasFullPouch, killGhasts);
+		steps.put(75, goKillGhasts);
+		steps.put(80, goKillGhasts);
+		steps.put(85, goKillGhasts);
+		steps.put(90, goKillGhasts);
+		steps.put(95, goKillGhasts);
+		steps.put(100, goKillGhasts);
+
+		ConditionalStep finishOff = new ConditionalStep(this, enterGrottoAgain);
+		finishOff.addStep(new Conditions(inGrotto, natureSpiritNearby), talkToNatureSpiritToFinish);
+		finishOff.addStep(inGrotto, touchAltarAgain);
+		steps.put(105, finishOff);
+
+		return steps;
 	}
 }
