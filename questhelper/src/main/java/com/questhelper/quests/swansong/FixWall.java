@@ -24,21 +24,18 @@
  */
 package com.questhelper.quests.swansong;
 
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.inject.Inject;
-import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class FixWall extends DetailedOwnerStep
@@ -50,11 +47,6 @@ public class FixWall extends DetailedOwnerStep
 	public FixWall(QuestHelper questHelper)
 	{
 		super(questHelper);
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Subscribe

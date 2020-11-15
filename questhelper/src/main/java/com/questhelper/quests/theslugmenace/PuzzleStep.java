@@ -1,6 +1,5 @@
 package com.questhelper.quests.theslugmenace;
 
-import com.google.inject.Inject;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.QuestStep;
@@ -10,14 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class PuzzleStep extends QuestStep
 {
-	@Inject
-	EventBus eventBus;
-
 	private final int FLIP_BUTTON = 33;
 	private final int DOWN_BUTTON = 32;
 	private final int LEFT_BUTTON = 31;
@@ -101,8 +96,6 @@ public class PuzzleStep extends QuestStep
 	public void startUp()
 	{
 		updateSolvedPositionState();
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
-
 	}
 
 	@Subscribe
@@ -115,7 +108,7 @@ public class PuzzleStep extends QuestStep
 	{
 		int currentPiece;
 
-		HashMap<Integer, Integer>[] piecesCurrentState = new HashMap[3];
+		HashMap<Integer, Integer>[] piecesCurrentState =  new HashMap[3];
 
 		HashMap<Integer, Integer> highlightButtonsTmp = new HashMap<>();
 

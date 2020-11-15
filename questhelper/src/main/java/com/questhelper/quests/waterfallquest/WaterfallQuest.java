@@ -24,18 +24,8 @@
  */
 package com.questhelper.quests.waterfallquest;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
@@ -49,6 +39,16 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.WATERFALL_QUEST
@@ -143,9 +143,9 @@ public class WaterfallQuest extends BasicQuestHelper
 		glarialsPebble.setHighlightInInventory(true);
 		glarialsPebble.setTip("You can get another from Golrie under the Tree Gnome Village");
 		glarialsUrn = new ItemRequirement("Glarial's urn", ItemID.GLARIALS_URN);
-		glarialsUrn.setTip("You can get another from Glarial's tomb");
+		glarialsUrn.setTip("You can get another from the chest in Glarial's tomb");
 		glarialsAmulet = new ItemRequirement("Glarial's amulet", ItemID.GLARIALS_AMULET, 1, true);
-		glarialsAmulet.setTip("You can get another from Glarial's tomb");
+		glarialsAmulet.setTip("You can get another from the chest in Glarial's tomb");
 		unequippedAmulet = new ItemRequirement("Glarial's amulet", ItemID.GLARIALS_AMULET);
 		key = new ItemRequirement("Key", ItemID.KEY_293);
 		baxKey = new ItemRequirement("Key", ItemID.KEY_298);

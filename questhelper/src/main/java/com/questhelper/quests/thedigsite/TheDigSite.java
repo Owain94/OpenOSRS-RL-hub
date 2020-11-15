@@ -24,19 +24,9 @@
  */
 package com.questhelper.quests.thedigsite;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -54,6 +44,16 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -381,7 +381,7 @@ public class TheDigSite extends BasicQuestHelper
 	{
 		talkToExaminer = new NpcStep(this, NpcID.EXAMINER, new WorldPoint(3362, 3337, 0), "Talk to an Examiner in the Exam Centre south east of Varrock.", unstampedLetter);
 		talkToExaminer.addDialogStep("Can I take an exam?");
-		((NpcStep) (talkToExaminer)).addAlternateNpcs(NpcID.EXAMINER_3636, NpcID.EXAMINER_3637);
+		((NpcStep)(talkToExaminer)).addAlternateNpcs(NpcID.EXAMINER_3636, NpcID.EXAMINER_3637);
 		talkToHaig = new NpcStep(this, NpcID.CURATOR_HAIG_HALEN, new WorldPoint(3257, 3448, 0), "Talk to Curator Haig in the Varrock Museum.");
 		talkToExaminer2 = new NpcStep(this, NpcID.EXAMINER, new WorldPoint(3362, 3337, 0), "Return to an Examiner in the Exam Centre south east of Varrock.", sealedLetter);
 
@@ -390,8 +390,8 @@ public class TheDigSite extends BasicQuestHelper
 		talkToGuide = new NpcStep(this, NpcID.PANNING_GUIDE, new WorldPoint(3385, 3386, 0), "Talk to the Panning Guide nearby.", tea);
 		panWater = new ObjectStep(this, ObjectID.PANNING_POINT, new WorldPoint(3384, 3381, 0), "Pan in the river for a special cup.", panningTray);
 		pickpocketWorkmen = new NpcStep(this, NpcID.DIGSITE_WORKMAN, new WorldPoint(3372, 3390, 0), "Pickpocket workmen until you get an animal skull and a specimen brush.", true);
-		((NpcStep) (pickpocketWorkmen)).addAlternateNpcs(NpcID.DIGSITE_WORKMAN_3630, NpcID.DIGSITE_WORKMAN_3631);
-		((NpcStep) (pickpocketWorkmen)).setMaxRoamRange(100);
+		((NpcStep)(pickpocketWorkmen)).addAlternateNpcs(NpcID.DIGSITE_WORKMAN_3630, NpcID.DIGSITE_WORKMAN_3631);
+		((NpcStep)(pickpocketWorkmen)).setMaxRoamRange(100);
 		talkToFemaleStudent = new NpcStep(this, NpcID.STUDENT_3634, new WorldPoint(3345, 3425, 0), "Talk to the female student in the north west of the Digsite twice.", teddybear);
 		talkToOrangeStudent = new NpcStep(this, NpcID.STUDENT_3633, new WorldPoint(3369, 3419, 0), "Talk to the student in an orange shirt in the north east of the Digsite twice.", specialCup);
 		talkToGreenStudent = new NpcStep(this, NpcID.STUDENT, new WorldPoint(3362, 3398, 0), "Talk to the student in a green shirt in the south of the Digsite twice.", skull);
@@ -422,12 +422,12 @@ public class TheDigSite extends BasicQuestHelper
 			"Brush carefully and slowly using short strokes.", "Handle bones very carefully and keep them away from other samples.");
 
 		getJar = new ObjectStep(this, ObjectID.CUPBOARD_17302, new WorldPoint(3355, 3332, 0), "Search the cupboard on the south wall of the west room of the Exam Centre for a specimen jar.");
-		((ObjectStep) (getJar)).addAlternateObjects(ObjectID.CUPBOARD_17303);
+		((ObjectStep)(getJar)).addAlternateObjects(ObjectID.CUPBOARD_17303);
 		getPick = new ObjectStep(this, ObjectID.CUPBOARD_17300, new WorldPoint(3356, 3337, 0), "Search the cupboard on the north wall of the west room of the Exam Centre for a rock pick.");
-		((ObjectStep) (getPick)).addAlternateObjects(ObjectID.CUPBOARD_17301);
+		((ObjectStep)(getPick)).addAlternateObjects(ObjectID.CUPBOARD_17301);
 		getBrush = new NpcStep(this, NpcID.DIGSITE_WORKMAN, new WorldPoint(3372, 3390, 0), "Pickpocket workmen until you get a specimen brush.", true);
-		((NpcStep) (getBrush)).addAlternateNpcs(NpcID.DIGSITE_WORKMAN_3630, NpcID.DIGSITE_WORKMAN_3631);
-		((NpcStep) (getBrush)).setMaxRoamRange(100);
+		((NpcStep)(getBrush)).addAlternateNpcs(NpcID.DIGSITE_WORKMAN_3630, NpcID.DIGSITE_WORKMAN_3631);
+		((NpcStep)(getBrush)).setMaxRoamRange(100);
 		digForTalisman = new ObjectStep(this, ObjectID.SOIL_2377, new WorldPoint(3374, 3438, 0), "Dig in the north east dig spot in the Digsite until you get a talisman.", trowelHighlighted, leatherBoots, leatherGloves);
 		digForTalisman.addIcon(ItemID.TROWEL);
 		talkToExpert = new NpcStep(this, NpcID.ARCHAEOLOGICAL_EXPERT, new WorldPoint(3357, 3334, 0), "Talk Archaeological expert in the Exam Centre.", talisman);
@@ -435,8 +435,8 @@ public class TheDigSite extends BasicQuestHelper
 		useInvitationOnWorkman = new NpcStep(this, NpcID.DIGSITE_WORKMAN, new WorldPoint(3360, 3415, 0), "Use the invitation on any workman.", true, invitation);
 		useInvitationOnWorkman.addIcon(ItemID.INVITATION_LETTER);
 		useInvitationOnWorkman.addDialogStep("I lost the letter you gave me.");
-		((NpcStep) (useInvitationOnWorkman)).addAlternateNpcs(NpcID.DIGSITE_WORKMAN_3630, NpcID.DIGSITE_WORKMAN_3631);
-		((NpcStep) (useInvitationOnWorkman)).setMaxRoamRange(100);
+		((NpcStep)(useInvitationOnWorkman)).addAlternateNpcs(NpcID.DIGSITE_WORKMAN_3630, NpcID.DIGSITE_WORKMAN_3631);
+		((NpcStep)(useInvitationOnWorkman)).setMaxRoamRange(100);
 		useRopeOnWinch = new ObjectStep(this, ObjectID.WINCH_2350, new WorldPoint(3353, 3417, 0), "Use a rope on the west winch.", rope);
 		useRopeOnWinch.addIcon(ItemID.ROPE);
 		goDownWinch = new ObjectStep(this, ObjectID.WINCH_2350, new WorldPoint(3353, 3417, 0), "Climb down the west winch.");

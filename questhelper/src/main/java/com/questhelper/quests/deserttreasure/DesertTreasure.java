@@ -25,18 +25,10 @@
 package com.questhelper.quests.deserttreasure;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -54,6 +46,14 @@ import net.runelite.api.NullItemID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DESERT_TREASURE
@@ -190,7 +190,7 @@ public class DesertTreasure extends BasicQuestHelper
 		coins650 = new ItemRequirement("Coins", ItemID.COINS_995, 650);
 		magicLogs12 = new ItemRequirement("Magic logs", ItemID.MAGIC_LOGS, 12);
 		magicLogs12.addAlternates(NullItemID.NULL_1514);
-		steelBars6 = new ItemRequirement("Steel bar", ItemID.STEEL_BAR, 6);
+		steelBars6 = new ItemRequirement("Steel bar", ItemID.STEEL_BAR,  6);
 		steelBars6.addAlternates(NullItemID.NULL_2354);
 		moltenGlass6 = new ItemRequirement("Molten glass", ItemID.MOLTEN_GLASS, 6);
 		moltenGlass6.addAlternates(NullItemID.NULL_1776);
@@ -274,11 +274,11 @@ public class DesertTreasure extends BasicQuestHelper
 
 		fireSpells = new ItemRequirement("Fire spells", -1, -1);
 
-		combatGear = new ItemRequirement("Decent combat gear", -1, -1);
-		food = new ItemRequirement("Food", -1, -1);
-		prayerPotions = new ItemRequirement("Prayer potions", -1, -1);
-		restorePotions = new ItemRequirement("Restore potions", -1, -1);
-		energyOrStaminas = new ItemRequirement("Energy/Stamina potions", -1, -1);
+		combatGear = new ItemRequirement("Decent combat gear",-1, -1);
+		food = new ItemRequirement("Food",-1, -1);
+		prayerPotions = new ItemRequirement("Prayer potions",-1, -1);
+		restorePotions = new ItemRequirement("Restore potions",-1, -1);
+		energyOrStaminas = new ItemRequirement("Energy/Stamina potions",-1, -1);
 	}
 
 	public void loadZones()
@@ -289,7 +289,7 @@ public class DesertTreasure extends BasicQuestHelper
 		draynorSewer = new Zone(new WorldPoint(3078, 9641, 0), new WorldPoint(3129, 9699, 0));
 		trollArea = new Zone(new WorldPoint(2839, 3716, 0), new WorldPoint(2868, 3741, 0));
 		path1 = new Zone(new WorldPoint(2872, 3714, 0), new WorldPoint(2903, 3771, 0));
-		path2 = new Zone(new WorldPoint(2817, 3748, 0), new WorldPoint(2892, 3869, 0));
+		path2 = new Zone(new WorldPoint(2817, 3748, 0), new WorldPoint( 2892, 3869, 0));
 		icePath = new Zone(new WorldPoint(2830, 3785, 1), new WorldPoint(2870, 3825, 1));
 		iceBridge = new Zone(new WorldPoint(2823, 3807, 2), new WorldPoint(2855, 3812, 2));
 		floor1 = new Zone(new WorldPoint(2893, 4944, 3), new WorldPoint(2931, 4973, 3));

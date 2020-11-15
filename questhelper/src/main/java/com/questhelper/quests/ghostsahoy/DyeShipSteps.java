@@ -25,8 +25,8 @@
 package com.questhelper.quests.ghostsahoy;
 
 import com.questhelper.Zone;
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -46,14 +45,10 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class DyeShipSteps extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
 	boolean coloursKnown = false;
 
 	HashMap<String, FlagColour> shapeColours = new HashMap<>();
@@ -256,8 +251,6 @@ public class DyeShipSteps extends DetailedOwnerStep
 			"Go up the ladder in the ship west of Port Phasmatys.");
 		goUpToMast = new ObjectStep(getQuestHelper(), ObjectID.SHIPS_LADDER_16111, new WorldPoint(3615, 3541, 1),
 			"Go up to the mast of the ship.");
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override
@@ -301,13 +294,10 @@ public class DyeShipSteps extends DetailedOwnerStep
 			return item;
 		}
 
-		public static FlagColour findByKey(String colour)
-		{
+		public static FlagColour findByKey(String colour) {
 			FlagColour[] flagColours = FlagColour.values();
-			for (FlagColour flagColour : flagColours)
-			{
-				if (flagColour.colourText.equals(colour))
-				{
+			for (FlagColour flagColour : flagColours) {
+				if (flagColour.colourText.equals(colour)) {
 					return flagColour;
 				}
 			}

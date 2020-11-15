@@ -24,18 +24,12 @@
  */
 package com.questhelper.quests.shieldofarrav;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestVarPlayer;
+import com.questhelper.QuestVarbits;
 import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.NpcCondition;
@@ -49,6 +43,14 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG
@@ -61,7 +63,7 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 		hasPhoenixCertificateHalf, hasCertificate, hasShieldHalf;
 
 	QuestStep talkToCharlie, getWeaponStoreKey, talkToKatrine, goUpToWeaponStore, killWeaponsMaster, pickupTwoCrossbows, goDownFromWeaponStore, returnToKatrine,
-		goUpstairsInBase, getShieldFromCupboard, getShieldFromCupboard1, goDownstairsInBase, talkToHaig, tradeCertificateHalf, combineCertificate, talkToRoald;
+	goUpstairsInBase, getShieldFromCupboard, getShieldFromCupboard1, goDownstairsInBase, talkToHaig, tradeCertificateHalf, combineCertificate, talkToRoald;
 
 	Zone storeRoom, upstairsInBase;
 
@@ -99,8 +101,7 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupItemRequirements()
-	{
+	public void setupItemRequirements() {
 		storeRoomKey = new ItemRequirement("Weapon store key", ItemID.WEAPON_STORE_KEY);
 		twoPhoenixCrossbow = new ItemRequirement("Phoenix crossbow", ItemID.PHOENIX_CROSSBOW, 2);
 		shieldHalf = new ItemRequirement("Broken shield", ItemID.BROKEN_SHIELD_765);
@@ -109,14 +110,12 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 		certificate = new ItemRequirement("Certificate", ItemID.CERTIFICATE);
 	}
 
-	public void loadZones()
-	{
-		storeRoom = new Zone(new WorldPoint(3242, 3380, 1), new WorldPoint(3252, 3386, 1));
-		upstairsInBase = new Zone(new WorldPoint(3182, 3382, 1), new WorldPoint(3201, 3398, 1));
+	public void loadZones() {
+		storeRoom = new Zone(new WorldPoint(3242, 3380,1), new WorldPoint(3252, 3386, 1));
+		upstairsInBase = new Zone(new WorldPoint(3182, 3382,1), new WorldPoint(3201, 3398, 1));
 	}
 
-	public void setupConditions()
-	{
+	public void setupConditions() {
 		hasStoreRoomKey = new ItemRequirementCondition(storeRoomKey);
 		inStoreRoom = new ZoneCondition(storeRoom);
 		hasTwoPhoenixCrossbow = new ItemRequirementCondition(twoPhoenixCrossbow);
@@ -129,9 +128,8 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 		hasCertificate = new ItemRequirementCondition(certificate);
 	}
 
-	public void setupSteps()
-	{
-		talkToCharlie = new NpcStep(this, NpcID.CHARLIE_THE_TRAMP, new WorldPoint(3208, 3392, 0), "To start the quest as the Black Arm Gang, talk to Charlie the Tramp in south Varrock to start.");
+	public void setupSteps() {
+		talkToCharlie = new NpcStep(this, NpcID.CHARLIE_THE_TRAMP, new WorldPoint(3208, 3392,0), "To start the quest as the Black Arm Gang, talk to Charlie the Tramp in south Varrock to start.");
 		talkToCharlie.addDialogStep("Is there anything down this alleyway?");
 		talkToCharlie.addDialogStep("Do you think they would let me join?");
 
@@ -196,8 +194,8 @@ public class ShieldOfArravBlackArmGang extends BasicQuestHelper
 	{
 		return new ArrayList<>(
 			Arrays.asList("You can also do this quest by joining the Phoenix Gang, which instead requires you to kill Jonny the beard (level 2).",
-				"Once you're accepted into one of the gangs, you CANNOT change gang.",
-				"This quest requires you to swap items with another player who's in the other gang, so it's recommended to either find a friend to help you, or you can use the friend's chat 'OSRS SOA' and find someone to help there."));
+			"Once you're accepted into one of the gangs, you CANNOT change gang.",
+			"This quest requires you to swap items with another player who's in the other gang, so it's recommended to either find a friend to help you, or you can use the friend's chat 'OSRS SOA' and find someone to help there."));
 	}
 
 	@Override

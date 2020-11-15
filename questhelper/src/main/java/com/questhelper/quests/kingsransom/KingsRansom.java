@@ -25,26 +25,13 @@
 package com.questhelper.quests.kingsransom;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.ItemRequirements;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.WidgetStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
 import com.questhelper.steps.conditional.VarbitCondition;
 import com.questhelper.steps.conditional.WidgetModelCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,6 +41,19 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.ItemRequirementCondition;
+import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.KINGS_RANSOM
@@ -240,12 +240,12 @@ public class KingsRansom extends BasicQuestHelper
 		keepF1 = new Zone(new WorldPoint(1689, 4250, 1), new WorldPoint(1701, 4264, 1));
 		keepF2 = new Zone(new WorldPoint(1689, 4250, 2), new WorldPoint(1701, 4264, 2));
 		basement = new Zone(new WorldPoint(1862, 4231, 0), new WorldPoint(1871, 4246, 0));
-		secretRoomFloor0 = new Zone(new WorldPoint(3015, 3517, 0), new WorldPoint(3016, 3519, 0));
+		secretRoomFloor0 = new Zone(new WorldPoint(3015, 3517,0), new WorldPoint(3016, 3519,0));
 		secretBasement = new Zone(new WorldPoint(1862, 4264, 0), new WorldPoint(1873, 4229, 0));
-		mainEntrance1 = new Zone(new WorldPoint(3008, 3513, 0), new WorldPoint(3012, 3518, 0));
-		mainEntrance2 = new Zone(new WorldPoint(3012, 3514, 0), new WorldPoint(3014, 3516, 0));
-		mainEntrance3 = new Zone(new WorldPoint(3015, 3515, 0), new WorldPoint(3019, 3516, 0));
-		mainEntrance4 = new Zone(new WorldPoint(3019, 3513, 0), new WorldPoint(3019, 3517, 0));
+		mainEntrance1 = new Zone(new WorldPoint(3008, 3513,0), new WorldPoint(3012, 3518,0));
+		mainEntrance2 = new Zone(new WorldPoint(3012, 3514,0), new WorldPoint(3014, 3516,0));
+		mainEntrance3 = new Zone(new WorldPoint(3015, 3515,0), new WorldPoint(3019, 3516,0));
+		mainEntrance4 = new Zone(new WorldPoint(3019, 3513,0), new WorldPoint(3019, 3517,0));
 	}
 
 	public void setupConditions()

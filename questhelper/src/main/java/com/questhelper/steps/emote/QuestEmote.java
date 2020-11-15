@@ -25,13 +25,7 @@
 package com.questhelper.steps.emote;
 
 import lombok.Getter;
-import static net.runelite.api.SpriteID.EMOTE_BLOW_KISS;
-import static net.runelite.api.SpriteID.EMOTE_BOW;
-import static net.runelite.api.SpriteID.EMOTE_CRY;
-import static net.runelite.api.SpriteID.EMOTE_DANCE;
-import static net.runelite.api.SpriteID.EMOTE_GOBLIN_BOW;
-import static net.runelite.api.SpriteID.EMOTE_THINK;
-import static net.runelite.api.SpriteID.EMOTE_WAVE;
+import static net.runelite.api.SpriteID.*;
 
 @Getter
 public enum QuestEmote
@@ -44,8 +38,8 @@ public enum QuestEmote
 	GOBLIN_BOW("Goblin bow", EMOTE_GOBLIN_BOW),
 	BLOW_KISS("Blow Kiss", EMOTE_BLOW_KISS);
 
-	private final String name;
-	private final int spriteId;
+	private String name;
+	private int spriteId;
 
 	QuestEmote(String name, int spriteId)
 	{

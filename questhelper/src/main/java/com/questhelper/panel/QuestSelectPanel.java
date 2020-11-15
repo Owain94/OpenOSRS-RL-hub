@@ -57,7 +57,6 @@ public class QuestSelectPanel extends JPanel
 
 		START_ICON = new ImageIcon(startImg);
 	}
-
 	public QuestSelectPanel(QuestHelperPlugin questHelperPlugin, QuestHelperPanel questHelperPanel, QuestHelper questHelper)
 	{
 		this.questHelper = questHelper;

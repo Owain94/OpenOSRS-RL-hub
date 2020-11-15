@@ -24,21 +24,12 @@
  */
 package com.questhelper.quests.shadowofthestorm;
 
-import com.google.inject.Inject;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -50,30 +41,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.SHADOW_OF_THE_STORM
 )
 public class ShadowOfTheStorm extends BasicQuestHelper
 {
-	@Inject
-	EventBus eventBus;
-
-	@Inject
-	Client client;
-
-	SearchKilns searchKiln = new SearchKilns(this);
-	boolean searchKilnSubscribed = false;
-
 	ItemRequirement darkItems, silverlight, strangeImplement, blackMushroomInk, pestle, vial, silverBar, silverlightHighlighted, blackMushroomHighlighted,
 		silverlightDyedEquipped, sigilMould, silverlightDyed, strangeImplementHighlighted, combatGear, coinsForCarpet, sigil, book, bookHighlighted,
 		sigilHighlighted, sigil2;
@@ -92,27 +78,13 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		standInCircleAgain, enterRuinNoDark, enterRuinForRitual, enterPortalForRitual, enterRuinForDave, enterPortalForFight,
 		enterRuinForFight, unequipDarklight;
 
-	IncantationStep readIncantation, incantRitual;
+	DetailedOwnerStep searchKiln;
 
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		if (eventBus != null && client != null)
-		{
-			if (!searchKilnSubscribed)
-			{
-				searchKiln.eventBus = eventBus;
-				searchKiln.client = client;
-				searchKiln.subscribe();
-				searchKilnSubscribed = true;
-			}
-		}
-	}
+	IncantationStep readIncantation, incantRitual;
 
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		Map<Integer, QuestStep> steps = new HashMap<>();
 		setupZones();
 		setupItemRequirements();
@@ -289,6 +261,7 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		smeltSigil = new DetailedQuestStep(this, "Travel to any furnace with the sigil mould and silver bar and smelt a sigil.", silverBar, sigilMould);
 		talkToGolem = new NpcStep(this, NpcID.CLAY_GOLEM_5136, new WorldPoint(3485, 3088, 0), "Talk to the Golem in Uzer.", silverlightDyed, sigil, combatGear);
 		talkToGolem.addDialogStep("Did you see anything happen last night?");
+		searchKiln = new SearchKilns(this);
 		readBook = new DetailedQuestStep(this, "Read the book.", bookHighlighted);
 		enterRuinAfterBook = new ObjectStep(this, ObjectID.STAIRCASE_6373, new WorldPoint(3493, 3090, 0), "Enter the Uzer ruins.", silverlightDyed, book, sigil);
 		enterPortalAfterBook = new ObjectStep(this, NullObjectID.NULL_6310, new WorldPoint(2722, 4913, 0), "Enter the portal.", book, sigil);

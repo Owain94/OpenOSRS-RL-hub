@@ -24,17 +24,11 @@
  */
 package com.questhelper.quests.daddyshome;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
@@ -47,6 +41,12 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DADDYS_HOME
@@ -56,13 +56,13 @@ public class DaddysHome extends BasicQuestHelper
 	ItemRequirement plank10, nails20, bolt5, hammer, saw, waxwoodLog3, waxwoodPlank3, bolt2, bolt3, nails2, nails4, plank, plank3, plank2, lumberyardTeleport, varrockTeleport3;
 
 	ConditionForStep removedChair, removedTable, removedTable2, removedStool, removedStool2, removedCampbed,
-		removedCarpet, hasLogs, hasPlanks, repairedCampbed, repairedCarpet, repairedStool, repairedTable,
-		repairedChair, repairedStool2, repairedTable2;
+			removedCarpet, hasLogs, hasPlanks, repairedCampbed, repairedCarpet, repairedStool, repairedTable,
+			repairedChair, repairedStool2, repairedTable2;
 
 	DetailedQuestStep talkToMarlo, talkToYarlo, removeChair, removeCarpet, removeStool,
-		removeStool2, removeTable, removeTable2, removeCampbed, talkToYarloAgain, searchCrate,
-		talkToOperator, buildChair, buildCarpet, buildStool, buildStool2, buildTable, buildTable2, buildCampbed,
-		talkToYarloOnceMore, talkToMarloToFinish;
+			removeStool2, removeTable, removeTable2, removeCampbed, talkToYarloAgain, searchCrate,
+			talkToOperator, buildChair, buildCarpet, buildStool, buildStool2, buildTable, buildTable2, buildCampbed,
+			talkToYarloOnceMore, talkToMarloToFinish;
 
 	@Override
 	public Map<Integer, QuestStep> loadSteps()

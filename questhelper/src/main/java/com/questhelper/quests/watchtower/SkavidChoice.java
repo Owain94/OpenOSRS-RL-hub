@@ -32,15 +32,13 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class SkavidChoice extends NpcStep
 {
-	public SkavidChoice(QuestHelper questHelper, EventBus eventBus)
+	public SkavidChoice(QuestHelper questHelper)
 	{
 		super(questHelper, NpcID.MAD_SKAVID, new WorldPoint(2526, 9413, 0), "Talk to the mad skavid.");
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Subscribe

@@ -1,23 +1,17 @@
 package com.questhelper.quests.deserttreasure;
 
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.NpcStep;
 import java.util.ArrayList;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullItemID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class GiveItems extends NpcStep
 {
-
-	@Inject
-	EventBus eventbus;
-
 	int magicLogId = 365;
 	int steelBarsId = 366;
 	int moltenGlassId = 367;
@@ -34,7 +28,7 @@ public class GiveItems extends NpcStep
 		super(questHelper, npcID, worldPoint, text, itemRequirements);
 		magicLogs = new ItemRequirement("Magic logs", ItemID.MAGIC_LOGS, 12);
 		magicLogs.addAlternates(NullItemID.NULL_1514);
-		steelBars = new ItemRequirement("Steel bar", ItemID.STEEL_BAR, 6);
+		steelBars = new ItemRequirement("Steel bar", ItemID.STEEL_BAR,  6);
 		steelBars.addAlternates(NullItemID.NULL_2354);
 		moltenGlass = new ItemRequirement("Molten glass", ItemID.MOLTEN_GLASS, 6);
 		moltenGlass.addAlternates(NullItemID.NULL_1776);
@@ -49,7 +43,6 @@ public class GiveItems extends NpcStep
 	{
 		super.startUp();
 		itemQuantitiesLeft();
-		eventbus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Subscribe

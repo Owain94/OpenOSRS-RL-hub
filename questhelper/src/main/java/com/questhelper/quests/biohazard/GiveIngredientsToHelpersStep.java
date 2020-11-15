@@ -24,29 +24,24 @@
  */
 package com.questhelper.quests.biohazard;
 
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.InteractingChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 {
-	@Inject
-	EventBus eventBus;
-
 	DetailedQuestStep giveHopsBroline, giveVinciEthenea, giveChancyHoney;
 
 	ItemRequirement ethenea, liquidHoney, sulphuricBroline;
@@ -80,7 +75,7 @@ public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 	{
 		if ((currentStep == giveHopsBroline && !sulphuricBroline.check(client))
 			|| (currentStep == giveChancyHoney && !liquidHoney.check(client))
-			|| (currentStep == giveVinciEthenea && !ethenea.check(client)))
+		    || (currentStep == giveVinciEthenea && !ethenea.check(client)))
 		{
 			updateSteps();
 		}
@@ -128,9 +123,6 @@ public class GiveIngredientsToHelpersStep extends DetailedOwnerStep
 		giveChancyHoney.addDialogStep("You give him the vial of liquid honey...");
 		giveVinciEthenea = new NpcStep(getQuestHelper(), NpcID.DA_VINCI, new WorldPoint(2930, 3220, 0), "Give Da Vinci the Ethenea.", ethenea);
 		giveVinciEthenea.addDialogStep("You give him the vial of ethenea...");
-
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		eventBus.subscribe(InteractingChanged.class, this, this::onInteractingChanged);
 	}
 
 	@Override

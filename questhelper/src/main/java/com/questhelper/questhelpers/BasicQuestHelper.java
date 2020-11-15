@@ -25,11 +25,12 @@
 package com.questhelper.questhelpers;
 
 import com.google.inject.Inject;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Map;
 import net.runelite.client.game.ItemManager;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.steps.QuestStep;
 
 public abstract class BasicQuestHelper extends QuestHelper
 {
@@ -42,7 +43,7 @@ public abstract class BasicQuestHelper extends QuestHelper
 	@Override
 	public void startUp()
 	{
-		if (steps == null)
+		if(steps == null)
 		{
 			steps = loadSteps();
 			instantiateSteps(steps.values());
@@ -71,8 +72,7 @@ public abstract class BasicQuestHelper extends QuestHelper
 		return false;
 	}
 
-	public ArrayList<PanelDetails> getPanels()
-	{
+	public ArrayList<PanelDetails> getPanels() {
 		ArrayList<PanelDetails> panelSteps = new ArrayList<>();
 		steps.forEach((id, step) -> panelSteps.add(new PanelDetails("", step)));
 		return panelSteps;

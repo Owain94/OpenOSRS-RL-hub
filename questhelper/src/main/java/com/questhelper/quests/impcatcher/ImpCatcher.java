@@ -24,14 +24,7 @@
  */
 package com.questhelper.quests.impcatcher;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +32,13 @@ import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.QuestDescriptor;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.IMP_CATCHER
@@ -63,8 +63,7 @@ public class ImpCatcher extends BasicQuestHelper
 		return steps;
 	}
 
-	private void setupRequirements()
-	{
+	private void setupRequirements() {
 		blackBead = new ItemRequirement("Black bead", ItemID.BLACK_BEAD);
 		whiteBead = new ItemRequirement("White bead", ItemID.WHITE_BEAD);
 		redBead = new ItemRequirement("Red bead", ItemID.RED_BEAD);

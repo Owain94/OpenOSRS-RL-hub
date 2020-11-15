@@ -26,9 +26,10 @@ package com.questhelper.steps.choice;
 
 import java.awt.Color;
 import lombok.Getter;
-import net.runelite.api.Client;
+import net.runelite.api.*;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 
 public class WidgetChoiceStep
 {

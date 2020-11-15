@@ -24,18 +24,9 @@
  */
 package com.questhelper.quests.dreammentor;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -54,6 +45,15 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DREAM_MENTOR
@@ -244,12 +244,12 @@ public class DreamMentor extends BasicQuestHelper
 		feed4Food = new NpcStep(this, NpcID.FALLEN_MAN, new WorldPoint(2346, 10360, 2), "Feed the fallen man 4 food. You'll need to alternate between at least 3 different types of food.", food4);
 
 		talkToCyrisus2 = new NpcStep(this, NpcID.FALLEN_MAN_3466, new WorldPoint(2346, 10360, 2), "Talk to the fallen man.");
-		((NpcStep) (talkToCyrisus2)).addAlternateNpcs(NpcID.FALLEN_MAN);
+		((NpcStep)(talkToCyrisus2)).addAlternateNpcs(NpcID.FALLEN_MAN);
 		feed4Food2 = new NpcStep(this, NpcID.FALLEN_MAN_3466, new WorldPoint(2346, 10360, 2), "Feed the fallen man 4 food. You'll need to alternate between at least 3 different types of food.", food4);
 
 		// 3622 = spirit
 		talkToCyrisus3 = new NpcStep(this, NpcID.FALLEN_MAN_3466, new WorldPoint(2346, 10360, 2), "Talk to the fallen man.");
-		((NpcStep) (talkToCyrisus3)).addAlternateNpcs(NpcID.CYRISUS_3467);
+		((NpcStep)(talkToCyrisus3)).addAlternateNpcs(NpcID.CYRISUS_3467);
 		talkToCyrisus3.addDialogSteps("You're looking better now.", "Well, you look and sound more lively.");
 		talkToCyrisus3.addDialogSteps("Are you looking forward to getting out?", "That's the spirit!");
 		talkToCyrisus3.addDialogSteps("You seem like a nice guy.", "Just being honest.");
@@ -267,7 +267,7 @@ public class DreamMentor extends BasicQuestHelper
 
 		feed6Food = new NpcStep(this, NpcID.CYRISUS_3467, new WorldPoint(2346, 10360, 2), "Feed Cyrisus 6 food. You'll need to alternate between at least 3 different types of food.", food6);
 		talkToCyrisus4 = new NpcStep(this, NpcID.CYRISUS_3467, new WorldPoint(2346, 10360, 2), "Talk to Cyrisus.");
-		((NpcStep) (talkToCyrisus4)).addAlternateNpcs(NpcID.CYRISUS_3468);
+		((NpcStep)(talkToCyrisus4)).addAlternateNpcs(NpcID.CYRISUS_3468);
 		talkToCyrisus4.addDialogSteps("You're looking better now.", "Well, you look and sound more lively.");
 		talkToCyrisus4.addDialogSteps("Are you looking forward to getting out?", "That's the spirit!");
 		talkToCyrisus4.addDialogSteps("You seem like a nice guy.", "Just being honest.");
@@ -298,14 +298,14 @@ public class DreamMentor extends BasicQuestHelper
 
 		useFood3 = new NpcStep(this, NpcID.CYRISUS_3468, new WorldPoint(2346, 10360, 2), "Feed Cyrisus alternating types of food.", food6);
 		useFood3.addSubSteps(goBackDownAfterGearing);
-		((NpcStep) (useFood3)).addAlternateNpcs(NpcID.CYRISUS_3469);
-		((NpcStep) (useFood3)).addAlternateNpcs(NpcID.CYRISUS_3470);
-		((NpcStep) (useFood3)).addAlternateNpcs(NpcID.CYRISUS_3471);
+		((NpcStep)(useFood3)).addAlternateNpcs(NpcID.CYRISUS_3469);
+		((NpcStep)(useFood3)).addAlternateNpcs(NpcID.CYRISUS_3470);
+		((NpcStep)(useFood3)).addAlternateNpcs(NpcID.CYRISUS_3471);
 
 		supportCyrisusToRecovery = new NpcStep(this, NpcID.CYRISUS_3468, new WorldPoint(2346, 10360, 2), "Talk to Cyrisus until he's fully recovered.");
-		((NpcStep) (supportCyrisusToRecovery)).addAlternateNpcs(NpcID.CYRISUS_3469);
-		((NpcStep) (supportCyrisusToRecovery)).addAlternateNpcs(NpcID.CYRISUS_3470);
-		((NpcStep) (supportCyrisusToRecovery)).addAlternateNpcs(NpcID.CYRISUS_3471);
+		((NpcStep)(supportCyrisusToRecovery)).addAlternateNpcs(NpcID.CYRISUS_3469);
+		((NpcStep)(supportCyrisusToRecovery)).addAlternateNpcs(NpcID.CYRISUS_3470);
+		((NpcStep)(supportCyrisusToRecovery)).addAlternateNpcs(NpcID.CYRISUS_3471);
 		supportCyrisusToRecovery.addDialogSteps("You're looking better now.", "Well, you look and sound more lively.");
 		supportCyrisusToRecovery.addDialogSteps("Are you looking forward to getting out?", "That's the spirit!");
 		supportCyrisusToRecovery.addDialogSteps("You seem like a nice guy.", "Just being honest.");
@@ -322,13 +322,12 @@ public class DreamMentor extends BasicQuestHelper
 		supportCyrisusToRecovery.addDialogSteps("Tell me a bit about yourself.", "Fishing!");
 
 		talkAfterHelping = new NpcStep(this, NpcID.CYRISUS_3468, new WorldPoint(2346, 10360, 2), "Talk to Cyrisus.");
-		((NpcStep) (talkAfterHelping)).addAlternateNpcs(NpcID.CYRISUS_3469, NpcID.CYRISUS_3470, NpcID.CYRISUS_3471);
+		((NpcStep)(talkAfterHelping)).addAlternateNpcs(NpcID.CYRISUS_3469, NpcID.CYRISUS_3470, NpcID.CYRISUS_3471);
 		supportCyrisusToRecovery.addSubSteps(talkAfterHelping);
 
 		talkToOneiromancer = new NpcStep(this, NpcID.ONEIROMANCER, new WorldPoint(2151, 3867, 0), "Talk to the Oneiromancer in the south east of Lunar Isle.", sealOfPassage);
 		talkToOneiromancer.addDialogStep("Cyrisus.");
 
-		fillVialWithWater = new DetailedQuestStep(this, "Fill the vial with water.", dreamVial);
 		fillVialWithWater = new ObjectStep(this, ObjectID.SINK_16705, new WorldPoint(2091, 3922, 0), "Fill the vial with water.", dreamVial);
 		fillVialWithWater.addIcon(ItemID.DREAM_VIAL_EMPTY);
 
@@ -342,12 +341,12 @@ public class DreamMentor extends BasicQuestHelper
 		lightBrazier.addIcon(ItemID.TINDERBOX);
 
 		talkToCyrisusForDream = new NpcStep(this, NpcID.CYRISUS_3468, new WorldPoint(2075, 3912, 0), "Talk to Cyrisus to enter the dream.", combatGear, sealOfPassage);
-		((NpcStep) (talkToCyrisusForDream)).addAlternateNpcs(NpcID.CYRISUS_3469, NpcID.CYRISUS_3470, NpcID.CYRISUS_3471);
+		((NpcStep)(talkToCyrisusForDream)).addAlternateNpcs(NpcID.CYRISUS_3469, NpcID.CYRISUS_3470, NpcID.CYRISUS_3471);
 		talkToCyrisusForDream.addDialogStep("Yes, let's go!");
 		killInadaquacy = new NpcStep(this, NpcID.THE_INADEQUACY, new WorldPoint(1824, 5150, 2), "Kill The Inadequacy.");
-		killEverlasting = new NpcStep(this, NpcID.THE_EVERLASTING, new WorldPoint(1824, 5150, 2), "Kill The Everlasting. You can safe spot it by the entry book.");
-		killUntouchable = new NpcStep(this, NpcID.THE_UNTOUCHABLE, new WorldPoint(1824, 5150, 2), "Kill The Untouchable. You can safe spot it by the entry book.");
-		killIllusive = new NpcStep(this, NpcID.THE_ILLUSIVE, new WorldPoint(1824, 5150, 2), "Kill The Illusive.");
+		killEverlasting = new NpcStep(this, NpcID.THE_EVERLASTING, new WorldPoint(1824, 5150, 2),"Kill The Everlasting. You can safe spot it by the entry book.");
+		killUntouchable = new NpcStep(this, NpcID.THE_UNTOUCHABLE, new WorldPoint(1824, 5150, 2),"Kill The Untouchable. You can safe spot it by the entry book.");
+		killIllusive = new NpcStep(this, NpcID.THE_ILLUSIVE, new WorldPoint(1824, 5150, 2),"Kill The Illusive.");
 		returnToOneiromancer = new NpcStep(this, NpcID.ONEIROMANCER, new WorldPoint(2151, 3867, 0), "Talk to the Oneiromancer to finish the quest!", sealOfPassage);
 		returnToOneiromancer.addDialogStep("Cyrisus.");
 	}

@@ -7,12 +7,9 @@ import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.inject.Inject;
-import net.runelite.api.Client;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class NumberChallenge extends DetailedOwnerStep
@@ -22,11 +19,6 @@ public class NumberChallenge extends DetailedOwnerStep
 	public NumberChallenge(QuestHelper questHelper)
 	{
 		super(questHelper, "Select the correct numbers to finish the pattern.");
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Override

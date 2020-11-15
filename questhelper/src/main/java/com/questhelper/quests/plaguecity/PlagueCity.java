@@ -25,18 +25,9 @@
 package com.questhelper.quests.plaguecity;
 
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.ObjectCondition;
@@ -51,6 +42,15 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.PLAGUE_CITY
@@ -61,7 +61,7 @@ public class PlagueCity extends BasicQuestHelper
 		chocolateDust, snapeGrass, pictureOfElena, gasMask, book, bucketOfChocolateMilk, hangoverCure, warrant, key;
 
 	ConditionForStep inUnderground, hasPictureOfElena, hasTriedToPullGrill, inWestArdougne, hasBook, inUpstairsMathasHouse, hasBucketOfChocolateMilk, hasHangoverCure,
-		hasWarrant, inPlagueHouse, inDownstairsOfPlagueHouse, hasKey, manholeClosed;
+	hasWarrant, inPlagueHouse, inDownstairsOfPlagueHouse, hasKey, manholeClosed;
 
 	QuestStep talkToEdmond, talkToAlrena, talkToEdmondAgain, useWaterOnMudPatch1, useWaterOnMudPatch2, useWaterOnMudPatch3, useWaterOnMudPatch4,
 		digHole, grabPictureOfElena, goDownHole, attemptToPullGrill, climbMudPile, talkToEdmondUnderground, useRopeOnGrill, climbThroughPipe, talkToJethick,
@@ -223,20 +223,18 @@ public class PlagueCity extends BasicQuestHelper
 		key = new ItemRequirement("A small key", ItemID.A_SMALL_KEY);
 	}
 
-	public void loadZones()
-	{
-		underground = new Zone(new WorldPoint(2506, 9737, 0), new WorldPoint(2532, 9781, 0));
-		westArdougne1 = new Zone(new WorldPoint(2460, 3279, 0), new WorldPoint(2556, 3334, 2));
-		westArdougne2 = new Zone(new WorldPoint(2434, 3305, 0), new WorldPoint(2464, 3323, 2));
-		westArdougne3 = new Zone(new WorldPoint(2510, 3265, 0), new WorldPoint(2556, 3280, 2));
-		upstairsMathasHouse = new Zone(new WorldPoint(2527, 3329, 1), new WorldPoint(2533, 3333, 1));
-		plagueHouse1 = new Zone(new WorldPoint(2532, 3268, 0), new WorldPoint(2541, 3271, 0));
-		plagueHouse2 = new Zone(new WorldPoint(2535, 3272, 0), new WorldPoint(2541, 3272, 0));
-		downstairsOfPlagueHouse = new Zone(new WorldPoint(2535, 9670, 0), new WorldPoint(2542, 9673, 0));
+	public void loadZones() {
+		underground = new Zone(new WorldPoint(2506,9737,0), new WorldPoint(2532,9781,0));
+		westArdougne1 = new Zone(new WorldPoint(2460,3279,0), new WorldPoint(2556, 3334,2));
+		westArdougne2 = new Zone(new WorldPoint(2434,3305,0), new WorldPoint(2464, 3323,2));
+		westArdougne3 = new Zone(new WorldPoint(2510,3265,0), new WorldPoint(2556, 3280,2));
+		upstairsMathasHouse = new Zone(new WorldPoint(2527,3329,1), new WorldPoint(2533, 3333,1));
+		plagueHouse1 = new Zone(new WorldPoint(2532,3268,0), new WorldPoint(2541, 3271,0));
+		plagueHouse2 = new Zone(new WorldPoint(2535,3272,0), new WorldPoint(2541, 3272,0));
+		downstairsOfPlagueHouse = new Zone(new WorldPoint(2535, 9670,0), new WorldPoint(2542, 9673,0));
 	}
 
-	public void setupConditions()
-	{
+	public void setupConditions() {
 		inUnderground = new ZoneCondition(underground);
 		hasPictureOfElena = new ItemRequirementCondition(pictureOfElena);
 		hasTriedToPullGrill = new VarbitCondition(1786, 1);
@@ -281,12 +279,12 @@ public class PlagueCity extends BasicQuestHelper
 		goDownHole = new ObjectStep(this, NullObjectID.NULL_2532, new WorldPoint(2566, 3332, 0),
 			"Go down the hole.");
 
-		attemptToPullGrill = new ObjectStep(this, NullObjectID.NULL_11422, new WorldPoint(2514, 9739, 0), "Attempt to pull the grill in the east of the sewer.");
-		climbMudPile = new ObjectStep(this, ObjectID.MUD_PILE_2533, new WorldPoint(2519, 9760, 0), "Climb the mud pile.");
+		attemptToPullGrill = new ObjectStep(this, NullObjectID.NULL_11422, new WorldPoint(2514,9739,0), "Attempt to pull the grill in the east of the sewer.");
+		climbMudPile = new ObjectStep(this, ObjectID.MUD_PILE_2533, new WorldPoint(2519,9760,0), "Climb the mud pile.");
 
 		grabPictureOfElena.addSubSteps(climbMudPile);
 
-		useRopeOnGrill = new ObjectStep(this, NullObjectID.NULL_11422, new WorldPoint(2514, 9739, 0), "Use a rope on the grill.", rope);
+		useRopeOnGrill = new ObjectStep(this, NullObjectID.NULL_11422, new WorldPoint(2514,9739,0), "Use a rope on the grill.", rope);
 		useRopeOnGrill.addIcon(ItemID.ROPE);
 
 		talkToEdmondUnderground = new NpcStep(this, NpcID.EDMOND_4256, new WorldPoint(2517, 9753, 0), "Talk to Edmond.");
@@ -342,7 +340,7 @@ public class PlagueCity extends BasicQuestHelper
 		goDownManhole = new ObjectStep(this, ObjectID.MANHOLE_2544, new WorldPoint(2529, 3303, 0), "Go back down the manhole to return to Edmond.");
 		goDownManhole2 = new ObjectStep(this, ObjectID.MANHOLE_2543, new WorldPoint(2529, 3303, 0), "Go back down the manhole to return to Edmond.");
 
-		climbMudPileToFinish = new ObjectStep(this, ObjectID.MUD_PILE_2533, new WorldPoint(2519, 9760, 0), "Climb the mud pile to return to Edmond.");
+		climbMudPileToFinish = new ObjectStep(this, ObjectID.MUD_PILE_2533, new WorldPoint(2519,9760,0), "Climb the mud pile to return to Edmond.");
 
 		talkToEdmondToFinish = new NpcStep(this, NpcID.EDMOND_4256, new WorldPoint(2568, 3333, 0), "Return to Edmond to finish the quest.");
 		talkToEdmondToFinish.addSubSteps(goUpstairsInPlagueHouseToFinish, goDownManhole, goDownManhole2, climbMudPileToFinish);

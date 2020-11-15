@@ -24,23 +24,13 @@
  */
 package com.questhelper.quests.lunardiplomacy;
 
-import com.google.inject.Inject;
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedOwnerStep;
-import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.DigStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -53,38 +43,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
-@Slf4j
 @QuestDescriptor(
 	quest = QuestHelperQuest.LUNAR_DIPLOMACY
 )
 public class LunarDiplomacy extends BasicQuestHelper
 {
-	@Inject
-	EventBus eventBus;
-
-	@Inject
-	Client client;
-
-	ChanceChallenge doChanceChallenge = new ChanceChallenge(this);
-	boolean doChanceChallengeSubscribed = false;
-	NumberChallenge doNumberChallenge = new NumberChallenge(this);
-	boolean doNumberChallengeSubscribed = false;
-	MimicChallenge doMimicChallenge = new MimicChallenge(this);
-	boolean doMimicChallengeSubscribed = false;
-
 	ItemRequirement sealOfPassage, bullseyeLantern, bullseyeLanternLit, emeraldLantern, emeraldLanternLit, emeraldLens,
 		bullseyeLanternHighlighted, tinderboxHighlighted, emeraldLensHighlighted, emeraldLanternLitHighlighted, suqahTooth,
 		groundTooth, marrentilPotion, guamPotion, guamMarrentilPotion, guamMarrentilPotionHighlighted, sleepPotion, specialVial,
@@ -124,6 +102,8 @@ public class LunarDiplomacy extends BasicQuestHelper
 
 	ObjectStep mineOre;
 
+	DetailedOwnerStep doNumberChallenge, doMimicChallenge, doChanceChallenge;
+
 	ConditionalStep returnToMakePotion, returnToTalkToYaga, enteringTheIsland, boardingTheBoat, setSail, returnToOneWithPotion, returnWithStaff, makingHelm,
 		gettingRing, gettingCape, gettingAmulet, gettingClothes;
 
@@ -131,39 +111,9 @@ public class LunarDiplomacy extends BasicQuestHelper
 		waterAltar, earthAltar, fireAltar, lunarMine, centreOfDream, chanceDream, numbersDream, treeDream, memoryDream, raceDream,
 		mimicDream, fightArena;
 
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		if (eventBus != null && client != null)
-		{
-			if (!doChanceChallengeSubscribed)
-			{
-				doChanceChallenge.eventBus = eventBus;
-				doChanceChallenge.client = client;
-				doChanceChallenge.subscribe();
-				doChanceChallengeSubscribed = true;
-			}
-			if (!doNumberChallengeSubscribed)
-			{
-				doNumberChallenge.eventBus = eventBus;
-				doNumberChallenge.client = client;
-				doNumberChallenge.subscribe();
-				doNumberChallengeSubscribed = true;
-			}
-			if (!doMimicChallengeSubscribed)
-			{
-				doMimicChallenge.eventBus = eventBus;
-				doMimicChallenge.client = client;
-				doMimicChallenge.subscribe();
-				doMimicChallengeSubscribed = true;
-			}
-		}
-	}
-
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		loadZones();
 		setupItemRequirements();
 		setupConditions();
@@ -836,9 +786,13 @@ public class LunarDiplomacy extends BasicQuestHelper
 		goToTrees = new ObjectStep(this, ObjectID.PLATFORM_16635, new WorldPoint(1764, 5098, 2), "Go on the platform to the trees challenge.");
 		goToChance = new ObjectStep(this, ObjectID.PLATFORM_16637, new WorldPoint(1751, 5080, 2), "Go on the platform to the chance challenge.");
 
+		doMemoryChallenge = new MemoryChallenge(this);
 		startTreeChallenge = new NpcStep(this, NpcID.ETHEREAL_PERCEPTIVE, new WorldPoint(1765, 5112, 2), "Talk to Ethereal perspective to begin. Cut 20 logs and deposit them on the log piles faster than the NPC.");
 		startTreeChallenge.addDialogStep("Ok, let's go!");
 		doRaceChallenge = new DetailedQuestStep(this, "Race to the end of the course to win!");
+		doChanceChallenge = new ChanceChallenge(this);
+		doNumberChallenge = new NumberChallenge(this);
+		doMimicChallenge = new MimicChallenge(this);
 
 		startNumber = new NpcStep(this, NpcID.ETHEREAL_NUMERATOR, new WorldPoint(1786, 5066, 2),
 			"Talk to the Ethereal Numerator to begin the challenge.");

@@ -25,6 +25,8 @@
 package com.questhelper.panel;
 
 import com.questhelper.QuestHelperPlugin;
+import com.questhelper.questhelpers.BasicQuestHelper;
+
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.DetailedQuestStep;

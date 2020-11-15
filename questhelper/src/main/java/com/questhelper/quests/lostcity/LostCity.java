@@ -25,23 +25,12 @@
 package com.questhelper.quests.lostcity;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.NpcCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,6 +40,17 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.LOST_CITY
@@ -110,8 +110,7 @@ public class LostCity extends BasicQuestHelper
 		return steps;
 	}
 
-	public void setupItemRequirements()
-	{
+	public void setupItemRequirements() {
 		knife = new ItemRequirement("Knife", ItemID.KNIFE);
 		bronzeAxe = new ItemRequirement("Bronze axe", ItemID.BRONZE_AXE);
 		axe = new ItemRequirement("Any axe", ItemID.BRONZE_AXE);
@@ -123,14 +122,12 @@ public class LostCity extends BasicQuestHelper
 		dramenStaffEquipped = new ItemRequirement("Dramen staff", ItemID.DRAMEN_STAFF, 1, true);
 	}
 
-	public void loadZones()
-	{
-		entrana = new Zone(new WorldPoint(2798, 3327, 0), new WorldPoint(2878, 3394, 1));
-		entranaDungeon = new Zone(new WorldPoint(2817, 9722, 0), new WorldPoint(2879, 9784, 0));
+	public void loadZones() {
+		entrana = new Zone(new WorldPoint(2798, 3327,0), new WorldPoint(2878, 3394,1));
+		entranaDungeon = new Zone(new WorldPoint(2817, 9722,0), new WorldPoint(2879, 9784,0));
 	}
 
-	public void setupConditions()
-	{
+	public void setupConditions() {
 		onEntrana = new ZoneCondition(entrana);
 		inDungeon = new ZoneCondition(entranaDungeon);
 		shamusNearby = new NpcCondition(NpcID.SHAMUS);
@@ -141,8 +138,7 @@ public class LostCity extends BasicQuestHelper
 		hasStaff = new ItemRequirementCondition(dramenStaff);
 	}
 
-	public void setupSteps()
-	{
+	public void setupSteps() {
 		talkToWarrior = new NpcStep(this, NpcID.WARRIOR, new WorldPoint(3151, 3207, 0), "Talk to the Warrior south east of Draynor Village.");
 		talkToWarrior.addDialogStep("What are you camped out here for?");
 		talkToWarrior.addDialogStep("What makes you think it's out here?");

@@ -25,19 +25,11 @@
 package com.questhelper.quests.royaltrouble;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -54,6 +46,14 @@ import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.ROYAL_TROUBLE
@@ -472,7 +472,7 @@ public class RoyalTrouble extends BasicQuestHelper
 		putCoalIntoEngine5 = new DetailedQuestStep(this, "Put 1 more coal into the engine.", engine, coal1);
 		putCoalIntoEngine.addSubSteps(putCoalIntoEngine2, putCoalIntoEngine3, putCoalIntoEngine4, putCoalIntoEngine5);
 
-		putCoalIntoEnginePlaced = new ObjectStep(this, NullObjectID.NULL_15238, new WorldPoint(2508, 10287, 0), "Read the nearby lift manual, then put 5 coal into the engine.", coal5);
+		putCoalIntoEnginePlaced = new ObjectStep(this, NullObjectID.NULL_15238, new WorldPoint(2508, 10287, 0), "Read the nearby lift manual, then put 5 coal into the engine.",  coal5);
 		putCoalIntoEnginePlaced2 = new ObjectStep(this, NullObjectID.NULL_15238, new WorldPoint(2508, 10287, 0), "Put 4 more coal into the engine.", coal4);
 		putCoalIntoEnginePlaced3 = new ObjectStep(this, NullObjectID.NULL_15238, new WorldPoint(2508, 10287, 0), "Put 3 more coal into the engine.", coal3);
 		putCoalIntoEnginePlaced4 = new ObjectStep(this, NullObjectID.NULL_15238, new WorldPoint(2508, 10287, 0), "Put 2 more coal into the engine.", coal2);

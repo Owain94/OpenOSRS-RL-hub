@@ -589,15 +589,9 @@ public class QuestHelperPlugin extends Plugin
 		try
 		{
 			questHelper = clazz.newInstance();
-			questHelper.setQuest(quest);
-		}
-		catch (InstantiationException | IllegalAccessException ex)
-		{
-			throw new QuestInstantiationException(ex);
-		}
 
-		try
-		{
+			// Handle injection immediately to avoid problems relating to
+			// us not being able to register at a later time.
 			Module questModule = (Binder binder) ->
 			{
 				binder.bind(clazz).toInstance(questHelper);
@@ -606,8 +600,10 @@ public class QuestHelperPlugin extends Plugin
 			Injector questInjector = RuneLite.getInjector().createChildInjector(questModule);
 			questInjector.injectMembers(questHelper);
 			questHelper.setInjector(questInjector);
+
+			questHelper.setQuest(quest);
 		}
-		catch (CreationException ex)
+		catch (InstantiationException | IllegalAccessException ex)
 		{
 			throw new QuestInstantiationException(ex);
 		}

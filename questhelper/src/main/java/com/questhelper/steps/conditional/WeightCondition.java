@@ -39,7 +39,7 @@ public class WeightCondition extends ConditionForStep
 		this.operation = Operation.EQUAL;
 	}
 
-	public WeightCondition(int weight, Operation operation)
+	public WeightCondition(int weight,  Operation operation)
 	{
 		this.weight = weight;
 		this.operation = operation;

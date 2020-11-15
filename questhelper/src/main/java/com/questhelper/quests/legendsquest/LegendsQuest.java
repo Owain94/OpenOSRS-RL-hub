@@ -1,23 +1,13 @@
 package com.questhelper.quests.legendsquest;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.ItemRequirements;
-import com.questhelper.requirements.Spellbook;
+import com.questhelper.QuestHelperQuest;
 import com.questhelper.requirements.SpellbookRequirement;
-import com.questhelper.steps.ConditionalStep;
+import com.questhelper.requirements.Spellbook;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ChatMessageCondition;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -25,7 +15,6 @@ import com.questhelper.steps.conditional.LogicType;
 import com.questhelper.steps.conditional.NpcCondition;
 import com.questhelper.steps.conditional.ObjectCondition;
 import com.questhelper.steps.conditional.WidgetTextCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +23,17 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.ZoneCondition;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -41,14 +41,14 @@ import net.runelite.api.widgets.WidgetInfo;
 )
 public class LegendsQuest extends BasicQuestHelper
 {
-	ItemRequirement axe, machete, radimusNotes, papyrus3, charcoal3, papyrus, charcoal, radimusNotesHighlight, completeNotes, bullRoarer, lockpick,
+	ItemRequirement axe, machete, radimusNotes, papyrus3, charcoal3, papyrus, charcoal, radimusNotesHighlight, completeNotesHighlighted, bullRoarer,  lockpick,
 		soulRune, mindRune, earthRune, lawRune2, opal, jade, sapphire, ruby, diamond, pickaxe, bullRoarerHighlight, sketch, lawRuneHighlight,
 		soulRuneHighlight, mindRuneHighlight, earthRuneHighlight, opalHighlighted, jadeHighlighted, topazHighlighted, sapphireHighlighted,
 		emeraldHighlighted, rubyHighlighted, diamondHighlighted, topaz, emerald, bindingBook, bindingBookHighlighted, goldBar2, hammer, goldBowl,
 		goldBowlHighlighted, combatGear, goldBowlBlessed, goldBowlFull, goldBowlFullHighlighted, reed, macheteHighlighted, yommiSeeds, germinatedSeeds,
 		germinatedSeedsHighlighted, runeOrDragonAxe, ardrigal, snakeWeed, vialOfWater, unpoweredOrb, ardrigalMixture, braveryPotion, braveryPotionHighlighted,
 		snakeMixture, rope, elemental30, cosmic3, ropeHighlighted, lumpCrystal, chunkCrystal, hunkCrystal, heartCrystal, heartCrystal2, darkDagger, glowingDagger,
-		force, forceHighlighted, yommiTotem, yommiTotemHighlighted, gildedTotem;
+		force, forceHighlighted, yommiTotem, yommiTotemHighlighted, gildedTotem, completeNotes;
 
 	ItemRequirements chargeOrbRunes;
 
@@ -372,7 +372,10 @@ public class LegendsQuest extends BasicQuestHelper
 
 		completeNotes = new ItemRequirement("Radimus notes", ItemID.RADIMUS_NOTES_715);
 		completeNotes.setTip("You can get another from Radimus in the Legends' Guild, and you'll need to re-sketch the jungle");
-		completeNotes.setHighlightInInventory(true);
+
+		completeNotesHighlighted = new ItemRequirement("Radimus notes", ItemID.RADIMUS_NOTES_715);
+		completeNotesHighlighted.setTip("You can get another from Radimus in the Legends' Guild, and you'll need to re-sketch the jungle");
+		completeNotesHighlighted.setHighlightInInventory(true);
 
 		sketch = new ItemRequirement("Sketch", ItemID.SKETCH);
 		sketch.setTip("You can get another by summoning Gujuo with the bull roarer again");
@@ -554,10 +557,10 @@ public class LegendsQuest extends BasicQuestHelper
 			new WidgetTextCondition(WidgetInfo.DIALOG_SPRITE_TEXT, "Eastern Kharazi Jungle- *** Completed"),
 			new Conditions(inEast, completeTextAppeared));
 		completeMiddle = new Conditions(true, LogicType.OR,
-			new WidgetTextCondition(WidgetInfo.DIALOG_SPRITE_TEXT, "Middle Kharazi Jungle- *** Completed"),
+			new WidgetTextCondition(WidgetInfo.DIALOG_SPRITE_TEXT,  "Middle Kharazi Jungle- *** Completed"),
 			new Conditions(inMiddle, completeTextAppeared));
 		completeWest = new Conditions(true, LogicType.OR,
-			new WidgetTextCondition(WidgetInfo.DIALOG_SPRITE_TEXT, "Western Kharazi Jungle- *** Completed"),
+			new WidgetTextCondition(WidgetInfo.DIALOG_SPRITE_TEXT,  "Western Kharazi Jungle- *** Completed"),
 			new Conditions(inWest, completeTextAppeared));
 
 		finishedMap = new WidgetTextCondition(WidgetInfo.DIALOG_SPRITE_TEXT, "You have completed mapping the Khazari");
@@ -573,7 +576,7 @@ public class LegendsQuest extends BasicQuestHelper
 		searchedMarkedWall = new WidgetTextCondition(229, 1, "You can see a message  on the wall");
 
 		addedSoulRune = new Conditions(true, LogicType.OR,
-			new WidgetTextCondition(229, 1, "You slide the Soul Rune into the first"),
+			new WidgetTextCondition(229, 1,  "You slide the Soul Rune into the first"),
 			new WidgetTextCondition(229, 1, "You find the letter 'S'"));
 		addedMindRune = new Conditions(true, LogicType.OR,
 			new WidgetTextCondition(229, 1, "You slide the Mind Rune into the second"),
@@ -649,10 +652,10 @@ public class LegendsQuest extends BasicQuestHelper
 		sketchMiddle.addDialogStep("Start Mapping Khazari Jungle.");
 		sketchWest = new DetailedQuestStep(this, new WorldPoint(2791, 2917, 0), "Stand in the west of the Khazari Jungle and right-click complete the Radimus note.", radimusNotesHighlight, papyrus, charcoal);
 		sketchWest.addDialogStep("Start Mapping Khazari Jungle.");
-		useNotes = new NpcStep(this, NpcID.JUNGLE_FORESTER, new WorldPoint(2867, 2942, 0), "Use the Radimus notes on a Jungle Foreseter outside the Khazari Jungle.", true, completeNotes);
+		useNotes = new NpcStep(this, NpcID.JUNGLE_FORESTER, new WorldPoint(2867, 2942, 0), "Use the Radimus notes on a Jungle Foreseter outside the Khazari Jungle.", true, completeNotesHighlighted);
 		useNotes.addAlternateNpcs(NpcID.JUNGLE_FORESTER_3955);
 		useNotes.addDialogStep("Yes, go ahead make a copy!");
-		enterJungleWithRoarer = new DetailedQuestStep(this, "Re-enter the Khazari Jungle. You'll need to cut through some trees and bushes to enter.", bullRoarer, axe, machete, lockpick, pickaxe, soulRune, mindRune, earthRune, lawRune2, opal, jade, sapphire, ruby, diamond);
+		enterJungleWithRoarer = new DetailedQuestStep(this, "Re-enter the Khazari Jungle. You'll need to cut through some trees and bushes to enter.", bullRoarer, axe, machete, lockpick, pickaxe, soulRune, mindRune, earthRune, lawRune2, opal, jade, topaz, sapphire, emerald, ruby, diamond);
 		spinBull = new DetailedQuestStep(this, "Spin the bull roarer until Gujuo appears.", bullRoarerHighlight);
 		talkToGujuo = new NpcStep(this, NpcID.GUJUO, "Talk to Gujuo.");
 		talkToGujuo.addDialogSteps("I was hoping to attract the attention of a native.", "I want to develop friendly relations with your people.", "Can you get your people together?", "What can we do instead then?", "How do we make the totem pole?", "I will release Ungadulu...");
@@ -811,18 +814,18 @@ public class LegendsQuest extends BasicQuestHelper
 		useHeartOnRecess = new ObjectStep(this, ObjectID.RECESS, new WorldPoint(2422, 4691, 0), "Use the heart on the recess next to the barrier to the south.", heartCrystal2);
 		useHeartOnRecess.addIcon(ItemID.HEART_CRYSTAL_745);
 
-		pushBoulder = new NpcStep(this, NpcID.BOULDER_3967, new WorldPoint(2393, 4679, 0), "Enter the south room and attempt to push one of the boulders to the west.", true);
+	    pushBoulder = new NpcStep(this, NpcID.BOULDER_3967, new WorldPoint(2393, 4679, 0), "Enter the south room and attempt to push one of the boulders to the west.", true);
 
-		talkToEchned = new NpcStep(this, NpcID.ECHNED_ZEKIN, new WorldPoint(2385, 4681, 0), "Talk to Echned Zekin.");
-		talkToEchned.addDialogSteps("Who's asking?", "Yes, I need it for my quest.", "What can I do about that?", "I'll do what I must to get the water.", "Ok, I'll do it.");
+	    talkToEchned = new NpcStep(this, NpcID.ECHNED_ZEKIN, new WorldPoint(2385, 4681, 0), "Talk to Echned Zekin.");
+	    talkToEchned.addDialogSteps("Who's asking?", "Yes, I need it for my quest.", "What can I do about that?", "I'll do what I must to get the water.", "Ok, I'll do it.");
 
-		pickUpHat = new DetailedQuestStep(this, new WorldPoint(2379, 4712, 0), "Attempt to pick up the wizard hat near the rope down and kill Viyeldi with the dark dagger. If he doesn't appear, you'll need to talk to Ungadulu for a holy force spell.", darkDagger);
-		killViyeldi = new NpcStep(this, NpcID.VIYELDI, new WorldPoint(2379, 4712, 0), "Kill Viyeldi.", darkDagger);
-		killViyeldi.addIcon(ItemID.DARK_DAGGER);
+	    pickUpHat = new DetailedQuestStep(this, new WorldPoint(2379, 4712, 0), "Attempt to pick up the wizard hat near the rope down and kill Viyeldi with the dark dagger. If he doesn't appear, you'll need to talk to Ungadulu for a holy force spell.", darkDagger);
+	    killViyeldi = new NpcStep(this, NpcID.VIYELDI, new WorldPoint(2379, 4712, 0), "Kill Viyeldi.", darkDagger);
+	    killViyeldi.addIcon(ItemID.DARK_DAGGER);
 
-		pickUpHat.addSubSteps(killViyeldi);
+	    pickUpHat.addSubSteps(killViyeldi);
 
-		pushBoulderAgain = new NpcStep(this, NpcID.BOULDER_3967, new WorldPoint(2393, 4679, 0), "Return to Echned in the south room with the dagger. Be prepared for a fight with Nezikchened again.", true, glowingDagger);
+		pushBoulderAgain =  new NpcStep(this, NpcID.BOULDER_3967, new WorldPoint(2393, 4679, 0), "Return to Echned in the south room with the dagger. Be prepared for a fight with Nezikchened again.", true, glowingDagger);
 		pushBoulderWithForce = new NpcStep(this, NpcID.BOULDER_3967, new WorldPoint(2393, 4679, 0), "Return to Echned in the south room with holy force. Be prepared for a fight with Nezikchened again.", true, force);
 		pushBoulderAgain.addSubSteps(pushBoulderWithForce);
 
@@ -919,7 +922,7 @@ public class LegendsQuest extends BasicQuestHelper
 				fightNezikchenedInFire, talkToUngadulu)), bullRoarer, goldBar2, hammer, axe, machete, combatGear));
 
 		allSteps.add(new PanelDetails("Attempted planting", new ArrayList<>(Arrays.asList(
-			useBowlOnSeeds, leaveCaveWithSeed, useMacheteOnReedsAgain, useReedOnPoolAgain, spinBullAfterSeeds, talkToGujuoAfterSeeds)), machete, axe, goldBowlFull, yommiSeeds, bullRoarer));
+		useBowlOnSeeds, leaveCaveWithSeed, useMacheteOnReedsAgain, useReedOnPoolAgain, spinBullAfterSeeds, talkToGujuoAfterSeeds)), machete, axe, goldBowlFull, yommiSeeds, bullRoarer));
 
 		allSteps.add(new PanelDetails("To the source", new ArrayList<>(Arrays.asList(
 			addArdrigal, enterMossyRockToSource, enterBookcaseToSource, enterGate1ToSource, enterGate2ToSource, searchMarkedWallToSource, useSpellOnDoor, useRopeOnWinch, climbDownWinch)),
@@ -939,7 +942,7 @@ public class LegendsQuest extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Finishing off", new ArrayList<>(Arrays.asList(
 			returnToRadimus, talkToRadimusInGuild, talkToRadimusInGuildAgain)),
-			gildedTotem, completeNotes));
+			gildedTotem, completeNotesHighlighted));
 
 		return allSteps;
 	}

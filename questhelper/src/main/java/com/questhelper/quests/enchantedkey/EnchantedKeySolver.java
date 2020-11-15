@@ -65,7 +65,7 @@ public class EnchantedKeySolver
 	 * @param temperature       The temperature of the checked point
 	 * @param temperatureChange The change of temperature of the checked point compared to the previously-checked point
 	 * @return A set of {@link EnchantedKeyDigLocation}s which are still possible after the filtering occurs. This return value
-	 * is the same as would be returned by {@code getPossibleLocations()}.
+	 *         is the same as would be returned by {@code getPossibleLocations()}.
 	 */
 	public Set<EnchantedKeyDigLocation> signal(@Nonnull final WorldPoint worldPoint, @Nonnull final EnchantedKeyTemperature temperature, @Nullable final EnchantedKeyTemperatureChange temperatureChange)
 	{
@@ -128,7 +128,7 @@ public class EnchantedKeySolver
 	 * @param secondPoint Second point to test
 	 * @param rect        Rectangle, whose corner points will be compared to the first and second points passed
 	 * @return {@code true} if {@code firstPoint} is closer to each of {@code rect}'s four corner points than
-	 * {@code secondPoint}, {@code false} otherwise.
+	 *         {@code secondPoint}, {@code false} otherwise.
 	 * @see WorldPoint#distanceTo2D
 	 */
 	@VisibleForTesting
@@ -166,7 +166,7 @@ public class EnchantedKeySolver
 	 * @param secondPoint Second point to test
 	 * @param worldPoint  Point to compare to the first and second points passed
 	 * @return {@code true} if {@code firstPoint} is closer to {@code worldPoint} than {@code secondPoint},
-	 * {@code false} otherwise.
+	 *         {@code false} otherwise.
 	 * @see WorldPoint#distanceTo2D
 	 */
 	@VisibleForTesting

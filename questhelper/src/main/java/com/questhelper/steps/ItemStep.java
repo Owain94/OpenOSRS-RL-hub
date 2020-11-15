@@ -1,7 +1,7 @@
 package com.questhelper.steps;
 
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
+import com.questhelper.questhelpers.QuestHelper;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import net.runelite.api.Perspective;

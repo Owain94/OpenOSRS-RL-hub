@@ -45,7 +45,6 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.OverlayUtil;
@@ -56,9 +55,6 @@ public class EnchantedKeyDigStep extends DetailedQuestStep
 {
 	@Inject
 	ItemManager itemManager;
-
-	@Inject
-	EventBus eventBus;
 
 	@Nullable
 	private EnchantedKeySolver enchantedKeySolver;
@@ -219,8 +215,6 @@ public class EnchantedKeyDigStep extends DetailedQuestStep
 		{
 			this.setWorldPoint(locations.iterator().next().getWorldPoint());
 		}
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
-		eventBus.subscribe(ChatMessage.class, this, this::onChatMessage);
 	}
 
 	@Override

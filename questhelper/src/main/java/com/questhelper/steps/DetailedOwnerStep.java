@@ -43,10 +43,10 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 	protected Requirement[] requirements;
 
 	@Inject
-	public EventBus eventBus;
+	protected EventBus eventBus;
 
 	@Inject
-	public Client client;
+	protected Client client;
 
 	public DetailedOwnerStep(QuestHelper questHelper, Requirement... requirements)
 	{

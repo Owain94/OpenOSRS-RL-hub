@@ -24,17 +24,11 @@
  */
 package com.questhelper.quests.theforsakentower;
 
-import com.google.inject.Inject;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -46,88 +40,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import net.runelite.api.Client;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.THE_FORSAKEN_TOWER
 )
 public class TheForsakenTower extends BasicQuestHelper
 {
-	@Inject
-	EventBus eventBus;
-
-	@Inject
-	Client client;
-
 	ItemRequirement tinderbox, gamesNecklace, fiveGallon, eightGallon, crank, oldNotes, dinhsHammer;
 
 	ConditionForStep has5Gallon, has8Gallon, hasTinderbox, inFirstFloor, inSecondFloor, inBasement, inspectedDisplayCase, finishedFurnacePuzzle, hasCrank, generatorStarted,
 		powerPuzzleVisible, finishedPowerPuzzle, hasOldNotes, finishedPotionPuzzle, finishedAltarPuzzle, hasDinhsHammer;
 
-	QuestStep talkToVulcana, talkToUndor, enterTheForsakenTower, inspectDisplayCase, goDownLadderToBasement, searchCrate, inspectGenerator, inspectPowerGrid,
+	QuestStep talkToVulcana, talkToUndor, enterTheForsakenTower, inspectDisplayCase, goDownLadderToBasement, searchCrate, inspectGenerator, inspectPowerGrid, doPowerPuzzle,
 		goDownToGroundFloor, goDownToFirstFloor, getHammer, goUpToGroundFloor, returnToUndor, returnToVulcana;
 
-	PowerPuzzle doPowerPuzzle = new PowerPuzzle(this);
-	boolean doPowerPuzzleSubscribed = false;
-	PotionPuzzle potionPuzzle = new PotionPuzzle(this);
-	boolean potionPuzzleSubscribed = false;
-	JugPuzzle furnacePuzzleSteps = new JugPuzzle(this);
-	boolean furnacePuzzleStepsSubscribed = false;
-	AltarPuzzle altarPuzzle = new AltarPuzzle(this);
-	boolean altarPuzzleSubscribed = false;
+	PotionPuzzle potionPuzzle;
+	JugPuzzle furnacePuzzleSteps;
+	AltarPuzzle altarPuzzle;
 
 	ConditionalStep powerPuzzle;
 
 	Zone firstFloor, secondFloor, basement;
 
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		if (eventBus != null && client != null)
-		{
-			if (!doPowerPuzzleSubscribed)
-			{
-				doPowerPuzzle.eventBus = eventBus;
-				doPowerPuzzle.client = client;
-				doPowerPuzzle.subscribe();
-				doPowerPuzzleSubscribed = true;
-			}
-			if (!potionPuzzleSubscribed)
-			{
-				potionPuzzle.eventBus = eventBus;
-				potionPuzzle.client = client;
-				potionPuzzle.subscribe();
-				potionPuzzleSubscribed = true;
-			}
-			if (!furnacePuzzleStepsSubscribed)
-			{
-				furnacePuzzleSteps.eventBus = eventBus;
-				furnacePuzzleSteps.client = client;
-				furnacePuzzleSteps.subscribe();
-				furnacePuzzleStepsSubscribed = true;
-			}
-			if (!altarPuzzleSubscribed)
-			{
-				altarPuzzle.eventBus = eventBus;
-				altarPuzzle.client = client;
-				altarPuzzle.subscribe();
-				altarPuzzleSubscribed = true;
-			}
-		}
-	}
-
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		setupItemRequirements();
 		setupZones();
 		setupConditions();
@@ -223,6 +170,7 @@ public class TheForsakenTower extends BasicQuestHelper
 		goDownToGroundFloor = new ObjectStep(this, ObjectID.STAIRCASE_33552, new WorldPoint(1378, 3825, 1), "Go down to the ground floor.");
 		goUpToGroundFloor = new ObjectStep(this, ObjectID.LADDER_33484, new WorldPoint(1382, 10229, 0), "Leave the tower's basement.");
 
+		furnacePuzzleSteps = new JugPuzzle(this);
 		furnacePuzzleSteps.setLockingCondition(finishedFurnacePuzzle);
 
 		goDownLadderToBasement = new ObjectStep(this, ObjectID.LADDER_33483, new WorldPoint(1382, 3825, 0), "Climb down the ladder into the tower's basement.");
@@ -233,8 +181,12 @@ public class TheForsakenTower extends BasicQuestHelper
 		inspectGenerator = new ObjectStep(this, NullObjectID.NULL_34589, new WorldPoint(1382, 10219, 0), "Inspect the steam generator in the south of the room", crank);
 		inspectGenerator.addDialogStep("Start the generator.");
 
+		doPowerPuzzle = new PowerPuzzle(this);
+
+		potionPuzzle = new PotionPuzzle(this);
 		potionPuzzle.setLockingCondition(finishedPotionPuzzle);
 
+		altarPuzzle = new AltarPuzzle(this);
 		altarPuzzle.setLockingCondition(finishedAltarPuzzle);
 
 		getHammer = new ObjectStep(this, NullObjectID.NULL_34588, new WorldPoint(1382, 3821, 0), "Get the hammer from the display case in the Forsaken Tower.");

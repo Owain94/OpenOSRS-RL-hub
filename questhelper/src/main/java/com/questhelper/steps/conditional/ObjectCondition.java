@@ -103,20 +103,13 @@ public class ObjectCondition extends ConditionForStep
 
 		for (GameObject object : tile.getGameObjects())
 		{
-			if (checkForObjects(object))
-			{
-				return true;
-			}
+			if (checkForObjects(object)) return true;
 		}
-		if (checkForObjects(tile.getDecorativeObject()))
-		{
-			return true;
-		}
-		if (checkForObjects(tile.getGroundObject()))
-		{
-			return true;
-		}
-		return checkForObjects(tile.getWallObject());
+		if (checkForObjects(tile.getDecorativeObject())) return true;
+		if (checkForObjects(tile.getGroundObject())) return true;
+		if (checkForObjects(tile.getWallObject())) return true;
+
+		return false;
 	}
 
 	private boolean checkForObjects(TileObject object)

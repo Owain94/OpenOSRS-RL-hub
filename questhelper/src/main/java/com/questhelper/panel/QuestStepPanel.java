@@ -24,23 +24,15 @@
  */
 package com.questhelper.panel;
 
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.QuestStep;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.QuestStep;
 import net.runelite.client.ui.ColorScheme;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.util.SwingUtil;
 
@@ -50,7 +42,7 @@ public class QuestStepPanel extends JPanel
 
 	PanelDetails panelDetails;
 
-	private final JPanel headerPanel = new JPanel();
+    private final JPanel headerPanel = new JPanel();
 	private final JLabel headerLabel = new JLabel();
 	private final JPanel bodyPanel = new JPanel();
 	private final JCheckBox lockStep = new JCheckBox();
@@ -62,7 +54,7 @@ public class QuestStepPanel extends JPanel
 
 	private final HashMap<QuestStep, JLabel> steps = new HashMap<>();
 
-	public QuestStepPanel(PanelDetails panelDetails, QuestStep currentStep)
+    public QuestStepPanel(PanelDetails panelDetails, QuestStep currentStep)
 	{
 		this.panelDetails = panelDetails;
 
@@ -115,8 +107,7 @@ public class QuestStepPanel extends JPanel
 		bodyPanel.setLayout(new BorderLayout());
 		bodyPanel.setBorder(new EmptyBorder(10, 5, 10, 5));
 
-		if (!panelDetails.getItemRequirements().isEmpty())
-		{
+		if(!panelDetails.getItemRequirements().isEmpty()) {
 			JPanel questItemRequirementsPanel = new JPanel();
 			questItemRequirementsPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 			questItemRequirementsPanel.setLayout(new BorderLayout());
@@ -142,8 +133,7 @@ public class QuestStepPanel extends JPanel
 			StringBuilder itemText = new StringBuilder();
 			for (ItemRequirement itemRequirement : panelDetails.getItemRequirements())
 			{
-				if (!itemText.toString().equals(""))
-				{
+				if(!itemText.toString().equals("")) {
 					itemText.append("<br>");
 				}
 				if (itemRequirement.showQuantity())
@@ -167,26 +157,23 @@ public class QuestStepPanel extends JPanel
 		questStepsPanel.setLayout(new BoxLayout(questStepsPanel, BoxLayout.Y_AXIS));
 		questStepsPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-		for (QuestStep step : panelDetails.getSteps())
+		for(QuestStep step : panelDetails.getSteps())
 		{
-			if (step != null)
+			if (!step.isShowInSidebar())
 			{
-				if (!step.isShowInSidebar())
-				{
-					steps.put(step, null);
-					continue;
-				}
-
-				JLabel questStepLabel = new JLabel();
-				questStepLabel.setLayout(new BorderLayout());
-				questStepLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
-				questStepLabel.setHorizontalAlignment(SwingConstants.LEFT);
-				questStepLabel.setVerticalAlignment(SwingConstants.TOP);
-				questStepLabel.setText(generateText(step));
-
-				steps.put(step, questStepLabel);
-				questStepsPanel.add(questStepLabel);
+				steps.put(step, null);
+				continue;
 			}
+
+			JLabel questStepLabel = new JLabel();
+			questStepLabel.setLayout(new BorderLayout());
+			questStepLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
+			questStepLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			questStepLabel.setVerticalAlignment(SwingConstants.TOP);
+			questStepLabel.setText(generateText(step));
+
+			steps.put(step, questStepLabel);
+			questStepsPanel.add(questStepLabel);
 		}
 
 		bodyPanel.add(questStepsPanel, BorderLayout.CENTER);
@@ -198,9 +185,9 @@ public class QuestStepPanel extends JPanel
 		{
 			collapse();
 		}
-	}
+    }
 
-	public String generateText(QuestStep step)
+    public String generateText(QuestStep step)
 	{
 		StringBuilder text = new StringBuilder();
 
@@ -212,9 +199,8 @@ public class QuestStepPanel extends JPanel
 		return "<html><body style = 'text-align:left'>" + text + "</body></html>";
 	}
 
-	public ArrayList<QuestStep> getSteps()
-	{
-		return new ArrayList<>(steps.keySet());
+    public ArrayList<QuestStep> getSteps() {
+    	return new ArrayList<>(steps.keySet());
 	}
 
 	public HashMap<QuestStep, JLabel> getStepsLabels()
@@ -227,7 +213,7 @@ public class QuestStepPanel extends JPanel
 		lockStep.setVisible(canLock);
 	}
 
-	public void updateHighlight(QuestStep currentStep)
+    public void updateHighlight(QuestStep currentStep)
 	{
 		if (currentlyHighlighted != null)
 		{

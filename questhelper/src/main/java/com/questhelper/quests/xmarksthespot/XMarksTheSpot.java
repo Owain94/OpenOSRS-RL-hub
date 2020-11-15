@@ -24,14 +24,7 @@
  */
 package com.questhelper.quests.xmarksthespot;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.DigStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +32,13 @@ import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.DigStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.QuestDescriptor;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.X_MARKS_THE_SPOT
@@ -69,13 +69,11 @@ public class XMarksTheSpot extends BasicQuestHelper
 		return steps;
 	}
 
-	private void setupRequirements()
-	{
+	private void setupRequirements() {
 		spade = new ItemRequirement("Spade", ItemID.SPADE);
 	}
 
-	private void setupSteps()
-	{
+	private void setupSteps() {
 		speakVeosLumbridge = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3228, 3242, 0),
 			"Talk to Veos in The Sheared Ram pub in Lumbridge to start the quest.");
 		speakVeosLumbridge.addDialogStep("I'm looking for a quest.");

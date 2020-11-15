@@ -24,24 +24,8 @@
  */
 package com.questhelper.quests.mountaindaughter;
 
-import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.TileStep;
-import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.Operation;
-import com.questhelper.steps.conditional.VarbitCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,6 +34,22 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.ItemCollections;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.TileStep;
+import com.questhelper.steps.conditional.Conditions;
+import com.questhelper.steps.conditional.ItemRequirementCondition;
+import com.questhelper.steps.conditional.VarbitCondition;
+import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MOUNTAIN_DAUGHTER
@@ -135,21 +135,19 @@ public class MountainDaughter extends BasicQuestHelper
 		return steps;
 	}
 
-	private void loadZones()
-	{
-		CAMP_ZONE_1 = new Zone(new WorldPoint(2758, 3660, 0), new WorldPoint(2821, 3664, 0));
-		CAMP_ZONE_2 = new Zone(new WorldPoint(2767, 3653, 0), new WorldPoint(2821, 3712, 0));
-		CAMP_ZONE_3 = new Zone(new WorldPoint(2751, 3671, 0), new WorldPoint(2767, 3712, 0));
+	private void loadZones() {
+		CAMP_ZONE_1 = new Zone(new WorldPoint(2758,3660,0), new WorldPoint(2821,3664,0));
+		CAMP_ZONE_2 = new Zone(new WorldPoint(2767,3653,0), new WorldPoint(2821,3712,0));
+		CAMP_ZONE_3 = new Zone(new WorldPoint(2751,3671,0), new WorldPoint(2767,3712,0));
 
-		LAKE_ISLAND_1 = new Zone(new WorldPoint(2770, 3681, 0), new WorldPoint(2775, 3688, 0));
-		LAKE_ISLAND_2 = new Zone(new WorldPoint(2770, 3689, 0), new WorldPoint(2776, 3694, 0));
-		LAKE_ISLAND_3 = new Zone(new WorldPoint(2776, 3688, 0), new WorldPoint(2787, 3698, 0));
+		LAKE_ISLAND_1 = new Zone(new WorldPoint(2770,3681,0), new WorldPoint(2775,3688,0));
+		LAKE_ISLAND_2 = new Zone(new WorldPoint(2770,3689,0), new WorldPoint(2776,3694,0));
+		LAKE_ISLAND_3 = new Zone(new WorldPoint(2776,3688,0), new WorldPoint(2787,3698,0));
 
-		KENDAL_CAVE = new Zone(new WorldPoint(2828, 10118, 0), new WorldPoint(2746, 10047, 0));
+		KENDAL_CAVE = new Zone(new WorldPoint(2828,10118,0), new WorldPoint(2746,10047,0));
 	}
 
-	private void loadItemRequirements()
-	{
+	private void loadItemRequirements() {
 		spade = new ItemRequirement("Spade", ItemID.SPADE);
 		rope = new ItemRequirement("Rope", ItemID.ROPE);
 		pickaxe = new ItemRequirement("A pickaxe", ItemID.BRONZE_PICKAXE);
@@ -179,8 +177,7 @@ public class MountainDaughter extends BasicQuestHelper
 		muddyRocks = new ItemRequirement("Muddy rock", ItemID.MUDDY_ROCK, 5);
 	}
 
-	private void loadConditions()
-	{
+	private void loadConditions() {
 		onIsland1 = new Conditions(new ZoneCondition(LAKE_ISLAND_1));
 		onIsland2 = new Conditions(new ZoneCondition(LAKE_ISLAND_2));
 		onIsland3 = new Conditions(new ZoneCondition(LAKE_ISLAND_3));
@@ -206,14 +203,13 @@ public class MountainDaughter extends BasicQuestHelper
 		hasBuried = new Conditions(new VarbitCondition(273, 1));
 	}
 
-	private void loadQuestSteps()
-	{
+	private void loadQuestSteps() {
 		enterCamp = new ObjectStep(this, ObjectID.BOULDER_5842, new WorldPoint(2766, 3667, 0),
 			"Use your rope on the boulder outside the Mountain Camp east of Rellekka.",
 			rope);
 		enterCamp.addIcon(ItemID.ROPE);
 
-		enterCampOverRocks = new ObjectStep(this, ObjectID.ROCKSLIDE_5847, new WorldPoint(2760, 3658, 0),
+		enterCampOverRocks = new ObjectStep(this, ObjectID.ROCKSLIDE_5847,  new WorldPoint(2760, 3658, 0),
 			"Return to the Mountain Camp.",
 			rope);
 
@@ -364,8 +360,7 @@ public class MountainDaughter extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
+	public ArrayList<PanelDetails> getPanels() {
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 
 		allSteps.add(new PanelDetails("Speak to Hamal", new ArrayList<>(Arrays.asList(enterCamp, talkToHamal)), rope, spade, plank, pickaxe));

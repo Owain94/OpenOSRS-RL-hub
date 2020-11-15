@@ -5,17 +5,13 @@ import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.QuestStep;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import javax.inject.Inject;
+import java.util.Arrays;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class PaintingWall extends QuestStep
 {
-	@Inject
-	EventBus eventBus;
-
 	private final int RIGHT_VARBIT = 3541;
 	private final int BOTTOM_VARBIT = 3542;
 	private final int LEFT_VARBIT = 3543;
@@ -34,8 +30,6 @@ public class PaintingWall extends QuestStep
 	public void startUp()
 	{
 		updateSolvedPositionState();
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-
 	}
 
 	@Subscribe

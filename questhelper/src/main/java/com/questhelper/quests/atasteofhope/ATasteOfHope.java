@@ -25,19 +25,11 @@
 package com.questhelper.quests.atasteofhope;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.ItemRequirements;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -51,6 +43,14 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.A_TASTE_OF_HOPE
@@ -151,6 +151,7 @@ public class ATasteOfHope extends BasicQuestHelper
 		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasBloodVial), searchForHerb);
 		trySecondPotion.addStep(new Conditions(inSerafinaHouse, hasVial), talkToSafalaanAfterPotion);
 		trySecondPotion.addStep(new Conditions(inSerafinaHouse), searchForVial);
+		steps.put(82, trySecondPotion);
 		steps.put(83, trySecondPotion);
 		steps.put(84, trySecondPotion);
 
@@ -435,7 +436,7 @@ public class ATasteOfHope extends BasicQuestHelper
 		useBloodOnDoor.addDialogStep("Yes.");
 		useBloodOnDoor.addIcon(ItemID.BLOOD_POTION);
 		getOldNotes = new ObjectStep(this, ObjectID.CHEST_32572, new WorldPoint(3596, 9683, 0), "Search the chest for some notes.");
-		((ObjectStep) (getOldNotes)).addAlternateObjects(ObjectID.CHEST_32573);
+		((ObjectStep)(getOldNotes)).addAlternateObjects(ObjectID.CHEST_32573);
 		talkToSafalaanWithNotes = new NpcStep(this, NpcID.SAFALAAN_HALLOW_8216, new WorldPoint(3596, 9675, 0), "Talk to Safalaan with the notes.", oldNotes);
 		talkToSafalaanWithNotes.addDialogStep("Here you go.");
 		enterBaseAfterSerafina = new ObjectStep(this, NullObjectID.NULL_18120, new WorldPoint(3639, 3249, 0), "Prepare for a fight, then return to the Meiyerditch Myreque base.");
@@ -443,16 +444,16 @@ public class ATasteOfHope extends BasicQuestHelper
 
 		talkToSafalaanForAbominationFight = new NpcStep(this, NpcID.SAFALAAN_HALLOW, new WorldPoint(3627, 9644, 0), "Talk to Safalaan, ready for a fight.");
 		killAbomination = new NpcStep(this, NpcID.ABOMINATION, new WorldPoint(3627, 9644, 0), "Kill the abomination. It can be safe spotted with a long-ranged weapon.");
-		((NpcStep) (killAbomination)).addAlternateNpcs(NpcID.ABOMINATION_8261, NpcID.ABOMINATION_8262);
+		((NpcStep)(killAbomination)).addAlternateNpcs(NpcID.ABOMINATION_8261, NpcID.ABOMINATION_8262);
 		talkToSafalaanAfterAbominationFight = new NpcStep(this, NpcID.SAFALAAN_HALLOW_8219, new WorldPoint(3627, 9644, 0), "Talk to Safalaan.");
 
 		enterOldManRalBasement = new ObjectStep(this, ObjectID.TRAPDOOR_32578, new WorldPoint(3605, 3215, 0), "Climb down the trapdoor in Old Man Ral's house in south west Meiyerditch.",
 			rodOfIvandis, emerald, chisel, enchantEmeraldRunesOrTablet);
-		((ObjectStep) (enterOldManRalBasement)).addAlternateObjects(ObjectID.TRAPDOOR_32577);
+		((ObjectStep)(enterOldManRalBasement)).addAlternateObjects(ObjectID.TRAPDOOR_32577);
 
 		enterRalWithFlail = new ObjectStep(this, ObjectID.TRAPDOOR_32578, new WorldPoint(3605, 3215, 0), "Climb down the trapdoor in Old Man Ral's house in south west Meiyerditch.",
 			ivandisFlail);
-		((ObjectStep) (enterRalWithFlail)).addAlternateObjects(ObjectID.TRAPDOOR_32577);
+		((ObjectStep)(enterRalWithFlail)).addAlternateObjects(ObjectID.TRAPDOOR_32577);
 		talkToSafalaanInRalBasement = new NpcStep(this, NpcID.SAFALAAN_HALLOW_8216, new WorldPoint(3598, 9614, 0), "Talk to Safalaan.");
 		talkToVertidaInRalBasement = new NpcStep(this, NpcID.VERTIDA_SEFALATIS, new WorldPoint(3598, 9614, 0), "Talk to Vertida.");
 		readFlaygianNotes = new DetailedQuestStep(this, "Read Flaygian's notes.", flaygianNotes);
@@ -476,7 +477,7 @@ public class ATasteOfHope extends BasicQuestHelper
 		talkToKaelSidebar.addSubSteps(talkToKael);
 
 		killRanis = new NpcStep(this, NpcID.RANIS_DRAKAN_8244, new WorldPoint(2082, 4891, 0), "Defeat Ranis.", ivandisFlailEquipped);
-		((NpcStep) (killRanis)).addAlternateNpcs(NpcID.RANIS_DRAKAN_8245, NpcID.RANIS_DRAKAN_8246, NpcID.RANIS_DRAKAN_8247, NpcID.RANIS_DRAKAN_8248);
+		((NpcStep)(killRanis)).addAlternateNpcs(NpcID.RANIS_DRAKAN_8245, NpcID.RANIS_DRAKAN_8246, NpcID.RANIS_DRAKAN_8247, NpcID.RANIS_DRAKAN_8248);
 		killRanis.addText("He can only be hurt by the flail, and uses magic and melee attacks.");
 		killRanis.addText("He will occasionally charge an attack and explode, dealing damage close to him. Just run away for this attack.");
 		killRanis.addText("During the fight he will spawn vyrewatch which you'll need to kill. Whilst fighting them Ranis will be throwing blood bombs at your current location, so make sure to move around.");
@@ -484,7 +485,7 @@ public class ATasteOfHope extends BasicQuestHelper
 
 		talkToKaelAgain = new NpcStep(this, NpcID.KAEL_FORSHAW_8231, new WorldPoint(3659, 3218, 0), "Talk to Kael outside the Theatre of Blood again.");
 		enterRalForEnd = new ObjectStep(this, ObjectID.TRAPDOOR_32578, new WorldPoint(3605, 3215, 0), "Climb down the trapdoor in Old Man Ral's house in south west Meiyerditch.");
-		((ObjectStep) (enterRalForEnd)).addAlternateObjects(ObjectID.TRAPDOOR_32577);
+		((ObjectStep)(enterRalForEnd)).addAlternateObjects(ObjectID.TRAPDOOR_32577);
 		talkToSafalaanForEnd = new NpcStep(this, NpcID.SAFALAAN_HALLOW_8216, new WorldPoint(3598, 9614, 0), "Talk to Safalaan to complete the quest!");
 	}
 

@@ -29,16 +29,11 @@ import com.questhelper.steps.WidgetDetails;
 import com.questhelper.steps.WidgetStep;
 import java.util.ArrayList;
 import java.util.Collections;
-import javax.inject.Inject;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class PenguinEmote extends WidgetStep
 {
-	@Inject
-	EventBus eventBus;
-
 	public PenguinEmote(QuestHelper questHelper)
 	{
 		super(questHelper, "Perform the 3 emotes the penguins performed in the bird hide cutscene.");
@@ -49,7 +44,6 @@ public class PenguinEmote extends WidgetStep
 	{
 		super.startUp();
 		updateWidgets();
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
 	}
 
 	@Subscribe

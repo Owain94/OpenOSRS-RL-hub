@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020, Zoinkwiz <https://github.com/Zoinkwiz>
  * Copyright (c) 2019, Trevor <https://github.com/Trevor159>
  * All rights reserved.
  *
@@ -24,9 +25,6 @@
  */
 package com.questhelper.steps;
 
-import com.questhelper.QuestHelperPlugin;
-import static com.questhelper.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -39,23 +37,24 @@ import java.util.Collection;
 import javax.inject.Inject;
 import lombok.Setter;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
+import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.QuestHelperPlugin;
+import static com.questhelper.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class NpcStep extends DetailedQuestStep
 {
-	@Inject
-	EventBus eventBus;
-
 	@Inject
 	protected Client client;
 
@@ -95,11 +94,6 @@ public class NpcStep extends DetailedQuestStep
 		this(questHelper, npcID, null, text, allowMultipleHighlights, requirements);
 	}
 
-	public void subscribe()
-	{
-
-	}
-
 	@Override
 	public void startUp()
 	{
@@ -120,7 +114,6 @@ public class NpcStep extends DetailedQuestStep
 				}
 			}
 		}
-		subscribe();
 	}
 
 	public void addAlternateNpcs(Integer... alternateNpcIDs)
@@ -134,6 +127,18 @@ public class NpcStep extends DetailedQuestStep
 		super.shutDown();
 		npc = null;
 		otherNpcs = new ArrayList<>();
+	}
+
+	@Subscribe
+	@Override
+	public void onGameStateChanged(GameStateChanged event)
+	{
+		super.onGameStateChanged(event);
+		if (event.getGameState() == GameState.HOPPING)
+		{
+			npc = null;
+			otherNpcs.clear();
+		}
 	}
 
 	@Subscribe

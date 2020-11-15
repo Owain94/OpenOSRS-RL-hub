@@ -37,18 +37,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class ValveStep extends DetailedOwnerStep
 {
+
 	DetailedQuestStep readNote, setNorthValve, setSouthValve, setNorthValveNoHighlight, setSouthValveNoHighlight, cutTree;
 
 	private int valveTotalValue;
@@ -75,11 +73,6 @@ public class ValveStep extends DetailedOwnerStep
 	public ValveStep(QuestHelper questHelper)
 	{
 		super(questHelper, "Turn the valves to solve the water puzzle.");
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	@Override
@@ -233,7 +226,7 @@ public class ValveStep extends DetailedOwnerStep
 		}
 	}
 
-	protected void setupRequirements()
+	protected  void setupRequirements()
 	{
 		scentedTop = new ItemRequirement("Vyre noble top", ItemID.VYRE_NOBLE_TOP, 1, true);
 		scentedTop.setTip("You can get a replacement from a chest in Old Man Ral's basement.");
@@ -271,7 +264,7 @@ public class ValveStep extends DetailedOwnerStep
 		setNorthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37997, new WorldPoint(3621, 3364, 0), "Turn the northern valve to the highlighted value.");
 		setSouthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37998, new WorldPoint(3621, 3359, 0), "Turn the southern valve to the highlighted value.");
 
-		cutTree = new ObjectStep(getQuestHelper(), ObjectID.BLISTERWOOD_TREE, new WorldPoint(3635, 3362, 0),
+		cutTree =  new ObjectStep(getQuestHelper(), ObjectID.BLISTERWOOD_TREE, new WorldPoint(3635, 3362, 0),
 			"Gather 8 logs from the Blisterwood tree.", scentedTop, scentedLegs, scentedShoes);
 	}
 

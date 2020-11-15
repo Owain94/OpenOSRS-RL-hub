@@ -26,6 +26,7 @@
 package com.questhelper.requirements;
 
 import com.questhelper.steps.conditional.LogicType;
+import com.questhelper.steps.conditional.Operation;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +54,11 @@ public class ItemRequirements extends ItemRequirement
 
 	@Override
 	public boolean check(Client client)
+	{
+		return check(client, true);
+	}
+
+	public boolean check(Client client, boolean checkEquippedOnly)
 	{
 		int successes = 0;
 		for (ItemRequirement itemRequirement : itemRequirements)

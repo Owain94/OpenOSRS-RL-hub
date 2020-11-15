@@ -24,21 +24,12 @@
  */
 package com.questhelper.quests.watchtower;
 
-import com.google.inject.Inject;
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ChatMessageCondition;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -55,18 +46,21 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.EventBus;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.WATCHTOWER
 )
 public class Watchtower extends BasicQuestHelper
 {
-
-	@Inject
-	EventBus eventBus;
-
 	ItemRequirement coins20, goldBar, deathRune, pickaxe, dragonBones, rope2, guamUnf, fingernails, rope, tobansKey, goradsTooth, relic3, relic1, relic2, tobansGold,
 		crystal, ogreRelic, rockCake, skavidMap, lightSource, nightshade, nightshade2, crystal2, jangerberries, batBones, groundBatBones, pestleAndMortar, partialPotion, potion,
 		magicPotion, magicPotionHighlight, crystal3, crystal4, crystalHighlight, crystal2Highlight, crystal3Highlight, crystal4Highlight;
@@ -254,7 +248,7 @@ public class Watchtower extends BasicQuestHelper
 		skavidMap = new ItemRequirement("Skavid map", ItemID.SKAVID_MAP);
 		skavidMap.setTip("You can get another from the city guard in south east Gu'Tanoth.");
 
-		lightSource = new ItemRequirement("A light source", -1, -1);
+		lightSource = new ItemRequirement("A light source", ItemCollections.getLightSources());
 
 		goldBar = new ItemRequirement("Gold bar", ItemID.GOLD_BAR);
 
@@ -476,7 +470,7 @@ public class Watchtower extends BasicQuestHelper
 
 		stealRockCake = new ObjectStep(this, ObjectID.COUNTER_2793, new WorldPoint(2514, 3036, 0), "Steal a rock cake from Gu'Tanoth's market.");
 
-		talkToGuardBattlement = new NpcStep(this, NpcID.OGRE_GUARD_4371, new WorldPoint(2503, 3012, 0), "Talk to an Ogre Guard next to the battelement.");
+		talkToGuardBattlement =  new NpcStep(this, NpcID.OGRE_GUARD_4371, new WorldPoint(2503, 3012, 0), "Talk to an Ogre Guard next to the battelement.");
 		talkToGuardBattlement.addDialogStep("But I am a friend to ogres...");
 		talkToGuardWithRockCake = new NpcStep(this, NpcID.OGRE_GUARD_4371, new WorldPoint(2503, 3012, 0), "Talk to an Ogre Guard next to the battelement again with a rock cake.", rockCake);
 		jumpGap = new ObjectStep(this, ObjectID.GAP, new WorldPoint(2530, 3026, 0), "Jump over the broken bridge.", coins20);
@@ -522,7 +516,7 @@ public class Watchtower extends BasicQuestHelper
 
 		enterInsaneSkavidCave = new ObjectStep(this, ObjectID.CAVE_ENTRANCE_2810, new WorldPoint(2528, 3013, 0), "Enter the mad skavid's cave.");
 
-		talkToInsaneSkavid = new SkavidChoice(this, eventBus);
+		talkToInsaneSkavid = new SkavidChoice(this);
 
 		pickUp2Nightshade = new DetailedQuestStep(this, new WorldPoint(2528, 9415, 0), "Pick up 2 cave nightshade. You can world hop to get a second one.", nightshade2);
 

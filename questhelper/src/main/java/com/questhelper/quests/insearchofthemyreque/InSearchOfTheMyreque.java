@@ -221,11 +221,11 @@ public class InSearchOfTheMyreque extends BasicQuestHelper
 		onQuestion5 = new WidgetTextCondition(219, 1, 0, "vampyre");
 		onQuestion6 = new WidgetTextCondition(219, 1, 0, "scholar");
 
-		talkedToSani = new VarbitCondition(2496, true, 0);
-		talkedToHarold = new VarbitCondition(2496, true, 1);
+		talkedToSani    = new VarbitCondition(2496, true, 0);
+		talkedToHarold  = new VarbitCondition(2496, true, 1);
 		talkedToRadigad = new VarbitCondition(2496, true, 2);
 		talkedToPolmafi = new VarbitCondition(2496, true, 3);
-		talkedToIvan = new VarbitCondition(2496, true, 4);
+		talkedToIvan    = new VarbitCondition(2496, true, 4);
 	}
 
 	public void setupSteps()

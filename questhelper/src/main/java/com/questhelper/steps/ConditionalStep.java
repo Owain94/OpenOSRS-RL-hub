@@ -25,13 +25,7 @@
 package com.questhelper.steps;
 
 import com.google.inject.Inject;
-import com.questhelper.QuestHelperPlugin;
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
-import com.questhelper.steps.conditional.ChatMessageCondition;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.NpcCondition;
 import com.questhelper.steps.conditional.WidgetTextCondition;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -47,6 +41,12 @@ import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
+import com.questhelper.QuestHelperPlugin;
+import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.steps.conditional.ChatMessageCondition;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.Conditions;
+import com.questhelper.steps.conditional.NpcCondition;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -81,16 +81,6 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 		this.requirements = requirements;
 		this.steps = new LinkedHashMap<>();
 		this.steps.put(null, step);
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
-		eventBus.subscribe(ChatMessage.class, this, this::onChatMessage);
-		eventBus.subscribe(NpcSpawned.class, this, this::onNpcSpawned);
-		eventBus.subscribe(NpcDespawned.class, this, this::onNpcDespawned);
-		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 	}
 
 	public void addStep(Conditions conditions, QuestStep step)
@@ -198,7 +188,6 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 		}
 		updateSteps();
 		started = true;
-		subscribe();
 	}
 
 	@Override

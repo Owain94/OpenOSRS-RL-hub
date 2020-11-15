@@ -25,21 +25,13 @@
 package com.questhelper.quests.olafsquest;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.DigStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.WidgetStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -58,6 +50,14 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.OLAFS_QUEST
@@ -71,7 +71,7 @@ public class OlafsQuest extends BasicQuestHelper
 		keyInterfaceOpen, hasCrossKey, hasSquareKey, hasTriangleKey, hasCircleKey, hasStarKey, ulfricNearby, killedUlfric;
 
 	QuestStep talkToOlaf, chopTree, giveLogToOlaf, talkToIngrid, talkToVolf, returnToOlaf, useDampPlanks, talkToOlafAfterPlanks, digHole, pickUpKey, searchPainting, doPuzzle, pickUpItems,
-		pickupItems2, useBarrel, useBarrel2, openGate, chooseSquare, chooseCross, chooseTriangle, chooseCircle, chooseStar, killUlfric;
+		pickUpItems2, useBarrel, useBarrel2, openGate, chooseSquare, chooseCross, chooseTriangle, chooseCircle, chooseStar, killUlfric;
 
 	NpcStep killSkeleton;
 
@@ -117,7 +117,7 @@ public class OlafsQuest extends BasicQuestHelper
 		solvePuzzleSteps.addStep(new Conditions(hasCrossKey, keyInterfaceOpen), chooseCross);
 		solvePuzzleSteps.addStep(new Conditions(hasKey, placedBarrel2), openGate);
 		solvePuzzleSteps.addStep(new Conditions(hasKey, placedBarrel1, hasBarrel3Ropes), useBarrel2);
-		solvePuzzleSteps.addStep(new Conditions(placedBarrel1, inSecondArea, hasKey), pickupItems2);
+		solvePuzzleSteps.addStep(new Conditions(placedBarrel1, inSecondArea, hasKey), pickUpItems2);
 		solvePuzzleSteps.addStep(new Conditions(has2Barrels6Ropes, hasKey), useBarrel);
 		solvePuzzleSteps.addStep(new Conditions(inSecondArea, hasKey), pickUpItems);
 		solvePuzzleSteps.addStep(puzzleOpen, doPuzzle);
@@ -229,6 +229,8 @@ public class OlafsQuest extends BasicQuestHelper
 		doPuzzle = new PaintingWall(this);
 
 		pickUpItems = new DetailedQuestStep(this, "Pick up 2 rotten barrels and 6 ropes from around the room.", rottenBarrels2, ropes6);
+		pickUpItems2 = new DetailedQuestStep(this, "Pick up 1 rotten barrels and 3 ropes from around the room.", rottenBarrel, ropes3);
+		pickUpItems.addSubSteps(pickUpItems2);
 
 		useBarrel = new ObjectStep(this, ObjectID.WALKWAY, new WorldPoint(2722, 10168, 0), "WALK onto the walkway to the east, and use a barrel on it to repair it.", rottenBarrel, ropes3);
 		useBarrel.addIcon(ItemID.ROTTEN_BARREL_11045);
@@ -237,11 +239,11 @@ public class OlafsQuest extends BasicQuestHelper
 
 		openGate = new ObjectStep(this, ObjectID.GATE_23216, new WorldPoint(2725, 10168, 0), "Open the gate on the walkway, clicking the key hole which matches your key.", key);
 
-		chooseSquare = new WidgetStep(this, "Click the square key hole.", 252, 3);
-		chooseCross = new WidgetStep(this, "Click the cross key hole.", 252, 4);
-		chooseTriangle = new WidgetStep(this, "Click the triangle key hole.", 252, 5);
-		chooseCircle = new WidgetStep(this, "Click the circle key hole.", 252, 6);
-		chooseStar = new WidgetStep(this, "Click the star key hole.", 252, 7);
+		chooseSquare = new WidgetStep(this,  "Click the square key hole.", 252, 3);
+		chooseCross = new WidgetStep(this,  "Click the cross key hole.", 252, 4);
+		chooseTriangle = new WidgetStep(this,  "Click the triangle key hole.", 252, 5);
+		chooseCircle = new WidgetStep(this,  "Click the circle key hole.", 252, 6);
+		chooseStar = new WidgetStep(this,  "Click the star key hole.", 252, 7);
 		openGate.addSubSteps(chooseCircle, chooseCross, chooseSquare, chooseStar, chooseTriangle);
 
 		searchChest = new ObjectStep(this, ObjectID.CHEST_14197, new WorldPoint(2740, 10164, 0), "WALK off the remaining walkway, and search the chest in the wreck. Be prepared to fight Ulfric.");

@@ -24,9 +24,6 @@
  */
 package com.questhelper.steps;
 
-import com.questhelper.QuestHelperPlugin;
-import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -34,6 +31,9 @@ import java.awt.image.BufferedImage;
 import net.runelite.api.ItemID;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.QuestHelperPlugin;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class DigStep extends DetailedQuestStep

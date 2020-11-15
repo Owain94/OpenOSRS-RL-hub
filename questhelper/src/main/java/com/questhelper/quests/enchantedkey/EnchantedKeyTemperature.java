@@ -36,7 +36,7 @@ import lombok.Getter;
 public enum EnchantedKeyTemperature
 {
 	FREEZING("It's freezing", 500, 5000),
-	COLD("It's cold", 120, 499),
+	COLD("It's cold",  120, 499),
 	WARM("It's warm", 60, 119),
 	VERY_HOT("It's very hot", 30, 59),
 	BURNING("Ouch! It's burning hot", 5, 29),

@@ -28,12 +28,8 @@ import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import static com.questhelper.QuestHelperOverlay.TITLED_CONTENT_COLOR;
-import com.questhelper.QuestHelperPlugin;
 import com.questhelper.QuestVarbits;
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
-import com.questhelper.steps.choice.DialogChoiceStep;
-import com.questhelper.steps.choice.DialogChoiceSteps;
 import com.questhelper.steps.choice.WidgetChoiceStep;
 import com.questhelper.steps.choice.WidgetChoiceSteps;
 import com.questhelper.steps.conditional.ConditionForStep;
@@ -50,9 +46,12 @@ import net.runelite.api.SpriteID;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.SpriteManager;
+import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.QuestHelperPlugin;
+import com.questhelper.steps.choice.DialogChoiceStep;
+import com.questhelper.steps.choice.DialogChoiceSteps;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.util.ImageUtil;
@@ -60,13 +59,10 @@ import net.runelite.client.util.ImageUtil;
 public abstract class QuestStep implements Module
 {
 	@Inject
-	public Client client;
+	protected Client client;
 
 	@Inject
 	private ClientThread clientThread;
-
-	@Inject
-	private EventBus eventBus;
 
 	@Inject
 	SpriteManager spriteManager;
@@ -137,12 +133,6 @@ public abstract class QuestStep implements Module
 		this.questHelper = questHelper;
 	}
 
-	public void subscribe()
-	{
-		eventBus.subscribe(VarbitChanged.class, this, this::onVarbitChanged);
-		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
-	}
-
 	@Override
 	public void configure(Binder binder)
 	{
@@ -152,7 +142,6 @@ public abstract class QuestStep implements Module
 	{
 		clientThread.invokeLater(this::highlightChoice);
 		clientThread.invokeLater(this::highlightWidgetChoice);
-		subscribe();
 	}
 
 	public void shutDown()

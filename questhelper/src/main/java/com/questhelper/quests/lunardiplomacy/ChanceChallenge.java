@@ -11,13 +11,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import javax.inject.Inject;
-import net.runelite.api.Client;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
 public class ChanceChallenge extends DetailedOwnerStep
@@ -32,11 +29,6 @@ public class ChanceChallenge extends DetailedOwnerStep
 	{
 		super(questHelper, "Flip the dice to sum up to the correct number.");
 		setupSolutions();
-	}
-
-	public void subscribe()
-	{
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 	}
 
 	public void setupSolutions()
@@ -196,6 +188,5 @@ public class ChanceChallenge extends DetailedOwnerStep
 	{
 		return Collections.singletonList(talk);
 	}
-
 }
 

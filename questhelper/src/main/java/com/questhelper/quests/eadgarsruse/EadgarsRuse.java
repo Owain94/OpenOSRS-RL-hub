@@ -24,12 +24,12 @@
  */
 package com.questhelper.quests.eadgarsruse;
 
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
@@ -237,7 +237,7 @@ public class EadgarsRuse extends BasicQuestHelper
 	{
 		climbingBoots = new ItemRequirement("Climbing boots", ItemID.CLIMBING_BOOTS);
 		climbingBootsEquipped = new ItemRequirement("Climbing boots", ItemID.CLIMBING_BOOTS, 1, true);
-		climbingBootsOr12Coins = new ItemRequirement("Climbing boots or 12 coins", -1, -1);
+		climbingBootsOr12Coins =  new ItemRequirement("Climbing boots or 12 coins", -1, -1);
 		vodka = new ItemRequirement("Vodka", ItemID.VODKA);
 		pineappleChunks = new ItemRequirement("Pineapple chunks", ItemID.PINEAPPLE_CHUNKS);
 		logs2 = new ItemRequirement("Logs", ItemID.LOGS, 2);
@@ -339,7 +339,7 @@ public class EadgarsRuse extends BasicQuestHelper
 		inTrollheimArea = new ZoneCondition(trollheimArea);
 
 		askedAboutAlcohol = new Conditions(true, LogicType.AND, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "Just recently."));
-		askedAboutPineapple = new Conditions(true, LogicType.AND, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "fruit and grain mostly"));
+		askedAboutPineapple =  new Conditions(true, LogicType.AND, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "fruit and grain mostly"));
 		hasAlcoChunks = new ItemRequirementCondition(alcoChunks);
 		hasParrot = new ItemRequirementCondition(parrot);
 		hasRobe = new ItemRequirementCondition(robe);
