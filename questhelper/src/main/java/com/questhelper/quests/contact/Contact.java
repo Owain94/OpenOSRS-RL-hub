@@ -25,13 +25,19 @@
 package com.questhelper.quests.contact;
 
 import com.questhelper.ItemCollections;
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -41,12 +47,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -65,53 +65,6 @@ public class Contact extends BasicQuestHelper
 		killGiantScarab, pickUpKeris, returnToHighPriest;
 
 	Zone bank, dungeon, chasm;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToHighPriest);
-		steps.put(10, talkToHighPriest);
-		steps.put(20, talkToHighPriest);
-		steps.put(30, talkToJex);
-
-		ConditionalStep goInvestigate = new ConditionalStep(this, goDownToBank);
-		goInvestigate.addStep(new Conditions(inChasm, hasReadParchment), talkToMaisa);
-		goInvestigate.addStep(hasParchment, readParchment);
-		goInvestigate.addStep(inChasm, searchKaleef);
-		goInvestigate.addStep(inDungeon, goDownToChasm);
-		goInvestigate.addStep(inBank, goDownToDungeon);
-
-		steps.put(40, goInvestigate);
-
-		steps.put(50, goInvestigate);
-
-		steps.put(60, talkToOsman);
-
-		steps.put(70, talkToOsmanOutsideSoph);
-
-		ConditionalStep scarabBattle = new ConditionalStep(this, goDownToBankAgain);
-		scarabBattle.addStep(inChasm, killGiantScarab);
-		scarabBattle.addStep(inDungeon, goDownToChasmAgain);
-		scarabBattle.addStep(inBank, goDownToDungeonAgain);
-
-		steps.put(80, scarabBattle);
-		steps.put(90, scarabBattle);
-		steps.put(100, scarabBattle);
-
-		ConditionalStep finishOff = new ConditionalStep(this, returnToHighPriest);
-		finishOff.addStep(kerisNearby, pickUpKeris);
-
-		steps.put(110, finishOff);
-		steps.put(120, finishOff);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -203,5 +156,52 @@ public class Contact extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Help Osman", new ArrayList<>(Arrays.asList(talkToOsmanOutsideSoph, goDownToBankAgain, goDownToDungeonAgain, goDownToChasmAgain, killGiantScarab, returnToHighPriest)), combatGear, lightSource));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToHighPriest);
+		steps.put(10, talkToHighPriest);
+		steps.put(20, talkToHighPriest);
+		steps.put(30, talkToJex);
+
+		ConditionalStep goInvestigate = new ConditionalStep(this, goDownToBank);
+		goInvestigate.addStep(new Conditions(inChasm, hasReadParchment), talkToMaisa);
+		goInvestigate.addStep(hasParchment, readParchment);
+		goInvestigate.addStep(inChasm, searchKaleef);
+		goInvestigate.addStep(inDungeon, goDownToChasm);
+		goInvestigate.addStep(inBank, goDownToDungeon);
+
+		steps.put(40, goInvestigate);
+
+		steps.put(50, goInvestigate);
+
+		steps.put(60, talkToOsman);
+
+		steps.put(70, talkToOsmanOutsideSoph);
+
+		ConditionalStep scarabBattle = new ConditionalStep(this, goDownToBankAgain);
+		scarabBattle.addStep(inChasm, killGiantScarab);
+		scarabBattle.addStep(inDungeon, goDownToChasmAgain);
+		scarabBattle.addStep(inBank, goDownToDungeonAgain);
+
+		steps.put(80, scarabBattle);
+		steps.put(90, scarabBattle);
+		steps.put(100, scarabBattle);
+
+		ConditionalStep finishOff = new ConditionalStep(this, returnToHighPriest);
+		finishOff.addStep(kerisNearby, pickUpKeris);
+
+		steps.put(110, finishOff);
+		steps.put(120, finishOff);
+
+		return steps;
 	}
 }

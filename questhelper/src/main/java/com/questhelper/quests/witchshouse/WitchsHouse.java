@@ -24,12 +24,12 @@
  */
 package com.questhelper.quests.witchshouse;
 
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
@@ -69,59 +69,6 @@ public class WitchsHouse extends BasicQuestHelper
 
 	Zone house, upstairsHouse, downstairsHouseEast, downstairsHouseWest, garden1, garden2, garden3, shed;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToBoy);
-
-		ConditionalStep getTheMagnet = new ConditionalStep(this, getKey);
-		getTheMagnet.addStep(new Conditions(inHouse, hasMagnet), useCheeseOnHole);
-		getTheMagnet.addStep(new Conditions(inDownstairsHouse, hasMagnet), goBackUpstairs);
-		getTheMagnet.addStep(new Conditions(inDownstairsHouseWest, new ObjectCondition(ObjectID.CUPBOARD_2869)), openCupboardAndLoot2);
-		getTheMagnet.addStep(inDownstairsHouseWest, openCupboardAndLoot);
-		getTheMagnet.addStep(inDownstairsHouseEast, enterGate);
-		getTheMagnet.addStep(inHouse, goDownstairs);
-		getTheMagnet.addStep(inUpstairsHouse, goDownstairsFromTop);
-		getTheMagnet.addStep(hasKey, enterHouse);
-
-		steps.put(1, getTheMagnet);
-		steps.put(2, getTheMagnet);
-
-		ConditionalStep killExperiment = new ConditionalStep(this, getKey);
-		killExperiment.addStep(new Conditions(inShed, experimentNearby), killWitchsExperiment);
-		killExperiment.addStep(inShed, grabBall);
-		killExperiment.addStep(new Conditions(ratHasMagnet, inHouseOrGarden, hasShedKey), enterShed);
-		killExperiment.addStep(new Conditions(ratHasMagnet, inHouseOrGarden), searchFountain);
-		killExperiment.addStep(new Conditions(ratHasMagnet, inDownstairsHouse), goBackUpstairs);
-		killExperiment.addStep(new Conditions(inHouse, hasMagnet), useCheeseOnHole);
-		killExperiment.addStep(new Conditions(inDownstairsHouse, hasMagnet), goBackUpstairs);
-		killExperiment.addStep(new Conditions(inDownstairsHouseWest, new ObjectCondition(ObjectID.CUPBOARD_2869)), openCupboardAndLoot2);
-		killExperiment.addStep(inDownstairsHouseWest, openCupboardAndLoot);
-		killExperiment.addStep(inDownstairsHouseEast, enterGate);
-		killExperiment.addStep(inHouse, goDownstairs);
-		killExperiment.addStep(inUpstairsHouse, goDownstairsFromTop);
-		killExperiment.addStep(hasKey, enterHouse);
-
-		steps.put(3, killExperiment);
-
-		ConditionalStep returnBall = new ConditionalStep(this, getKey);
-		returnBall.addStep(new Conditions(hasBall), returnToBoy);
-		returnBall.addStep(inShed, pickupBall);
-		returnBall.addStep(inHouseOrGarden, enterShedWithoutKey);
-		returnBall.addStep(hasKey, enterHouse);
-		returnBall.addStep(inDownstairsHouse, goBackUpstairs);
-		returnBall.addStep(inUpstairsHouse, goDownstairsFromTop);
-
-		steps.put(6, returnBall);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		cheese = new ItemRequirement("Cheese (multiple if you mess up)", ItemID.CHEESE);
@@ -136,8 +83,8 @@ public class WitchsHouse extends BasicQuestHelper
 
 	public void loadZones()
 	{
-		house = new Zone(new WorldPoint(2901, 3466,0), new WorldPoint(2907, 3476, 0));
-		upstairsHouse = new Zone(new WorldPoint(2900, 3466,1), new WorldPoint(2907, 3476, 1));
+		house = new Zone(new WorldPoint(2901, 3466, 0), new WorldPoint(2907, 3476, 0));
+		upstairsHouse = new Zone(new WorldPoint(2900, 3466, 1), new WorldPoint(2907, 3476, 1));
 		downstairsHouseWest = new Zone(new WorldPoint(2897, 9870, 0), new WorldPoint(2902, 9878, 0));
 		downstairsHouseEast = new Zone(new WorldPoint(2903, 9870, 0), new WorldPoint(2909, 9878, 0));
 		garden1 = new Zone(new WorldPoint(2900, 3459, 0), new WorldPoint(2933, 3465, 0));
@@ -190,7 +137,7 @@ public class WitchsHouse extends BasicQuestHelper
 
 		grabBall = new DetailedQuestStep(this, new WorldPoint(2936, 3470, 0), "If an experiment hasn't spawned, attempt to pick up the ball once.", ball);
 		killWitchsExperiment = new NpcStep(this, NpcID.WITCHS_EXPERIMENT, new WorldPoint(2935, 3463, 0), "Kill all four forms of the Witch's experiment (levels 19, 30, 42, and 53). You can safe spot the last two forms from the crate in the south of the room.");
-		((NpcStep)killWitchsExperiment).addAlternateNpcs(NpcID.WITCHS_EXPERIMENT_SECOND_FORM, NpcID.WITCHS_EXPERIMENT_THIRD_FORM, NpcID.WITCHS_EXPERIMENT_FOURTH_FORM);
+		((NpcStep) killWitchsExperiment).addAlternateNpcs(NpcID.WITCHS_EXPERIMENT_SECOND_FORM, NpcID.WITCHS_EXPERIMENT_THIRD_FORM, NpcID.WITCHS_EXPERIMENT_FOURTH_FORM);
 		killWitchsExperiment.addSubSteps(grabBall);
 
 		pickupBall = new DetailedQuestStep(this, new WorldPoint(2936, 3470, 0), "Pick up the ball.", ball);
@@ -229,5 +176,58 @@ public class WitchsHouse extends BasicQuestHelper
 			openCupboardAndLoot, goBackUpstairs, useCheeseOnHole))));
 		allSteps.add(new PanelDetails("Defeat the witch's experiment", new ArrayList<>(Arrays.asList(searchFountain, enterShed, killWitchsExperiment, pickupBall, returnToBoy))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToBoy);
+
+		ConditionalStep getTheMagnet = new ConditionalStep(this, getKey);
+		getTheMagnet.addStep(new Conditions(inHouse, hasMagnet), useCheeseOnHole);
+		getTheMagnet.addStep(new Conditions(inDownstairsHouse, hasMagnet), goBackUpstairs);
+		getTheMagnet.addStep(new Conditions(inDownstairsHouseWest, new ObjectCondition(ObjectID.CUPBOARD_2869)), openCupboardAndLoot2);
+		getTheMagnet.addStep(inDownstairsHouseWest, openCupboardAndLoot);
+		getTheMagnet.addStep(inDownstairsHouseEast, enterGate);
+		getTheMagnet.addStep(inHouse, goDownstairs);
+		getTheMagnet.addStep(inUpstairsHouse, goDownstairsFromTop);
+		getTheMagnet.addStep(hasKey, enterHouse);
+
+		steps.put(1, getTheMagnet);
+		steps.put(2, getTheMagnet);
+
+		ConditionalStep killExperiment = new ConditionalStep(this, getKey);
+		killExperiment.addStep(new Conditions(inShed, experimentNearby), killWitchsExperiment);
+		killExperiment.addStep(inShed, grabBall);
+		killExperiment.addStep(new Conditions(ratHasMagnet, inHouseOrGarden, hasShedKey), enterShed);
+		killExperiment.addStep(new Conditions(ratHasMagnet, inHouseOrGarden), searchFountain);
+		killExperiment.addStep(new Conditions(ratHasMagnet, inDownstairsHouse), goBackUpstairs);
+		killExperiment.addStep(new Conditions(inHouse, hasMagnet), useCheeseOnHole);
+		killExperiment.addStep(new Conditions(inDownstairsHouse, hasMagnet), goBackUpstairs);
+		killExperiment.addStep(new Conditions(inDownstairsHouseWest, new ObjectCondition(ObjectID.CUPBOARD_2869)), openCupboardAndLoot2);
+		killExperiment.addStep(inDownstairsHouseWest, openCupboardAndLoot);
+		killExperiment.addStep(inDownstairsHouseEast, enterGate);
+		killExperiment.addStep(inHouse, goDownstairs);
+		killExperiment.addStep(inUpstairsHouse, goDownstairsFromTop);
+		killExperiment.addStep(hasKey, enterHouse);
+
+		steps.put(3, killExperiment);
+
+		ConditionalStep returnBall = new ConditionalStep(this, getKey);
+		returnBall.addStep(new Conditions(hasBall), returnToBoy);
+		returnBall.addStep(inShed, pickupBall);
+		returnBall.addStep(inHouseOrGarden, enterShedWithoutKey);
+		returnBall.addStep(hasKey, enterHouse);
+		returnBall.addStep(inDownstairsHouse, goBackUpstairs);
+		returnBall.addStep(inUpstairsHouse, goDownstairsFromTop);
+
+		steps.put(6, returnBall);
+		return steps;
 	}
 }

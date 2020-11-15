@@ -24,8 +24,8 @@
  */
 package com.questhelper.quests.swansong;
 
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;

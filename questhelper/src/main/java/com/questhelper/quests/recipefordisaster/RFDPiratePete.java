@@ -76,74 +76,6 @@ public class RFDPiratePete extends BasicQuestHelper
 
 	Zone diningRoom, underwater;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goInspectPete = new ConditionalStep(this, enterDiningRoom);
-		goInspectPete.addStep(inDiningRoom, inspectPete);
-		steps.put(0, goInspectPete);
-
-		ConditionalStep goTalkToCook = new ConditionalStep(this, talkToCook);
-		goTalkToCook.addStep(askedCookOptions, talkToMurphy);
-		steps.put(10, goTalkToCook);
-		steps.put(20, goTalkToCook);
-
-		steps.put(30, talkToMurphyAgain);
-
-		ConditionalStep goTalkToNung = new ConditionalStep(this, goDiving);
-		goTalkToNung.addStep(new Conditions(hasKelp, inUnderWater), talkToNung);
-		goTalkToNung.addStep(inUnderWater, pickKelp);
-		steps.put(40, goTalkToNung);
-
-		ConditionalStep goGetHides = new ConditionalStep(this, goDiving);
-		goGetHides.addStep(new Conditions(hasKelp, inUnderWater, has5Hide), returnToNung);
-		goGetHides.addStep(new Conditions(hasKelp, inUnderWater, walkingUnderwater), killMudksippers5);
-		goGetHides.addStep(new Conditions(hasKelp, inUnderWater, hasEnoughRocks), enterCave);
-		goGetHides.addStep(new Conditions(hasKelp, inUnderWater), pickUpRocks);
-		goGetHides.addStep(inUnderWater, pickKelp);
-		steps.put(50, goGetHides);
-
-		ConditionalStep goTalkToNungAgain = new ConditionalStep(this, goDiving);
-		goTalkToNungAgain.addStep(new Conditions(hasKelp, inUnderWater), talkToNungAgain);
-		goTalkToNungAgain.addStep(inUnderWater, pickKelp);
-		steps.put(60, goTalkToNungAgain);
-
-		ConditionalStep goBringNungWire = new ConditionalStep(this, goDiving);
-		goBringNungWire.addStep(new Conditions(hasKelp, inUnderWater), giveNungWire);
-		goBringNungWire.addStep(inUnderWater, pickKelp);
-		steps.put(70, goBringNungWire);
-
-		ConditionalStep goLearnHowToMakeFishCake = new ConditionalStep(this, goDivingAgain);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasCake, inDiningRoom), useCakeOnPete);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasCake), enterDiningRoomAgain);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasRawCake), cookCake);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, hasCrabMeat, inUnderWater), climbAnchor);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, inUnderWater, hasEnoughRocks), killCrab);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, inUnderWater), pickUpRocksAgain);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasGroundKelp, hasGroundCrabMeat, hasGroundCod, hasBreadcrumbs), talkToCookAgain);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasGroundKelp, hasGroundCrabMeat, hasGroundCod), useKnifeOnBread);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasGroundKelp, hasGroundCrabMeat), usePestleOnCod);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, hasGroundCrabMeat), grindKelp);
-		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, hasCrabMeat), grindCrab);
-		goLearnHowToMakeFishCake.addStep(inUnderWater, pickKelp);
-		steps.put(80, goLearnHowToMakeFishCake);
-		steps.put(90, goLearnHowToMakeFishCake);
-
-		ConditionalStep savePete = new ConditionalStep(this, useCrabOnKelp);
-		savePete.addStep(new Conditions(hasCake, inDiningRoom), useCakeOnPete);
-		savePete.addStep(new Conditions(hasCake), enterDiningRoomAgain);
-		savePete.addStep(new Conditions(hasRawCake), cookCake);
-		steps.put(100, savePete);
-
-		return steps;
-	}
-
 	public void setupRequirements()
 	{
 		canSwim = new WeightRequirement("Weight less than 27kg", 26, Operation.LESS_EQUAL);
@@ -249,7 +181,7 @@ public class RFDPiratePete extends BasicQuestHelper
 		pickUpRocks = new DetailedQuestStep(this, new WorldPoint(2950, 9511, 1), "Pick up 5 rocks in the west of the area.", rocks5);
 		enterCave = new ObjectStep(this, ObjectID.UNDERWATER_CAVERN_ENTRANCE_12461, new WorldPoint(2950, 9516, 1), "Enter the underwater cave entrance.");
 		killMudksippers5 = new NpcStep(this, NpcID.MUDSKIPPER, new WorldPoint(2951, 9526, 1), "Kill mudskippers for 5 hides.", true, mudskipperHide5);
-		((NpcStep)(killMudksippers5)).addAlternateNpcs(NpcID.MUDSKIPPER_4821);
+		((NpcStep) (killMudksippers5)).addAlternateNpcs(NpcID.MUDSKIPPER_4821);
 		returnToNung = new NpcStep(this, NpcID.NUNG, new WorldPoint(2971, 9513, 1), "Bring the hides to Nung.", mudskipperHide5);
 		talkToNungAgain = new NpcStep(this, NpcID.NUNG, new WorldPoint(2971, 9513, 1), "Talk to Nung again.");
 		returnToNung.addSubSteps(talkToNungAgain);
@@ -275,6 +207,90 @@ public class RFDPiratePete extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Arrays.asList(inspectPete, talkToCook, talkToMurphy, talkToMurphyAgain)), fishBowl));
+		allSteps.add(new PanelDetails("Get Crab and Kelp", new ArrayList<>(Arrays.asList(goDiving, pickKelp, talkToNung, pickUpRocks, enterCave, killMudksippers5, returnToNung, giveNungWire, killCrab, climbAnchor)), divingHelmet, divingAparatus, bronzeWire3, needle));
+		allSteps.add(new PanelDetails("Saving Pete", new ArrayList<>(Arrays.asList(grindCrab, grindKelp, usePestleOnCod, useKnifeOnBread, talkToCookAgain, useCrabOnKelp, cookCake, useCakeOnPete)), pestleHighlighted, knifeHighlighted, rawCodHighlighted, breadHighlighted, crabMeat, kelp));
+		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goInspectPete = new ConditionalStep(this, enterDiningRoom);
+		goInspectPete.addStep(inDiningRoom, inspectPete);
+		steps.put(0, goInspectPete);
+
+		ConditionalStep goTalkToCook = new ConditionalStep(this, talkToCook);
+		goTalkToCook.addStep(askedCookOptions, talkToMurphy);
+		steps.put(10, goTalkToCook);
+		steps.put(20, goTalkToCook);
+
+		steps.put(30, talkToMurphyAgain);
+
+		ConditionalStep goTalkToNung = new ConditionalStep(this, goDiving);
+		goTalkToNung.addStep(new Conditions(hasKelp, inUnderWater), talkToNung);
+		goTalkToNung.addStep(inUnderWater, pickKelp);
+		steps.put(40, goTalkToNung);
+
+		ConditionalStep goGetHides = new ConditionalStep(this, goDiving);
+		goGetHides.addStep(new Conditions(hasKelp, inUnderWater, has5Hide), returnToNung);
+		goGetHides.addStep(new Conditions(hasKelp, inUnderWater, walkingUnderwater), killMudksippers5);
+		goGetHides.addStep(new Conditions(hasKelp, inUnderWater, hasEnoughRocks), enterCave);
+		goGetHides.addStep(new Conditions(hasKelp, inUnderWater), pickUpRocks);
+		goGetHides.addStep(inUnderWater, pickKelp);
+		steps.put(50, goGetHides);
+
+		ConditionalStep goTalkToNungAgain = new ConditionalStep(this, goDiving);
+		goTalkToNungAgain.addStep(new Conditions(hasKelp, inUnderWater), talkToNungAgain);
+		goTalkToNungAgain.addStep(inUnderWater, pickKelp);
+		steps.put(60, goTalkToNungAgain);
+
+		ConditionalStep goBringNungWire = new ConditionalStep(this, goDiving);
+		goBringNungWire.addStep(new Conditions(hasKelp, inUnderWater), giveNungWire);
+		goBringNungWire.addStep(inUnderWater, pickKelp);
+		steps.put(70, goBringNungWire);
+
+		ConditionalStep goLearnHowToMakeFishCake = new ConditionalStep(this, goDivingAgain);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasCake, inDiningRoom), useCakeOnPete);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasCake), enterDiningRoomAgain);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasRawCake), cookCake);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, hasCrabMeat, inUnderWater), climbAnchor);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, inUnderWater, hasEnoughRocks), killCrab);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, inUnderWater), pickUpRocksAgain);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasGroundKelp, hasGroundCrabMeat, hasGroundCod, hasBreadcrumbs), talkToCookAgain);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasGroundKelp, hasGroundCrabMeat, hasGroundCod), useKnifeOnBread);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasGroundKelp, hasGroundCrabMeat), usePestleOnCod);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, hasGroundCrabMeat), grindKelp);
+		goLearnHowToMakeFishCake.addStep(new Conditions(hasKelp, hasCrabMeat), grindCrab);
+		goLearnHowToMakeFishCake.addStep(inUnderWater, pickKelp);
+		steps.put(80, goLearnHowToMakeFishCake);
+		steps.put(90, goLearnHowToMakeFishCake);
+
+		ConditionalStep savePete = new ConditionalStep(this, useCrabOnKelp);
+		savePete.addStep(new Conditions(hasCake, inDiningRoom), useCakeOnPete);
+		savePete.addStep(new Conditions(hasCake), enterDiningRoomAgain);
+		savePete.addStep(new Conditions(hasRawCake), cookCake);
+		steps.put(100, savePete);
+
+		return steps;
+	}
+
+	@Override
+	public boolean isCompleted()
+	{
+		return (client.getVarbitValue(1895) >= 110 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
+	}
+
+	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		return new ArrayList<>(Arrays.asList(fishBowl, needle, bronzeWire3, pestleHighlighted, rawCodHighlighted, breadHighlighted, knifeHighlighted));
@@ -290,21 +306,5 @@ public class RFDPiratePete extends BasicQuestHelper
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Arrays.asList("5 Mudskippers (level 30/31)", "Crab (level 21/23)"));
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Arrays.asList(inspectPete, talkToCook, talkToMurphy, talkToMurphyAgain)), fishBowl));
-		allSteps.add(new PanelDetails("Get Crab and Kelp", new ArrayList<>(Arrays.asList(goDiving, pickKelp, talkToNung, pickUpRocks, enterCave, killMudksippers5, returnToNung, giveNungWire, killCrab, climbAnchor)), divingHelmet, divingAparatus, bronzeWire3, needle));
-		allSteps.add(new PanelDetails("Saving Pete", new ArrayList<>(Arrays.asList(grindCrab, grindKelp, usePestleOnCod, useKnifeOnBread, talkToCookAgain, useCrabOnKelp, cookCake, useCakeOnPete)), pestleHighlighted, knifeHighlighted, rawCodHighlighted, breadHighlighted, crabMeat, kelp));
-		return allSteps;
-	}
-
-	@Override
-	public boolean isCompleted()
-	{
-		return (client.getVarbitValue(1895) >= 110 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
 	}
 }

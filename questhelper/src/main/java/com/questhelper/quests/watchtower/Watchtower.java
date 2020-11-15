@@ -25,11 +25,19 @@
 package com.questhelper.quests.watchtower;
 
 import com.questhelper.ItemCollections;
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ChatMessageCondition;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -46,14 +54,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -83,133 +83,6 @@ public class Watchtower extends BasicQuestHelper
 
 	Zone watchtowerFloor1, watchtowerFloor2, grewIsland, tobanIsland, endOfJumpingPath, scaredSkavidRoom, skavidRoom1, skavidRoom2, skavidRoom3, skavidRoom4, insaneSkavidPath1,
 		insaneSkavidPath2, insaneSkavidRoom, enclave;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goTalkToWizard = new ConditionalStep(this, goUpTrellis);
-		goTalkToWizard.addStep(inWatchtowerFloor2, talkToWizard);
-		goTalkToWizard.addStep(inWatchtowerFloor1, goUpLadderToWizard);
-
-		steps.put(0, goTalkToWizard);
-
-		ConditionalStep getBushItem = new ConditionalStep(this, searchBush);
-		getBushItem.addStep(new Conditions(hasFingernails, inWatchtowerFloor2), talkToWizardAgain);
-		getBushItem.addStep(new Conditions(hasFingernails, inWatchtowerFloor1), goBackUpToWizard);
-		getBushItem.addStep(hasFingernails, goBackUpToFirstFloor);
-		getBushItem.addStep(inWatchtowerFloor2, goDownFromWizard);
-		getBushItem.addStep(inWatchtowerFloor1, goDownFromFirstFloor);
-
-		steps.put(1, getBushItem);
-
-		ConditionalStep helpOgres = new ConditionalStep(this, syncStep);
-		helpOgres.addStep(new Conditions(hasRelic1, hasRelic2, hasRelic3, inWatchtowerFloor2), talkToWizardWithRelic);
-		helpOgres.addStep(new Conditions(hasRelic1, hasRelic2, hasRelic3, inWatchtowerFloor1), bringRelicUpToWizard);
-		helpOgres.addStep(new Conditions(hasRelic1, hasRelic2, hasRelic3), bringRelicUpToFirstFloor);
-		helpOgres.addStep(new Conditions(hasRelic1, hasGoradsTooth, hasRelic3, onGrewIsland), talkToGrewAgain);
-		helpOgres.addStep(new Conditions(hasRelic1, hasGoradsTooth, hasRelic3), useRopeOnBranchAgain);
-		helpOgres.addStep(new Conditions(hasTobansGold, hasGoradsTooth, hasRelic3), talkToOgAgain);
-		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland, hasGoradsTooth, hasRelic3), searchChestForTobansGold);
-		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland, hasGoradsTooth, talkedToToban), giveTobanDragonBones);
-		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland, hasGoradsTooth), talkToToban);
-		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland), killGorad);
-		helpOgres.addStep(new Conditions(onGrewIsland, talkedToGrew), leaveGrewIsland);
-		helpOgres.addStep(new Conditions(knownOgreStep, talkedToOg, talkedToGrew), enterHoleSouthOfGuTanoth);
-		helpOgres.addStep(new Conditions(knownOgreStep, onGrewIsland), talkToGrew);
-		helpOgres.addStep(new Conditions(knownOgreStep, talkedToOg), useRopeOnBranch);
-		helpOgres.addStep(knownOgreStep, talkToOg);
-
-		steps.put(2, helpOgres);
-
-		steps.put(3, enterGuTanoth);
-
-		ConditionalStep getCrystal1 = new ConditionalStep(this, stealRockCake);
-		getCrystal1.addStep(new Conditions(knowsRiddle, inEndOfJumpingPath), talkToCityGuardAgain);
-		getCrystal1.addStep(inEndOfJumpingPath, talkToCityGuard);
-		getCrystal1.addStep(gaveCake, jumpGap);
-		getCrystal1.addStep(new Conditions(hasRockCake, gettingOgreRockCake), talkToGuardWithRockCake);
-		getCrystal1.addStep(hasRockCake, talkToGuardBattlement);
-
-		steps.put(4, getCrystal1);
-
-		steps.put(5, getCrystal1);
-
-		ConditionalStep goTalkToScaredSkavid = new ConditionalStep(this, syncStep);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4, inInsaneSkavidRoom), talkToInsaneSkavid);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4, inInsaneSkavidPath), enterInsaneSkavidCave);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4), tryToGoThroughToInsaneSkavid);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4, inSkavidRoom4), leaveSkavid4);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, inSkavidRoom4), talkToSkavid4);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, inSkavidRoom3), leaveSkavid3);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, inSkavidRoom3), talkToSkavid3);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, inSkavidRoom2), leaveSkavid2);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, inSkavidRoom2), talkToSkavid2);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, inSkavidRoom1), leaveSkavid1);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, inSkavidRoom1), talkToSkavid1);
-		goTalkToScaredSkavid.addStep(new Conditions(inScaredSkavidRoom, talkedToScaredSkavid), leaveScaredSkavidRoom);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3), enterSkavid4Cave);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2), enterSkavid3Cave);
-		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1), enterSkavid2Cave);
-		goTalkToScaredSkavid.addStep(talkedToScaredSkavid, enterSkavid1Cave);
-		goTalkToScaredSkavid.addStep(new Conditions(LogicType.OR, hasBeenAtEndOfPath, inScaredSkavidRoom), talkToScaredSkavid);
-
-		steps.put(6, goTalkToScaredSkavid);
-
-		ConditionalStep infiltrateEnclave = new ConditionalStep(this, useNightshadeOnGuard);
-		infiltrateEnclave.addStep(new Conditions(seenShamans, inWatchtowerFloor2), talkToWizardAgainEnclave);
-		infiltrateEnclave.addStep(new Conditions(seenShamans, inWatchtowerFloor1), goBackUpToWizardAfterEnclave);
-		infiltrateEnclave.addStep(new Conditions(seenShamans, inEnclave), leaveEnclave);
-		infiltrateEnclave.addStep(new Conditions(seenShamans), goBackUpToFirstFloorAfterEnclave);
-		infiltrateEnclave.addStep(new Conditions(inInsaneSkavidRoom, has2Nightshade), leaveMadSkavid);
-		infiltrateEnclave.addStep(inInsaneSkavidRoom, pickUp2Nightshade);
-
-		steps.put(7, infiltrateEnclave);
-
-		steps.put(8, infiltrateEnclave);
-
-		ConditionalStep makePotion = new ConditionalStep(this, useJangerberriesOnGuam);
-		makePotion.addStep(new Conditions(hasPotion, inWatchtowerFloor2), talkToWizardWithPotion);
-		makePotion.addStep(new Conditions(hasPotion, inWatchtowerFloor1), goUpToWizardWithPotion);
-		makePotion.addStep(hasPotion, goUpToFirstFloorWithPotion);
-		makePotion.addStep(new Conditions(hasPartialPotion, hasGroundBatBones), useBonesOnPotion);
-		makePotion.addStep(hasPartialPotion, grindBatBones);
-
-		steps.put(9, makePotion);
-
-		ConditionalStep killOgres = new ConditionalStep(this, useNightshadeOnGuardAgain);
-		killOgres.addStep(new Conditions(inWatchtowerFloor2, gotCrystal4), talkToWizardWithCrystals);
-		killOgres.addStep(new Conditions(inWatchtowerFloor1, gotCrystal4), goUpToWizardWithCrystals);
-		killOgres.addStep(new Conditions(inEnclave, gotCrystal4), leaveEnclaveWithCrystals);
-		killOgres.addStep(gotCrystal4, goUpToFirstFloorWithCrystals);
-		killOgres.addStep(new Conditions(inEnclave, killedAllOgres), mineRock);
-		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2, killedOgre3, killedOgre4, killedOgre5), usePotionOnOgre6);
-		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2, killedOgre3, killedOgre4), usePotionOnOgre5);
-		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2, killedOgre3), usePotionOnOgre4);
-		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2), usePotionOnOgre3);
-		killOgres.addStep(new Conditions(inEnclave, killedOgre1), usePotionOnOgre2);
-		killOgres.addStep(inEnclave, usePotionOnOgre1);
-
-		steps.put(10, killOgres);
-
-		ConditionalStep placeCrystals = new ConditionalStep(this, goUpToFirstFloorWithCrystals);
-		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1, placedCrystal2, placedCrystal3, placedCrystal4), pullLever);
-		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1, placedCrystal2, placedCrystal3), useCrystal4);
-		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1, placedCrystal2), useCrystal3);
-		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1), useCrystal2);
-		placeCrystals.addStep(inWatchtowerFloor2, useCrystal1);
-		placeCrystals.addStep(inWatchtowerFloor1, goUpToWizardWithCrystals);
-
-		steps.put(11, placeCrystals);
-		steps.put(12, placeCrystals);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -470,7 +343,7 @@ public class Watchtower extends BasicQuestHelper
 
 		stealRockCake = new ObjectStep(this, ObjectID.COUNTER_2793, new WorldPoint(2514, 3036, 0), "Steal a rock cake from Gu'Tanoth's market.");
 
-		talkToGuardBattlement =  new NpcStep(this, NpcID.OGRE_GUARD_4371, new WorldPoint(2503, 3012, 0), "Talk to an Ogre Guard next to the battelement.");
+		talkToGuardBattlement = new NpcStep(this, NpcID.OGRE_GUARD_4371, new WorldPoint(2503, 3012, 0), "Talk to an Ogre Guard next to the battelement.");
 		talkToGuardBattlement.addDialogStep("But I am a friend to ogres...");
 		talkToGuardWithRockCake = new NpcStep(this, NpcID.OGRE_GUARD_4371, new WorldPoint(2503, 3012, 0), "Talk to an Ogre Guard next to the battelement again with a rock cake.", rockCake);
 		jumpGap = new ObjectStep(this, ObjectID.GAP, new WorldPoint(2530, 3026, 0), "Jump over the broken bridge.", coins20);
@@ -602,7 +475,6 @@ public class Watchtower extends BasicQuestHelper
 		return reqs;
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -624,5 +496,132 @@ public class Watchtower extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Getting the other crystals", new ArrayList<>(Arrays.asList(talkToWizardAgainEnclave, useJangerberriesOnGuam, grindBatBones, useBonesOnPotion, talkToWizardWithPotion, useNightshadeOnGuardAgain, usePotionOnOgre1, mineRock, talkToWizardWithCrystals, useCrystal1, pullLever)),
 			guamUnf, jangerberries, pestleAndMortar, batBones, nightshade, pickaxe));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goTalkToWizard = new ConditionalStep(this, goUpTrellis);
+		goTalkToWizard.addStep(inWatchtowerFloor2, talkToWizard);
+		goTalkToWizard.addStep(inWatchtowerFloor1, goUpLadderToWizard);
+
+		steps.put(0, goTalkToWizard);
+
+		ConditionalStep getBushItem = new ConditionalStep(this, searchBush);
+		getBushItem.addStep(new Conditions(hasFingernails, inWatchtowerFloor2), talkToWizardAgain);
+		getBushItem.addStep(new Conditions(hasFingernails, inWatchtowerFloor1), goBackUpToWizard);
+		getBushItem.addStep(hasFingernails, goBackUpToFirstFloor);
+		getBushItem.addStep(inWatchtowerFloor2, goDownFromWizard);
+		getBushItem.addStep(inWatchtowerFloor1, goDownFromFirstFloor);
+
+		steps.put(1, getBushItem);
+
+		ConditionalStep helpOgres = new ConditionalStep(this, syncStep);
+		helpOgres.addStep(new Conditions(hasRelic1, hasRelic2, hasRelic3, inWatchtowerFloor2), talkToWizardWithRelic);
+		helpOgres.addStep(new Conditions(hasRelic1, hasRelic2, hasRelic3, inWatchtowerFloor1), bringRelicUpToWizard);
+		helpOgres.addStep(new Conditions(hasRelic1, hasRelic2, hasRelic3), bringRelicUpToFirstFloor);
+		helpOgres.addStep(new Conditions(hasRelic1, hasGoradsTooth, hasRelic3, onGrewIsland), talkToGrewAgain);
+		helpOgres.addStep(new Conditions(hasRelic1, hasGoradsTooth, hasRelic3), useRopeOnBranchAgain);
+		helpOgres.addStep(new Conditions(hasTobansGold, hasGoradsTooth, hasRelic3), talkToOgAgain);
+		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland, hasGoradsTooth, hasRelic3), searchChestForTobansGold);
+		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland, hasGoradsTooth, talkedToToban), giveTobanDragonBones);
+		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland, hasGoradsTooth), talkToToban);
+		helpOgres.addStep(new Conditions(talkedToOg, onTobanIsland), killGorad);
+		helpOgres.addStep(new Conditions(onGrewIsland, talkedToGrew), leaveGrewIsland);
+		helpOgres.addStep(new Conditions(knownOgreStep, talkedToOg, talkedToGrew), enterHoleSouthOfGuTanoth);
+		helpOgres.addStep(new Conditions(knownOgreStep, onGrewIsland), talkToGrew);
+		helpOgres.addStep(new Conditions(knownOgreStep, talkedToOg), useRopeOnBranch);
+		helpOgres.addStep(knownOgreStep, talkToOg);
+
+		steps.put(2, helpOgres);
+
+		steps.put(3, enterGuTanoth);
+
+		ConditionalStep getCrystal1 = new ConditionalStep(this, stealRockCake);
+		getCrystal1.addStep(new Conditions(knowsRiddle, inEndOfJumpingPath), talkToCityGuardAgain);
+		getCrystal1.addStep(inEndOfJumpingPath, talkToCityGuard);
+		getCrystal1.addStep(gaveCake, jumpGap);
+		getCrystal1.addStep(new Conditions(hasRockCake, gettingOgreRockCake), talkToGuardWithRockCake);
+		getCrystal1.addStep(hasRockCake, talkToGuardBattlement);
+
+		steps.put(4, getCrystal1);
+
+		steps.put(5, getCrystal1);
+
+		ConditionalStep goTalkToScaredSkavid = new ConditionalStep(this, syncStep);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4, inInsaneSkavidRoom), talkToInsaneSkavid);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4, inInsaneSkavidPath), enterInsaneSkavidCave);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4), tryToGoThroughToInsaneSkavid);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, talkedToSkavid4, inSkavidRoom4), leaveSkavid4);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, inSkavidRoom4), talkToSkavid4);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3, inSkavidRoom3), leaveSkavid3);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, inSkavidRoom3), talkToSkavid3);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, inSkavidRoom2), leaveSkavid2);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, inSkavidRoom2), talkToSkavid2);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, inSkavidRoom1), leaveSkavid1);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, inSkavidRoom1), talkToSkavid1);
+		goTalkToScaredSkavid.addStep(new Conditions(inScaredSkavidRoom, talkedToScaredSkavid), leaveScaredSkavidRoom);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2, talkedToSkavid3), enterSkavid4Cave);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1, talkedToSkavid2), enterSkavid3Cave);
+		goTalkToScaredSkavid.addStep(new Conditions(talkedToScaredSkavid, talkedToSkavid1), enterSkavid2Cave);
+		goTalkToScaredSkavid.addStep(talkedToScaredSkavid, enterSkavid1Cave);
+		goTalkToScaredSkavid.addStep(new Conditions(LogicType.OR, hasBeenAtEndOfPath, inScaredSkavidRoom), talkToScaredSkavid);
+
+		steps.put(6, goTalkToScaredSkavid);
+
+		ConditionalStep infiltrateEnclave = new ConditionalStep(this, useNightshadeOnGuard);
+		infiltrateEnclave.addStep(new Conditions(seenShamans, inWatchtowerFloor2), talkToWizardAgainEnclave);
+		infiltrateEnclave.addStep(new Conditions(seenShamans, inWatchtowerFloor1), goBackUpToWizardAfterEnclave);
+		infiltrateEnclave.addStep(new Conditions(seenShamans, inEnclave), leaveEnclave);
+		infiltrateEnclave.addStep(new Conditions(seenShamans), goBackUpToFirstFloorAfterEnclave);
+		infiltrateEnclave.addStep(new Conditions(inInsaneSkavidRoom, has2Nightshade), leaveMadSkavid);
+		infiltrateEnclave.addStep(inInsaneSkavidRoom, pickUp2Nightshade);
+
+		steps.put(7, infiltrateEnclave);
+
+		steps.put(8, infiltrateEnclave);
+
+		ConditionalStep makePotion = new ConditionalStep(this, useJangerberriesOnGuam);
+		makePotion.addStep(new Conditions(hasPotion, inWatchtowerFloor2), talkToWizardWithPotion);
+		makePotion.addStep(new Conditions(hasPotion, inWatchtowerFloor1), goUpToWizardWithPotion);
+		makePotion.addStep(hasPotion, goUpToFirstFloorWithPotion);
+		makePotion.addStep(new Conditions(hasPartialPotion, hasGroundBatBones), useBonesOnPotion);
+		makePotion.addStep(hasPartialPotion, grindBatBones);
+
+		steps.put(9, makePotion);
+
+		ConditionalStep killOgres = new ConditionalStep(this, useNightshadeOnGuardAgain);
+		killOgres.addStep(new Conditions(inWatchtowerFloor2, gotCrystal4), talkToWizardWithCrystals);
+		killOgres.addStep(new Conditions(inWatchtowerFloor1, gotCrystal4), goUpToWizardWithCrystals);
+		killOgres.addStep(new Conditions(inEnclave, gotCrystal4), leaveEnclaveWithCrystals);
+		killOgres.addStep(gotCrystal4, goUpToFirstFloorWithCrystals);
+		killOgres.addStep(new Conditions(inEnclave, killedAllOgres), mineRock);
+		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2, killedOgre3, killedOgre4, killedOgre5), usePotionOnOgre6);
+		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2, killedOgre3, killedOgre4), usePotionOnOgre5);
+		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2, killedOgre3), usePotionOnOgre4);
+		killOgres.addStep(new Conditions(inEnclave, killedOgre1, killedOgre2), usePotionOnOgre3);
+		killOgres.addStep(new Conditions(inEnclave, killedOgre1), usePotionOnOgre2);
+		killOgres.addStep(inEnclave, usePotionOnOgre1);
+
+		steps.put(10, killOgres);
+
+		ConditionalStep placeCrystals = new ConditionalStep(this, goUpToFirstFloorWithCrystals);
+		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1, placedCrystal2, placedCrystal3, placedCrystal4), pullLever);
+		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1, placedCrystal2, placedCrystal3), useCrystal4);
+		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1, placedCrystal2), useCrystal3);
+		placeCrystals.addStep(new Conditions(inWatchtowerFloor2, placedCrystal1), useCrystal2);
+		placeCrystals.addStep(inWatchtowerFloor2, useCrystal1);
+		placeCrystals.addStep(inWatchtowerFloor1, goUpToWizardWithCrystals);
+
+		steps.put(11, placeCrystals);
+		steps.put(12, placeCrystals);
+
+		return steps;
 	}
 }

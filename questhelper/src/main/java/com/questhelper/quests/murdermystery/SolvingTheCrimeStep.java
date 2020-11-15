@@ -14,11 +14,13 @@ public class SolvingTheCrimeStep extends ConditionalStep
 		setupSteps();
 	}
 
-	public void setupConditions() {
+	public void setupConditions()
+	{
 
 	}
 
-	public void setupItemRequirements() {
+	public void setupItemRequirements()
+	{
 
 	}
 

@@ -25,7 +25,13 @@
 package com.questhelper.steps;
 
 import com.google.inject.Inject;
+import com.questhelper.QuestHelperPlugin;
+import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
+import com.questhelper.steps.conditional.ChatMessageCondition;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.Conditions;
+import com.questhelper.steps.conditional.NpcCondition;
 import com.questhelper.steps.conditional.WidgetTextCondition;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -41,28 +47,19 @@ import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
-import com.questhelper.QuestHelperPlugin;
-import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.steps.conditional.ChatMessageCondition;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.NpcCondition;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 import org.apache.commons.lang3.ArrayUtils;
 
 /* Conditions are checked in the order they were added */
 public class ConditionalStep extends QuestStep implements OwnerStep
 {
-	@Inject
-	protected EventBus eventBus;
-
-	protected boolean started = false;
-
 	protected final LinkedHashMap<Conditions, QuestStep> steps;
 	protected final ArrayList<ChatMessageCondition> chatConditions = new ArrayList<>();
 	protected final ArrayList<NpcCondition> npcConditions = new ArrayList<>();
 	protected final ArrayList<WidgetTextCondition> widgetConditions = new ArrayList<>();
-
+	@Inject
+	protected EventBus eventBus;
+	protected boolean started = false;
 	protected QuestStep currentStep;
 
 	protected Requirement[] requirements;
@@ -199,60 +196,6 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 	}
 
 	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		if (started)
-		{
-			updateSteps();
-		}
-	}
-
-	@Subscribe
-	public void onGameStateChanged(final GameStateChanged event)
-	{
-		if (event.getGameState() == GameState.LOADING || event.getGameState() == GameState.HOPPING)
-		{
-			for (Conditions conditions : steps.keySet())
-			{
-				if (conditions != null)
-				{
-					conditions.loadingHandler();
-				}
-			}
-		}
-	}
-
-	@Subscribe
-	public void onChatMessage(ChatMessage chatMessage)
-	{
-		if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE)
-		{
-			for (ChatMessageCondition step : chatConditions)
-			{
-				step.validateCondition(client, chatMessage.getMessage());
-			}
-		}
-	}
-
-	@Subscribe
-	public void onNpcSpawned(NpcSpawned event)
-	{
-		for (NpcCondition condition : npcConditions)
-		{
-			condition.checkNpcSpawned(event.getNpc());
-		}
-	}
-
-	@Subscribe
-	public void onNpcDespawned(NpcDespawned event)
-	{
-		for (NpcCondition condition : npcConditions)
-		{
-			condition.checkNpcDespawned(event.getNpc().getId());
-		}
-	}
-
-	@Subscribe
 	public void onWidgetLoaded(final WidgetLoaded event)
 	{
 		super.onWidgetLoaded(event);
@@ -262,66 +205,6 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 			{
 				condition.checkWidgetText(client);
 			}
-		}
-	}
-
-	protected void updateSteps()
-	{
-		Conditions lastPossibleCondition = null;
-
-		for (Conditions conditions : steps.keySet())
-		{
-			boolean stepIsLocked = steps.get(conditions).isLocked();
-			if (conditions != null && conditions.checkCondition(client) && !stepIsLocked)
-			{
-				startUpStep(steps.get(conditions));
-				return;
-			}
-			else if (steps.get(conditions).isBlocker() && stepIsLocked)
-			{
-				startUpStep(steps.get(lastPossibleCondition));
-				return;
-			}
-			else if (conditions != null && !stepIsLocked)
-			{
-				lastPossibleCondition = conditions;
-			}
-		}
-
-		if (!steps.get(null).isLocked())
-		{
-			startUpStep(steps.get(null));
-		}
-		else
-		{
-			startUpStep(steps.get(lastPossibleCondition));
-		}
-	}
-
-	protected void startUpStep(QuestStep step)
-	{
-		if (currentStep == null)
-		{
-			step.startUp();
-			currentStep = step;
-			return;
-		}
-
-		if (!step.equals(currentStep))
-		{
-			shutDownStep();
-			step.startUp();
-			currentStep = step;
-		}
-	}
-
-	protected void shutDownStep()
-	{
-		if (currentStep != null)
-		{
-			eventBus.unregister(currentStep);
-			currentStep.shutDown();
-			currentStep = null;
 		}
 	}
 
@@ -388,6 +271,120 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 		}
 
 		return this;
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		if (started)
+		{
+			updateSteps();
+		}
+	}
+
+	@Subscribe
+	public void onGameStateChanged(final GameStateChanged event)
+	{
+		if (event.getGameState() == GameState.LOADING || event.getGameState() == GameState.HOPPING)
+		{
+			for (Conditions conditions : steps.keySet())
+			{
+				if (conditions != null)
+				{
+					conditions.loadingHandler();
+				}
+			}
+		}
+	}
+
+	@Subscribe
+	public void onChatMessage(ChatMessage chatMessage)
+	{
+		if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE)
+		{
+			for (ChatMessageCondition step : chatConditions)
+			{
+				step.validateCondition(client, chatMessage.getMessage());
+			}
+		}
+	}
+
+	@Subscribe
+	public void onNpcSpawned(NpcSpawned event)
+	{
+		for (NpcCondition condition : npcConditions)
+		{
+			condition.checkNpcSpawned(event.getNpc());
+		}
+	}
+
+	@Subscribe
+	public void onNpcDespawned(NpcDespawned event)
+	{
+		for (NpcCondition condition : npcConditions)
+		{
+			condition.checkNpcDespawned(event.getNpc().getId());
+		}
+	}
+
+	protected void updateSteps()
+	{
+		Conditions lastPossibleCondition = null;
+
+		for (Conditions conditions : steps.keySet())
+		{
+			boolean stepIsLocked = steps.get(conditions).isLocked();
+			if (conditions != null && conditions.checkCondition(client) && !stepIsLocked)
+			{
+				startUpStep(steps.get(conditions));
+				return;
+			}
+			else if (steps.get(conditions).isBlocker() && stepIsLocked)
+			{
+				startUpStep(steps.get(lastPossibleCondition));
+				return;
+			}
+			else if (conditions != null && !stepIsLocked)
+			{
+				lastPossibleCondition = conditions;
+			}
+		}
+
+		if (!steps.get(null).isLocked())
+		{
+			startUpStep(steps.get(null));
+		}
+		else
+		{
+			startUpStep(steps.get(lastPossibleCondition));
+		}
+	}
+
+	protected void startUpStep(QuestStep step)
+	{
+		if (currentStep == null)
+		{
+			step.startUp();
+			currentStep = step;
+			return;
+		}
+
+		if (!step.equals(currentStep))
+		{
+			shutDownStep();
+			step.startUp();
+			currentStep = step;
+		}
+	}
+
+	protected void shutDownStep()
+	{
+		if (currentStep != null)
+		{
+			eventBus.unregister(currentStep);
+			currentStep.shutDown();
+			currentStep = null;
+		}
 	}
 
 	@Override

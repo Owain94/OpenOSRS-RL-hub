@@ -24,31 +24,35 @@
  */
 package com.questhelper.steps.choice;
 
-import lombok.Getter;
-import net.runelite.api.Client;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import lombok.Getter;
+import net.runelite.api.Client;
 
 public class WidgetChoiceSteps
 {
 	@Getter
 	final private ArrayList<WidgetChoiceStep> choices = new ArrayList<>();
 
-	public WidgetChoiceSteps(WidgetChoiceStep... choices) {
+	public WidgetChoiceSteps(WidgetChoiceStep... choices)
+	{
 		Collections.addAll(this.choices, choices);
 	}
 
-	public void addChoice(WidgetChoiceStep choice) {
+	public void addChoice(WidgetChoiceStep choice)
+	{
 		choices.add(choice);
 	}
 
-	public void checkChoices(Client client) {
-		if (choices.size() == 0) {
+	public void checkChoices(Client client)
+	{
+		if (choices.size() == 0)
+		{
 			return;
 		}
 
-		for (WidgetChoiceStep currentChoice : choices) {
+		for (WidgetChoiceStep currentChoice : choices)
+		{
 			currentChoice.highlightChoice(client);
 		}
 	}

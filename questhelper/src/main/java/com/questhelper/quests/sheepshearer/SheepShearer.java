@@ -24,126 +24,125 @@
  */
 package com.questhelper.quests.sheepshearer;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
 
-import java.util.HashMap;
-import java.util.Map;
+@QuestDescriptor(
+	quest = QuestHelperQuest.SHEEP_SHEARER
+)
+public class SheepShearer extends BasicQuestHelper
+{
+	ItemRequirement twentyBallsOfWool, shears;
 
-    @QuestDescriptor(
-            quest = QuestHelperQuest.SHEEP_SHEARER
-    )
-    public class SheepShearer extends BasicQuestHelper
-    {
-    	ItemRequirement twentyBallsOfWool, shears;
+	QuestStep startStep;
 
-    	QuestStep startStep;
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(twentyBallsOfWool);
+		reqs.add(shears);
+		return reqs;
+	}
 
-        @Override
-        public Map<Integer, QuestStep> loadSteps()
-        {
-            Map<Integer, QuestStep> steps = new HashMap<>();
+	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 
-            WorldPoint farmerFredPoint = new WorldPoint(3190, 3273, 0);
-            String dialoguePrompt = "Bring Fred the Farmer north of Lumbridge 20 balls of wool (UNNOTED) to finish the quest. You don't have to bring them all at once.";
+		allSteps.add(new PanelDetails("Bring Fred some wool", new ArrayList<>(Collections.singletonList(startStep))));
+		return allSteps;
+	}
 
-            twentyBallsOfWool = new ItemRequirement("Balls of wool", ItemID.BALL_OF_WOOL, 20);
-            shears = new ItemRequirement("Shears if you plan on collecting wool yourself", ItemID.SHEARS);
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		Map<Integer, QuestStep> steps = new HashMap<>();
 
-            startStep = new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint, dialoguePrompt, new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 20));
+		WorldPoint farmerFredPoint = new WorldPoint(3190, 3273, 0);
+		String dialoguePrompt = "Bring Fred the Farmer north of Lumbridge 20 balls of wool (UNNOTED) to finish the quest. You don't have to bring them all at once.";
 
-            steps.put(0, startStep);
+		twentyBallsOfWool = new ItemRequirement("Balls of wool", ItemID.BALL_OF_WOOL, 20);
+		shears = new ItemRequirement("Shears if you plan on collecting wool yourself", ItemID.SHEARS);
 
-            steps.put(1, steps.get(0));
-            steps.put(2, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 19)));
-            steps.put(3, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 18)));
-            steps.put(4, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 17)));
-            steps.put(5, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 16)));
-            steps.put(6, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 15)));
-            steps.put(7, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 14)));
-            steps.put(8, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 13)));
-            steps.put(9, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 12)));
-            steps.put(10, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 11)));
-            steps.put(11, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 10)));
-            steps.put(12, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 9)));
-            steps.put(13, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 8)));
-            steps.put(14, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 7)));
-            steps.put(15, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 6)));
-            steps.put(16, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 5)));
-            steps.put(17, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 4)));
-            steps.put(18, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 3)));
-            steps.put(19, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 2)));
-            steps.put(20, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
-                    dialoguePrompt,
-                    new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 1)));
+		startStep = new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint, dialoguePrompt, new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 20));
+
+		steps.put(0, startStep);
+
+		steps.put(1, steps.get(0));
+		steps.put(2, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 19)));
+		steps.put(3, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 18)));
+		steps.put(4, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 17)));
+		steps.put(5, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 16)));
+		steps.put(6, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 15)));
+		steps.put(7, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 14)));
+		steps.put(8, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 13)));
+		steps.put(9, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 12)));
+		steps.put(10, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 11)));
+		steps.put(11, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 10)));
+		steps.put(12, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 9)));
+		steps.put(13, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 8)));
+		steps.put(14, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 7)));
+		steps.put(15, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 6)));
+		steps.put(16, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 5)));
+		steps.put(17, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 4)));
+		steps.put(18, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 3)));
+		steps.put(19, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 2)));
+		steps.put(20, new NpcStep(this, NpcID.FRED_THE_FARMER, farmerFredPoint,
+			dialoguePrompt,
+			new ItemRequirement("Ball of wool", ItemID.BALL_OF_WOOL, 1)));
 
 
-            steps.get(0).addDialogStep("I'm looking for a quest.");
-            steps.get(0).addDialogStep("Yes, okay. I can do that.");
-            return steps;
-        }
-
-		@Override
-		public ArrayList<ItemRequirement> getItemRequirements()
-		{
-			ArrayList<ItemRequirement> reqs = new ArrayList<>();
-			reqs.add(twentyBallsOfWool);
-			reqs.add(shears);
-			return reqs;
-		}
-
-		@Override
-		public ArrayList<PanelDetails> getPanels()
-		{
-			ArrayList<PanelDetails> allSteps = new ArrayList<>();
-
-			allSteps.add(new PanelDetails("Bring Fred some wool", new ArrayList<>(Collections.singletonList(startStep))));
-			return allSteps;
-		}
-    }
+		steps.get(0).addDialogStep("I'm looking for a quest.");
+		steps.get(0).addDialogStep("Yes, okay. I can do that.");
+		return steps;
+	}
+}

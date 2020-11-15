@@ -24,11 +24,18 @@
  */
 package com.questhelper.quests.aporcineofinterest;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
@@ -41,13 +48,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.A_PORCINE_OF_INTEREST
@@ -62,40 +62,6 @@ public class APorcineOfInterest extends BasicQuestHelper
 		enterHoleForFoot, cutOffFoot, returnToSarah, returnToSpria;
 
 	Zone cave;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, readNotice);
-		steps.put(5, talkToSarah);
-		steps.put(10, useRopeOnHole);
-
-		ConditionalStep investigateCave = new ConditionalStep(this, enterHole);
-		investigateCave.addStep(inCave, investigateSkeleton);
-
-		steps.put(15, investigateCave);
-
-		steps.put(20, talkToSpria);
-
-		ConditionalStep goKillSourhog = new ConditionalStep(this, enterHoleAgain);
-		goKillSourhog.addStep(inCave, killSourhog);
-
-		steps.put(25, goKillSourhog);
-
-		ConditionalStep getFootSteps = new ConditionalStep(this, enterHoleForFoot);
-		getFootSteps.addStep(hasFoot, returnToSarah);
-		getFootSteps.addStep(inCave, cutOffFoot);
-
-		steps.put(30, getFootSteps);
-		steps.put(35, returnToSpria);
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -179,6 +145,40 @@ public class APorcineOfInterest extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Arrays.asList(readNotice, talkToSarah, useRopeOnHole, enterHole, investigateSkeleton, talkToSpria, enterHoleAgain,
 			killSourhog, cutOffFoot, returnToSarah, returnToSpria)), rope, slashItem, combatGear));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, readNotice);
+		steps.put(5, talkToSarah);
+		steps.put(10, useRopeOnHole);
+
+		ConditionalStep investigateCave = new ConditionalStep(this, enterHole);
+		investigateCave.addStep(inCave, investigateSkeleton);
+
+		steps.put(15, investigateCave);
+
+		steps.put(20, talkToSpria);
+
+		ConditionalStep goKillSourhog = new ConditionalStep(this, enterHoleAgain);
+		goKillSourhog.addStep(inCave, killSourhog);
+
+		steps.put(25, goKillSourhog);
+
+		ConditionalStep getFootSteps = new ConditionalStep(this, enterHoleForFoot);
+		getFootSteps.addStep(hasFoot, returnToSarah);
+		getFootSteps.addStep(inCave, cutOffFoot);
+
+		steps.put(30, getFootSteps);
+		steps.put(35, returnToSpria);
+		return steps;
 	}
 }
 

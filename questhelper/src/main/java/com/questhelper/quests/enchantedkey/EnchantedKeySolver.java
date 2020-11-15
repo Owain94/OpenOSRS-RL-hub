@@ -57,6 +57,60 @@ public class EnchantedKeySolver
 	}
 
 	/**
+	 * Determines whether the first point passed is closer to each corner of the given rectangle than the second point.
+	 *
+	 * @param firstPoint  First point to test. Return result will be relating to this point's location.
+	 * @param secondPoint Second point to test
+	 * @param rect        Rectangle, whose corner points will be compared to the first and second points passed
+	 * @return {@code true} if {@code firstPoint} is closer to each of {@code rect}'s four corner points than
+	 * {@code secondPoint}, {@code false} otherwise.
+	 * @see WorldPoint#distanceTo2D
+	 */
+	@VisibleForTesting
+	static boolean isFirstPointCloserRect(final WorldPoint firstPoint, final WorldPoint secondPoint, final Rectangle rect)
+	{
+		final WorldPoint nePoint = new WorldPoint((rect.x + rect.width), (rect.y + rect.height), 0);
+
+		if (!isFirstPointCloser(firstPoint, secondPoint, nePoint))
+		{
+			return false;
+		}
+
+		final WorldPoint sePoint = new WorldPoint((rect.x + rect.width), rect.y, 0);
+
+		if (!isFirstPointCloser(firstPoint, secondPoint, sePoint))
+		{
+			return false;
+		}
+
+		final WorldPoint nwPoint = new WorldPoint(rect.x, (rect.y + rect.height), 0);
+
+		if (!isFirstPointCloser(firstPoint, secondPoint, nwPoint))
+		{
+			return false;
+		}
+
+		final WorldPoint swPoint = new WorldPoint(rect.x, rect.y, 0);
+		return (isFirstPointCloser(firstPoint, secondPoint, swPoint));
+	}
+
+	/**
+	 * Determines whether the first point passed is closer to the given point of comparison than the second point.
+	 *
+	 * @param firstPoint  First point to test. Return result will be relating to this point's location.
+	 * @param secondPoint Second point to test
+	 * @param worldPoint  Point to compare to the first and second points passed
+	 * @return {@code true} if {@code firstPoint} is closer to {@code worldPoint} than {@code secondPoint},
+	 * {@code false} otherwise.
+	 * @see WorldPoint#distanceTo2D
+	 */
+	@VisibleForTesting
+	static boolean isFirstPointCloser(final WorldPoint firstPoint, final WorldPoint secondPoint, final WorldPoint worldPoint)
+	{
+		return firstPoint.distanceTo2D(worldPoint) < secondPoint.distanceTo2D(worldPoint);
+	}
+
+	/**
 	 * Process a hot-cold update given a {@link WorldPoint} where a check occurred and the resulting temperature and
 	 * temperature change discovered at that point. This will filter the set of possible locations which can be the
 	 * solution.
@@ -65,7 +119,7 @@ public class EnchantedKeySolver
 	 * @param temperature       The temperature of the checked point
 	 * @param temperatureChange The change of temperature of the checked point compared to the previously-checked point
 	 * @return A set of {@link EnchantedKeyDigLocation}s which are still possible after the filtering occurs. This return value
-	 *         is the same as would be returned by {@code getPossibleLocations()}.
+	 * is the same as would be returned by {@code getPossibleLocations()}.
 	 */
 	public Set<EnchantedKeyDigLocation> signal(@Nonnull final WorldPoint worldPoint, @Nonnull final EnchantedKeyTemperature temperature, @Nullable final EnchantedKeyTemperatureChange temperatureChange)
 	{
@@ -119,59 +173,5 @@ public class EnchantedKeySolver
 	{
 		lastWorldPoint = null;
 		this.possibleLocations = possibleLocations;
-	}
-
-	/**
-	 * Determines whether the first point passed is closer to each corner of the given rectangle than the second point.
-	 *
-	 * @param firstPoint  First point to test. Return result will be relating to this point's location.
-	 * @param secondPoint Second point to test
-	 * @param rect        Rectangle, whose corner points will be compared to the first and second points passed
-	 * @return {@code true} if {@code firstPoint} is closer to each of {@code rect}'s four corner points than
-	 *         {@code secondPoint}, {@code false} otherwise.
-	 * @see WorldPoint#distanceTo2D
-	 */
-	@VisibleForTesting
-	static boolean isFirstPointCloserRect(final WorldPoint firstPoint, final WorldPoint secondPoint, final Rectangle rect)
-	{
-		final WorldPoint nePoint = new WorldPoint((rect.x + rect.width), (rect.y + rect.height), 0);
-
-		if (!isFirstPointCloser(firstPoint, secondPoint, nePoint))
-		{
-			return false;
-		}
-
-		final WorldPoint sePoint = new WorldPoint((rect.x + rect.width), rect.y, 0);
-
-		if (!isFirstPointCloser(firstPoint, secondPoint, sePoint))
-		{
-			return false;
-		}
-
-		final WorldPoint nwPoint = new WorldPoint(rect.x, (rect.y + rect.height), 0);
-
-		if (!isFirstPointCloser(firstPoint, secondPoint, nwPoint))
-		{
-			return false;
-		}
-
-		final WorldPoint swPoint = new WorldPoint(rect.x, rect.y, 0);
-		return (isFirstPointCloser(firstPoint, secondPoint, swPoint));
-	}
-
-	/**
-	 * Determines whether the first point passed is closer to the given point of comparison than the second point.
-	 *
-	 * @param firstPoint  First point to test. Return result will be relating to this point's location.
-	 * @param secondPoint Second point to test
-	 * @param worldPoint  Point to compare to the first and second points passed
-	 * @return {@code true} if {@code firstPoint} is closer to {@code worldPoint} than {@code secondPoint},
-	 *         {@code false} otherwise.
-	 * @see WorldPoint#distanceTo2D
-	 */
-	@VisibleForTesting
-	static boolean isFirstPointCloser(final WorldPoint firstPoint, final WorldPoint secondPoint, final WorldPoint worldPoint)
-	{
-		return firstPoint.distanceTo2D(worldPoint) < secondPoint.distanceTo2D(worldPoint);
 	}
 }

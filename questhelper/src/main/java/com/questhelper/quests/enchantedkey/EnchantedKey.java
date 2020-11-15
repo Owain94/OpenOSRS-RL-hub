@@ -24,17 +24,17 @@
  */
 package com.questhelper.quests.enchantedkey;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import net.runelite.api.ItemID;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.QuestDescriptor;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.ENCHANTED_KEY
@@ -44,22 +44,6 @@ public class EnchantedKey extends BasicQuestHelper
 	ItemRequirement spade, key, varrockTeleports, ardougneTeleports, rellekkaTeleports, lumbridgeTeleports, passage;
 
 	QuestStep solvePuzzle;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupRequirements();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		for (int i = 0; i < 2047; i++)
-		{
-			steps.put(i, solvePuzzle);
-		}
-
-		return steps;
-	}
 
 	private void setupRequirements()
 	{
@@ -96,5 +80,21 @@ public class EnchantedKey extends BasicQuestHelper
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Dig for treasure", new ArrayList<>(Arrays.asList(solvePuzzle)), key, spade));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupRequirements();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		for (int i = 0; i < 2047; i++)
+		{
+			steps.put(i, solvePuzzle);
+		}
+
+		return steps;
 	}
 }

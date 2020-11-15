@@ -25,13 +25,19 @@
 package com.questhelper.quests.dragonslayerii;
 
 import com.questhelper.ItemCollections;
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.ItemRequirements;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -50,12 +56,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DRAGON_SLAYER_II
@@ -118,280 +118,6 @@ public class DragonSlayerII extends BasicQuestHelper
 	DetailedQuestStep takeBoatToUngael, keepShipAfloat, getToMainShip, kill2Blue2Green, killBlackSteelBrutalRedDragon, killMithAddyAndRuneDragons, killGalvek, talkToAlecToFinish;
 
 	ConditionalStep goEnterMithDoorFirstTime, goEnterMithDoorSecondTime, goSmithKey, goOpenDoorWithKey, openDoorWithoutKey, goTalkToBobAfterRelease;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		setupConditionalSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToAlec);
-		steps.put(5, talkToDallas);
-
-		ConditionalStep goTalkToDallasCrandor = new ConditionalStep(this, enterVolcano);
-		goTalkToDallasCrandor.addStep(inCrandorUnderground, talkToDallasOnCrandor);
-		goTalkToDallasCrandor.addStep(inKaramjaVolcano, enterCrandorWall);
-		steps.put(10, goTalkToDallasCrandor);
-
-		ConditionalStep goMineWall = new ConditionalStep(this, enterVolcano);
-		goMineWall.addStep(inCrandorUnderground, usePickaxeOnBlockage);
-		goMineWall.addStep(inKaramjaVolcano, enterCrandorWall);
-		steps.put(15, goMineWall);
-		steps.put(16, goMineWall);
-
-		ConditionalStep goInspectMural = new ConditionalStep(this, enterVolcano);
-		goInspectMural.addStep(inMuralRoom, investigateMural);
-		goInspectMural.addStep(inCrandorUnderground, enterBlockage);
-		goInspectMural.addStep(inKaramjaVolcano, enterCrandorWall);
-		steps.put(17, goInspectMural);
-		steps.put(18, goInspectMural);
-		steps.put(19, goInspectMural);
-		steps.put(20, goInspectMural);
-		steps.put(21, goInspectMural);
-
-		ConditionalStep goKillSpawn = new ConditionalStep(this, enterVolcano);
-		goKillSpawn.addStep(inMuralRoom, killSpawn);
-		goKillSpawn.addStep(inCrandorUnderground, enterBlockage);
-		goKillSpawn.addStep(inKaramjaVolcano, enterCrandorWall);
-		steps.put(22, goKillSpawn);
-		steps.put(23, goKillSpawn);
-		steps.put(24, goKillSpawn);
-
-		ConditionalStep goInvestigateMuralAgain = new ConditionalStep(this, enterVolcano);
-		goInvestigateMuralAgain.addStep(inMuralRoom, investigateMuralAgain);
-		goInvestigateMuralAgain.addStep(inCrandorUnderground, enterBlockage);
-		goInvestigateMuralAgain.addStep(inKaramjaVolcano, enterCrandorWall);
-		steps.put(25, goInvestigateMuralAgain);
-
-		ConditionalStep goTalkToDallasAfterMural = new ConditionalStep(this, enterVolcano);
-		goTalkToDallasAfterMural.addStep(inMuralRoom, talkToDallasAfterMural);
-		goTalkToDallasAfterMural.addStep(inCrandorUnderground, enterBlockage);
-		goTalkToDallasAfterMural.addStep(inKaramjaVolcano, enterCrandorWall);
-		steps.put(30, goTalkToDallasAfterMural);
-
-		ConditionalStep goTalkToDallasOnFossilIsland = new ConditionalStep(this, enterHouseOnTheHill);
-		goTalkToDallasOnFossilIsland.addStep(inHouseGroundFloor, talkToDallasInHouse);
-		goTalkToDallasOnFossilIsland.addStep(inHouseFirstFloor, enterHouseBasement);
-		steps.put(35, goTalkToDallasOnFossilIsland);
-
-		ConditionalStep getMapPieces = new ConditionalStep(this, enterHouseOnTheHill);
-		getMapPieces.addStep(new Conditions(inHouseGroundFloor, hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces, hadMushtreeMapPieces), talkToDallasWithMapPieces);
-		getMapPieces.addStep(new Conditions(inHouseFirstFloor, hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces, hadMushtreeMapPieces), goDownWithMapPieces);
-		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces, hadMushtreeMapPieces), enterHouseWithMapPieces);
-
-		getMapPieces.addStep(new Conditions(inHouseFirstFloor, hadChest1MapPieces, hadChest2MapPieces), leaveHouseForMap);
-		getMapPieces.addStep(new Conditions(inHouseGroundFloor, hadChest1MapPieces, hadChest2MapPieces), goUpstairsForMap);
-
-		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces), searchMushtree);
-		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces), searchBriar);
-		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces), searchFungi);
-		getMapPieces.addStep(new Conditions(inHouseFirstFloor, hadChest1MapPieces), searchStoneChestNorth);
-		getMapPieces.addStep(new Conditions(inHouseGroundFloor, hadChest1MapPieces), goUpstairsForMap);
-		getMapPieces.addStep(inHouseGroundFloor, searchNorthChest);
-		getMapPieces.addStep(inHouseFirstFloor, enterHouseBasement);
-		steps.put(40, getMapPieces);
-
-		ConditionalStep talkToDallasAfterMap = new ConditionalStep(this, enterHouseOnTheHill);
-		talkToDallasAfterMap.addStep(inHouseGroundFloor, talkToDallasInHouse);
-		talkToDallasAfterMap.addStep(inHouseFirstFloor, enterHouseBasement);
-		steps.put(45, talkToDallasAfterMap);
-
-		ConditionalStep goSolveMapPuzzle = new ConditionalStep(this, enterHouseOnTheHill);
-		goSolveMapPuzzle.addStep(inMapPuzzle, solveMap);
-		goSolveMapPuzzle.addStep(inHouseGroundFloor, startMapPuzzle);
-		goSolveMapPuzzle.addStep(inHouseFirstFloor, enterHouseBasement);
-		steps.put(45, goSolveMapPuzzle);
-
-		ConditionalStep goTalkToDallasAfterSolvingMap = new ConditionalStep(this, enterHouseOnTheHill);
-		goTalkToDallasAfterSolvingMap.addStep(inHouseGroundFloor, talkToDallasAfterSolvingMap);
-		goTalkToDallasAfterSolvingMap.addStep(inHouseFirstFloor, enterHouseBasement);
-		steps.put(50, goTalkToDallasAfterSolvingMap);
-
-		steps.put(55, talkToJardricInMuseumCamp);
-
-		steps.put(60, buildRowBoat);
-		steps.put(61, buildRowBoat);
-		steps.put(62, buildRowBoat);
-		steps.put(63, buildRowBoat);
-		steps.put(64, buildRowBoat);
-
-		steps.put(65, talkToDallasAfterBoatRepair);
-
-		ConditionalStep goDownToLithkrenBasement = new ConditionalStep(this, boardBoat);
-		goDownToLithkrenBasement.addStep(inLithkrenUnderground, talkToDallasInLithkren);
-		goDownToLithkrenBasement.addStep(inLithkrenGroundFloorRoom, climbDownLithkrenNorthStairs);
-		goDownToLithkrenBasement.addStep(inLithkrenFirstFloor, climbDownLithkrenTrapdoor);
-		goDownToLithkrenBasement.addStep(inLithkrenGroundFloor, climbCourtyardStairs);
-
-		steps.put(70, goDownToLithkrenBasement);
-		steps.put(71, goDownToLithkrenBasement);
-		steps.put(72, goDownToLithkrenBasement);
-		steps.put(73, goDownToLithkrenBasement);
-		steps.put(74, goDownToLithkrenBasement);
-		steps.put(75, goDownToLithkrenBasement);
-
-		ConditionalStep goReadDiary = new ConditionalStep(this, boardBoat);
-		goReadDiary.addStep(hasAivasDiary, readDiary);
-		goReadDiary.addStep(inLithkrenUnderground, searchSkeleton);
-		goReadDiary.addStep(inLithkrenGroundFloorRoom, climbDownLithkrenNorthStairs);
-		goReadDiary.addStep(inLithkrenFirstFloor, climbDownLithkrenTrapdoor);
-		goReadDiary.addStep(inLithkrenGroundFloor, climbCourtyardStairs);
-		steps.put(80, goReadDiary);
-		steps.put(81, goReadDiary);
-		steps.put(82, goReadDiary);
-		steps.put(83, goReadDiary);
-		steps.put(84, goReadDiary);
-
-		ConditionalStep goTalkToDallasAfterDiary = new ConditionalStep(this, boardBoat);
-		goTalkToDallasAfterDiary.addStep(inLithkrenUnderground, talkToDallasAfterDiary);
-		goTalkToDallasAfterDiary.addStep(inLithkrenGroundFloorRoom, climbDownLithkrenNorthStairs);
-		goTalkToDallasAfterDiary.addStep(inLithkrenFirstFloor, climbDownLithkrenTrapdoor);
-		goTalkToDallasAfterDiary.addStep(inLithkrenGroundFloor, climbCourtyardStairs);
-		steps.put(85, goTalkToDallasAfterDiary);
-
-		steps.put(90, talkToBob);
-
-		steps.put(95, talkToSphinx);
-		steps.put(96, talkToSphinx);
-
-		steps.put(100, talkToOneiromancer);
-
-		ConditionalStep goEnterDream = new ConditionalStep(this, fillDreamVial);
-		goEnterDream.addStep(new Conditions(hasDreamPotion, litBrazier), usePotionOnFlame);
-		goEnterDream.addStep(hasDreamPotion, lightBrazier);
-		goEnterDream.addStep(new Conditions(hasVialGout, hasAstralPowder), addGroundAstral);
-		goEnterDream.addStep(new Conditions(hasVialGout, hasAstralShard), grindAstralShards);
-		goEnterDream.addStep(hasVialGout, crushAstralRune);
-		goEnterDream.addStep(hasVialWater, addGoutweed);
-		steps.put(105, goEnterDream);
-
-		ConditionalStep goTalkToBobInDream = new ConditionalStep(this, talkToBobToEnterDreamAgain);
-		goTalkToBobInDream.addStep(inDream, talkToBobInDream);
-		steps.put(110, goTalkToBobInDream);
-
-		ConditionalStep goDefeatRobert = new ConditionalStep(this, talkToBobToEnterDreamAgain);
-		goDefeatRobert.addStep(inDream, killRobertTheStrong);
-		steps.put(111, goDefeatRobert);
-
-		steps.put(115, talkToBobAfterRobertFight);
-		steps.put(120, talkToBobAfterRobertFight);
-
-		gettingTheFremennikKey = new ConditionalStep(this, talkToBrundt);
-		gettingTheFremennikKey.addStep(new Conditions(inUngaelKeyRoom), searchStoneChestForVorkathKey);
-		gettingTheFremennikKey.addStep(new Conditions(inUngaelUnderground, pulledLever), enterEastVorkathRoom);
-		gettingTheFremennikKey.addStep(new Conditions(inUngaelUnderground), pullLeverInVorkathCave);
-		gettingTheFremennikKey.addStep(new Conditions(onUngael, defeatedVorkath), enterVorkathCave);
-		gettingTheFremennikKey.addStep(onUngael, killVorkath);
-		gettingTheFremennikKey.addStep(talkedToBrundt, talkToTorfinn);
-		gettingTheFremennikKey.setLockingCondition(hasTheFremennikKeyPiece);
-
-		gettingTheKaramjaKey = new ConditionalStep(this, enterKhazariMaze);
-		gettingTheKaramjaKey.addStep(inKhazariMaze, getToCentreOfMaze);
-		gettingTheKaramjaKey.setLockingCondition(hasTheKaramjaKeyPiece);
-
-		gettingTheKourendKey = new ConditionalStep(this, talkToAmelia);
-		gettingTheKourendKey.addStep(new Conditions(openedTomb, inCryptF0), searchTombForCryptKey);
-		gettingTheKourendKey.addStep(new Conditions(inspectedTomb, inCryptF0), solveCryptPuzzle);
-		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia, inCryptF0), searchTombInCrypt);
-		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia, inCryptF1), goDownInCryptF1ToF0);
-		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia, inCryptF2), goDownInCryptF2ToF1);
-		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia), enterCrypt);
-		gettingTheKourendKey.setLockingCondition(hasTheKourendKeyPiece);
-
-		gettingTheVarrockKey = new ConditionalStep(this, talkToReldo);
-		gettingTheVarrockKey.addStep(new Conditions(talkedToAvaAgain), useLocatorInSwamp);
-		gettingTheVarrockKey.addStep(new Conditions(givenAvaOrb), talkToAvaAgainNoOrb);
-		gettingTheVarrockKey.addStep(new Conditions(talkedToAva, haveInertLocator), talkToAvaAgain);
-		gettingTheVarrockKey.addStep(talkedToAva, usePipeOnDragonstone);
-		gettingTheVarrockKey.addStep(talkedToSarah, talkToAva);
-		gettingTheVarrockKey.addStep(talkedToReldoAgain, talkToSarah);
-		gettingTheVarrockKey.addStep(givenReldoBook, talkToReldoAgainNoBook);
-		gettingTheVarrockKey.addStep(foundCensus, talkToReldoAgain);
-		gettingTheVarrockKey.addStep(talkedToReldo, searchBookcase);
-		gettingTheVarrockKey.setLockingCondition(hasTheVarrockKeyPiece);
-
-		ConditionalStep goAndForgeTheKey = new ConditionalStep(this, gettingTheKourendKey);
-		goAndForgeTheKey.addStep(new Conditions(hasTheKourendKeyPiece, hasTheVarrockKeyPiece, hasTheFremennikKeyPiece), gettingTheKaramjaKey);
-		goAndForgeTheKey.addStep(new Conditions(hasTheKourendKeyPiece, hasTheVarrockKeyPiece), gettingTheFremennikKey);
-		goAndForgeTheKey.addStep(hasTheKourendKeyPiece, gettingTheVarrockKey);
-
-		steps.put(125, goAndForgeTheKey);
-		steps.put(126, goAndForgeTheKey);
-		steps.put(127, goAndForgeTheKey);
-		steps.put(128, goAndForgeTheKey);
-		steps.put(129, goAndForgeTheKey);
-
-		ConditionalStep goForgeKey = new ConditionalStep(this, goEnterMithDoorFirstTime);
-		goForgeKey.addStep(litFurnace, goSmithKey);
-		goForgeKey.addStep(openedMithrilDoor, goEnterMithDoorSecondTime);
-		steps.put(130, goForgeKey);
-
-		steps.put(135, goOpenDoorWithKey);
-
-		steps.put(140, openDoorWithoutKey);
-		steps.put(141, openDoorWithoutKey);
-		steps.put(142, openDoorWithoutKey);
-		steps.put(143, openDoorWithoutKey);
-		steps.put(144, openDoorWithoutKey);
-		steps.put(145, openDoorWithoutKey);
-
-		steps.put(150, goTalkToBobAfterRelease);
-
-		steps.put(155, talkToRoald);
-
-		ConditionalStep recruitTheTeam = new ConditionalStep(this, talkToBrundtAboutThreat);
-		recruitTheTeam.addStep(new Conditions(recruitedBrundt, recruitedAmik, inArdougneCastle), talkToLathasOrThoros);
-		recruitTheTeam.addStep(new Conditions(recruitedBrundt, recruitedAmik), goUpToLathasOrThoros);
-		recruitTheTeam.addStep(new Conditions(recruitedBrundt, inFaladorF2), talkToAmik);
-		recruitTheTeam.addStep(new Conditions(recruitedBrundt, inFaladorF1), goUpToAmik2);
-		recruitTheTeam.addStep(recruitedBrundt, goUpToAmik1);
-		steps.put(160, recruitTheTeam);
-
-		steps.put(161, enterVarrockDiningRoom);
-		steps.put(165, talkToBobAfterDiningRoom);
-		steps.put(170, takeBoatToUngael);
-
-		ConditionalStep goRepairBoat = new ConditionalStep(this, takeBoatToUngael);
-		goRepairBoat.addStep(onBoat, keepShipAfloat);
-		steps.put(175, goRepairBoat);
-
-		ConditionalStep getToMainShipSteps = new ConditionalStep(this, takeBoatToUngael);
-		getToMainShipSteps.addStep(inBattle, getToMainShip);
-		steps.put(180, getToMainShipSteps);
-		steps.put(181, getToMainShipSteps);
-		steps.put(182, getToMainShipSteps);
-		steps.put(183, getToMainShipSteps);
-		steps.put(184, getToMainShipSteps);
-
-		ConditionalStep goFightBlueAndGreenDragons = new ConditionalStep(this, takeBoatToUngael);
-		goFightBlueAndGreenDragons.addStep(inBattle, kill2Blue2Green);
-		steps.put(185, goFightBlueAndGreenDragons);
-		steps.put(186, goFightBlueAndGreenDragons);
-
-		ConditionalStep goFightBlackSteelBrutalRedDragons = new ConditionalStep(this, takeBoatToUngael);
-		goFightBlackSteelBrutalRedDragons.addStep(inBattle, killBlackSteelBrutalRedDragon);
-		steps.put(190, goFightBlackSteelBrutalRedDragons);
-		steps.put(191, goFightBlackSteelBrutalRedDragons);
-
-		ConditionalStep goFightMetalDragons = new ConditionalStep(this, takeBoatToUngael);
-		goFightMetalDragons.addStep(inBattle, killMithAddyAndRuneDragons);
-		steps.put(195, goFightMetalDragons);
-		steps.put(196, goFightMetalDragons);
-
-		ConditionalStep goFightGalvek = new ConditionalStep(this, takeBoatToUngael);
-		goFightGalvek.addStep(inBattle, killGalvek);
-		steps.put(200, goFightGalvek);
-		steps.put(201, goFightGalvek);
-
-		steps.put(205, talkToAlecToFinish);
-		steps.put(210, talkToAlecToFinish);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -937,10 +663,10 @@ public class DragonSlayerII extends BasicQuestHelper
 		takeBoatToUngael = new NpcStep(this, NpcID.TORFINN_10405, new WorldPoint(2640, 3696, 0), "Talk to Torfinn on the Rellekka docks to go to Ungael. Be prepared for a lot of fighting.", combatGear, antifireShield);
 		takeBoatToUngael.addDialogSteps("Yes please.", "Yes.");
 		keepShipAfloat = new ObjectStep(this, ObjectID.FIRE_32297, "Keep the boat afloat by filling leaks, putting out fires, healing warriors and repairing the masts.");
-		((ObjectStep)(keepShipAfloat)).addAlternateObjects(ObjectID.LEAK, ObjectID.FREMENNIK_WARRIOR_32302, ObjectID.FREMENNIK_WARRIOR_32300, ObjectID.DAMAGED_MAST);
+		((ObjectStep) (keepShipAfloat)).addAlternateObjects(ObjectID.LEAK, ObjectID.FREMENNIK_WARRIOR_32302, ObjectID.FREMENNIK_WARRIOR_32300, ObjectID.DAMAGED_MAST);
 
 		getToMainShip = new NpcStep(this, NpcID.RED_DRAGON_8079, "Travel to the main ship, killing dragons along the way.", true);
-		((NpcStep)(getToMainShip)).addAlternateNpcs(NpcID.IRON_DRAGON_8080, NpcID.BRUTAL_GREEN_DRAGON_8081);
+		((NpcStep) (getToMainShip)).addAlternateNpcs(NpcID.IRON_DRAGON_8080, NpcID.BRUTAL_GREEN_DRAGON_8081);
 		getToMainShip.setLinePoints(new ArrayList<>(Arrays.asList(
 			new WorldPoint(1695, 5665, 2),
 			new WorldPoint(1688, 5665, 1),
@@ -1025,17 +751,17 @@ public class DragonSlayerII extends BasicQuestHelper
 		)));
 
 		kill2Blue2Green = new NpcStep(this, NpcID.BLUE_DRAGON_8083, "Kill the blue and green dragons.", true);
-		((NpcStep)(kill2Blue2Green)).addAlternateNpcs(NpcID.GREEN_DRAGON_8082);
+		((NpcStep) (kill2Blue2Green)).addAlternateNpcs(NpcID.GREEN_DRAGON_8082);
 
 		killBlackSteelBrutalRedDragon = new NpcStep(this, NpcID.BLACK_DRAGON_8084, "Kill the black, steel, and brutal red dragon. Occasionally Gorvek will shoot a fireball in the air, move to avoid it.", true);
-		((NpcStep)(killBlackSteelBrutalRedDragon)).addAlternateNpcs(NpcID.BLACK_DRAGON_8085, NpcID.BRUTAL_RED_DRAGON_8087, NpcID.STEEL_DRAGON_8086);
+		((NpcStep) (killBlackSteelBrutalRedDragon)).addAlternateNpcs(NpcID.BLACK_DRAGON_8085, NpcID.BRUTAL_RED_DRAGON_8087, NpcID.STEEL_DRAGON_8086);
 
 		killMithAddyAndRuneDragons = new NpcStep(this, NpcID.MITHRIL_DRAGON_8088, "Kill the metal dragons.", true);
 		killMithAddyAndRuneDragons.addText("Occasionally Gorvek will shoot a fireball in the air, move to avoid it.");
 		killMithAddyAndRuneDragons.addText("");
-		((NpcStep)(killMithAddyAndRuneDragons)).addAlternateNpcs(NpcID.MITHRIL_DRAGON_8089, NpcID.ADAMANT_DRAGON, NpcID.ADAMANT_DRAGON_8090, NpcID.RUNE_DRAGON, NpcID.RUNE_DRAGON_8091);
+		((NpcStep) (killMithAddyAndRuneDragons)).addAlternateNpcs(NpcID.MITHRIL_DRAGON_8089, NpcID.ADAMANT_DRAGON, NpcID.ADAMANT_DRAGON_8090, NpcID.RUNE_DRAGON, NpcID.RUNE_DRAGON_8091);
 		killGalvek = new NpcStep(this, NpcID.GALVEK_8095, new WorldPoint(1631, 5735, 2), "Kill Galvek. This is a hard fight, so it's recommended you check a video to see what you'll have to do.", true);
-		((NpcStep)(killGalvek)).addAlternateNpcs(NpcID.GALVEK_8096, NpcID.GALVEK_8097, NpcID.GALVEK_8098);
+		((NpcStep) (killGalvek)).addAlternateNpcs(NpcID.GALVEK_8096, NpcID.GALVEK_8097, NpcID.GALVEK_8098);
 		killGalvek.addText("Avoid the ground-targeted fireballs.");
 		killGalvek.addText("The pink attack turns off prayer.");
 		killGalvek.addText("Use Protect from Magic in phase 1, use Protect from Missiles otherwise.");
@@ -1053,6 +779,18 @@ public class DragonSlayerII extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(pickaxe, axe, oakPlank8, swampPaste10, nails12OrMore, hammer, machete, saw, catspeakAmulet, lightSource, goutweed,
 			astralRune, sealOfPassage, tinderbox, pestleAndMortarHighlighted, dragonstone, moltenGlass2, glassblowingPipe, ghostspeakOrMory2, chisel, spade,
 			runesForFireWaveOrSurge3, antifireShield));
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		return new ArrayList<>(Collections.singletonList(teleports));
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		return new ArrayList<>(Arrays.asList("Spawn (level 100)", "Robert the Strong (level 194)", "Vorkath (level 392)", "Numerous chromatic and metal dragons", "Galvek (level 608)"));
 	}
 
 	public void setupConditionalSteps()
@@ -1095,18 +833,6 @@ public class DragonSlayerII extends BasicQuestHelper
 		goTalkToBobAfterRelease.addStep(inLithkrenGroundFloorRoom, climbDownLithkrenNorthStairs);
 		goTalkToBobAfterRelease.addStep(inLithkrenFirstFloor, climbDownLithkrenTrapdoor);
 		goTalkToBobAfterRelease.addStep(inLithkrenGroundFloor, climbCourtyardStairs);
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		return new ArrayList<>(Collections.singletonList(teleports));
-	}
-
-	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		return new ArrayList<>(Arrays.asList("Spawn (level 100)", "Robert the Strong (level 194)", "Vorkath (level 392)", "Numerous chromatic and metal dragons", "Galvek (level 608)"));
 	}
 
 	@Override
@@ -1154,5 +880,279 @@ public class DragonSlayerII extends BasicQuestHelper
 			killMithAddyAndRuneDragons, killGalvek, talkToAlecToFinish)), combatGear, antifireShield));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		setupConditionalSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToAlec);
+		steps.put(5, talkToDallas);
+
+		ConditionalStep goTalkToDallasCrandor = new ConditionalStep(this, enterVolcano);
+		goTalkToDallasCrandor.addStep(inCrandorUnderground, talkToDallasOnCrandor);
+		goTalkToDallasCrandor.addStep(inKaramjaVolcano, enterCrandorWall);
+		steps.put(10, goTalkToDallasCrandor);
+
+		ConditionalStep goMineWall = new ConditionalStep(this, enterVolcano);
+		goMineWall.addStep(inCrandorUnderground, usePickaxeOnBlockage);
+		goMineWall.addStep(inKaramjaVolcano, enterCrandorWall);
+		steps.put(15, goMineWall);
+		steps.put(16, goMineWall);
+
+		ConditionalStep goInspectMural = new ConditionalStep(this, enterVolcano);
+		goInspectMural.addStep(inMuralRoom, investigateMural);
+		goInspectMural.addStep(inCrandorUnderground, enterBlockage);
+		goInspectMural.addStep(inKaramjaVolcano, enterCrandorWall);
+		steps.put(17, goInspectMural);
+		steps.put(18, goInspectMural);
+		steps.put(19, goInspectMural);
+		steps.put(20, goInspectMural);
+		steps.put(21, goInspectMural);
+
+		ConditionalStep goKillSpawn = new ConditionalStep(this, enterVolcano);
+		goKillSpawn.addStep(inMuralRoom, killSpawn);
+		goKillSpawn.addStep(inCrandorUnderground, enterBlockage);
+		goKillSpawn.addStep(inKaramjaVolcano, enterCrandorWall);
+		steps.put(22, goKillSpawn);
+		steps.put(23, goKillSpawn);
+		steps.put(24, goKillSpawn);
+
+		ConditionalStep goInvestigateMuralAgain = new ConditionalStep(this, enterVolcano);
+		goInvestigateMuralAgain.addStep(inMuralRoom, investigateMuralAgain);
+		goInvestigateMuralAgain.addStep(inCrandorUnderground, enterBlockage);
+		goInvestigateMuralAgain.addStep(inKaramjaVolcano, enterCrandorWall);
+		steps.put(25, goInvestigateMuralAgain);
+
+		ConditionalStep goTalkToDallasAfterMural = new ConditionalStep(this, enterVolcano);
+		goTalkToDallasAfterMural.addStep(inMuralRoom, talkToDallasAfterMural);
+		goTalkToDallasAfterMural.addStep(inCrandorUnderground, enterBlockage);
+		goTalkToDallasAfterMural.addStep(inKaramjaVolcano, enterCrandorWall);
+		steps.put(30, goTalkToDallasAfterMural);
+
+		ConditionalStep goTalkToDallasOnFossilIsland = new ConditionalStep(this, enterHouseOnTheHill);
+		goTalkToDallasOnFossilIsland.addStep(inHouseGroundFloor, talkToDallasInHouse);
+		goTalkToDallasOnFossilIsland.addStep(inHouseFirstFloor, enterHouseBasement);
+		steps.put(35, goTalkToDallasOnFossilIsland);
+
+		ConditionalStep getMapPieces = new ConditionalStep(this, enterHouseOnTheHill);
+		getMapPieces.addStep(new Conditions(inHouseGroundFloor, hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces, hadMushtreeMapPieces), talkToDallasWithMapPieces);
+		getMapPieces.addStep(new Conditions(inHouseFirstFloor, hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces, hadMushtreeMapPieces), goDownWithMapPieces);
+		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces, hadMushtreeMapPieces), enterHouseWithMapPieces);
+
+		getMapPieces.addStep(new Conditions(inHouseFirstFloor, hadChest1MapPieces, hadChest2MapPieces), leaveHouseForMap);
+		getMapPieces.addStep(new Conditions(inHouseGroundFloor, hadChest1MapPieces, hadChest2MapPieces), goUpstairsForMap);
+
+		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces, hadBriarMapPieces), searchMushtree);
+		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces, hadFungiMapPieces), searchBriar);
+		getMapPieces.addStep(new Conditions(hadChest1MapPieces, hadChest2MapPieces), searchFungi);
+		getMapPieces.addStep(new Conditions(inHouseFirstFloor, hadChest1MapPieces), searchStoneChestNorth);
+		getMapPieces.addStep(new Conditions(inHouseGroundFloor, hadChest1MapPieces), goUpstairsForMap);
+		getMapPieces.addStep(inHouseGroundFloor, searchNorthChest);
+		getMapPieces.addStep(inHouseFirstFloor, enterHouseBasement);
+		steps.put(40, getMapPieces);
+
+		ConditionalStep talkToDallasAfterMap = new ConditionalStep(this, enterHouseOnTheHill);
+		talkToDallasAfterMap.addStep(inHouseGroundFloor, talkToDallasInHouse);
+		talkToDallasAfterMap.addStep(inHouseFirstFloor, enterHouseBasement);
+		steps.put(45, talkToDallasAfterMap);
+
+		ConditionalStep goSolveMapPuzzle = new ConditionalStep(this, enterHouseOnTheHill);
+		goSolveMapPuzzle.addStep(inMapPuzzle, solveMap);
+		goSolveMapPuzzle.addStep(inHouseGroundFloor, startMapPuzzle);
+		goSolveMapPuzzle.addStep(inHouseFirstFloor, enterHouseBasement);
+		steps.put(45, goSolveMapPuzzle);
+
+		ConditionalStep goTalkToDallasAfterSolvingMap = new ConditionalStep(this, enterHouseOnTheHill);
+		goTalkToDallasAfterSolvingMap.addStep(inHouseGroundFloor, talkToDallasAfterSolvingMap);
+		goTalkToDallasAfterSolvingMap.addStep(inHouseFirstFloor, enterHouseBasement);
+		steps.put(50, goTalkToDallasAfterSolvingMap);
+
+		steps.put(55, talkToJardricInMuseumCamp);
+
+		steps.put(60, buildRowBoat);
+		steps.put(61, buildRowBoat);
+		steps.put(62, buildRowBoat);
+		steps.put(63, buildRowBoat);
+		steps.put(64, buildRowBoat);
+
+		steps.put(65, talkToDallasAfterBoatRepair);
+
+		ConditionalStep goDownToLithkrenBasement = new ConditionalStep(this, boardBoat);
+		goDownToLithkrenBasement.addStep(inLithkrenUnderground, talkToDallasInLithkren);
+		goDownToLithkrenBasement.addStep(inLithkrenGroundFloorRoom, climbDownLithkrenNorthStairs);
+		goDownToLithkrenBasement.addStep(inLithkrenFirstFloor, climbDownLithkrenTrapdoor);
+		goDownToLithkrenBasement.addStep(inLithkrenGroundFloor, climbCourtyardStairs);
+
+		steps.put(70, goDownToLithkrenBasement);
+		steps.put(71, goDownToLithkrenBasement);
+		steps.put(72, goDownToLithkrenBasement);
+		steps.put(73, goDownToLithkrenBasement);
+		steps.put(74, goDownToLithkrenBasement);
+		steps.put(75, goDownToLithkrenBasement);
+
+		ConditionalStep goReadDiary = new ConditionalStep(this, boardBoat);
+		goReadDiary.addStep(hasAivasDiary, readDiary);
+		goReadDiary.addStep(inLithkrenUnderground, searchSkeleton);
+		goReadDiary.addStep(inLithkrenGroundFloorRoom, climbDownLithkrenNorthStairs);
+		goReadDiary.addStep(inLithkrenFirstFloor, climbDownLithkrenTrapdoor);
+		goReadDiary.addStep(inLithkrenGroundFloor, climbCourtyardStairs);
+		steps.put(80, goReadDiary);
+		steps.put(81, goReadDiary);
+		steps.put(82, goReadDiary);
+		steps.put(83, goReadDiary);
+		steps.put(84, goReadDiary);
+
+		ConditionalStep goTalkToDallasAfterDiary = new ConditionalStep(this, boardBoat);
+		goTalkToDallasAfterDiary.addStep(inLithkrenUnderground, talkToDallasAfterDiary);
+		goTalkToDallasAfterDiary.addStep(inLithkrenGroundFloorRoom, climbDownLithkrenNorthStairs);
+		goTalkToDallasAfterDiary.addStep(inLithkrenFirstFloor, climbDownLithkrenTrapdoor);
+		goTalkToDallasAfterDiary.addStep(inLithkrenGroundFloor, climbCourtyardStairs);
+		steps.put(85, goTalkToDallasAfterDiary);
+
+		steps.put(90, talkToBob);
+
+		steps.put(95, talkToSphinx);
+		steps.put(96, talkToSphinx);
+
+		steps.put(100, talkToOneiromancer);
+
+		ConditionalStep goEnterDream = new ConditionalStep(this, fillDreamVial);
+		goEnterDream.addStep(new Conditions(hasDreamPotion, litBrazier), usePotionOnFlame);
+		goEnterDream.addStep(hasDreamPotion, lightBrazier);
+		goEnterDream.addStep(new Conditions(hasVialGout, hasAstralPowder), addGroundAstral);
+		goEnterDream.addStep(new Conditions(hasVialGout, hasAstralShard), grindAstralShards);
+		goEnterDream.addStep(hasVialGout, crushAstralRune);
+		goEnterDream.addStep(hasVialWater, addGoutweed);
+		steps.put(105, goEnterDream);
+
+		ConditionalStep goTalkToBobInDream = new ConditionalStep(this, talkToBobToEnterDreamAgain);
+		goTalkToBobInDream.addStep(inDream, talkToBobInDream);
+		steps.put(110, goTalkToBobInDream);
+
+		ConditionalStep goDefeatRobert = new ConditionalStep(this, talkToBobToEnterDreamAgain);
+		goDefeatRobert.addStep(inDream, killRobertTheStrong);
+		steps.put(111, goDefeatRobert);
+
+		steps.put(115, talkToBobAfterRobertFight);
+		steps.put(120, talkToBobAfterRobertFight);
+
+		gettingTheFremennikKey = new ConditionalStep(this, talkToBrundt);
+		gettingTheFremennikKey.addStep(new Conditions(inUngaelKeyRoom), searchStoneChestForVorkathKey);
+		gettingTheFremennikKey.addStep(new Conditions(inUngaelUnderground, pulledLever), enterEastVorkathRoom);
+		gettingTheFremennikKey.addStep(new Conditions(inUngaelUnderground), pullLeverInVorkathCave);
+		gettingTheFremennikKey.addStep(new Conditions(onUngael, defeatedVorkath), enterVorkathCave);
+		gettingTheFremennikKey.addStep(onUngael, killVorkath);
+		gettingTheFremennikKey.addStep(talkedToBrundt, talkToTorfinn);
+		gettingTheFremennikKey.setLockingCondition(hasTheFremennikKeyPiece);
+
+		gettingTheKaramjaKey = new ConditionalStep(this, enterKhazariMaze);
+		gettingTheKaramjaKey.addStep(inKhazariMaze, getToCentreOfMaze);
+		gettingTheKaramjaKey.setLockingCondition(hasTheKaramjaKeyPiece);
+
+		gettingTheKourendKey = new ConditionalStep(this, talkToAmelia);
+		gettingTheKourendKey.addStep(new Conditions(openedTomb, inCryptF0), searchTombForCryptKey);
+		gettingTheKourendKey.addStep(new Conditions(inspectedTomb, inCryptF0), solveCryptPuzzle);
+		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia, inCryptF0), searchTombInCrypt);
+		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia, inCryptF1), goDownInCryptF1ToF0);
+		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia, inCryptF2), goDownInCryptF2ToF1);
+		gettingTheKourendKey.addStep(new Conditions(talkedToAmelia), enterCrypt);
+		gettingTheKourendKey.setLockingCondition(hasTheKourendKeyPiece);
+
+		gettingTheVarrockKey = new ConditionalStep(this, talkToReldo);
+		gettingTheVarrockKey.addStep(new Conditions(talkedToAvaAgain), useLocatorInSwamp);
+		gettingTheVarrockKey.addStep(new Conditions(givenAvaOrb), talkToAvaAgainNoOrb);
+		gettingTheVarrockKey.addStep(new Conditions(talkedToAva, haveInertLocator), talkToAvaAgain);
+		gettingTheVarrockKey.addStep(talkedToAva, usePipeOnDragonstone);
+		gettingTheVarrockKey.addStep(talkedToSarah, talkToAva);
+		gettingTheVarrockKey.addStep(talkedToReldoAgain, talkToSarah);
+		gettingTheVarrockKey.addStep(givenReldoBook, talkToReldoAgainNoBook);
+		gettingTheVarrockKey.addStep(foundCensus, talkToReldoAgain);
+		gettingTheVarrockKey.addStep(talkedToReldo, searchBookcase);
+		gettingTheVarrockKey.setLockingCondition(hasTheVarrockKeyPiece);
+
+		ConditionalStep goAndForgeTheKey = new ConditionalStep(this, gettingTheKourendKey);
+		goAndForgeTheKey.addStep(new Conditions(hasTheKourendKeyPiece, hasTheVarrockKeyPiece, hasTheFremennikKeyPiece), gettingTheKaramjaKey);
+		goAndForgeTheKey.addStep(new Conditions(hasTheKourendKeyPiece, hasTheVarrockKeyPiece), gettingTheFremennikKey);
+		goAndForgeTheKey.addStep(hasTheKourendKeyPiece, gettingTheVarrockKey);
+
+		steps.put(125, goAndForgeTheKey);
+		steps.put(126, goAndForgeTheKey);
+		steps.put(127, goAndForgeTheKey);
+		steps.put(128, goAndForgeTheKey);
+		steps.put(129, goAndForgeTheKey);
+
+		ConditionalStep goForgeKey = new ConditionalStep(this, goEnterMithDoorFirstTime);
+		goForgeKey.addStep(litFurnace, goSmithKey);
+		goForgeKey.addStep(openedMithrilDoor, goEnterMithDoorSecondTime);
+		steps.put(130, goForgeKey);
+
+		steps.put(135, goOpenDoorWithKey);
+
+		steps.put(140, openDoorWithoutKey);
+		steps.put(141, openDoorWithoutKey);
+		steps.put(142, openDoorWithoutKey);
+		steps.put(143, openDoorWithoutKey);
+		steps.put(144, openDoorWithoutKey);
+		steps.put(145, openDoorWithoutKey);
+
+		steps.put(150, goTalkToBobAfterRelease);
+
+		steps.put(155, talkToRoald);
+
+		ConditionalStep recruitTheTeam = new ConditionalStep(this, talkToBrundtAboutThreat);
+		recruitTheTeam.addStep(new Conditions(recruitedBrundt, recruitedAmik, inArdougneCastle), talkToLathasOrThoros);
+		recruitTheTeam.addStep(new Conditions(recruitedBrundt, recruitedAmik), goUpToLathasOrThoros);
+		recruitTheTeam.addStep(new Conditions(recruitedBrundt, inFaladorF2), talkToAmik);
+		recruitTheTeam.addStep(new Conditions(recruitedBrundt, inFaladorF1), goUpToAmik2);
+		recruitTheTeam.addStep(recruitedBrundt, goUpToAmik1);
+		steps.put(160, recruitTheTeam);
+
+		steps.put(161, enterVarrockDiningRoom);
+		steps.put(165, talkToBobAfterDiningRoom);
+		steps.put(170, takeBoatToUngael);
+
+		ConditionalStep goRepairBoat = new ConditionalStep(this, takeBoatToUngael);
+		goRepairBoat.addStep(onBoat, keepShipAfloat);
+		steps.put(175, goRepairBoat);
+
+		ConditionalStep getToMainShipSteps = new ConditionalStep(this, takeBoatToUngael);
+		getToMainShipSteps.addStep(inBattle, getToMainShip);
+		steps.put(180, getToMainShipSteps);
+		steps.put(181, getToMainShipSteps);
+		steps.put(182, getToMainShipSteps);
+		steps.put(183, getToMainShipSteps);
+		steps.put(184, getToMainShipSteps);
+
+		ConditionalStep goFightBlueAndGreenDragons = new ConditionalStep(this, takeBoatToUngael);
+		goFightBlueAndGreenDragons.addStep(inBattle, kill2Blue2Green);
+		steps.put(185, goFightBlueAndGreenDragons);
+		steps.put(186, goFightBlueAndGreenDragons);
+
+		ConditionalStep goFightBlackSteelBrutalRedDragons = new ConditionalStep(this, takeBoatToUngael);
+		goFightBlackSteelBrutalRedDragons.addStep(inBattle, killBlackSteelBrutalRedDragon);
+		steps.put(190, goFightBlackSteelBrutalRedDragons);
+		steps.put(191, goFightBlackSteelBrutalRedDragons);
+
+		ConditionalStep goFightMetalDragons = new ConditionalStep(this, takeBoatToUngael);
+		goFightMetalDragons.addStep(inBattle, killMithAddyAndRuneDragons);
+		steps.put(195, goFightMetalDragons);
+		steps.put(196, goFightMetalDragons);
+
+		ConditionalStep goFightGalvek = new ConditionalStep(this, takeBoatToUngael);
+		goFightGalvek.addStep(inBattle, killGalvek);
+		steps.put(200, goFightGalvek);
+		steps.put(201, goFightGalvek);
+
+		steps.put(205, talkToAlecToFinish);
+		steps.put(210, talkToAlecToFinish);
+
+		return steps;
 	}
 }

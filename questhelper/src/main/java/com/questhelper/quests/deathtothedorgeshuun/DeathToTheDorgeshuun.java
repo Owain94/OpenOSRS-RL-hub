@@ -25,13 +25,20 @@
 package com.questhelper.quests.deathtothedorgeshuun;
 
 import com.questhelper.ItemCollections;
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
 import com.questhelper.requirements.FollowerRequirement;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.ItemRequirements;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.FollowerCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -49,13 +56,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DEATH_TO_THE_DORGESHUUN
@@ -79,7 +79,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		listenToSpeaker, standNearTrapdoor, goDownTrapdoor, standBehindGuard1, talkToGuard1, talkToGuard2, tellZanikToKillGuard3, talkToJohanhus,
 		standNearGuard4, tellZanikToWaitForGuard4, runSouthToLureGuard4, standNearGuard5, tellZanikToWaitForGuard5, lureGuard5, listenToDoor,
 		checkZanikCorpse, mineRocks, climbIntoSwamp, enterJunaArea, talkToJuna, talkToJunaMore, searchCrate, enterMill, killGuards, killSigmund,
-	    smashDrill, enterExit, goDownFromF1, goUpToF1, goDownIntoBasement, climbThroughHole,  goUpFromBasement, enterHamLair, talkToKazgar;
+		smashDrill, enterExit, goDownFromF1, goUpToF1, goDownIntoBasement, climbThroughHole, goUpFromBasement, enterHamLair, talkToKazgar;
 
 	ConditionalStep goTalkToMistag, goTalkToZanik, goHaveZanikFollow, goTalkToCook, goTalkToDuke, goTalkToHans, goTalkToWoman, goTalkToBob,
 		goTalkToAereck, goTalkToGuide, goNearGoblins, goTalkToShopkeeper, goOutsideSteps, goIntoHamLair, goClearRocks, goToJunaSteps,
@@ -87,87 +87,6 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 
 	Zone basement, lumbridgeF0, lumbridgeF1, lumbridgeF2, tunnels, mines, hamBase, behindGuard1, nearGuard4, nearGuard5, storeRoom, swamp, junaRoom,
 		mill1, mill2;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		setupConditionalSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, goTalkToMistag);
-		steps.put(1, goTalkToZanik);
-		steps.put(2, goTalkToZanik);
-
-		ConditionalStep takeZanikAbout = new ConditionalStep(this, goHaveZanikFollow);
-		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman, talkedToAereck, talkedToGoblins, talkedToShopkeeper), talkToZanikAboutOrigin);
-		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman, talkedToAereck, talkedToGoblins), goTalkToShopkeeper);
-		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman, talkedToAereck), goNearGoblins);
-		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman), goTalkToAereck);
-		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke), goTalkToWoman);
-		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, talkedToDuke), goOutsideSteps);
-		takeZanikAbout.addStep(zanikIsFollowing, goTalkToDuke);
-		steps.put(3, takeZanikAbout);
-
-		ConditionalStep infiltrateTheHam = new ConditionalStep(this, goHaveZanikFollow);
-		infiltrateTheHam.addStep(new Conditions(zanikIsFollowing, inHamBase, heardSpeaker), standNearTrapdoor);
-		infiltrateTheHam.addStep(new Conditions(zanikIsFollowing, inHamBase, talkedToJohn), listenToSpeaker);
-		infiltrateTheHam.addStep(new Conditions(zanikIsFollowing, inHamBase), talkToJohanhus);
-		infiltrateTheHam.addStep(zanikIsFollowing, goIntoHamLair);
-		steps.put(4, infiltrateTheHam);
-
-		ConditionalStep findingTheHamMeeting = new ConditionalStep(this, goHaveZanikFollow);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard5), listenToDoor);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard4, zanikWaitingFor5), lureGuard5);
-		findingTheHamMeeting.addStep(new Conditions(isNearGuard5, killedGuard4), tellZanikToWaitForGuard5);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard4), standNearGuard5);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard3, zanikWaitingFor4), runSouthToLureGuard4);
-		findingTheHamMeeting.addStep(new Conditions(isNearGuard4, killedGuard3), tellZanikToWaitForGuard4);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard3), standNearGuard4);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard2), tellZanikToKillGuard3);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard1), talkToGuard2);
-		findingTheHamMeeting.addStep(new Conditions(isBehindGuard1), talkToGuard1);
-		findingTheHamMeeting.addStep(new Conditions(inStoreroom), standBehindGuard1);
-		findingTheHamMeeting.addStep(new Conditions(zanikIsFollowing, inHamBase), goDownTrapdoor);
-		findingTheHamMeeting.addStep(zanikIsFollowing, goIntoHamLair);
-		steps.put(5, findingTheHamMeeting);
-
-		ConditionalStep savingZanik = new ConditionalStep(this, checkZanikCorpse);
-		savingZanik.addStep(new Conditions(zanikPickedUp, inJunaRoom), talkToJuna);
-		savingZanik.addStep(new Conditions(zanikPickedUp, inSwamp), enterJunaArea);
-		savingZanik.addStep(new Conditions(zanikPickedUp, minedRocks), goToJunaSteps);
-		savingZanik.addStep(new Conditions(zanikPickedUp, inTunnels), mineRocks);
-		savingZanik.addStep(zanikPickedUp, goClearRocks);
-		steps.put(6, savingZanik);
-
-		steps.put(7, talkToJunaMore);
-
-		steps.put(8, learnZanikStory);
-
-		ConditionalStep infiltrateMill = new ConditionalStep(this, goGetZanikForMill);
-		infiltrateMill.addStep(inMill, killGuards);
-		infiltrateMill.addStep(holdingCrate, enterMill);
-		infiltrateMill.addStep(zanikIsFollowing, searchCrate);
-		steps.put(9, infiltrateMill);
-
-		ConditionalStep defeatSigmund = new ConditionalStep(this, enterMill);
-		defeatSigmund.addStep(new Conditions(inMill, killedGuards), killSigmund);
-		defeatSigmund.addStep(inMill, killGuards);
-		steps.put(10, defeatSigmund);
-
-		ConditionalStep goSmashMachine = new ConditionalStep(this, enterMill);
-		goSmashMachine.addStep(inMill, smashDrill);
-		steps.put(11, goSmashMachine);
-
-		ConditionalStep goFinishQuest = new ConditionalStep(this, enterMill);
-		goFinishQuest.addStep(inMill, enterExit);
-		steps.put(12, goFinishQuest);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -305,7 +224,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		talkToDuke = new NpcStep(this, NpcID.DUKE_HORACIO, new WorldPoint(3210, 3222, 1), "");
 		talkToHans = new NpcStep(this, NpcID.HANS, new WorldPoint(3222, 3218, 0), "");
 		talkToWoman = new NpcStep(this, NpcID.WOMAN, new WorldPoint(3224, 3218, 0), "", true);
-		((NpcStep)(talkToWoman)).addAlternateNpcs(NpcID.MAN_3108, NpcID.MAN_3106, NpcID.WOMAN_3111);
+		((NpcStep) (talkToWoman)).addAlternateNpcs(NpcID.MAN_3108, NpcID.MAN_3106, NpcID.WOMAN_3111);
 		talkToGuide = new NpcStep(this, NpcID.LUMBRIDGE_GUIDE, new WorldPoint(3238, 3220, 0), "");
 		talkToBob = new NpcStep(this, NpcID.BOB_2812, new WorldPoint(3231, 3208, 0), "");
 		talkToAereck = new NpcStep(this, NpcID.FATHER_AERECK, new WorldPoint(3244, 3210, 0), "");
@@ -374,7 +293,7 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 
 		searchCrate = new ObjectStep(this, ObjectID.CRATE_15704, new WorldPoint(3228, 3280, 0), "Search a crate south of the farm east of the Lumbridge.", zanikFollower, combatGear, hamSet);
 		searchCrate.addDialogSteps("I don't know, what are you thinking?", "Good idea.");
-		enterMill = new ObjectStep(this,NullObjectID.NULL_15765, new WorldPoint(3230, 3286, 0), "Enter the trapdoor outside the farm.", combatGear, hamSet);
+		enterMill = new ObjectStep(this, NullObjectID.NULL_15765, new WorldPoint(3230, 3286, 0), "Enter the trapdoor outside the farm.", combatGear, hamSet);
 		killGuards = new NpcStep(this, NpcID.GUARD, new WorldPoint(2000, 5087, 0), "Kill the guards to the west.", true);
 		killSigmund = new NpcStep(this, NpcID.SIGMUND_991, new WorldPoint(2000, 5087, 0), "Defeat Sigmund. You need to use magic or melee to hurt him.", combatGear);
 		smashDrill = new ObjectStep(this, ObjectID.DRILLING_MACHINE, new WorldPoint(1998, 5088, 0), "Destroy the drilling machine.");
@@ -506,5 +425,86 @@ public class DeathToTheDorgeshuun extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Saving Zanik", new ArrayList<>(Arrays.asList(checkZanikCorpse, goToJunaSteps, learnZanikStory)), lightSource, tinderbox));
 		allSteps.add(new PanelDetails("Foiling H.A.M", new ArrayList<>(Arrays.asList(goGetZanikForMill, searchCrate, enterMill, killGuards, killSigmund, smashDrill, enterExit)), hamSet, combatGear));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		setupConditionalSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, goTalkToMistag);
+		steps.put(1, goTalkToZanik);
+		steps.put(2, goTalkToZanik);
+
+		ConditionalStep takeZanikAbout = new ConditionalStep(this, goHaveZanikFollow);
+		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman, talkedToAereck, talkedToGoblins, talkedToShopkeeper), talkToZanikAboutOrigin);
+		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman, talkedToAereck, talkedToGoblins), goTalkToShopkeeper);
+		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman, talkedToAereck), goNearGoblins);
+		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke, talkedToWoman), goTalkToAereck);
+		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, goneOutside, talkedToDuke), goTalkToWoman);
+		takeZanikAbout.addStep(new Conditions(zanikIsFollowing, talkedToDuke), goOutsideSteps);
+		takeZanikAbout.addStep(zanikIsFollowing, goTalkToDuke);
+		steps.put(3, takeZanikAbout);
+
+		ConditionalStep infiltrateTheHam = new ConditionalStep(this, goHaveZanikFollow);
+		infiltrateTheHam.addStep(new Conditions(zanikIsFollowing, inHamBase, heardSpeaker), standNearTrapdoor);
+		infiltrateTheHam.addStep(new Conditions(zanikIsFollowing, inHamBase, talkedToJohn), listenToSpeaker);
+		infiltrateTheHam.addStep(new Conditions(zanikIsFollowing, inHamBase), talkToJohanhus);
+		infiltrateTheHam.addStep(zanikIsFollowing, goIntoHamLair);
+		steps.put(4, infiltrateTheHam);
+
+		ConditionalStep findingTheHamMeeting = new ConditionalStep(this, goHaveZanikFollow);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard5), listenToDoor);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard4, zanikWaitingFor5), lureGuard5);
+		findingTheHamMeeting.addStep(new Conditions(isNearGuard5, killedGuard4), tellZanikToWaitForGuard5);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard4), standNearGuard5);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard3, zanikWaitingFor4), runSouthToLureGuard4);
+		findingTheHamMeeting.addStep(new Conditions(isNearGuard4, killedGuard3), tellZanikToWaitForGuard4);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard3), standNearGuard4);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard2), tellZanikToKillGuard3);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom, killedGuard1), talkToGuard2);
+		findingTheHamMeeting.addStep(new Conditions(isBehindGuard1), talkToGuard1);
+		findingTheHamMeeting.addStep(new Conditions(inStoreroom), standBehindGuard1);
+		findingTheHamMeeting.addStep(new Conditions(zanikIsFollowing, inHamBase), goDownTrapdoor);
+		findingTheHamMeeting.addStep(zanikIsFollowing, goIntoHamLair);
+		steps.put(5, findingTheHamMeeting);
+
+		ConditionalStep savingZanik = new ConditionalStep(this, checkZanikCorpse);
+		savingZanik.addStep(new Conditions(zanikPickedUp, inJunaRoom), talkToJuna);
+		savingZanik.addStep(new Conditions(zanikPickedUp, inSwamp), enterJunaArea);
+		savingZanik.addStep(new Conditions(zanikPickedUp, minedRocks), goToJunaSteps);
+		savingZanik.addStep(new Conditions(zanikPickedUp, inTunnels), mineRocks);
+		savingZanik.addStep(zanikPickedUp, goClearRocks);
+		steps.put(6, savingZanik);
+
+		steps.put(7, talkToJunaMore);
+
+		steps.put(8, learnZanikStory);
+
+		ConditionalStep infiltrateMill = new ConditionalStep(this, goGetZanikForMill);
+		infiltrateMill.addStep(inMill, killGuards);
+		infiltrateMill.addStep(holdingCrate, enterMill);
+		infiltrateMill.addStep(zanikIsFollowing, searchCrate);
+		steps.put(9, infiltrateMill);
+
+		ConditionalStep defeatSigmund = new ConditionalStep(this, enterMill);
+		defeatSigmund.addStep(new Conditions(inMill, killedGuards), killSigmund);
+		defeatSigmund.addStep(inMill, killGuards);
+		steps.put(10, defeatSigmund);
+
+		ConditionalStep goSmashMachine = new ConditionalStep(this, enterMill);
+		goSmashMachine.addStep(inMill, smashDrill);
+		steps.put(11, goSmashMachine);
+
+		ConditionalStep goFinishQuest = new ConditionalStep(this, enterMill);
+		goFinishQuest.addStep(inMill, enterExit);
+		steps.put(12, goFinishQuest);
+
+		return steps;
 	}
 }

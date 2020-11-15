@@ -25,19 +25,19 @@
 package com.questhelper.quests.theforsakentower;
 
 import com.google.inject.Inject;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
-import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.conditional.VarbitCondition;
 import com.questhelper.steps.conditional.ZoneCondition;
 import java.awt.Graphics2D;
@@ -65,25 +65,17 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	private static final Pattern JUG_FILLED = Pattern.compile("^You fill up your ([0-9])-gallon jug");
 	private static final Pattern JUG_EMPTIED = Pattern.compile("^You empty the ([0-9])-gallon jug");
 	private static final Pattern JUG_CHECKED = Pattern.compile("^The ([0-9])-gallon jug(?: contains ([0-9]) gallons* of coolant| is empty)");
-
+	private final HashMap<String, Integer> jugs = new HashMap<>();
 	@Inject
 	protected EventBus eventBus;
-
 	@Inject
 	protected Client client;
-
 	protected QuestStep currentStep;
-
 	ItemRequirement tinderbox, fiveGallon, eightGallon;
-
 	ConditionForStep has5Gallon, has8Gallon, missingTinderbox, hasFilledWithFuel, inFirstFloor, inSecondFloor, inBasement;
-
 	DetailedQuestStep syncStep, searchCupboardTinderbox, searchCupboardJug, fill5Gallon, use5GallonOn8, fill5Gallon2, use5GallonOn82, empty8Gallon, use5GallonOn83, fill5Gallon3, use5GallonOn84, fill5Gallon4, use5GallonOn85, use5GallonOnFurnace,
 		lightFurnace, restartPuzzle, goUpToGroundFloor, goDownToGroundFloor, goDownToFirstFloor;
-
 	Zone firstFloor, secondFloor, basement;
-
-	private final HashMap<String, Integer> jugs = new HashMap<>();
 
 	public JugPuzzle(QuestHelper questHelper)
 	{
@@ -108,6 +100,37 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 	{
 		shutDownStep();
 		currentStep = null;
+	}
+
+	@Override
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
+		}
+	}
+
+	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeWorldOverlayHint(graphics, plugin);
+		}
+	}
+
+	@Override
+	public QuestStep getActiveStep()
+	{
+		if (currentStep != null)
+		{
+			return currentStep.getActiveStep();
+		}
+		else
+		{
+			return this;
+		}
 	}
 
 	@Subscribe
@@ -285,37 +308,6 @@ public class JugPuzzle extends QuestStep implements OwnerStep
 			eventBus.unregister(currentStep);
 			currentStep.shutDown();
 			currentStep = null;
-		}
-	}
-
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
-		}
-	}
-
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldOverlayHint(graphics, plugin);
-		}
-	}
-
-	@Override
-	public QuestStep getActiveStep()
-	{
-		if (currentStep != null)
-		{
-			return currentStep.getActiveStep();
-		}
-		else
-		{
-			return this;
 		}
 	}
 

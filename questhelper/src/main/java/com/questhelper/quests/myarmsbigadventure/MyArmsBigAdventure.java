@@ -24,12 +24,19 @@
  */
 package com.questhelper.quests.myarmsbigadventure;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -45,13 +52,6 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MY_ARMS_BIG_ADVENTURE
@@ -72,142 +72,6 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 		goUpFromBurntmeatFinish, talkToMyArmFinish, enterStrongholdFinish;
 
 	Zone strongholdFloor1, strongholdFloor2, prison, roof;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startingOffSteps = new ConditionalStep(this, enterStronghold);
-		startingOffSteps.addStep(inStrongholdFloor1, talkToBurntmeat);
-		startingOffSteps.addStep(inPrison, goUpToChef);
-		startingOffSteps.addStep(inStrongholdFloor2, goDownToChef);
-
-		steps.put(0, startingOffSteps);
-		steps.put(10, startingOffSteps);
-		steps.put(20, startingOffSteps);
-		steps.put(30, startingOffSteps);
-
-		ConditionalStep goTalkToBurntmeat = new ConditionalStep(this, enterStronghold);
-		goTalkToBurntmeat.addStep(inStrongholdFloor1, talkToMyArm);
-		goTalkToBurntmeat.addStep(inPrison, goUpToChef);
-		goTalkToBurntmeat.addStep(inStrongholdFloor2, goDownToChef);
-
-
-		steps.put(40, goTalkToBurntmeat);
-		steps.put(50, goTalkToBurntmeat);
-
-		ConditionalStep getGout = new ConditionalStep(this, useBucketOnPot);
-		getGout.addStep(new Conditions(hasLump, inStrongholdFloor1), talkToArmWithLump);
-		getGout.addStep(new Conditions(hasLump, inStrongholdFloor2), goDownToArmWithLump);
-		getGout.addStep(new Conditions(hasLump, inPrison), goUpToArmWithLump);
-		getGout.addStep(hasLump, enterStrongholdWithLump);
-
-		steps.put(60, getGout);
-
-		ConditionalStep talkAfterLump = new ConditionalStep(this, enterStrongholdAfterLump);
-		talkAfterLump.addStep(new Conditions(inStrongholdFloor1), talkToArmWithLump);
-		talkAfterLump.addStep(new Conditions(inStrongholdFloor2), goDownToArmWithLump);
-		talkAfterLump.addStep(new Conditions(inPrison), goUpAfterLump);
-
-		steps.put(70, talkAfterLump);
-
-		ConditionalStep talkToArmOnRoofSteps = new ConditionalStep(this, enterStrongholdAfterLump);
-		talkToArmOnRoofSteps.addStep(new Conditions(onRoof), talkToMyArmUpstairs);
-		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor2), goUpToMyArm);
-		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
-		talkToArmOnRoofSteps.addStep(new Conditions(inPrison), goUpAfterLump);
-
-		steps.put(80, talkToArmOnRoofSteps);
-
-		steps.put(90, readBook);
-
-		ConditionalStep readBookForArm = new ConditionalStep(this, enterStrongholdAfterLump);
-		readBookForArm.addStep(new Conditions(onRoof), talkToMyArmAfterReading);
-		readBookForArm.addStep(new Conditions(inStrongholdFloor2), goUpToMyArm);
-		readBookForArm.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
-		readBookForArm.addStep(new Conditions(inPrison), goUpAfterLump);
-
-		steps.put(100, readBookForArm);
-
-		ConditionalStep treatPatch = new ConditionalStep(this, useUgthankiDung);
-		treatPatch.addStep(added3Dung, useCompost);
-
-		steps.put(110, treatPatch);
-
-		ConditionalStep talkToArmAfterMakingPatch = new ConditionalStep(this, enterStrongholdAfterLump);
-		talkToArmAfterMakingPatch.addStep(new Conditions(onRoof), talkToMyArmAfterFertilising);
-		talkToArmAfterMakingPatch.addStep(new Conditions(inStrongholdFloor2), goUpToMyArm);
-		talkToArmAfterMakingPatch.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
-		talkToArmAfterMakingPatch.addStep(new Conditions(inPrison), goUpAfterLump);
-
-		steps.put(120, talkToArmAfterMakingPatch);
-		steps.put(130, talkToArmAfterMakingPatch);
-		steps.put(140, talkToArmAfterMakingPatch);
-
-		steps.put(150, talkToBarnaby);
-		steps.put(160, talkAfterBoat);
-
-		steps.put(170, talkToMyArmAtTai);
-
-		steps.put(180, talkToMurcaily);
-		steps.put(190, talkToMurcaily);
-		steps.put(200, talkToMurcaily);
-
-		steps.put(210, talkToMyArmAfterMurcaily);
-
-		ConditionalStep prepareToFight = new ConditionalStep(this, enterStrongholdForFight);
-		prepareToFight.addStep(new Conditions(onRoof), talkToMyArmForFight);
-		prepareToFight.addStep(new Conditions(inStrongholdFloor2), goUpToRoofForFight);
-		prepareToFight.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ForFight);
-		prepareToFight.addStep(new Conditions(inPrison), goUpFromPrisonForFight);
-
-		steps.put(220, prepareToFight);
-		steps.put(230, prepareToFight);
-
-		ConditionalStep growGout = new ConditionalStep(this, giveRake);
-		growGout.addStep(new Conditions(givenHardy, givenCompost), giveDibber);
-		growGout.addStep(givenCompost, giveHardyGout);
-		growGout.addStep(usedRake, giveSupercompost);
-		growGout.addStep(hasRakeHeadAndHandle, repairRake);
-		growGout.addStep(rakeHeadNearby, pickUpRakeHead);
-
-		steps.put(240, growGout);
-
-		ConditionalStep dealWithSmallBird = new ConditionalStep(this, talkToMyArmAfterGrow);
-		dealWithSmallBird.addStep(babyNearby, killBabyRoc);
-
-		steps.put(250, dealWithSmallBird);
-
-		ConditionalStep dealWithBigBird = new ConditionalStep(this, talkToMyArmAfterBaby);
-		dealWithBigBird.addStep(giantNearby, killGiantRoc);
-
-		steps.put(260, dealWithBigBird);
-
-		steps.put(270, giveSpade);
-
-		steps.put(280, talkToMyArmAfterHarvest);
-
-		ConditionalStep talkBurntForEnd = new ConditionalStep(this, goDownFromMyArmToBurntmeat);
-		talkBurntForEnd.addStep(inStrongholdFloor1, talkToBurntmeatAgain);
-		talkBurntForEnd.addStep(inStrongholdFloor2, goDownToBurntmeat);
-
-		steps.put(290, talkBurntForEnd);
-		steps.put(300, talkBurntForEnd);
-
-		ConditionalStep talkArmForEnd = new ConditionalStep(this, enterStrongholdFinish);
-		talkArmForEnd.addStep(onRoof, talkToMyArmFinish);
-		talkArmForEnd.addStep(inStrongholdFloor1, goUpFromBurntmeatFinish);
-		talkArmForEnd.addStep(inStrongholdFloor2, goUpToMyArmFinish);
-
-		steps.put(310, talkArmForEnd);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -420,7 +284,6 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(ugthanki3, supercompost7, rake, dibber, spade, bucket, cureOrCompost));
 	}
 
-
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -440,6 +303,142 @@ public class MyArmsBigAdventure extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Karamja adventure", new ArrayList<>(Arrays.asList(talkToBarnaby, talkAfterBoat, talkToMyArmAtTai, talkToMurcaily, talkToMyArmAfterMurcaily))));
 		allSteps.add(new PanelDetails("Troll farming", new ArrayList<>(Arrays.asList(talkToMyArmForFight, giveRake, giveSupercompost, giveHardyGout, giveDibber, talkToMyArmAfterGrow, killBabyRoc, killGiantRoc, giveSpade, talkToMyArmAfterHarvest, talkToBurntmeatAgain, talkToMyArmFinish)), combatGear, rake, superCompost, dibber, plantCure));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startingOffSteps = new ConditionalStep(this, enterStronghold);
+		startingOffSteps.addStep(inStrongholdFloor1, talkToBurntmeat);
+		startingOffSteps.addStep(inPrison, goUpToChef);
+		startingOffSteps.addStep(inStrongholdFloor2, goDownToChef);
+
+		steps.put(0, startingOffSteps);
+		steps.put(10, startingOffSteps);
+		steps.put(20, startingOffSteps);
+		steps.put(30, startingOffSteps);
+
+		ConditionalStep goTalkToBurntmeat = new ConditionalStep(this, enterStronghold);
+		goTalkToBurntmeat.addStep(inStrongholdFloor1, talkToMyArm);
+		goTalkToBurntmeat.addStep(inPrison, goUpToChef);
+		goTalkToBurntmeat.addStep(inStrongholdFloor2, goDownToChef);
+
+
+		steps.put(40, goTalkToBurntmeat);
+		steps.put(50, goTalkToBurntmeat);
+
+		ConditionalStep getGout = new ConditionalStep(this, useBucketOnPot);
+		getGout.addStep(new Conditions(hasLump, inStrongholdFloor1), talkToArmWithLump);
+		getGout.addStep(new Conditions(hasLump, inStrongholdFloor2), goDownToArmWithLump);
+		getGout.addStep(new Conditions(hasLump, inPrison), goUpToArmWithLump);
+		getGout.addStep(hasLump, enterStrongholdWithLump);
+
+		steps.put(60, getGout);
+
+		ConditionalStep talkAfterLump = new ConditionalStep(this, enterStrongholdAfterLump);
+		talkAfterLump.addStep(new Conditions(inStrongholdFloor1), talkToArmWithLump);
+		talkAfterLump.addStep(new Conditions(inStrongholdFloor2), goDownToArmWithLump);
+		talkAfterLump.addStep(new Conditions(inPrison), goUpAfterLump);
+
+		steps.put(70, talkAfterLump);
+
+		ConditionalStep talkToArmOnRoofSteps = new ConditionalStep(this, enterStrongholdAfterLump);
+		talkToArmOnRoofSteps.addStep(new Conditions(onRoof), talkToMyArmUpstairs);
+		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor2), goUpToMyArm);
+		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
+		talkToArmOnRoofSteps.addStep(new Conditions(inPrison), goUpAfterLump);
+
+		steps.put(80, talkToArmOnRoofSteps);
+
+		steps.put(90, readBook);
+
+		ConditionalStep readBookForArm = new ConditionalStep(this, enterStrongholdAfterLump);
+		readBookForArm.addStep(new Conditions(onRoof), talkToMyArmAfterReading);
+		readBookForArm.addStep(new Conditions(inStrongholdFloor2), goUpToMyArm);
+		readBookForArm.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
+		readBookForArm.addStep(new Conditions(inPrison), goUpAfterLump);
+
+		steps.put(100, readBookForArm);
+
+		ConditionalStep treatPatch = new ConditionalStep(this, useUgthankiDung);
+		treatPatch.addStep(added3Dung, useCompost);
+
+		steps.put(110, treatPatch);
+
+		ConditionalStep talkToArmAfterMakingPatch = new ConditionalStep(this, enterStrongholdAfterLump);
+		talkToArmAfterMakingPatch.addStep(new Conditions(onRoof), talkToMyArmAfterFertilising);
+		talkToArmAfterMakingPatch.addStep(new Conditions(inStrongholdFloor2), goUpToMyArm);
+		talkToArmAfterMakingPatch.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
+		talkToArmAfterMakingPatch.addStep(new Conditions(inPrison), goUpAfterLump);
+
+		steps.put(120, talkToArmAfterMakingPatch);
+		steps.put(130, talkToArmAfterMakingPatch);
+		steps.put(140, talkToArmAfterMakingPatch);
+
+		steps.put(150, talkToBarnaby);
+		steps.put(160, talkAfterBoat);
+
+		steps.put(170, talkToMyArmAtTai);
+
+		steps.put(180, talkToMurcaily);
+		steps.put(190, talkToMurcaily);
+		steps.put(200, talkToMurcaily);
+
+		steps.put(210, talkToMyArmAfterMurcaily);
+
+		ConditionalStep prepareToFight = new ConditionalStep(this, enterStrongholdForFight);
+		prepareToFight.addStep(new Conditions(onRoof), talkToMyArmForFight);
+		prepareToFight.addStep(new Conditions(inStrongholdFloor2), goUpToRoofForFight);
+		prepareToFight.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ForFight);
+		prepareToFight.addStep(new Conditions(inPrison), goUpFromPrisonForFight);
+
+		steps.put(220, prepareToFight);
+		steps.put(230, prepareToFight);
+
+		ConditionalStep growGout = new ConditionalStep(this, giveRake);
+		growGout.addStep(new Conditions(givenHardy, givenCompost), giveDibber);
+		growGout.addStep(givenCompost, giveHardyGout);
+		growGout.addStep(usedRake, giveSupercompost);
+		growGout.addStep(hasRakeHeadAndHandle, repairRake);
+		growGout.addStep(rakeHeadNearby, pickUpRakeHead);
+
+		steps.put(240, growGout);
+
+		ConditionalStep dealWithSmallBird = new ConditionalStep(this, talkToMyArmAfterGrow);
+		dealWithSmallBird.addStep(babyNearby, killBabyRoc);
+
+		steps.put(250, dealWithSmallBird);
+
+		ConditionalStep dealWithBigBird = new ConditionalStep(this, talkToMyArmAfterBaby);
+		dealWithBigBird.addStep(giantNearby, killGiantRoc);
+
+		steps.put(260, dealWithBigBird);
+
+		steps.put(270, giveSpade);
+
+		steps.put(280, talkToMyArmAfterHarvest);
+
+		ConditionalStep talkBurntForEnd = new ConditionalStep(this, goDownFromMyArmToBurntmeat);
+		talkBurntForEnd.addStep(inStrongholdFloor1, talkToBurntmeatAgain);
+		talkBurntForEnd.addStep(inStrongholdFloor2, goDownToBurntmeat);
+
+		steps.put(290, talkBurntForEnd);
+		steps.put(300, talkBurntForEnd);
+
+		ConditionalStep talkArmForEnd = new ConditionalStep(this, enterStrongholdFinish);
+		talkArmForEnd.addStep(onRoof, talkToMyArmFinish);
+		talkArmForEnd.addStep(inStrongholdFloor1, goUpFromBurntmeatFinish);
+		talkArmForEnd.addStep(inStrongholdFloor2, goUpToMyArmFinish);
+
+		steps.put(310, talkArmForEnd);
+
+		return steps;
 	}
 }
 

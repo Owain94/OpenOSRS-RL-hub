@@ -24,18 +24,19 @@
  */
 package com.questhelper.panel;
 
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.Getter;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.QuestStep;
 
-public class PanelDetails {
+public class PanelDetails
+{
 	@Getter
 	String header;
 
 	@Getter
-	private ArrayList<QuestStep> steps;
+	private final ArrayList<QuestStep> steps;
 
 	@Getter
 	private QuestStep lockingQuestSteps;
@@ -46,18 +47,21 @@ public class PanelDetails {
 	@Getter
 	private ArrayList<Integer> vars;
 
-	public PanelDetails(String header) {
+	public PanelDetails(String header)
+	{
 		this.header = header;
 		this.steps = new ArrayList<>();
 	}
 
-	public PanelDetails(String header, QuestStep... steps) {
+	public PanelDetails(String header, QuestStep... steps)
+	{
 		this.header = header;
 		this.steps = new ArrayList<>(Arrays.asList(steps));
 		this.itemRequirements = new ArrayList<>();
 	}
 
-	public PanelDetails(String header, ArrayList<QuestStep> steps, ItemRequirement... itemRequirements) {
+	public PanelDetails(String header, ArrayList<QuestStep> steps, ItemRequirement... itemRequirements)
+	{
 		this.header = header;
 		this.steps = steps;
 		this.itemRequirements = new ArrayList<>(Arrays.asList(itemRequirements));
@@ -73,7 +77,8 @@ public class PanelDetails {
 		this.lockingQuestSteps = lockingStep;
 	}
 
-	public void addSteps(QuestStep... steps) {
+	public void addSteps(QuestStep... steps)
+	{
 		this.steps.addAll(Arrays.asList(steps));
 	}
 }

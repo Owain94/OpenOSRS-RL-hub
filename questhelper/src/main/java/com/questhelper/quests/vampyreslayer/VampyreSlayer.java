@@ -24,12 +24,17 @@
  */
 package com.questhelper.quests.vampyreslayer;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.NpcCondition;
@@ -38,11 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -60,35 +60,6 @@ public class VampyreSlayer extends BasicQuestHelper
 	QuestStep talkToMorgan, goUpstairsMorgan, getGarlic, ifNeedGarlic, talkToHarlow, talkToHarlowAgain, enterDraynorManor, goDownToBasement, openCoffin, killDraynor;
 
 	Zone manor, basement, upstairsInMorgans;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToMorgan);
-
-		ConditionalStep getGarlicAndStake = new ConditionalStep(this, goUpstairsMorgan);
-		getGarlicAndStake.addStep(hasGarlic, talkToHarlow);
-		getGarlicAndStake.addStep(isUpstairsInMorgans, getGarlic);
-
-		steps.put(1, getGarlicAndStake);
-
-		ConditionalStep prepareAndKillDraynor = new ConditionalStep(this, getGarlicAndStake);
-		prepareAndKillDraynor.addStep(draynorNearby, killDraynor);
-		prepareAndKillDraynor.addStep(inBasement, openCoffin);
-		prepareAndKillDraynor.addStep(inManor, goDownToBasement);
-		prepareAndKillDraynor.addStep(hasStake, enterDraynorManor);
-
-		steps.put(2, prepareAndKillDraynor);
-
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -177,5 +148,34 @@ public class VampyreSlayer extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Get a stake", new ArrayList<>(Arrays.asList(talkToHarlow, talkToHarlowAgain)), beer));
 		allSteps.add(new PanelDetails("Kill Count Draynor", new ArrayList<>(Arrays.asList(enterDraynorManor, goDownToBasement, openCoffin)), hammer, stake, garlic, combatGear));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToMorgan);
+
+		ConditionalStep getGarlicAndStake = new ConditionalStep(this, goUpstairsMorgan);
+		getGarlicAndStake.addStep(hasGarlic, talkToHarlow);
+		getGarlicAndStake.addStep(isUpstairsInMorgans, getGarlic);
+
+		steps.put(1, getGarlicAndStake);
+
+		ConditionalStep prepareAndKillDraynor = new ConditionalStep(this, getGarlicAndStake);
+		prepareAndKillDraynor.addStep(draynorNearby, killDraynor);
+		prepareAndKillDraynor.addStep(inBasement, openCoffin);
+		prepareAndKillDraynor.addStep(inManor, goDownToBasement);
+		prepareAndKillDraynor.addStep(hasStake, enterDraynorManor);
+
+		steps.put(2, prepareAndKillDraynor);
+
+
+		return steps;
 	}
 }

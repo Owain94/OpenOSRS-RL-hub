@@ -25,9 +25,9 @@
 package com.questhelper.quests.dragonslayerii;
 
 import com.google.inject.Inject;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.Zone;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ObjectStep;
@@ -53,37 +53,26 @@ import net.runelite.client.eventbus.Subscribe;
 
 public class CryptPuzzle extends DetailedOwnerStep
 {
-	@Inject
-	protected EventBus eventBus;
-
-	@Inject
-	protected Client client;
-
 	private final int TRISTAN = 1;
 	private final int CAMORRA = 2;
 	private final int AIVAS = 3;
 	private final int ROBERT = 4;
-
-	Integer northBust, eastBust, southBust, westBust;
-
 	private final HashMap<String, Integer> locations = new HashMap<>();
 	private final HashMap<String, Integer> weaponsSouth = new HashMap<>();
 	private final HashMap<String, Integer> weaponsWest = new HashMap<>();
-
 	private final HashMap<Integer, QuestStep> getBustSteps = new HashMap<>();
 	private final HashMap<Integer, ItemRequirement> items = new HashMap<>();
 	private final HashMap<Integer, ItemRequirementCondition> bustsConditions = new HashMap<>();
-
-
-	private boolean solutionFound;
-
+	@Inject
+	protected EventBus eventBus;
+	@Inject
+	protected Client client;
+	Integer northBust, eastBust, southBust, westBust;
 	ItemRequirement aivasBust, camorraBust, robertBust, tristanBust;
-
 	ConditionForStep inFirstFloor, inBasement, inSecondFloor, hasAivasBust, hasRobertBust, hasCamorraBust, hasTristanBust;
-
 	DetailedQuestStep takeCamorraBust, takeAivasBust, takeRobertBust, takeTristanBust, placeBustNorth, placeBustSouth, placeBustEast, placeBustWest, inspectTomb;
-
 	Zone firstFloor, basement, secondFloor;
+	private boolean solutionFound;
 
 	// Find match, set bust to take to correct step, set bust to use to correct ItemRequirement
 	public CryptPuzzle(QuestHelper questHelper)
@@ -117,7 +106,7 @@ public class CryptPuzzle extends DetailedOwnerStep
 
 		items.put(AIVAS, aivasBust);
 		items.put(CAMORRA, camorraBust);
-		items.put(ROBERT,robertBust);
+		items.put(ROBERT, robertBust);
 		items.put(TRISTAN, tristanBust);
 	}
 
@@ -132,12 +121,6 @@ public class CryptPuzzle extends DetailedOwnerStep
 	{
 		shutDownStep();
 		currentStep = null;
-	}
-
-	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		updateSteps();
 	}
 
 	protected void updateSteps()
@@ -202,30 +185,6 @@ public class CryptPuzzle extends DetailedOwnerStep
 		}
 	}
 
-	private void setupItemRequirements()
-	{
-		aivasBust = new ItemRequirement("Aivas bust", ItemID.AIVAS_BUST);
-		aivasBust.setHighlightInInventory(true);
-		robertBust = new ItemRequirement("Robert bust", ItemID.ROBERT_BUST);
-		robertBust.setHighlightInInventory(true);
-		tristanBust = new ItemRequirement("Trisan bust", ItemID.TRISTAN_BUST);
-		tristanBust.setHighlightInInventory(true);
-		camorraBust = new ItemRequirement("Camorra bust", ItemID.CAMORRA_BUST);
-		camorraBust.setHighlightInInventory(true);
-	}
-
-	private void setupConditions()
-	{
-		inFirstFloor = new ZoneCondition(firstFloor);
-		inSecondFloor = new ZoneCondition(secondFloor);
-		inBasement = new ZoneCondition(basement);
-
-		hasAivasBust = new ItemRequirementCondition(aivasBust);
-		hasRobertBust = new ItemRequirementCondition(robertBust);
-		hasCamorraBust = new ItemRequirementCondition(camorraBust);
-		hasTristanBust = new ItemRequirementCondition(tristanBust);
-	}
-
 	@Override
 	protected void setupSteps()
 	{
@@ -249,6 +208,36 @@ public class CryptPuzzle extends DetailedOwnerStep
 	public Collection<QuestStep> getSteps()
 	{
 		return Arrays.asList(inspectTomb, takeAivasBust, takeCamorraBust, takeRobertBust, takeTristanBust, placeBustEast, placeBustWest, placeBustNorth, placeBustSouth);
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		updateSteps();
+	}
+
+	private void setupItemRequirements()
+	{
+		aivasBust = new ItemRequirement("Aivas bust", ItemID.AIVAS_BUST);
+		aivasBust.setHighlightInInventory(true);
+		robertBust = new ItemRequirement("Robert bust", ItemID.ROBERT_BUST);
+		robertBust.setHighlightInInventory(true);
+		tristanBust = new ItemRequirement("Trisan bust", ItemID.TRISTAN_BUST);
+		tristanBust.setHighlightInInventory(true);
+		camorraBust = new ItemRequirement("Camorra bust", ItemID.CAMORRA_BUST);
+		camorraBust.setHighlightInInventory(true);
+	}
+
+	private void setupConditions()
+	{
+		inFirstFloor = new ZoneCondition(firstFloor);
+		inSecondFloor = new ZoneCondition(secondFloor);
+		inBasement = new ZoneCondition(basement);
+
+		hasAivasBust = new ItemRequirementCondition(aivasBust);
+		hasRobertBust = new ItemRequirementCondition(robertBust);
+		hasCamorraBust = new ItemRequirementCondition(camorraBust);
+		hasTristanBust = new ItemRequirementCondition(tristanBust);
 	}
 
 	@Subscribe

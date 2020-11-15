@@ -24,7 +24,20 @@
  */
 package com.questhelper.quests.murdermystery;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.Conditions;
+import com.questhelper.steps.conditional.ItemRequirementCondition;
+import com.questhelper.steps.conditional.LogicType;
 import com.questhelper.steps.conditional.WidgetTextCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,19 +49,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.ItemRequirementCondition;
-import com.questhelper.steps.conditional.LogicType;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -70,68 +70,6 @@ public class MurderMystery extends BasicQuestHelper
 		useFlypaperOnDagger, getSilverItems, searchAnnasBarrel, searchDavidsBarrel, compareSilverToMurdererPrint, getAndComparePrintsOfNecklaceOrBook, remainingSteps,
 		talkToTheSuspect, disproveSuspectStory, finishQuest, searchFranksBarrel, searchElizabethsBarrel, getAndComparePrintsOfNeeedleOrPot, searchBobsBarrel,
 		searchCarolsBarrel, getAndComparePrintsOfCupOrBottle;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToGuard);
-
-		/*
-		  Starting quest, 195 0->1
-
-		  173 0->1, may be unrelated. Had it at 1 for flypaper on dagger
-
-		*/
-
-		// Thread2, get Anna or David's items
-
-		ConditionalStep investigating = new ConditionalStep(this, collectThreeFlypaper);
-		investigating.addStep(new Conditions(hasKillersPrint), new SolvingTheCrimeStep(this, remainingSteps));
-
-		/* compare prints */
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsThread2, hasUnknownPrint, hasAnyThread1Item), getAndComparePrintsOfCupOrBottle);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsThread2, hasUnknownPrint, hasAnyThread2Item), getAndComparePrintsOfNecklaceOrBook);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsThread3, hasUnknownPrint, hasAnyThread3Item), getAndComparePrintsOfNeeedleOrPot);
-
-		/* Get dagger print */
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerWithflour, hasCriminalsThreadAny), useFlypaperOnDagger);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThreadAny, hasPotOfFlour), useFlourOnDagger);
-
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThread2, hasSilverCup, hasSilverBottle), fillPotWithFlour);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThread2, hasSilverNecklace, hasSilverBook), fillPotWithFlour);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThread3, hasSilverNeedle, hasSilverPot), fillPotWithFlour);
-
-		/* Getting silver items for thread 1 */
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread1, hasSilverBottle), searchBobsBarrel);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread1), searchCarolsBarrel);
-		/* Getting silver items for thread 2 */
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread3, hasSilverNeedle), searchFranksBarrel);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread3), searchElizabethsBarrel);
-		/* Getting silver items for thread 3 */
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread2, hasSilverNecklace), searchDavidsBarrel);
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread2), searchAnnasBarrel);
-
-		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger), searchWindowForThread);
-		investigating.addStep(hasCriminalsDagger, pickUpPungentPot);
-		investigating.addStep(new Conditions(LogicType.OR, hasThreeFlypaper, hasCriminalsThreadAny, hasPungentPot), pickUpDagger);
-
-		steps.put(1, investigating);
-
-		// 195 0->4
-		// Green thread
-		// David responsible
-
-		// 195 0->5
-		// Blue thread
-		// Elizabeth is responsible
-
-		return steps;
-	}
 
 	public void setupConditions()
 	{
@@ -275,7 +213,7 @@ public class MurderMystery extends BasicQuestHelper
 
 
 		talkToGossip = new NpcStep(this, NpcID.GOSSIP, new WorldPoint(2741, 3557, 0), "Talk to Gossip, just south of the Sinclair Mansion.");
-		talkToGossip.addDialogStep(2,"Who do you think was responsible?");
+		talkToGossip.addDialogStep(2, "Who do you think was responsible?");
 
 		talkToPoisonSalesman = new NpcStep(this, NpcID.POISON_SALESMAN, new WorldPoint(2694, 3493, 0), "Talk to the Posion Salesman in the Seer's Village pub.");
 		talkToPoisonSalesman.addDialogStep("Who did you sell Poison to at the house?");
@@ -313,5 +251,67 @@ public class MurderMystery extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Collect fingerprints", new ArrayList<>(Arrays.asList(collectThreeFlypaper, getSilverItems, fillPotWithFlour, useFlourOnDagger, useFlypaperOnDagger, compareSilverToMurdererPrint))));
 		allSteps.add(new PanelDetails("Finishing off", new ArrayList<>(Arrays.asList(remainingSteps, talkToGossip, talkToPoisonSalesman, talkToTheSuspect, disproveSuspectStory, finishQuest))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToGuard);
+
+		/*
+		  Starting quest, 195 0->1
+
+		  173 0->1, may be unrelated. Had it at 1 for flypaper on dagger
+
+		*/
+
+		// Thread2, get Anna or David's items
+
+		ConditionalStep investigating = new ConditionalStep(this, collectThreeFlypaper);
+		investigating.addStep(new Conditions(hasKillersPrint), new SolvingTheCrimeStep(this, remainingSteps));
+
+		/* compare prints */
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsThread2, hasUnknownPrint, hasAnyThread1Item), getAndComparePrintsOfCupOrBottle);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsThread2, hasUnknownPrint, hasAnyThread2Item), getAndComparePrintsOfNecklaceOrBook);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsThread3, hasUnknownPrint, hasAnyThread3Item), getAndComparePrintsOfNeeedleOrPot);
+
+		/* Get dagger print */
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerWithflour, hasCriminalsThreadAny), useFlypaperOnDagger);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThreadAny, hasPotOfFlour), useFlourOnDagger);
+
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThread2, hasSilverCup, hasSilverBottle), fillPotWithFlour);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThread2, hasSilverNecklace, hasSilverBook), fillPotWithFlour);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDaggerNoFlour, hasCriminalsThread3, hasSilverNeedle, hasSilverPot), fillPotWithFlour);
+
+		/* Getting silver items for thread 1 */
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread1, hasSilverBottle), searchBobsBarrel);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread1), searchCarolsBarrel);
+		/* Getting silver items for thread 2 */
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread3, hasSilverNeedle), searchFranksBarrel);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread3), searchElizabethsBarrel);
+		/* Getting silver items for thread 3 */
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread2, hasSilverNecklace), searchDavidsBarrel);
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger, hasCriminalsThread2), searchAnnasBarrel);
+
+		investigating.addStep(new Conditions(hasPungentPot, hasCriminalsDagger), searchWindowForThread);
+		investigating.addStep(hasCriminalsDagger, pickUpPungentPot);
+		investigating.addStep(new Conditions(LogicType.OR, hasThreeFlypaper, hasCriminalsThreadAny, hasPungentPot), pickUpDagger);
+
+		steps.put(1, investigating);
+
+		// 195 0->4
+		// Green thread
+		// David responsible
+
+		// 195 0->5
+		// Blue thread
+		// Elizabeth is responsible
+
+		return steps;
 	}
 }

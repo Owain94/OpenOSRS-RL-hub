@@ -23,7 +23,7 @@ public class KillTrolls extends NpcStep
 
 	protected void updateSteps()
 	{
-		int numToKill =  client.getVarbitValue(3312);
+		int numToKill = client.getVarbitValue(3312);
 		this.setText("Kill " + numToKill + " trolls to continue.");
 	}
 }

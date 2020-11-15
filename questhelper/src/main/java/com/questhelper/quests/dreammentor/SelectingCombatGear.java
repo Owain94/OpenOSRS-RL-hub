@@ -49,6 +49,23 @@ public class SelectingCombatGear extends QuestStep
 		updateItems();
 	}
 
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+
+		if (itemsToHighlight.size() > 0)
+		{
+			for (Widget widget : itemsToHighlight)
+			{
+				graphics.setColor(new Color(0, 255, 255, 65));
+				graphics.fill(widget.getBounds());
+				graphics.setColor(Color.CYAN);
+				graphics.draw(widget.getBounds());
+			}
+		}
+	}
+
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
@@ -76,23 +93,6 @@ public class SelectingCombatGear extends QuestStep
 					}
 				}
 				itemsToHighlight = newItemsToHighlight;
-			}
-		}
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-
-		if (itemsToHighlight.size() > 0)
-		{
-			for (Widget widget : itemsToHighlight)
-			{
-				graphics.setColor(new Color(0, 255, 255, 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(Color.CYAN);
-				graphics.draw(widget.getBounds());
 			}
 		}
 	}

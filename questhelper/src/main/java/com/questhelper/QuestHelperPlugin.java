@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Binder;
-import com.google.inject.CreationException;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.questhelper.panel.QuestHelperPanel;
@@ -42,7 +41,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.Getter;
@@ -116,44 +114,30 @@ public class QuestHelperPlugin extends Plugin
 	private static final String MENUOP_RFD_SIR_AMIK_VARZE = "Start Quest Helper (Sir Amik Varze)";
 	private static final String MENUOP_RFD_MONKEY_AMBASSADOR = "Start Quest Helper (Monkey Ambassador)";
 	private static final String MENUOP_RFD_FINALE = "Start Quest Helper (Finale)";
-
-	@Inject
-	private Client client;
-
-	@Inject
-	private ClientToolbar clientToolbar;
-
-	@Inject
-	private ClientThread clientThread;
-
-	@Inject
-	private EventBus eventBus;
-
-	@Inject
-	private OverlayManager overlayManager;
-
-	@Inject
-	private QuestHelperOverlay questHelperOverlay;
-
-	@Inject
-	private QuestHelperWidgetOverlay questHelperWidgetOverlay;
-
-	@Inject
-	private QuestHelperWorldOverlay questHelperWorldOverlay;
-
-	@Getter
-	private QuestHelper selectedQuest = null;
-
-	@Setter
-	private QuestHelper sidebarSelectedQuest = null;
-
-	private QuestStep lastStep = null;
-
-	private Map<String, QuestHelper> quests;
-
 	@Inject
 	SpriteManager spriteManager;
-
+	@Inject
+	private Client client;
+	@Inject
+	private ClientToolbar clientToolbar;
+	@Inject
+	private ClientThread clientThread;
+	@Inject
+	private EventBus eventBus;
+	@Inject
+	private OverlayManager overlayManager;
+	@Inject
+	private QuestHelperOverlay questHelperOverlay;
+	@Inject
+	private QuestHelperWidgetOverlay questHelperWidgetOverlay;
+	@Inject
+	private QuestHelperWorldOverlay questHelperWorldOverlay;
+	@Getter
+	private QuestHelper selectedQuest = null;
+	@Setter
+	private QuestHelper sidebarSelectedQuest = null;
+	private QuestStep lastStep = null;
+	private Map<String, QuestHelper> quests;
 	private QuestHelperPanel panel;
 
 	private NavigationButton navButton;
@@ -280,17 +264,23 @@ public class QuestHelperPlugin extends Plugin
 		{
 			List<QuestHelper> questHelpers = new ArrayList<>();
 			if (quests != null)
-			for (Object o : quests.values().toArray())
 			{
-				if (o instanceof QuestHelper)
+				for (Object o : quests.values().toArray())
 				{
-					QuestHelper qh = (QuestHelper) o;
-					if (!qh.isCompleted())
-						questHelpers.add(qh);
+					if (o instanceof QuestHelper)
+					{
+						QuestHelper qh = (QuestHelper) o;
+						if (!qh.isCompleted())
+						{
+							questHelpers.add(qh);
+						}
+					}
 				}
 			}
 			if (questHelpers.size() > 0)
-			SwingUtilities.invokeLater(() -> panel.refresh(questHelpers, false));
+			{
+				SwingUtilities.invokeLater(() -> panel.refresh(questHelpers, false));
+			}
 		}
 	}
 

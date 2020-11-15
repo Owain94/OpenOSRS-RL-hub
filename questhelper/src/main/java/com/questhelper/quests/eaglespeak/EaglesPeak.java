@@ -1,8 +1,25 @@
 package com.questhelper.quests.eaglespeak;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
+import com.questhelper.steps.conditional.ItemRequirementCondition;
+import com.questhelper.steps.conditional.LogicType;
+import com.questhelper.steps.conditional.ObjectCondition;
+import com.questhelper.steps.conditional.VarbitCondition;
+import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,23 +29,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.ItemRequirementCondition;
-import com.questhelper.steps.conditional.LogicType;
-import com.questhelper.steps.conditional.ObjectCondition;
-import com.questhelper.steps.conditional.VarbitCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.EAGLES_PEAK
@@ -53,99 +53,6 @@ public class EaglesPeak extends BasicQuestHelper
 		useBronzeSilverFeathersOnStoneDoor, sneakPastEagle, speakToNickolaus, speakToNickolausInTheCamp, speakToCharlieAgain, pickUpActualSilverFeather, leavePeak;
 
 	Zone inMainCave, inSilverRoomZone, inGoldRoomZone1, inGoldRoomZone2, inNest;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, speakToCharlie);
-
-		ConditionalStep getFeatherKey = new ConditionalStep(this, inspectBooks);
-		getFeatherKey.addStep(hasBirdBook, clickBook);
-
-		steps.put(5, getFeatherKey);
-
-		// TODO: Need a missing step for entering the
-		ConditionalStep enterEaglesPeak = new ConditionalStep(this, inspectBooksForFeather);
-		enterEaglesPeak.addStep(hasMetalFeather, useFeatherOnDoor);
-
-		steps.put(10, enterEaglesPeak);
-
-		Conditions hasGoldFeatherOrUsed = new Conditions(LogicType.OR, hasGoldFeather, hasInsertedGoldFeather);
-		Conditions hasSilverFeatherOrUsed = new Conditions(LogicType.OR, hasSilverFeather, hasInsertedSilverFeather);
-		Conditions hasBronzeFeatherOrUsed = new Conditions(LogicType.OR, hasBronzeFeather, hasInsertedBronzeFeather);
-
-		ConditionalStep createDisguises = new ConditionalStep(this, enterPeak);
-		createDisguises.addStep(new Conditions(inMainCavern, hasInsertedGoldFeather, hasInsertedBronzeFeather, hasSilverFeatherOrUsed), useSilverFeathersOnStoneDoor);
-		createDisguises.addStep(new Conditions(inMainCavern, hasInsertedGoldFeather, hasBronzeFeatherOrUsed, hasInsertedSilverFeather), useBronzeFeathersOnStoneDoor);
-		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasInsertedBronzeFeather, hasInsertedSilverFeather), useGoldFeathersOnStoneDoor);
-		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasBronzeFeatherOrUsed, hasInsertedSilverFeather), useGoldBronzeFeathersOnStoneDoor);
-		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasInsertedBronzeFeather, hasSilverFeatherOrUsed), useGoldSilverFeathersOnStoneDoor);
-		createDisguises.addStep(new Conditions(inMainCavern, hasInsertedGoldFeather, hasBronzeFeatherOrUsed, hasSilverFeatherOrUsed), useBronzeSilverFeathersOnStoneDoor);
-		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasBronzeFeatherOrUsed, hasSilverFeatherOrUsed), useFeathersOnStoneDoor);
-		createDisguises.addStep(new Conditions(inGoldRoom, hasGoldFeatherOrUsed), enterMainCavernFromGold);
-		createDisguises.addStep(new Conditions(inGoldRoom, bird5Moved), grabGoldFeather);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever3Pulled, lever4Pulled, bird3Moved), fillFeeder6);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever3Pulled, lever4Pulled), fillFeeder4Again);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever4Pulled), pullLever3Down);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled, lever3Pulled, bird4Moved), pullLever4Down);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled, lever3Pulled), fillFeeder5);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled, bird3Moved), pullLever3Down);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled), fillFeeder4);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, lever2Pulled, bird4Moved), fillFeeder7); // If you've blocked lever 1
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, lever2Pulled), pushLever1Up);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, bird1Moved, bird2Moved), pullLever2Down);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, bird2Moved), fillFeeder3);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, bird1Moved), fillFeeder2);
-		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled), fillFeeder1);
-		createDisguises.addStep(new Conditions(inGoldRoom, hasBirdFeed), pullLever1Down);
-		createDisguises.addStep(new Conditions(inGoldRoom), collectFeed);
-		createDisguises.addStep(new Conditions(inMainCavern, hasSilverFeatherOrUsed, hasBronzeFeatherOrUsed), enterGoldRoom);
-		createDisguises.addStep(new Conditions(inSilverRoom, hasSilverFeatherOrUsed), enterMainCavernFromSilver);
-		createDisguises.addStep(new Conditions(inSilverRoom, silverFeatherNearby), pickUpActualSilverFeather);
-		createDisguises.addStep(new Conditions(inSilverRoom, threatenedKebbit), pickupSilverFeather);
-		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedOpening), threatenKebbit);
-		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedRocks2), inspectOpening);
-		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedRocks1), inspectRocks2);
-		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedSilverPedestal), inspectRocks1);
-		createDisguises.addStep(new Conditions(inSilverRoom), inspectSilverPedestal);
-		createDisguises.addStep(new Conditions(inMainCavern, hasBronzeFeatherOrUsed), enterSilverRoom);
-		createDisguises.addStep(new Conditions(bronzeRoomPedestalLowered, hasBronzeFeatherOrUsed), enterMainCavernFromBronze);
-		createDisguises.addStep(new Conditions(hasSolvedBronze, bronzeRoomPedestalLowered), grabBronzeFeather);
-		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch4NotDone), winch4);
-		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch3NotDone), winch3);
-		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch2NotDone), winch2);
-		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch1NotDone), winch1);
-		createDisguises.addStep(new Conditions(inBronzeRoom, spokenTwiceToAsyff), attemptToTakeBronzeFeather);
-		createDisguises.addStep(new Conditions(new ZoneCondition(inMainCave), spokenTwiceToAsyff), enterBronzeRoom);
-		createDisguises.addStep(new Conditions(spokenTwiceToAsyff), returnToEaglesPeak);
-		createDisguises.addStep(new Conditions(spokenOnceToAsyff, hasTenFeathers), speakAsyffAgain);
-		createDisguises.addStep(new Conditions(spokenToNickolaus, hasTenFeathers), goToFancyStore);
-		createDisguises.addStep(new Conditions(spokenToNickolaus, inMainCavern), pickupFeathers);
-		createDisguises.addStep(inMainCavern, shoutAtNickolaus);
-		steps.put(15, createDisguises);
-
-		ConditionalStep freeNickolaus = new ConditionalStep(this, enterPeak);
-		freeNickolaus.addStep(new Conditions(new ZoneCondition(inNest)), speakToNickolaus);
-		freeNickolaus.addStep(new Conditions(inMainCavern), sneakPastEagle);
-		steps.put(20, freeNickolaus);
-
-		ConditionalStep goTalkToNeckInCamp = new ConditionalStep(this, speakToNickolausInTheCamp);
-		goTalkToNeckInCamp.addStep(inMainCavern, leavePeak);
-
-		steps.put(25, goTalkToNeckInCamp);
-
-		steps.put(30, goTalkToNeckInCamp);
-
-		steps.put(35, speakToCharlieAgain);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -435,5 +342,98 @@ public class EaglesPeak extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Free Nickolaus", new ArrayList<>(Arrays.asList(useFeathersOnStoneDoor, sneakPastEagle, speakToNickolaus))));
 		allSteps.add(new PanelDetails("Learn how to catch ferrets", new ArrayList<>(Arrays.asList(speakToNickolausInTheCamp, speakToCharlieAgain))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, speakToCharlie);
+
+		ConditionalStep getFeatherKey = new ConditionalStep(this, inspectBooks);
+		getFeatherKey.addStep(hasBirdBook, clickBook);
+
+		steps.put(5, getFeatherKey);
+
+		// TODO: Need a missing step for entering the
+		ConditionalStep enterEaglesPeak = new ConditionalStep(this, inspectBooksForFeather);
+		enterEaglesPeak.addStep(hasMetalFeather, useFeatherOnDoor);
+
+		steps.put(10, enterEaglesPeak);
+
+		Conditions hasGoldFeatherOrUsed = new Conditions(LogicType.OR, hasGoldFeather, hasInsertedGoldFeather);
+		Conditions hasSilverFeatherOrUsed = new Conditions(LogicType.OR, hasSilverFeather, hasInsertedSilverFeather);
+		Conditions hasBronzeFeatherOrUsed = new Conditions(LogicType.OR, hasBronzeFeather, hasInsertedBronzeFeather);
+
+		ConditionalStep createDisguises = new ConditionalStep(this, enterPeak);
+		createDisguises.addStep(new Conditions(inMainCavern, hasInsertedGoldFeather, hasInsertedBronzeFeather, hasSilverFeatherOrUsed), useSilverFeathersOnStoneDoor);
+		createDisguises.addStep(new Conditions(inMainCavern, hasInsertedGoldFeather, hasBronzeFeatherOrUsed, hasInsertedSilverFeather), useBronzeFeathersOnStoneDoor);
+		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasInsertedBronzeFeather, hasInsertedSilverFeather), useGoldFeathersOnStoneDoor);
+		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasBronzeFeatherOrUsed, hasInsertedSilverFeather), useGoldBronzeFeathersOnStoneDoor);
+		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasInsertedBronzeFeather, hasSilverFeatherOrUsed), useGoldSilverFeathersOnStoneDoor);
+		createDisguises.addStep(new Conditions(inMainCavern, hasInsertedGoldFeather, hasBronzeFeatherOrUsed, hasSilverFeatherOrUsed), useBronzeSilverFeathersOnStoneDoor);
+		createDisguises.addStep(new Conditions(inMainCavern, hasGoldFeatherOrUsed, hasBronzeFeatherOrUsed, hasSilverFeatherOrUsed), useFeathersOnStoneDoor);
+		createDisguises.addStep(new Conditions(inGoldRoom, hasGoldFeatherOrUsed), enterMainCavernFromGold);
+		createDisguises.addStep(new Conditions(inGoldRoom, bird5Moved), grabGoldFeather);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever3Pulled, lever4Pulled, bird3Moved), fillFeeder6);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever3Pulled, lever4Pulled), fillFeeder4Again);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever4Pulled), pullLever3Down);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled, lever3Pulled, bird4Moved), pullLever4Down);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled, lever3Pulled), fillFeeder5);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled, bird3Moved), pullLever3Down);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1OriginalPosition, lever2Pulled), fillFeeder4);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, lever2Pulled, bird4Moved), fillFeeder7); // If you've blocked lever 1
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, lever2Pulled), pushLever1Up);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, bird1Moved, bird2Moved), pullLever2Down);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, bird2Moved), fillFeeder3);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled, bird1Moved), fillFeeder2);
+		createDisguises.addStep(new Conditions(inGoldRoom, lever1Pulled), fillFeeder1);
+		createDisguises.addStep(new Conditions(inGoldRoom, hasBirdFeed), pullLever1Down);
+		createDisguises.addStep(new Conditions(inGoldRoom), collectFeed);
+		createDisguises.addStep(new Conditions(inMainCavern, hasSilverFeatherOrUsed, hasBronzeFeatherOrUsed), enterGoldRoom);
+		createDisguises.addStep(new Conditions(inSilverRoom, hasSilverFeatherOrUsed), enterMainCavernFromSilver);
+		createDisguises.addStep(new Conditions(inSilverRoom, silverFeatherNearby), pickUpActualSilverFeather);
+		createDisguises.addStep(new Conditions(inSilverRoom, threatenedKebbit), pickupSilverFeather);
+		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedOpening), threatenKebbit);
+		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedRocks2), inspectOpening);
+		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedRocks1), inspectRocks2);
+		createDisguises.addStep(new Conditions(inSilverRoom, hasInspectedSilverPedestal), inspectRocks1);
+		createDisguises.addStep(new Conditions(inSilverRoom), inspectSilverPedestal);
+		createDisguises.addStep(new Conditions(inMainCavern, hasBronzeFeatherOrUsed), enterSilverRoom);
+		createDisguises.addStep(new Conditions(bronzeRoomPedestalLowered, hasBronzeFeatherOrUsed), enterMainCavernFromBronze);
+		createDisguises.addStep(new Conditions(hasSolvedBronze, bronzeRoomPedestalLowered), grabBronzeFeather);
+		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch4NotDone), winch4);
+		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch3NotDone), winch3);
+		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch2NotDone), winch2);
+		createDisguises.addStep(new Conditions(bronzeRoomPedestalUp, winch1NotDone), winch1);
+		createDisguises.addStep(new Conditions(inBronzeRoom, spokenTwiceToAsyff), attemptToTakeBronzeFeather);
+		createDisguises.addStep(new Conditions(new ZoneCondition(inMainCave), spokenTwiceToAsyff), enterBronzeRoom);
+		createDisguises.addStep(new Conditions(spokenTwiceToAsyff), returnToEaglesPeak);
+		createDisguises.addStep(new Conditions(spokenOnceToAsyff, hasTenFeathers), speakAsyffAgain);
+		createDisguises.addStep(new Conditions(spokenToNickolaus, hasTenFeathers), goToFancyStore);
+		createDisguises.addStep(new Conditions(spokenToNickolaus, inMainCavern), pickupFeathers);
+		createDisguises.addStep(inMainCavern, shoutAtNickolaus);
+		steps.put(15, createDisguises);
+
+		ConditionalStep freeNickolaus = new ConditionalStep(this, enterPeak);
+		freeNickolaus.addStep(new Conditions(new ZoneCondition(inNest)), speakToNickolaus);
+		freeNickolaus.addStep(new Conditions(inMainCavern), sneakPastEagle);
+		steps.put(20, freeNickolaus);
+
+		ConditionalStep goTalkToNeckInCamp = new ConditionalStep(this, speakToNickolausInTheCamp);
+		goTalkToNeckInCamp.addStep(inMainCavern, leavePeak);
+
+		steps.put(25, goTalkToNeckInCamp);
+
+		steps.put(30, goTalkToNeckInCamp);
+
+		steps.put(35, speakToCharlieAgain);
+
+		return steps;
 	}
 }

@@ -57,27 +57,6 @@ public class RFDStart extends BasicQuestHelper
 
 	QuestStep talkToCook, useAshesOnFruitBlast, talkToCookAgain, enterDiningRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		int tmp = QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId();
-
-		steps.put(0, talkToCook);
-
-		ConditionalStep goGiveCookItems = new ConditionalStep(this, useAshesOnFruitBlast);
-		goGiveCookItems.addStep(hasDirtyBlast, talkToCookAgain);
-		steps.put(1, goGiveCookItems);
-
-		steps.put(2, enterDiningRoom);
-
-		return steps;
-	}
-
 	public void setupRequirements()
 	{
 		eyeOfNewt = new ItemRequirement("Eye of newt", ItemID.EYE_OF_NEWT);
@@ -115,12 +94,6 @@ public class RFDStart extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		return new ArrayList<>(Arrays.asList(eyeOfNewt, greenmansAle, rottenTomato, ashes, fruitBlast));
-	}
-
-	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -129,8 +102,35 @@ public class RFDStart extends BasicQuestHelper
 	}
 
 	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		int tmp = QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId();
+
+		steps.put(0, talkToCook);
+
+		ConditionalStep goGiveCookItems = new ConditionalStep(this, useAshesOnFruitBlast);
+		goGiveCookItems.addStep(hasDirtyBlast, talkToCookAgain);
+		steps.put(1, goGiveCookItems);
+
+		steps.put(2, enterDiningRoom);
+
+		return steps;
+	}
+
+	@Override
 	public boolean isCompleted()
 	{
 		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) >= 3);
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		return new ArrayList<>(Arrays.asList(eyeOfNewt, greenmansAle, rottenTomato, ashes, fruitBlast));
 	}
 }

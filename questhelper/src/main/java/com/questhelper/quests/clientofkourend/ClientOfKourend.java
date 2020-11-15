@@ -24,10 +24,16 @@
  */
 package com.questhelper.quests.clientofkourend;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
@@ -35,12 +41,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
@@ -55,40 +55,6 @@ public class ClientOfKourend extends BasicQuestHelper
 	ConditionForStep hasEnchantedScroll, hasEnchantedQuill, hasMysteriousOrb, hasFeather, talkedToLeenz, talkedToHorace, talkedToJennifer, talkedToMunty, talkedToRegath;
 
 	QuestStep talkToVeos, useFeatherOnScroll, talkToLeenz, talkToHorace, talkToJennifer, talkToMunty, talkToRegath, returnToVeos, goToAltar, finishQuest;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToVeos);
-
-		ConditionalStep makeEnchantedQuill = new ConditionalStep(this, talkToVeos);
-		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz, talkedToRegath, talkedToMunty, talkedToJennifer), talkToHorace);
-		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz, talkedToRegath, talkedToMunty), talkToJennifer);
-		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz, talkedToRegath), talkToMunty);
-		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz), talkToRegath);
-		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill), talkToLeenz);
-		makeEnchantedQuill.addStep(hasEnchantedScroll, useFeatherOnScroll);
-		steps.put(1, makeEnchantedQuill);
-
-		steps.put(2, returnToVeos);
-
-		ConditionalStep takeOrbToAltar = new ConditionalStep(this, returnToVeos);
-		takeOrbToAltar.addStep(hasMysteriousOrb, goToAltar);
-
-		steps.put(3, returnToVeos);
-
-		steps.put(4, takeOrbToAltar);
-
-		steps.put(5, finishQuest);
-		steps.put(6, finishQuest);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -168,5 +134,39 @@ public class ClientOfKourend extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Learn about Kourend", new ArrayList<>(Arrays.asList(talkToLeenz, talkToRegath, talkToMunty, talkToJennifer, talkToHorace, returnToVeos))));
 		allSteps.add(new PanelDetails("The Dark Altar", new ArrayList<>(Arrays.asList(goToAltar, finishQuest))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToVeos);
+
+		ConditionalStep makeEnchantedQuill = new ConditionalStep(this, talkToVeos);
+		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz, talkedToRegath, talkedToMunty, talkedToJennifer), talkToHorace);
+		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz, talkedToRegath, talkedToMunty), talkToJennifer);
+		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz, talkedToRegath), talkToMunty);
+		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill, talkedToLeenz), talkToRegath);
+		makeEnchantedQuill.addStep(new Conditions(hasEnchantedQuill), talkToLeenz);
+		makeEnchantedQuill.addStep(hasEnchantedScroll, useFeatherOnScroll);
+		steps.put(1, makeEnchantedQuill);
+
+		steps.put(2, returnToVeos);
+
+		ConditionalStep takeOrbToAltar = new ConditionalStep(this, returnToVeos);
+		takeOrbToAltar.addStep(hasMysteriousOrb, goToAltar);
+
+		steps.put(3, returnToVeos);
+
+		steps.put(4, takeOrbToAltar);
+
+		steps.put(5, finishQuest);
+		steps.put(6, finishQuest);
+
+		return steps;
 	}
 }

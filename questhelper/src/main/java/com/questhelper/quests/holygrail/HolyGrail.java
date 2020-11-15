@@ -24,14 +24,25 @@
  */
 package com.questhelper.quests.holygrail;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
 import com.questhelper.steps.conditional.NpcCondition;
 import com.questhelper.steps.conditional.WidgetTextCondition;
+import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,17 +52,6 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.ZoneCondition;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -76,68 +76,6 @@ public class HolyGrail extends BasicQuestHelper
 	Zone camelotGround, camelotUpstairsZone1, camelotUpstairsZone2, merlinRoom, entranaBoat, entranaIsland, galahadHouse, draynorManorFront, draynorManorBottomFloor, draynorManorSecondFloor,
 		draynorManorTopFloor, magicWhistleRoom, teleportLocation, fisherKingRealmEntrance, fisherKingRealmAfterTitan1, fisherKingRealmAfterTitan2, fisherKingRealmAfterTitan3, grailBellRingLocation,
 		fisherKingRealmCastle1BottomFloor, fisherKingRealmCastle1SecondFloor, fisherKingRealm, fisherKingRealmCastle2BottomFloor, fisherKingRealmCastle2SecondFloor, fisherKingRealmCastle2ThirdFloor;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToKingArthur1);
-
-		ConditionalStep findingMerlin = new ConditionalStep(this, goUpStairsCamelot);
-		findingMerlin.addStep(new Conditions(inMerlinRoom, merlinNearby), talkToMerlin);
-		findingMerlin.addStep(inCamelotUpstairs, openMerlinDoor);
-
-		steps.put(2, findingMerlin);
-
-		ConditionalStep findHighPriest = new ConditionalStep(this, goToEntrana);
-		findHighPriest.addStep(onEntrana, talkToHighPriest);
-
-		steps.put(3, findHighPriest);
-
-		findFisherKing = new ConditionalStep(this, goToGalahad);
-		findFisherKing.addStep(inFisherKingCastle1SecondFloor, talkToFisherKing);
-		findFisherKing.addStep(inFisherKingCastle1BottomFloor, goUpStairsBrokenCastle);
-		findFisherKing.addStep(new Conditions(hasGrailBell, inFisherKingRealmAfterTitan), ringBell);
-		findFisherKing.addStep(talkedToFisherman, pickupBell);
-		findFisherKing.addStep(inFisherKingRealmAfterTitan, talkToFisherman);
-		findFisherKing.addStep(new Conditions(hasExcalibur, titanNearby), attackTitan);
-		findFisherKing.addStep(new Conditions(hasTwoWhistles, inTeleportLocation, hasExcalibur), blowWhistle1);
-		findFisherKing.addStep(new Conditions(hasTwoWhistles, hasExcalibur), goToTeleportLocation1);
-		findFisherKing.addStep(hasTwoWhistles, goGetExcalibur);
-		findFisherKing.addStep(inMagicWhistleRoom, takeWhistles);
-		findFisherKing.addStep(inDraynorManorTopFloor, openWhistleDoor);
-		findFisherKing.addStep(inDraynorManorSecondFloor, goUpStairsDraynor2);
-		findFisherKing.addStep(inDraynorManorBottomFloor, goUpStairsDraynor1);
-		findFisherKing.addStep(inDraynorFrontManor, enterDraynorManor);
-		findFisherKing.addStep(hasNapkin, goToDraynorManor);
-		findFisherKing.addStep(inGalahadHouse, talkToGalahad);
-
-		findFisherKing.setLockingCondition(hasTwoWhistles);
-
-		steps.put(4, findFisherKing);
-
-		ConditionalStep findPercival = new ConditionalStep(this, talkToKingArthur2);
-		findPercival.addStep(hasFeather, openSack);
-
-		steps.put(8, findPercival);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, goToTeleportLocation2);
-		finishQuest.addStep(hasGrail, talkToKingArthur3);
-		finishQuest.addStep(inFisherKingCastle2ThirdFloor, takeGrail);
-		finishQuest.addStep(inFisherKingCastle2SecondFloor, goUpNewCastleLadder);
-		finishQuest.addStep(inFisherKingCastle2BottomFloor, goUpNewCastleStairs);
-		finishQuest.addStep(inFisherKingRealm, openFisherKingCastleDoor);
-		finishQuest.addStep(inTeleportLocation, blowWhistle2);
-
-		steps.put(9, finishQuest);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -293,14 +231,6 @@ public class HolyGrail extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Black Knight Titan (level 120)");
-		return reqs;
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
@@ -323,6 +253,14 @@ public class HolyGrail extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Black Knight Titan (level 120)");
+		return reqs;
+	}
+
+	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -335,5 +273,67 @@ public class HolyGrail extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Finishing Up", new ArrayList<>(Collections.singletonList(talkToKingArthur3)), grail));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToKingArthur1);
+
+		ConditionalStep findingMerlin = new ConditionalStep(this, goUpStairsCamelot);
+		findingMerlin.addStep(new Conditions(inMerlinRoom, merlinNearby), talkToMerlin);
+		findingMerlin.addStep(inCamelotUpstairs, openMerlinDoor);
+
+		steps.put(2, findingMerlin);
+
+		ConditionalStep findHighPriest = new ConditionalStep(this, goToEntrana);
+		findHighPriest.addStep(onEntrana, talkToHighPriest);
+
+		steps.put(3, findHighPriest);
+
+		findFisherKing = new ConditionalStep(this, goToGalahad);
+		findFisherKing.addStep(inFisherKingCastle1SecondFloor, talkToFisherKing);
+		findFisherKing.addStep(inFisherKingCastle1BottomFloor, goUpStairsBrokenCastle);
+		findFisherKing.addStep(new Conditions(hasGrailBell, inFisherKingRealmAfterTitan), ringBell);
+		findFisherKing.addStep(talkedToFisherman, pickupBell);
+		findFisherKing.addStep(inFisherKingRealmAfterTitan, talkToFisherman);
+		findFisherKing.addStep(new Conditions(hasExcalibur, titanNearby), attackTitan);
+		findFisherKing.addStep(new Conditions(hasTwoWhistles, inTeleportLocation, hasExcalibur), blowWhistle1);
+		findFisherKing.addStep(new Conditions(hasTwoWhistles, hasExcalibur), goToTeleportLocation1);
+		findFisherKing.addStep(hasTwoWhistles, goGetExcalibur);
+		findFisherKing.addStep(inMagicWhistleRoom, takeWhistles);
+		findFisherKing.addStep(inDraynorManorTopFloor, openWhistleDoor);
+		findFisherKing.addStep(inDraynorManorSecondFloor, goUpStairsDraynor2);
+		findFisherKing.addStep(inDraynorManorBottomFloor, goUpStairsDraynor1);
+		findFisherKing.addStep(inDraynorFrontManor, enterDraynorManor);
+		findFisherKing.addStep(hasNapkin, goToDraynorManor);
+		findFisherKing.addStep(inGalahadHouse, talkToGalahad);
+
+		findFisherKing.setLockingCondition(hasTwoWhistles);
+
+		steps.put(4, findFisherKing);
+
+		ConditionalStep findPercival = new ConditionalStep(this, talkToKingArthur2);
+		findPercival.addStep(hasFeather, openSack);
+
+		steps.put(8, findPercival);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, goToTeleportLocation2);
+		finishQuest.addStep(hasGrail, talkToKingArthur3);
+		finishQuest.addStep(inFisherKingCastle2ThirdFloor, takeGrail);
+		finishQuest.addStep(inFisherKingCastle2SecondFloor, goUpNewCastleLadder);
+		finishQuest.addStep(inFisherKingCastle2BottomFloor, goUpNewCastleStairs);
+		finishQuest.addStep(inFisherKingRealm, openFisherKingCastleDoor);
+		finishQuest.addStep(inTeleportLocation, blowWhistle2);
+
+		steps.put(9, finishQuest);
+
+		return steps;
 	}
 }

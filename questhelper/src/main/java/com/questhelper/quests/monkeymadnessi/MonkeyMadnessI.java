@@ -24,11 +24,18 @@
  */
 package com.questhelper.quests.monkeymadnessi;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -45,13 +52,6 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -82,144 +82,13 @@ public class MonkeyMadnessI extends BasicQuestHelper
 	NpcStep talkToDaero, talkToDaeroInHangar, talkToDaeroAfterPuzzle, talkToWaydarAfterPuzzle, talkToWaydarOnCrash, talkToDaeroTravel,
 		talkToDaeroForAmuletRun, talkToWaydarForAmuletRun, talkToLumdoForAmuletRun, talkToLumdo, talkToLumdoToReturn, talkToDaeroForAmuletMake,
 		talkToWaydarForAmuletMake, talkToLumdoForAmuletMake, talkToZooknockForTalisman, talkToLumdoForTalismanRun, talkToWaydarForTalismanRun,
-		talkToDaeroForTalismanRun,  talkToLumdoForTalkingToAwow, talkToWaydarForTalkingToAwow, talkToDaeroForTalkingToAwow;
+		talkToDaeroForTalismanRun, talkToLumdoForTalkingToAwow, talkToWaydarForTalkingToAwow, talkToDaeroForTalkingToAwow;
 
 	ObjectStep enterTemple;
 
 	Zone stronghold, floor1, floor2, floor3, karamja, hangar, hangar2, crashIsland, apeAtollSouth1, apeAtollSouth2, apeAtollSouth3, prison, apeAtollNorth1,
 		apeAtollNorth2, apeAtollNorth3, apeAtollNorth4, apeAtollNorthBridge, apeAtollOverBridge, dentureBuilding, mouldRoom, zooknockDungeon, templeDungeon,
 		monkeyPen1, monkeyPen2, monkeyPen3, throne1, throne2, throne3, throne4, jungleDemonRoom;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToNarnode);
-
-		ConditionalStep gettingToApeAtoll = new ConditionalStep(this, talkToCaranock);
-		gettingToApeAtoll.addStep(new Conditions(onCrashIsland, talkedToLumdo), talkToWaydarOnCrash);
-		gettingToApeAtoll.addStep(new Conditions(onCrashIsland), talkToLumdo);
-		gettingToApeAtoll.addStep(new Conditions(inHangar, talkedToDaeroAfterPuzzle), talkToWaydarAfterPuzzle);
-		gettingToApeAtoll.addStep(new Conditions(inHangar, solvedPuzzle), talkToDaeroAfterPuzzle);
-		gettingToApeAtoll.addStep(new Conditions(inHangar, startedPuzzle), clickPuzzle);
-		gettingToApeAtoll.addStep(new Conditions(startedPuzzle, inFloor1), talkToDaeroTravel);
-		gettingToApeAtoll.addStep(inHangar, talkToDaeroInHangar);
-		gettingToApeAtoll.addStep(new Conditions(reportedBackToNarnode, inFloor1), talkToDaero);
-		gettingToApeAtoll.addStep(reportedBackToNarnode, goUpToDaero);
-		gettingToApeAtoll.addStep(talkedToCaranock, talkToNarnodeAfterShipyard);
-		gettingToApeAtoll.addStep(inFloor3, flyGandius);
-		gettingToApeAtoll.addStep(inFloor2, goUpF2ToF3);
-		gettingToApeAtoll.addStep(inFloor1, goUpF1ToF2);
-		gettingToApeAtoll.addStep(inStronghold, goUpF0ToF1);
-
-		steps.put(1, gettingToApeAtoll);
-		steps.put(2, gettingToApeAtoll);
-
-		ConditionalStep gettingToGarkor = new ConditionalStep(this, goUpToDaero);
-		gettingToGarkor.addStep(new Conditions(talkedToGarkor, inMouldRoom, hasMonkeyDentures), searchForMould);
-		gettingToGarkor.addStep(new Conditions(talkedToGarkor, inDentureBuilding, hasMonkeyDentures), goDownFromDentures);
-		gettingToGarkor.addStep(new Conditions(talkedToGarkor, inDentureBuilding), searchForDentures);
-		gettingToGarkor.addStep(inPrison, leavePrison);
-		gettingToGarkor.addStep(new Conditions(onApeAtollNorth, talkedToGarkor), enterDentureBuilding);
-		gettingToGarkor.addStep(onApeAtollNorth, talkToGarkor);
-		gettingToGarkor.addStep(onApeAtollSouth, enterValley);
-		gettingToGarkor.addStep(onCrashIsland, talkToLumdoToReturn);
-		gettingToGarkor.addStep(inHangar, talkToWaydarAfterPuzzle);
-		gettingToGarkor.addStep(inFloor1, talkToDaeroTravel);
-
-		getAmuletParts = new ConditionalStep(this, gettingToGarkor);
-		getAmuletParts.setLockingCondition(hadDenturesAndMould);
-
-		makeBar = new ConditionalStep(this, goUpToDaeroForAmuletRun);
-		makeBar.addStep(new Conditions(inZooknockDungeon, givenDentures, givenMould, givenBar), talkToZooknock);
-		makeBar.addStep(new Conditions(inZooknockDungeon, givenDentures, givenMould), useBar);
-		makeBar.addStep(new Conditions(inZooknockDungeon, givenDentures), useMould);
-		makeBar.addStep(new Conditions(inZooknockDungeon, talkedToZooknock), useDentures);
-		makeBar.addStep(inZooknockDungeon, talkToZooknock);
-		makeBar.addStep(onApeAtollSouth, enterDungeonForAmuletRun);
-		makeBar.addStep(onCrashIsland, talkToLumdoForAmuletRun);
-		makeBar.addStep(inHangar, talkToWaydarForAmuletRun);
-		makeBar.addStep(inFloor1, talkToDaeroForAmuletRun);
-		makeBar.addStep(inMouldRoom, leaveToPrepareForBar);
-		makeBar.addStep(onApeAtollNorth, leaveToPrepareForBar);
-		makeBar.setLockingCondition(hadEnchantedBar);
-
-		makeAmulet = new ConditionalStep(this, goUpToDaeroForAmuletMake);
-		makeAmulet.addStep(hasUnstrungAmulet, useWool);
-		makeAmulet.addStep(inTempleDungeon, useBarOnFlame);
-		makeAmulet.addStep(onApeAtollNorth, enterTemple);
-		makeAmulet.addStep(onApeAtollSouth, enterValleyForAmuletMake);
-		makeAmulet.addStep(onCrashIsland, talkToLumdoForAmuletMake);
-		makeAmulet.addStep(inHangar, talkToWaydarForAmuletMake);
-		makeAmulet.addStep(inFloor1, talkToDaeroForAmuletMake);
-		makeAmulet.addStep(inZooknockDungeon, leaveToPrepareForAmulet);
-		makeAmulet.setLockingCondition(hasAmulet);
-
-		getTalisman = new ConditionalStep(this, leaveTempleDungeon);
-		getTalisman.addStep(onApeAtollNorth, talkToMonkeyChild);
-		getTalisman.setLockingCondition(hasTalisman);
-
-		makeTalisman = new ConditionalStep(this, goUpToDaeroForTalismanRun);
-		makeTalisman.addStep(new Conditions(inZooknockDungeon, givenTalisman, givenBones), talkToZooknockForTalisman);
-		makeTalisman.addStep(new Conditions(inZooknockDungeon, givenTalisman), useBones);
-		makeTalisman.addStep(new Conditions(inZooknockDungeon), useTalisman);
-		makeTalisman.addStep(onApeAtollSouth, enterDungeonForTalismanRun);
-		makeTalisman.addStep(onCrashIsland, talkToLumdoForTalismanRun);
-		makeTalisman.addStep(inHangar, talkToWaydarForTalismanRun);
-		makeTalisman.addStep(inFloor1, talkToDaeroForTalismanRun);
-		makeTalisman.addStep(inTempleDungeon, leaveToPrepareForTalismanRun);
-		makeTalisman.addStep(inMouldRoom, leaveToPrepareForTalismanRun);
-		makeTalisman.addStep(onApeAtollNorth, leaveToPrepareForTalismanRun);
-		makeTalisman.setLockingCondition(hasMonkeyTalismanMade);
-
-		ConditionalStep infiltratingTheMonkeys = new ConditionalStep(this, getAmuletParts);
-		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hasTalisman), makeTalisman);
-		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hasAmulet), getTalisman);
-		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hadEnchantedBar), makeAmulet);
-		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hadDenturesAndMould), makeBar);
-
-		steps.put(3, infiltratingTheMonkeys);
-
-		// 127 5->6 for step 4 start
-
-		ConditionalStep bringMonkey = new ConditionalStep(this, goUpToDaeroForTalkingToAwow);
-		bringMonkey.addStep(new Conditions(inThroneRoom), talkToAwow);
-		bringMonkey.addStep(new Conditions(onApeAtollNorth, talkedToKruk), talkToAwow);
-		bringMonkey.addStep(new Conditions(onApeAtollOverBridge, talkedToGuard), talkToKruk);
-		bringMonkey.addStep(new Conditions(onApeAtollNorthBridge, talkedToGuard), goDownFromBridge);
-		bringMonkey.addStep(new Conditions(onApeAtollNorth, talkedToGuard), goUpToBridge);
-		bringMonkey.addStep(new Conditions(onApeAtollNorth, talkedToGarkorWithGreeGree), talkToGuard);
-		bringMonkey.addStep(onApeAtollNorth, talkToGarkorWithMonkey);
-		bringMonkey.addStep(onApeAtollSouth, enterGate);
-		bringMonkey.addStep(onCrashIsland, talkToLumdoForTalkingToAwow);
-		bringMonkey.addStep(inHangar, talkToWaydarForTalkingToAwow);
-		bringMonkey.addStep(inFloor1, talkToDaeroForTalkingToAwow);
-		bringMonkey.addStep(inMonkeyPen, talkToMinderAgain);
-
-		ConditionalStep bringingAMonkeyToAwow = new ConditionalStep(this, talkToMinder);
-		bringingAMonkeyToAwow.addStep(givenMonkey, talkToGarkorForSigil);
-		bringingAMonkeyToAwow.addStep(hasMonkey, bringMonkey);
-		bringingAMonkeyToAwow.addStep(inMonkeyPen, talkToMonkeyAtZoo);
-		bringingAMonkeyToAwow.addStep(inZooknockDungeon, leaveDungeonWithGreeGree);
-
-		steps.put(4, bringingAMonkeyToAwow);
-
-		ConditionalStep getSigil = new ConditionalStep(this, talkToGarkorForSigil);
-		getSigil.addStep(inJungleDemonRoom, killDemon);
-		getSigil.addStep(gotSigil, prepareForBattle);
-
-		steps.put(5, getSigil);
-
-		steps.put(6, talkToNarnodeToFinish);
-		steps.put(7, talkToNarnodeToFinish);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -408,7 +277,7 @@ public class MonkeyMadnessI extends BasicQuestHelper
 		talkedToGuard = new Conditions(true, LogicType.OR, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "He goes by the name of Kruk."));
 		talkedToKruk = new Conditions(true, LogicType.OR, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "As you wish.", "I see. Very well, you look genuine enough. Follow me."));
 
-		givenMonkey = new Conditions(true, LogicType.OR, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "We are still pondering your proposition", "You have shown yourself to be very resourceful."), new WidgetTextCondition(119, 3, true,"appear to have earnt Awowogei's favour."));
+		givenMonkey = new Conditions(true, LogicType.OR, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "We are still pondering your proposition", "You have shown yourself to be very resourceful."), new WidgetTextCondition(119, 3, true, "appear to have earnt Awowogei's favour."));
 
 		gotSigil = new VarbitCondition(126, 6, Operation.GREATER_EQUAL);
 	}
@@ -732,6 +601,137 @@ public class MonkeyMadnessI extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Defeat the demon", new ArrayList<>(Arrays.asList(prepareForBattle, killDemon, talkToNarnodeToFinish)), combatGear));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToNarnode);
+
+		ConditionalStep gettingToApeAtoll = new ConditionalStep(this, talkToCaranock);
+		gettingToApeAtoll.addStep(new Conditions(onCrashIsland, talkedToLumdo), talkToWaydarOnCrash);
+		gettingToApeAtoll.addStep(new Conditions(onCrashIsland), talkToLumdo);
+		gettingToApeAtoll.addStep(new Conditions(inHangar, talkedToDaeroAfterPuzzle), talkToWaydarAfterPuzzle);
+		gettingToApeAtoll.addStep(new Conditions(inHangar, solvedPuzzle), talkToDaeroAfterPuzzle);
+		gettingToApeAtoll.addStep(new Conditions(inHangar, startedPuzzle), clickPuzzle);
+		gettingToApeAtoll.addStep(new Conditions(startedPuzzle, inFloor1), talkToDaeroTravel);
+		gettingToApeAtoll.addStep(inHangar, talkToDaeroInHangar);
+		gettingToApeAtoll.addStep(new Conditions(reportedBackToNarnode, inFloor1), talkToDaero);
+		gettingToApeAtoll.addStep(reportedBackToNarnode, goUpToDaero);
+		gettingToApeAtoll.addStep(talkedToCaranock, talkToNarnodeAfterShipyard);
+		gettingToApeAtoll.addStep(inFloor3, flyGandius);
+		gettingToApeAtoll.addStep(inFloor2, goUpF2ToF3);
+		gettingToApeAtoll.addStep(inFloor1, goUpF1ToF2);
+		gettingToApeAtoll.addStep(inStronghold, goUpF0ToF1);
+
+		steps.put(1, gettingToApeAtoll);
+		steps.put(2, gettingToApeAtoll);
+
+		ConditionalStep gettingToGarkor = new ConditionalStep(this, goUpToDaero);
+		gettingToGarkor.addStep(new Conditions(talkedToGarkor, inMouldRoom, hasMonkeyDentures), searchForMould);
+		gettingToGarkor.addStep(new Conditions(talkedToGarkor, inDentureBuilding, hasMonkeyDentures), goDownFromDentures);
+		gettingToGarkor.addStep(new Conditions(talkedToGarkor, inDentureBuilding), searchForDentures);
+		gettingToGarkor.addStep(inPrison, leavePrison);
+		gettingToGarkor.addStep(new Conditions(onApeAtollNorth, talkedToGarkor), enterDentureBuilding);
+		gettingToGarkor.addStep(onApeAtollNorth, talkToGarkor);
+		gettingToGarkor.addStep(onApeAtollSouth, enterValley);
+		gettingToGarkor.addStep(onCrashIsland, talkToLumdoToReturn);
+		gettingToGarkor.addStep(inHangar, talkToWaydarAfterPuzzle);
+		gettingToGarkor.addStep(inFloor1, talkToDaeroTravel);
+
+		getAmuletParts = new ConditionalStep(this, gettingToGarkor);
+		getAmuletParts.setLockingCondition(hadDenturesAndMould);
+
+		makeBar = new ConditionalStep(this, goUpToDaeroForAmuletRun);
+		makeBar.addStep(new Conditions(inZooknockDungeon, givenDentures, givenMould, givenBar), talkToZooknock);
+		makeBar.addStep(new Conditions(inZooknockDungeon, givenDentures, givenMould), useBar);
+		makeBar.addStep(new Conditions(inZooknockDungeon, givenDentures), useMould);
+		makeBar.addStep(new Conditions(inZooknockDungeon, talkedToZooknock), useDentures);
+		makeBar.addStep(inZooknockDungeon, talkToZooknock);
+		makeBar.addStep(onApeAtollSouth, enterDungeonForAmuletRun);
+		makeBar.addStep(onCrashIsland, talkToLumdoForAmuletRun);
+		makeBar.addStep(inHangar, talkToWaydarForAmuletRun);
+		makeBar.addStep(inFloor1, talkToDaeroForAmuletRun);
+		makeBar.addStep(inMouldRoom, leaveToPrepareForBar);
+		makeBar.addStep(onApeAtollNorth, leaveToPrepareForBar);
+		makeBar.setLockingCondition(hadEnchantedBar);
+
+		makeAmulet = new ConditionalStep(this, goUpToDaeroForAmuletMake);
+		makeAmulet.addStep(hasUnstrungAmulet, useWool);
+		makeAmulet.addStep(inTempleDungeon, useBarOnFlame);
+		makeAmulet.addStep(onApeAtollNorth, enterTemple);
+		makeAmulet.addStep(onApeAtollSouth, enterValleyForAmuletMake);
+		makeAmulet.addStep(onCrashIsland, talkToLumdoForAmuletMake);
+		makeAmulet.addStep(inHangar, talkToWaydarForAmuletMake);
+		makeAmulet.addStep(inFloor1, talkToDaeroForAmuletMake);
+		makeAmulet.addStep(inZooknockDungeon, leaveToPrepareForAmulet);
+		makeAmulet.setLockingCondition(hasAmulet);
+
+		getTalisman = new ConditionalStep(this, leaveTempleDungeon);
+		getTalisman.addStep(onApeAtollNorth, talkToMonkeyChild);
+		getTalisman.setLockingCondition(hasTalisman);
+
+		makeTalisman = new ConditionalStep(this, goUpToDaeroForTalismanRun);
+		makeTalisman.addStep(new Conditions(inZooknockDungeon, givenTalisman, givenBones), talkToZooknockForTalisman);
+		makeTalisman.addStep(new Conditions(inZooknockDungeon, givenTalisman), useBones);
+		makeTalisman.addStep(new Conditions(inZooknockDungeon), useTalisman);
+		makeTalisman.addStep(onApeAtollSouth, enterDungeonForTalismanRun);
+		makeTalisman.addStep(onCrashIsland, talkToLumdoForTalismanRun);
+		makeTalisman.addStep(inHangar, talkToWaydarForTalismanRun);
+		makeTalisman.addStep(inFloor1, talkToDaeroForTalismanRun);
+		makeTalisman.addStep(inTempleDungeon, leaveToPrepareForTalismanRun);
+		makeTalisman.addStep(inMouldRoom, leaveToPrepareForTalismanRun);
+		makeTalisman.addStep(onApeAtollNorth, leaveToPrepareForTalismanRun);
+		makeTalisman.setLockingCondition(hasMonkeyTalismanMade);
+
+		ConditionalStep infiltratingTheMonkeys = new ConditionalStep(this, getAmuletParts);
+		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hasTalisman), makeTalisman);
+		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hasAmulet), getTalisman);
+		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hadEnchantedBar), makeAmulet);
+		infiltratingTheMonkeys.addStep(new Conditions(talkedToGarkor, hadDenturesAndMould), makeBar);
+
+		steps.put(3, infiltratingTheMonkeys);
+
+		// 127 5->6 for step 4 start
+
+		ConditionalStep bringMonkey = new ConditionalStep(this, goUpToDaeroForTalkingToAwow);
+		bringMonkey.addStep(new Conditions(inThroneRoom), talkToAwow);
+		bringMonkey.addStep(new Conditions(onApeAtollNorth, talkedToKruk), talkToAwow);
+		bringMonkey.addStep(new Conditions(onApeAtollOverBridge, talkedToGuard), talkToKruk);
+		bringMonkey.addStep(new Conditions(onApeAtollNorthBridge, talkedToGuard), goDownFromBridge);
+		bringMonkey.addStep(new Conditions(onApeAtollNorth, talkedToGuard), goUpToBridge);
+		bringMonkey.addStep(new Conditions(onApeAtollNorth, talkedToGarkorWithGreeGree), talkToGuard);
+		bringMonkey.addStep(onApeAtollNorth, talkToGarkorWithMonkey);
+		bringMonkey.addStep(onApeAtollSouth, enterGate);
+		bringMonkey.addStep(onCrashIsland, talkToLumdoForTalkingToAwow);
+		bringMonkey.addStep(inHangar, talkToWaydarForTalkingToAwow);
+		bringMonkey.addStep(inFloor1, talkToDaeroForTalkingToAwow);
+		bringMonkey.addStep(inMonkeyPen, talkToMinderAgain);
+
+		ConditionalStep bringingAMonkeyToAwow = new ConditionalStep(this, talkToMinder);
+		bringingAMonkeyToAwow.addStep(givenMonkey, talkToGarkorForSigil);
+		bringingAMonkeyToAwow.addStep(hasMonkey, bringMonkey);
+		bringingAMonkeyToAwow.addStep(inMonkeyPen, talkToMonkeyAtZoo);
+		bringingAMonkeyToAwow.addStep(inZooknockDungeon, leaveDungeonWithGreeGree);
+
+		steps.put(4, bringingAMonkeyToAwow);
+
+		ConditionalStep getSigil = new ConditionalStep(this, talkToGarkorForSigil);
+		getSigil.addStep(inJungleDemonRoom, killDemon);
+		getSigil.addStep(gotSigil, prepareForBattle);
+
+		steps.put(5, getSigil);
+
+		steps.put(6, talkToNarnodeToFinish);
+		steps.put(7, talkToNarnodeToFinish);
+
+		return steps;
 	}
 }
 

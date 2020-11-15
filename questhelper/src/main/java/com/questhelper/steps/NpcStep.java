@@ -25,6 +25,9 @@
  */
 package com.questhelper.steps;
 
+import com.questhelper.QuestHelperPlugin;
+import static com.questhelper.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
+import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -48,26 +51,18 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.eventbus.Subscribe;
-import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.QuestHelperPlugin;
-import static com.questhelper.QuestHelperWorldOverlay.IMAGE_Z_OFFSET;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class NpcStep extends DetailedQuestStep
 {
-	@Inject
-	protected Client client;
-
 	private final int npcID;
 	private final ArrayList<Integer> alternateNpcIDs = new ArrayList<>();
-
+	@Inject
+	protected Client client;
+	protected BufferedImage npcIcon;
 	private boolean allowMultipleHighlights;
-
 	private NPC npc;
 	private ArrayList<NPC> otherNpcs = new ArrayList<>();
-
-	protected BufferedImage npcIcon;
-
 	@Setter
 	private int maxRoamRange = 48;
 
@@ -116,11 +111,6 @@ public class NpcStep extends DetailedQuestStep
 		}
 	}
 
-	public void addAlternateNpcs(Integer... alternateNpcIDs)
-	{
-		this.alternateNpcIDs.addAll(Arrays.asList(alternateNpcIDs));
-	}
-
 	@Override
 	public void shutDown()
 	{
@@ -139,53 +129,6 @@ public class NpcStep extends DetailedQuestStep
 			npc = null;
 			otherNpcs.clear();
 		}
-	}
-
-	@Subscribe
-	public void onNpcSpawned(NpcSpawned event)
-	{
-		if (event.getNpc().getId() == npcID || alternateNpcIDs.contains(event.getNpc().getId()))
-		{
-			WorldPoint npcPoint = WorldPoint.fromLocalInstance(client, event.getNpc().getLocalLocation());
-			if (npc == null)
-			{
-				if (worldPoint == null)
-				{
-					npc = event.getNpc();
-				}
-				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
-				{
-					npc = event.getNpc();
-				}
-			}
-			else if (allowMultipleHighlights)
-			{
-				if (worldPoint == null)
-				{
-					npc = event.getNpc();
-				}
-				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
-				{
-					otherNpcs.add(event.getNpc());
-				}
-			}
-		}
-	}
-
-	@Subscribe
-	public void onNpcDespawned(NpcDespawned event)
-	{
-		if (event.getNpc().equals(npc))
-		{
-			npc = null;
-			if (allowMultipleHighlights && !otherNpcs.isEmpty())
-			{
-				npc = otherNpcs.get(0);
-				otherNpcs.remove(0);
-			}
-		}
-
-		otherNpcs.remove(event.getNpc());
 	}
 
 	@Override
@@ -296,5 +239,57 @@ public class NpcStep extends DetailedQuestStep
 		}
 
 		graphics.drawImage(getSmallArrow(), posOnMinimap.getX() - 5, posOnMinimap.getY() - 14, null);
+	}
+
+	public void addAlternateNpcs(Integer... alternateNpcIDs)
+	{
+		this.alternateNpcIDs.addAll(Arrays.asList(alternateNpcIDs));
+	}
+
+	@Subscribe
+	public void onNpcSpawned(NpcSpawned event)
+	{
+		if (event.getNpc().getId() == npcID || alternateNpcIDs.contains(event.getNpc().getId()))
+		{
+			WorldPoint npcPoint = WorldPoint.fromLocalInstance(client, event.getNpc().getLocalLocation());
+			if (npc == null)
+			{
+				if (worldPoint == null)
+				{
+					npc = event.getNpc();
+				}
+				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
+				{
+					npc = event.getNpc();
+				}
+			}
+			else if (allowMultipleHighlights)
+			{
+				if (worldPoint == null)
+				{
+					npc = event.getNpc();
+				}
+				else if (npcPoint.distanceTo(worldPoint) < maxRoamRange)
+				{
+					otherNpcs.add(event.getNpc());
+				}
+			}
+		}
+	}
+
+	@Subscribe
+	public void onNpcDespawned(NpcDespawned event)
+	{
+		if (event.getNpc().equals(npc))
+		{
+			npc = null;
+			if (allowMultipleHighlights && !otherNpcs.isEmpty())
+			{
+				npc = otherNpcs.get(0);
+				otherNpcs.remove(0);
+			}
+		}
+
+		otherNpcs.remove(event.getNpc());
 	}
 }

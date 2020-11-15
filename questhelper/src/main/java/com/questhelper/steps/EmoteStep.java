@@ -38,8 +38,8 @@ import net.runelite.api.widgets.WidgetInfo;
 
 public class EmoteStep extends DetailedQuestStep
 {
-	private boolean hasScrolled;
 	private final QuestEmote emote;
+	private boolean hasScrolled;
 
 	public EmoteStep(QuestHelper questHelper, QuestEmote emote, String text, Requirement... requirements)
 	{

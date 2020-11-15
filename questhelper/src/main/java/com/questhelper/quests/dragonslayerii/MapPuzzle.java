@@ -40,29 +40,29 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.FontManager;
 
 /* Approach:
-* 1. Arrow pointing what to grab and where to move it to. Do for all pieces
-* 2. Once all pieces in place, highlight all which need rotating */
+ * 1. Arrow pointing what to grab and where to move it to. Do for all pieces
+ * 2. Once all pieces in place, highlight all which need rotating */
 public class MapPuzzle extends QuestStep
 {
 	int[] currentPositionsVarbits =
 		{
-			6156, 6168, 6159, 6178,   -1, 6203,
+			6156, 6168, 6159, 6178, -1, 6203,
 			6173, 6167, 6158, 6169, 6208, 6199,
-			6204, 6174, 6183, 6176, 6162,   -1,
-			-1,   6179,   -1, 6180, 6182, 6175,
+			6204, 6174, 6183, 6176, 6162, -1,
+			-1, 6179, -1, 6180, 6182, 6175,
 			6184, 6170, 6209, 6190, 6191, 6216,
-			  -1, 6217, 6198, 6171, 6200, 6211
+			-1, 6217, 6198, 6171, 6200, 6211
 		};
 
 
 	int[] currentRotationVarbits =
 		{
-			6166, 6172, 6177, 6181,   -1, 6197,
+			6166, 6172, 6177, 6181, -1, 6197,
 			6201, 6202, 6160, 6161, 6163, 6164,
-			6165, 6205, 6206, 6207, 6185,   -1,
-			  -1, 6186,   -1, 6187, 6188, 6189,
+			6165, 6205, 6206, 6207, 6185, -1,
+			-1, 6186, -1, 6187, 6188, 6189,
 			6210, 6212, 6213, 6214, 6215, 6192,
-			  -1, 6193, 6194, 6195, 6196, 6218
+			-1, 6193, 6194, 6195, 6196, 6218
 		};
 
 	int[] currentRotationValue = new int[36];
@@ -87,64 +87,9 @@ public class MapPuzzle extends QuestStep
 		updateSolvedPositionState();
 	}
 
-	private void updateSolvedPositionState()
-	{
-		int[] currentTilePositions = new int[36];
-		int[] currentRotationValueTmp = new int[36];
-
-		int nullSlotsPassed = 0;
-
-		for (int i=0; i < 36; i++)
-		{
-			// Tile values start from 1 rather than 0, so -1 for simplicity
-			if (currentPositionsVarbits[i] == -1)
-			{
-				nullSlotsPassed++;
-				continue;
-			}
-
-			currentTilePositions[i] = client.getVarbitValue(currentPositionsVarbits[i]) - 1;
-
-			int expectedTileValue = i - nullSlotsPassed;
-			if (currentTilePositions[i] != expectedTileValue)
-			{
-				firstTileForSwapping = i;
-				for (int j = i+1; j < 36; j++)
-				{
-					if (currentPositionsVarbits[j] == -1)
-					{
-						nullSlotsPassed++;
-						continue;
-					}
-					currentTilePositions[j] = client.getVarbitValue(currentPositionsVarbits[j]) - 1;
-					if (currentTilePositions[j] == expectedTileValue)
-					{
-						secondTileForSwapping = j;
-						setText("Drag to swap the highlighted tiles.");
-						return;
-					}
-				}
-			}
-		}
-
-		firstTileForSwapping = -1;
-		secondTileForSwapping = -1;
-
-		for (int i=0; i < 36; i++)
-		{
-			if (currentRotationVarbits[i] == -1)
-			{
-				currentRotationValueTmp[i] = 0;
-				continue;
-			}
-			currentRotationValueTmp[i] = client.getVarbitValue(currentRotationVarbits[i]);
-		}
-		currentRotationValue = currentRotationValueTmp;
-		setText("Click the highlighted tiles to rotate them to complete the puzzle.");
-	}
-
 	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin) {
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
 		super.makeWidgetOverlayHint(graphics, plugin);
 		Widget widgetWrapper = client.getWidget(305, 2);
 		if (widgetWrapper != null)
@@ -198,18 +143,75 @@ public class MapPuzzle extends QuestStep
 		}
 	}
 
-	private void drawArrowHead(Graphics2D g2d, Line2D.Double line) {
+	private void updateSolvedPositionState()
+	{
+		int[] currentTilePositions = new int[36];
+		int[] currentRotationValueTmp = new int[36];
+
+		int nullSlotsPassed = 0;
+
+		for (int i = 0; i < 36; i++)
+		{
+			// Tile values start from 1 rather than 0, so -1 for simplicity
+			if (currentPositionsVarbits[i] == -1)
+			{
+				nullSlotsPassed++;
+				continue;
+			}
+
+			currentTilePositions[i] = client.getVarbitValue(currentPositionsVarbits[i]) - 1;
+
+			int expectedTileValue = i - nullSlotsPassed;
+			if (currentTilePositions[i] != expectedTileValue)
+			{
+				firstTileForSwapping = i;
+				for (int j = i + 1; j < 36; j++)
+				{
+					if (currentPositionsVarbits[j] == -1)
+					{
+						nullSlotsPassed++;
+						continue;
+					}
+					currentTilePositions[j] = client.getVarbitValue(currentPositionsVarbits[j]) - 1;
+					if (currentTilePositions[j] == expectedTileValue)
+					{
+						secondTileForSwapping = j;
+						setText("Drag to swap the highlighted tiles.");
+						return;
+					}
+				}
+			}
+		}
+
+		firstTileForSwapping = -1;
+		secondTileForSwapping = -1;
+
+		for (int i = 0; i < 36; i++)
+		{
+			if (currentRotationVarbits[i] == -1)
+			{
+				currentRotationValueTmp[i] = 0;
+				continue;
+			}
+			currentRotationValueTmp[i] = client.getVarbitValue(currentRotationVarbits[i]);
+		}
+		currentRotationValue = currentRotationValueTmp;
+		setText("Click the highlighted tiles to rotate them to complete the puzzle.");
+	}
+
+	private void drawArrowHead(Graphics2D g2d, Line2D.Double line)
+	{
 		AffineTransform tx = new AffineTransform();
 
 		Polygon arrowHead = new Polygon();
-		arrowHead.addPoint( 0,4);
-		arrowHead.addPoint( -6, -5);
-		arrowHead.addPoint( 6,-5);
+		arrowHead.addPoint(0, 4);
+		arrowHead.addPoint(-6, -5);
+		arrowHead.addPoint(6, -5);
 
 		tx.setToIdentity();
-		double angle = Math.atan2(line.y2-line.y1, line.x2-line.x1);
+		double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
 		tx.translate(line.x2, line.y2);
-		tx.rotate((angle-Math.PI/2d));
+		tx.rotate((angle - Math.PI / 2d));
 
 		Graphics2D g = (Graphics2D) g2d.create();
 		g.setTransform(tx);

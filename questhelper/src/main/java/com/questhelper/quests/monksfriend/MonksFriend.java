@@ -24,10 +24,21 @@
  */
 package com.questhelper.quests.monksfriend;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
+import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,17 +48,6 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MONKS_FRIEND
@@ -63,51 +63,27 @@ public class MonksFriend extends BasicQuestHelper
 
 	Zone dungeon;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
+	public void setupItemRequirements()
 	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToOmad);
-
-		ConditionalStep getBlanket = new ConditionalStep(this, goDownLadder);
-		getBlanket.addStep(new Conditions(inDungeon, hasBlanket), goUpLadder);
-		getBlanket.addStep(hasBlanket, returnToOmadWithBlanket);
-		getBlanket.addStep(inDungeon, grabBlanket);
-
-		steps.put(10, getBlanket);
-
-		steps.put(20, talkToOmadAgain);
-		steps.put(30, talkToCedric);
-		steps.put(40, talkToCedricWithJug);
-		steps.put(50, continueTalkingToCedric);
-		steps.put(60, talkToCedricWithLog);
-		steps.put(70, finishQuest);
-
-		return steps;
-	}
-
-	public void setupItemRequirements() {
 		log = new ItemRequirement("Logs", ItemID.LOGS);
 		jugOfWater = new ItemRequirement("Jug of Water", ItemID.JUG_OF_WATER);
 		blanket = new ItemRequirement("Child's blanket", ItemID.CHILDS_BLANKET);
 		ardougneCloak = new ItemRequirement("Ardougne cloak 1 or higher for teleports to the monastery", ItemID.ARDOUGNE_CLOAK);
 	}
 
-	public void loadZones() {
+	public void loadZones()
+	{
 		dungeon = new Zone(new WorldPoint(2559, 9597, 0), new WorldPoint(2582, 9623, 0));
 	}
 
-	public void setupConditions() {
+	public void setupConditions()
+	{
 		inDungeon = new ZoneCondition(dungeon);
 		hasBlanket = new ItemRequirementCondition(blanket);
 	}
 
-	public void setupSteps() {
+	public void setupSteps()
+	{
 		talkToOmad = new NpcStep(this, NpcID.BROTHER_OMAD, new WorldPoint(2607, 3211, 0), "Talk to Brother Omad in the monastery south of West Ardougne.");
 		talkToOmad.addDialogStep("Why can't you sleep, what's wrong?");
 		talkToOmad.addDialogStep("Can I help at all?");
@@ -154,5 +130,33 @@ public class MonksFriend extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Help Cedric", new ArrayList<>(Arrays.asList(talkToOmadAgain, talkToCedric, talkToCedricWithJug, talkToCedricWithLog, finishQuest))));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToOmad);
+
+		ConditionalStep getBlanket = new ConditionalStep(this, goDownLadder);
+		getBlanket.addStep(new Conditions(inDungeon, hasBlanket), goUpLadder);
+		getBlanket.addStep(hasBlanket, returnToOmadWithBlanket);
+		getBlanket.addStep(inDungeon, grabBlanket);
+
+		steps.put(10, getBlanket);
+
+		steps.put(20, talkToOmadAgain);
+		steps.put(30, talkToCedric);
+		steps.put(40, talkToCedricWithJug);
+		steps.put(50, continueTalkingToCedric);
+		steps.put(60, talkToCedricWithLog);
+		steps.put(70, finishQuest);
+
+		return steps;
 	}
 }

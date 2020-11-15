@@ -24,22 +24,22 @@
  */
 package com.questhelper.quests.runemysteries;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -57,38 +57,6 @@ public class RuneMysteries extends BasicQuestHelper
 	QuestStep goUpToHoracio, talkToHoracio, goDownToSedridor, talkToSedridor, finishTalkingToSedridor, talkToAubury, talkToAudburyAgain, goDownToSedridor2, talkToSedridor2;
 
 	Zone wizardBasement, upstairsLumbridge;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goTalkToHoracio = new ConditionalStep(this, goUpToHoracio);
-		goTalkToHoracio.addStep(inUpstairsLumbridge, talkToHoracio);
-
-		steps.put(0, goTalkToHoracio);
-
-		ConditionalStep goTalkToSedridor = new ConditionalStep(this, goDownToSedridor);
-		goTalkToSedridor.addStep(inWizardBasement, talkToSedridor);
-
-		steps.put(1, goTalkToSedridor);
-
-		steps.put(2, finishTalkingToSedridor);
-
-		steps.put(3, talkToAubury);
-
-		steps.put(4, talkToAudburyAgain);
-
-		ConditionalStep goTalkToSedridor2 = new ConditionalStep(this, goDownToSedridor2);
-		goTalkToSedridor2.addStep(inWizardBasement, talkToSedridor2);
-		steps.put(5, goTalkToSedridor2);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -122,10 +90,10 @@ public class RuneMysteries extends BasicQuestHelper
 		talkToHoracio.addDialogStep("Sure, no problem.");
 		talkToHoracio.addSubSteps(goUpToHoracio);
 
-		goDownToSedridor =  new ObjectStep(this, ObjectID.LADDER_2147, new WorldPoint(3104, 3162, 0), "Bring the Air Talisman to Sedridor in the Wizard Tower's basement.", airTalisman);
+		goDownToSedridor = new ObjectStep(this, ObjectID.LADDER_2147, new WorldPoint(3104, 3162, 0), "Bring the Air Talisman to Sedridor in the Wizard Tower's basement.", airTalisman);
 		goDownToSedridor.addDialogStep("Have you any quests for me?");
 
-		talkToSedridor =  new NpcStep(this, NpcID.SEDRIDOR, new WorldPoint(3104, 9571, 0), "Bring the Air Talisman to Sedridor in the Wizard Tower's basement.", airTalisman);
+		talkToSedridor = new NpcStep(this, NpcID.SEDRIDOR, new WorldPoint(3104, 9571, 0), "Bring the Air Talisman to Sedridor in the Wizard Tower's basement.", airTalisman);
 		talkToSedridor.addDialogStep("I'm looking for the head wizard.");
 		talkToSedridor.addDialogStep("Ok, here you are.");
 
@@ -138,8 +106,8 @@ public class RuneMysteries extends BasicQuestHelper
 		talkToAubury.addDialogStep("I have been sent here with a package for you.");
 		talkToAudburyAgain = new NpcStep(this, NpcID.AUBURY, new WorldPoint(3253, 3401, 0), "Talk to Aubury again in south east Varrock.");
 
-		goDownToSedridor2 =  new ObjectStep(this, ObjectID.LADDER_2147, new WorldPoint(3104, 3162, 0), "Bring the research notes to Sedridor in the Wizard Tower's basement.", notes);
-		talkToSedridor2 =  new NpcStep(this, NpcID.SEDRIDOR, new WorldPoint(3104, 9571, 0), "Bring the notes to Sedridor in the Wizard Tower's basement.", notes);
+		goDownToSedridor2 = new ObjectStep(this, ObjectID.LADDER_2147, new WorldPoint(3104, 3162, 0), "Bring the research notes to Sedridor in the Wizard Tower's basement.", notes);
+		talkToSedridor2 = new NpcStep(this, NpcID.SEDRIDOR, new WorldPoint(3104, 9571, 0), "Bring the notes to Sedridor in the Wizard Tower's basement.", notes);
 		talkToSedridor2.addSubSteps(goDownToSedridor2);
 	}
 
@@ -159,5 +127,37 @@ public class RuneMysteries extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Discover Runecrafting", new ArrayList<>(Arrays.asList(talkToHoracio, talkToSedridor, talkToAubury, talkToAudburyAgain, talkToSedridor2))));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goTalkToHoracio = new ConditionalStep(this, goUpToHoracio);
+		goTalkToHoracio.addStep(inUpstairsLumbridge, talkToHoracio);
+
+		steps.put(0, goTalkToHoracio);
+
+		ConditionalStep goTalkToSedridor = new ConditionalStep(this, goDownToSedridor);
+		goTalkToSedridor.addStep(inWizardBasement, talkToSedridor);
+
+		steps.put(1, goTalkToSedridor);
+
+		steps.put(2, finishTalkingToSedridor);
+
+		steps.put(3, talkToAubury);
+
+		steps.put(4, talkToAudburyAgain);
+
+		ConditionalStep goTalkToSedridor2 = new ConditionalStep(this, goDownToSedridor2);
+		goTalkToSedridor2.addStep(inWizardBasement, talkToSedridor2);
+		steps.put(5, goTalkToSedridor2);
+
+		return steps;
 	}
 }

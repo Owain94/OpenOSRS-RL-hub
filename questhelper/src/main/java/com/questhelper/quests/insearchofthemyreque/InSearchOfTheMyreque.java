@@ -73,104 +73,6 @@ public class InSearchOfTheMyreque extends BasicQuestHelper
 
 	Zone entranceIsland, bridge, caves, myrequeCave;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToVanstrom);
-
-		ConditionalStep goTalkToCyreg = new ConditionalStep(this, fillDruidPouch);
-		goTalkToCyreg.addStep(hasEnoughPouch, talkToCyreg);
-		steps.put(5, goTalkToCyreg);
-		steps.put(10, goTalkToCyreg);
-		steps.put(15, goTalkToCyreg);
-
-		steps.put(20, boardBoat);
-
-		ConditionalStep goTalkToCurpile = new ConditionalStep(this, climbTree);
-		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion6), talkToCurpile6);
-		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion5), talkToCurpile5);
-		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion4), talkToCurpile4);
-		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion3), talkToCurpile3);
-		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion2), talkToCurpile2);
-		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion1), talkToCurpile1);
-		goTalkToCurpile.addStep(new Conditions(onEntranceIsland), talkToCurpile);
-		goTalkToCurpile.addStep(new Conditions(onBridge, repairedBridge2), repairBridge3);
-		goTalkToCurpile.addStep(new Conditions(onBridge, repairedBridge1), repairBridge2);
-		goTalkToCurpile.addStep(onBridge, repairBridge1);
-		goTalkToCurpile.addStep(repairedBridge3, climbTree4);
-		goTalkToCurpile.addStep(repairedBridge2, climbTree3);
-		goTalkToCurpile.addStep(repairedBridge1, climbTree2);
-		steps.put(25, goTalkToCurpile);
-		steps.put(52, goTalkToCurpile);
-
-		ConditionalStep goTalkToVeliaf = new ConditionalStep(this, climbTree4);
-		goTalkToVeliaf.addStep(inMyrequeCave, talkToVeliaf);
-		goTalkToVeliaf.addStep(inCaves, enterCave);
-		goTalkToVeliaf.addStep(onEntranceIsland, enterDoors);
-		steps.put(55, goTalkToVeliaf);
-		steps.put(60, goTalkToVeliaf);
-
-		ConditionalStep talkToCrew = new ConditionalStep(this, climbTree4);
-		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad, talkedToSani, talkedToPolmafi, talkedToIvan), talkToVeliafAgain);
-		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad, talkedToSani, talkedToPolmafi), talkToIvan);
-		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad, talkedToSani), talkToPolmafi);
-		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad), talkToSani);
-		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold), talkToRadigad);
-		talkToCrew.addStep(inMyrequeCave, talkToHarold);
-		talkToCrew.addStep(inCaves, enterCave);
-		talkToCrew.addStep(onEntranceIsland, enterDoors);
-		steps.put(65, talkToCrew);
-
-		ConditionalStep goTalkToVeliafAgain = new ConditionalStep(this, climbTree4);
-		goTalkToVeliafAgain.addStep(inMyrequeCave, talkToVeliafForCutscene);
-		goTalkToVeliafAgain.addStep(inCaves, enterCave);
-		goTalkToVeliafAgain.addStep(onEntranceIsland, enterDoors);
-		steps.put(67, goTalkToVeliafAgain);
-		steps.put(70, goTalkToVeliafAgain);
-
-		ConditionalStep goKillSkeletonHellhound = new ConditionalStep(this, climbTreeHellhound);
-		goKillSkeletonHellhound.addStep(inMyrequeCave, killHellhound);
-		goKillSkeletonHellhound.addStep(inCaves, enterCaveHellhound);
-		goKillSkeletonHellhound.addStep(onEntranceIsland, enterDoorsHellhound);
-		steps.put(71, goKillSkeletonHellhound);
-		steps.put(72, goKillSkeletonHellhound);
-		steps.put(73, goKillSkeletonHellhound);
-		steps.put(74, goKillSkeletonHellhound);
-		steps.put(75, goKillSkeletonHellhound);
-		steps.put(76, goKillSkeletonHellhound);
-		steps.put(77, goKillSkeletonHellhound);
-		steps.put(78, goKillSkeletonHellhound);
-		steps.put(79, goKillSkeletonHellhound);
-		steps.put(80, goKillSkeletonHellhound);
-
-		ConditionalStep goLearnExit = new ConditionalStep(this, climbTreeLeave);
-		goLearnExit.addStep(inMyrequeCave, talkToVeliafToLeave);
-		goLearnExit.addStep(inCaves, enterCaveLeave);
-		goLearnExit.addStep(onEntranceIsland, enterDoorsLeave);
-		steps.put(85, goLearnExit);
-
-		ConditionalStep tryLeavingExit = new ConditionalStep(this, climbTreeLeave);
-		tryLeavingExit.addStep(inMyrequeCave, leaveCave);
-		tryLeavingExit.addStep(inCaves, goUpToCanifis);
-		tryLeavingExit.addStep(onEntranceIsland, enterDoorsLeave);
-		steps.put(90, tryLeavingExit);
-		steps.put(95, tryLeavingExit);
-
-		ConditionalStep finishingOff = new ConditionalStep(this, talkToStranger);
-		finishingOff.addStep(inMyrequeCave, leaveCave);
-		finishingOff.addStep(inCaves, goUpToCanifis);
-		steps.put(97, finishingOff);
-		steps.put(100, finishingOff);
-		steps.put(105, finishingOff);
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		steelLong = new ItemRequirement("Steel longsword", ItemID.STEEL_LONGSWORD);
@@ -221,11 +123,11 @@ public class InSearchOfTheMyreque extends BasicQuestHelper
 		onQuestion5 = new WidgetTextCondition(219, 1, 0, "vampyre");
 		onQuestion6 = new WidgetTextCondition(219, 1, 0, "scholar");
 
-		talkedToSani    = new VarbitCondition(2496, true, 0);
-		talkedToHarold  = new VarbitCondition(2496, true, 1);
+		talkedToSani = new VarbitCondition(2496, true, 0);
+		talkedToHarold = new VarbitCondition(2496, true, 1);
 		talkedToRadigad = new VarbitCondition(2496, true, 2);
 		talkedToPolmafi = new VarbitCondition(2496, true, 3);
-		talkedToIvan    = new VarbitCondition(2496, true, 4);
+		talkedToIvan = new VarbitCondition(2496, true, 4);
 	}
 
 	public void setupSteps()
@@ -324,15 +226,15 @@ public class InSearchOfTheMyreque extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getNotes()
-	{
-		return new ArrayList<>(Collections.singletonList("Whilst in Mort Myre, the Ghasts will occasionally rot the food in your inventory and steal charges from your Druid Pouch."));
-	}
-
-	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Collections.singletonList("Skeleton hellhound (level 97)"));
+	}
+
+	@Override
+	public ArrayList<String> getNotes()
+	{
+		return new ArrayList<>(Collections.singletonList("Whilst in Mort Myre, the Ghasts will occasionally rot the food in your inventory and steal charges from your Druid Pouch."));
 	}
 
 	@Override
@@ -345,5 +247,103 @@ public class InSearchOfTheMyreque extends BasicQuestHelper
 			steelLong, steelSword2, steelMace, steelWarhammer, steeldagger, steelNails225, coins10OrCharos, druidPouch5, hammer, plank6));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToVanstrom);
+
+		ConditionalStep goTalkToCyreg = new ConditionalStep(this, fillDruidPouch);
+		goTalkToCyreg.addStep(hasEnoughPouch, talkToCyreg);
+		steps.put(5, goTalkToCyreg);
+		steps.put(10, goTalkToCyreg);
+		steps.put(15, goTalkToCyreg);
+
+		steps.put(20, boardBoat);
+
+		ConditionalStep goTalkToCurpile = new ConditionalStep(this, climbTree);
+		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion6), talkToCurpile6);
+		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion5), talkToCurpile5);
+		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion4), talkToCurpile4);
+		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion3), talkToCurpile3);
+		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion2), talkToCurpile2);
+		goTalkToCurpile.addStep(new Conditions(onEntranceIsland, onQuestion1), talkToCurpile1);
+		goTalkToCurpile.addStep(new Conditions(onEntranceIsland), talkToCurpile);
+		goTalkToCurpile.addStep(new Conditions(onBridge, repairedBridge2), repairBridge3);
+		goTalkToCurpile.addStep(new Conditions(onBridge, repairedBridge1), repairBridge2);
+		goTalkToCurpile.addStep(onBridge, repairBridge1);
+		goTalkToCurpile.addStep(repairedBridge3, climbTree4);
+		goTalkToCurpile.addStep(repairedBridge2, climbTree3);
+		goTalkToCurpile.addStep(repairedBridge1, climbTree2);
+		steps.put(25, goTalkToCurpile);
+		steps.put(52, goTalkToCurpile);
+
+		ConditionalStep goTalkToVeliaf = new ConditionalStep(this, climbTree4);
+		goTalkToVeliaf.addStep(inMyrequeCave, talkToVeliaf);
+		goTalkToVeliaf.addStep(inCaves, enterCave);
+		goTalkToVeliaf.addStep(onEntranceIsland, enterDoors);
+		steps.put(55, goTalkToVeliaf);
+		steps.put(60, goTalkToVeliaf);
+
+		ConditionalStep talkToCrew = new ConditionalStep(this, climbTree4);
+		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad, talkedToSani, talkedToPolmafi, talkedToIvan), talkToVeliafAgain);
+		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad, talkedToSani, talkedToPolmafi), talkToIvan);
+		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad, talkedToSani), talkToPolmafi);
+		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold, talkedToRadigad), talkToSani);
+		talkToCrew.addStep(new Conditions(inMyrequeCave, talkedToHarold), talkToRadigad);
+		talkToCrew.addStep(inMyrequeCave, talkToHarold);
+		talkToCrew.addStep(inCaves, enterCave);
+		talkToCrew.addStep(onEntranceIsland, enterDoors);
+		steps.put(65, talkToCrew);
+
+		ConditionalStep goTalkToVeliafAgain = new ConditionalStep(this, climbTree4);
+		goTalkToVeliafAgain.addStep(inMyrequeCave, talkToVeliafForCutscene);
+		goTalkToVeliafAgain.addStep(inCaves, enterCave);
+		goTalkToVeliafAgain.addStep(onEntranceIsland, enterDoors);
+		steps.put(67, goTalkToVeliafAgain);
+		steps.put(70, goTalkToVeliafAgain);
+
+		ConditionalStep goKillSkeletonHellhound = new ConditionalStep(this, climbTreeHellhound);
+		goKillSkeletonHellhound.addStep(inMyrequeCave, killHellhound);
+		goKillSkeletonHellhound.addStep(inCaves, enterCaveHellhound);
+		goKillSkeletonHellhound.addStep(onEntranceIsland, enterDoorsHellhound);
+		steps.put(71, goKillSkeletonHellhound);
+		steps.put(72, goKillSkeletonHellhound);
+		steps.put(73, goKillSkeletonHellhound);
+		steps.put(74, goKillSkeletonHellhound);
+		steps.put(75, goKillSkeletonHellhound);
+		steps.put(76, goKillSkeletonHellhound);
+		steps.put(77, goKillSkeletonHellhound);
+		steps.put(78, goKillSkeletonHellhound);
+		steps.put(79, goKillSkeletonHellhound);
+		steps.put(80, goKillSkeletonHellhound);
+
+		ConditionalStep goLearnExit = new ConditionalStep(this, climbTreeLeave);
+		goLearnExit.addStep(inMyrequeCave, talkToVeliafToLeave);
+		goLearnExit.addStep(inCaves, enterCaveLeave);
+		goLearnExit.addStep(onEntranceIsland, enterDoorsLeave);
+		steps.put(85, goLearnExit);
+
+		ConditionalStep tryLeavingExit = new ConditionalStep(this, climbTreeLeave);
+		tryLeavingExit.addStep(inMyrequeCave, leaveCave);
+		tryLeavingExit.addStep(inCaves, goUpToCanifis);
+		tryLeavingExit.addStep(onEntranceIsland, enterDoorsLeave);
+		steps.put(90, tryLeavingExit);
+		steps.put(95, tryLeavingExit);
+
+		ConditionalStep finishingOff = new ConditionalStep(this, talkToStranger);
+		finishingOff.addStep(inMyrequeCave, leaveCave);
+		finishingOff.addStep(inCaves, goUpToCanifis);
+		steps.put(97, finishingOff);
+		steps.put(100, finishingOff);
+		steps.put(105, finishingOff);
+		return steps;
 	}
 }

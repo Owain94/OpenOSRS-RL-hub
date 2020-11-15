@@ -24,10 +24,18 @@
  */
 package com.questhelper.quests.mourningsendpartii;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -46,14 +54,6 @@ import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -129,270 +129,6 @@ public class MourningsEndPartII extends BasicQuestHelper
 
 	Zone mournerHQ, mournerHQ2, mournerBasement, cave, templeF0, templeF1, northTempleF2, southTempleF2, northRoomF2, templeStairSquare, blueRoom, yellowRoom1, yellowRoom2, cyanRoom1,
 		cyanRoom2, deathAltarArea, centralArea, centralAreaBehindBarrier, ibanRoom, wellEntrance, passF1, passF0, deathAltar;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToArianwyn);
-
-		ConditionalStep goTalkToEssyllt = new ConditionalStep(this, enterMournerHQ);
-		goTalkToEssyllt.addStep(inMournerBasement, talkToEssyllt);
-		goTalkToEssyllt.addStep(inMournerHQ, enterMournerBasement);
-
-		steps.put(5, goTalkToEssyllt);
-
-		ConditionalStep getCrystal = new ConditionalStep(this, enterMournerHQ);
-		getCrystal.addStep(hasBlackenedCrystal, bringCrystalToArianwyn);
-		getCrystal.addStep(inNorthF2, useChisel);
-		getCrystal.addStep(inTempleStairSquare, goUpFromMiddleToNorth);
-		getCrystal.addStep(inSouthF2, goToMiddleFromSouth);
-		getCrystal.addStep(inTempleF1, goUpSouthLadder);
-		getCrystal.addStep(inCaveOrF0, goUpStairsTemple);
-		getCrystal.addStep(inMournerBasement, enterCave);
-		getCrystal.addStep(inMournerHQ, enterMournerBasement);
-
-		steps.put(10, getCrystal);
-		steps.put(15, getCrystal);
-		steps.put(20, getCrystal);
-
-		steps.put(30, talkToElunedAfterGivingCrystal);
-
-		ConditionalStep puzzle1 = new ConditionalStep(this, goBackIntoMournerHQ);
-		puzzle1.addStep(new Conditions(inBlueRoom, f1r0c3EY), searchBlueChest);
-		puzzle1.addStep(new Conditions(inTempleF1, f1r0c3EY), climbWallSupport);
-		puzzle1.addStep(new Conditions(inTempleF1, f1r1c3SY), puzzle1Pillar5);
-		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c3S), puzzle1Pillar4);
-		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle1Pillar3);
-		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle1Pillar2);
-		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle1Pillar1);
-		puzzle1.addStep(inTempleF1, pullDispenser1);
-		puzzle1.addStep(inTempleF2, genericGoDownToFloor1);
-		puzzle1.addStep(inTempleF0, goUpStairsTempleC1);
-		puzzle1.addStep(inCave, enterTempleOfLight);
-		puzzle1.addStep(inMournerBasement, goBackIntoMournerCave);
-		puzzle1.addStep(inMournerHQ, goBackIntoMournerBasement);
-		puzzle1.setLockingCondition(solvedPuzzle1);
-
-		ConditionalStep puzzle2 = new ConditionalStep(this, goBackIntoMournerHQ);
-		puzzle2.addStep(new Conditions(inTempleF1, f1r4c3EG), searchMagentaChest);
-		puzzle2.addStep(new Conditions(inTempleF1, f1r4c2EC), puzzle2Pillar6);
-		puzzle2.addStep(new Conditions(inTempleF1, f1r3c2NC), puzzle2Pillar5);
-		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c3WC), puzzle2Pillar4);
-		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle2Pillar3);
-		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle2Pillar2);
-		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle2Pillar1);
-		puzzle2.addStep(inTempleF1, pullDispenser2);
-		puzzle2.addStep(inTempleF2, genericGoDownToFloor1);
-		puzzle2.addStep(inTempleF0, genericGoUpToFloor1);
-		puzzle2.addStep(inCave, enterTempleOfLight);
-		puzzle2.addStep(inMournerBasement, goBackIntoMournerCave);
-		puzzle2.addStep(inMournerHQ, goBackIntoMournerBasement);
-		puzzle2.setLockingCondition(solvedPuzzle2);
-
-		ConditionalStep puzzle3 = new ConditionalStep(this, goBackIntoMournerHQ);
-		puzzle3.addStep(new Conditions(inYellowRoom, f0r4c0SB), searchYellowChest);
-		puzzle3.addStep(new Conditions(inTempleF0, f0r4c0SB), pullDispenser3);
-		puzzle3.addStep(new Conditions(inYellowRoom, f2r4c0DB), puzzle3Pillar9);
-		puzzle3.addStep(new Conditions(inTempleF0, f2r4c0DB), enterNorthWestRoomPuzzle3);
-		puzzle3.addStep(new Conditions(inTempleF1, f2r4c0DB), goDownFromF1Puzzle3);
-		puzzle3.addStep(new Conditions(inTempleF2, f2r4c0DB), goDownFromF2Puzzle3);
-		puzzle3.addStep(new Conditions(inTempleF2, f2r4c3WC), puzzle3Pillar8);
-		puzzle3.addStep(new Conditions(inTempleF1, f2r4c3WC), goUpToFloor2Puzzle3);
-		puzzle3.addStep(new Conditions(inTempleF2NorthRoom, f2r4c3WC), goDownFromF2NorthRoomPuzzle3);
-		puzzle3.addStep(new Conditions(inTempleF2NorthRoom, f1r4c3UC), puzzle3Pillar7);
-		puzzle3.addStep(new Conditions(inTempleF1, f1r4c3UC), goUpLadderNorthForPuzzle3);
-		puzzle3.addStep(new Conditions(inTempleF1, f1r4c3EG), puzzle3Pillar6RemoveYellow);
-		puzzle3.addStep(new Conditions(inTempleF1, f1r4c2EC), puzzle3Pillar6);
-		puzzle3.addStep(new Conditions(inTempleF1, f1r3c2NC), puzzle3Pillar5);
-		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c3WC), puzzle3Pillar4);
-		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle3Pillar3);
-		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle3Pillar2);
-		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle3Pillar1);
-		puzzle3.addStep(inTempleF1, pullDispenser3);
-		puzzle3.addStep(inTempleF2, genericGoDownToFloor1);
-		puzzle3.addStep(inTempleF0, genericGoUpToFloor1);
-		puzzle3.addStep(inCave, enterTempleOfLight);
-		puzzle3.addStep(inMournerBasement, goBackIntoMournerCave);
-		puzzle3.addStep(inMournerHQ, goBackIntoMournerBasement);
-		puzzle3.setLockingCondition(solvedPuzzle3);
-
-		ConditionalStep puzzle4 = new ConditionalStep(this, goBackIntoMournerHQ);
-		puzzle4.addStep(new Conditions(inCyanRoom, f2r0c0DR), searchCyanChest);
-		puzzle4.addStep(new Conditions(inTempleF0, cyanDoorOpen), enterCyanDoor);
-		puzzle4.addStep(new Conditions(inTempleF1, cyanDoorOpen), goToGroundFloorPuzzle4);
-		puzzle4.addStep(new Conditions(inTempleF1, usedRope, f2r0c0DR), goDownRope);
-		puzzle4.addStep(new Conditions(inTempleF1, f2r0c0DR), useRope);
-		puzzle4.addStep(new Conditions(inTempleF2, f2r0c0DR), goDownFromF2Puzzle4);
-		puzzle4.addStep(new Conditions(inTempleF2, f2r4c0SR, f2r2c0SNotRed), removeMirrorPuzzle4);
-		puzzle4.addStep(new Conditions(inTempleF2, f2r4c0SR), puzzle4Pillar9);
-		puzzle4.addStep(new Conditions(inYellowRoom, f0r4c0SB), yellowRoomRotateToLeave);
-		puzzle4.addStep(new Conditions(inTempleF0), goUpToFirstFloorPuzzle4);
-		puzzle4.addStep(new Conditions(inTempleF2, f2r4c3WY), puzzle4Pillar8);
-		puzzle4.addStep(new Conditions(inTempleF1, f2r4c3WY), goUpToFloor2Puzzle4);
-		puzzle4.addStep(new Conditions(inTempleF2NorthRoom, f2r4c3WY), goDownFromF2NorthRoomPuzzle4);
-		puzzle4.addStep(new Conditions(inTempleF2NorthRoom, f1r4c3UY), puzzle4Pillar7);
-		puzzle4.addStep(new Conditions(inTempleF1, f1r4c3UY), goUpLadderNorthForPuzzle4);
-		puzzle4.addStep(new Conditions(inTempleF1, f1r4c2EY), puzzle4Pillar6);
-		puzzle4.addStep(new Conditions(inTempleF1, f1r3c2NY), puzzle4Pillar5);
-		puzzle4.addStep(new Conditions(inTempleF1, f1r3c3WY), puzzle4Pillar4);
-		puzzle4.addStep(new Conditions(inTempleF1, f1r3c3WC), puzzle4Pillar3RemoveCyan);
-		puzzle4.addStep(new Conditions(inTempleF1, f1r3c4W), puzzle4Pillar3);
-		puzzle4.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle4Pillar2);
-		puzzle4.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle4Pillar1);
-		puzzle4.addStep(inTempleF1, pullDispenser4);
-		puzzle4.addStep(inTempleF2, genericGoDownToFloor1);
-		puzzle4.addStep(inTempleF0, genericGoUpToFloor1);
-		puzzle4.addStep(inCave, enterTempleOfLight);
-		puzzle4.addStep(inMournerBasement, goBackIntoMournerCave);
-		puzzle4.addStep(inMournerHQ, goBackIntoMournerBasement);
-		puzzle4.setLockingCondition(solvedPuzzle4);
-
-		puzzle5PlaceBlue = new ConditionalStep(this, puzzle5Pillar5);
-		puzzle5PlaceBlue.addStep(new Conditions(placedBlueCrystalInJumpRoom), puzzle5Pillar5RemoveMirror);
-		puzzle5PlaceBlue.addStep(new Conditions(inBlueRoom, f1r0c3EY), puzzle5Pillar6);
-		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r0c3EY), climbWallSupportPuzzle5);
-		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r1c3SY), puzzle5Pillar5);
-		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r3c3S), puzzle5Pillar4);
-		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r3c3WY), pullDispenser5);
-		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle5Pillar3);
-		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle5Pillar2);
-		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle5Pillar1);
-		puzzle5PlaceBlue.addStep(inTempleF1, pullDispenser5);
-		puzzle5PlaceBlue.addStep(inYellowRoom, climbUpRope);
-		puzzle5PlaceBlue.addStep(inTempleF2, genericGoDownToFloor1);
-		puzzle5PlaceBlue.addStep(inTempleF0, genericGoUpToFloor1);
-		puzzle5PlaceBlue.addStep(inCave, enterTempleOfLight);
-		puzzle5PlaceBlue.addStep(inMournerBasement, goBackIntoMournerCave);
-		puzzle5PlaceBlue.addStep(inMournerHQ, goBackIntoMournerBasement);
-		puzzle5PlaceBlue.setLockingCondition(placedBlueCrystalInJumpRoom);
-
-		ConditionalStep puzzle5Part2 = new ConditionalStep(this, goBackIntoMournerHQ);
-		puzzle5Part2.addStep(new Conditions(inTempleF0, f0r0c2EG, f0r0c4NB), searchMagentaYellowChest);
-		puzzle5Part2.addStep(new Conditions(inTempleF0, f2r1c3F, f0r0c2EG, f2r0c4D), puzzle5Pillar14);
-		puzzle5Part2.addStep(new Conditions(inTempleF0, f2r1c3F, f0r1c2SG, f2r0c4D), puzzle5Pillar13);
-		puzzle5Part2.addStep(new Conditions(inTempleF0, f2r1c3F, f2r1c2D, f2r0c4D), puzzle5Pillar12);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, f2r1c3F, f2r1c2D, f2r0c4D), goDownFromF1Puzzle5);
-		puzzle5Part2.addStep(new Conditions(inTempleF2, f2r1c3F, f2r1c2D, f2r0c4D), goDownFromF2Puzzle5);
-		puzzle5Part2.addStep(blueCrystalNotPlaced, resetPuzzle);
-		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r1c3F, f2r1c2D, f2r0c3E), puzzle5Pillar11);
-		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r1c3F, f2r1c2D), puzzle5Pillar10);
-		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r1c3F), puzzle5Pillar9);
-		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r3c3S), puzzle5Pillar8);
-		puzzle5Part2.addStep(new Conditions(inTempleStairSquare, f2r3c3S), goUpFromMiddleToSouthPuzzle5);
-		puzzle5Part2.addStep(new Conditions(inNorthF2, f2r3c3S), goDownToMiddleFromNorthPuzzle5);
-		puzzle5Part2.addStep(new Conditions(inNorthF2, f1r3c3U), puzzle5Pillar7);
-		puzzle5Part2.addStep(new Conditions(inTempleStairSquare, f1r3c3U), goUpFromMiddleToNorthPuzzle5);
-		puzzle5Part2.addStep(new Conditions(inSouthF2, f1r3c3U), goDownToMiddleFromSouthPuzzle5);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r3c3U), goUpToFloor2Puzzle5);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r0c3EY), puzzle5Pillar5RemoveMirror);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r1c3SY), puzzle5Pillar3RotateUp);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r3c3S), puzzle5Pillar4);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r3c4W), puzzle5Pillar3);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, startColumnN), puzzle5Pillar2);
-		puzzle5Part2.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle5Pillar1);
-		puzzle5Part2.addStep(inTempleF1, pullDispenser5);
-		puzzle5Part2.addStep(inTempleF2, genericGoDownToFloor1);
-		puzzle5Part2.addStep(inTempleF0, genericGoUpToFloor1);
-		puzzle5Part2.addStep(inCave, enterTempleOfLight);
-		puzzle5Part2.addStep(inMournerBasement, goBackIntoMournerCave);
-		puzzle5Part2.addStep(inMournerHQ, goBackIntoMournerBasement);
-
-		ConditionalStep deathAltarPuzzle = new ConditionalStep(this, goBackIntoMournerHQ);
-		deathAltarPuzzle.addStep(new Conditions(inCentralArea, redAtAltar, f2r1c2LG, f2r3c2WB), enterDeathAltarBarrier);
-		deathAltarPuzzle.addStep(new Conditions(inCentralArea, redAtDoor, f2r1c2LG, f2r3c2WB), turnKeyMirror);
-		deathAltarPuzzle.addStep(new Conditions(inBehindBarrierCentralArea, f2r2c0ER, f2r1c2LG, f2r3c2WB), turnKeyMirror);
-		deathAltarPuzzle.addStep(new Conditions(inTempleStairSquare, f2r2c0ER, f2r1c2LG, f2r3c2WB), goDownToCentre);
-		deathAltarPuzzle.addStep(new Conditions(inTempleStairSquare, f2r2c0ER, f2r1c2LG, f2r3c2WB), goDownToCentre);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r2c0ER, f2r1c2LG, f2r3c2WB), goDownToMiddleFromNorthPuzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c0SR, f2r1c2LG, f2r3c2WB), puzzle6Pillar17);
-		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c3WY, f2r1c2LG, f2r3c2WB), puzzle6Pillar16);
-		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c3WY, f2r1c2LG, f2r3c3W), puzzle6Pillar15);
-		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c3WY, f2r1c2LG, f2r1c3N), puzzle6Pillar14);
-		deathAltarPuzzle.addStep(new Conditions(inTempleStairSquare, f2r4c3WY, f2r1c2LG, f2r1c3N), goUpFromMiddleToNorthPuzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inSouthF2, f2r4c3WY, f2r1c2LG, f2r1c3N), goDownToMiddleFromSouthPuzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r4c3WY, f2r1c2LG, f2r1c4L), puzzle6Pillar13);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r4c3WY, f2r1c2LG, f0r1c4U), puzzle6Pillar12);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF2NorthRoom, f2r4c3WY, f0r1c2U, f0r1c4U), goDownNorthLadderToF1Puzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r4c3WY, f0r1c2U, f0r1c4U), puzzle6Pillar11);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f2r4c3WY, f0r1c2U, f0r1c4U), goUpToFloor2Puzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f1r4c3UY, f0r1c2U, f0r1c4U), puzzle6Pillar10);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f1r4c3UY, f0r1c2U, f0r1c4U), goUpNorthLadderToF2Puzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f0r4c3U, f0r1c2U, f0r1c4U), puzzle6Pillar9);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r4c3U, f0r1c2U, f0r1c4U), goUpToF1Puzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r1c3F, f0r4c3U, f0r1c2U), puzzle6Pillar8);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r1c3F, f0r4c3U), puzzle6Pillar7);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r3c3F, f0r4c3U), puzzle6Pillar6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r3c3F), puzzle6Pillar5);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r3c4W), puzzle6Pillar4);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f1r3c4D), puzzle6Pillar3);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f1r3c4D), goDownFromF1Puzzle6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f1r3c3U), pullDispenser6);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF1, startColumnN), puzzle6Pillar2);
-		deathAltarPuzzle.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle6Pillar1);
-		deathAltarPuzzle.addStep(inTempleF1, pullDispenser6);
-		deathAltarPuzzle.addStep(inTempleF2, genericGoDownToFloor1);
-		deathAltarPuzzle.addStep(inTempleF0, genericGoUpToFloor1);
-		deathAltarPuzzle.addStep(inCave, enterTempleOfLight);
-		deathAltarPuzzle.addStep(inMournerBasement, goBackIntoMournerCave);
-		deathAltarPuzzle.addStep(inMournerHQ, goBackIntoMournerBasement);
-
-		ConditionalStep addCrystal = new ConditionalStep(this, getDeathTalisman);
-		addCrystal.addStep(new Conditions(inNorthF2, hasChargedCrystal), useCrystalOnCrystal);
-		addCrystal.addStep(new Conditions(inBehindBarrierCentralArea, hasChargedCrystal), goUpFromCentre);
-		addCrystal.addStep(new Conditions(inCentralArea, hasChargedCrystal, redAtDoor), goUpFromCentre);
-		addCrystal.addStep(new Conditions(inCentralArea, hasChargedCrystal, redAtAltar), turnPillarFromTemple);
-		addCrystal.addStep(new Conditions(inDeathAltarArea, hasChargedCrystal, redAtAltar), turnPillarFromTemple);
-		addCrystal.addStep(new Conditions(inTempleStairSquare, hasChargedCrystal), goUpToNorthToCharge);
-		addCrystal.addStep(new Conditions(inSouthF2, hasChargedCrystal), goDownToMiddleFromSouthCrystal);
-		addCrystal.addStep(new Conditions(inTempleF1, hasChargedCrystal), enterFloor2Crystal);
-		addCrystal.addStep(new Conditions(inCaveOrF0, hasChargedCrystal), enterFloor1Crystal);
-		addCrystal.addStep(new Conditions(inMournerBasement, hasChargedCrystal), enterMournerCaveCrystal);
-		addCrystal.addStep(new Conditions(inMournerHQ, hasChargedCrystal), enterMournerBasementCrystal);
-		addCrystal.addStep(new Conditions(inDeathAltarArea, hasChargedCrystal), enterMournerHQCrystal);
-		addCrystal.addStep(new Conditions(inDeathAltar, hasChargedCrystal), leaveDeathAltar);
-		addCrystal.addStep(inDeathAltar, useCrystalOnAltar);
-		addCrystal.addStep(new Conditions(hasDeathTalisman, inDeathAltarArea), enterDeathAltar);
-		addCrystal.addStep(new Conditions(hasDeathTalisman, redAtAltar, inCentralArea), enterDeathAltar);
-		addCrystal.addStep(new Conditions(hasDeathTalisman, redAtDoor, inCentralArea), turnKeyMirrorCharging);
-		addCrystal.addStep(new Conditions(inDeathAltarArea, redAtAltar), getDeathTalismanInCentre);
-		addCrystal.addStep(new Conditions(inCentralArea), getDeathTalismanInCentre);
-		addCrystal.addStep(new Conditions(inDeathAltarArea), getDeathTalismanInCentreDoorCorrect);
-		addCrystal.addStep(new Conditions(redAtDoor, inBehindBarrierCentralArea), turnKeyMirrorCharging);
-		addCrystal.addStep(new Conditions(redAtDoor, inTempleStairSquare), goDownToCentreCharging);
-		addCrystal.addStep(new Conditions(redAtDoor, inTempleF2), goDownToMiddleFromSouthCharging);
-		addCrystal.addStep(new Conditions(redAtDoor, inTempleF1), goUpToF2ForCharging);
-		addCrystal.addStep(new Conditions(redAtDoor, inCaveOrF0), goUpToF1ForCharging);
-		addCrystal.addStep(new Conditions(redAtDoor, inMournerBasement), enterMournerCaveCharging);
-		addCrystal.addStep(new Conditions(redAtDoor, inMournerHQ), enterMournerBasementCharging);
-		addCrystal.addStep(new Conditions(redAtDoor), enterMournerHQCharging);
-		addCrystal.addStep(new Conditions(inIbanRoom), leavePassCentre);
-		addCrystal.addStep(new Conditions(inPassF0), enterAltarFromBehind);
-		addCrystal.addStep(new Conditions(inPassF1), enterSouthPass);
-		addCrystal.addStep(new Conditions(inWellEntrance), enterWell);
-		addCrystal.addStep(new Conditions(redAtAltar), enterUndergroundPass);
-
-		ConditionalStep doAllPuzzles = new ConditionalStep(this, talkToArianwynAfterGivingCrystal);
-		doAllPuzzles.addStep(new Conditions(enteredDeathArea), addCrystal);
-		doAllPuzzles.addStep(new Conditions(solvedPuzzle5), deathAltarPuzzle);
-		doAllPuzzles.addStep(new Conditions(solvedPuzzle3, solvedPuzzle4, placedBlueCrystalInJumpRoom), puzzle5Part2);
-		doAllPuzzles.addStep(new Conditions(solvedPuzzle3, solvedPuzzle4), puzzle5PlaceBlue);
-		doAllPuzzles.addStep(solvedPuzzle3, puzzle4);
-		doAllPuzzles.addStep(solvedPuzzle2, puzzle3);
-		doAllPuzzles.addStep(solvedPuzzle1, puzzle2);
-		doAllPuzzles.addStep(knowToUseCrystal, puzzle1);
-
-		steps.put(40, doAllPuzzles);
-
-		steps.put(50, returnToArianwyn);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -949,7 +685,7 @@ public class MourningsEndPartII extends BasicQuestHelper
 		leaveDeathAltar = new ObjectStep(this, ObjectID.PORTAL_34758, new WorldPoint(2208, 4829, 0), "Leave the Death Altar and go use the charged crystal on the dark crystal.");
 		turnPillarFromTemple = new ObjectStep(this, NullObjectID.NULL_9939, new WorldPoint(1881, 4639, 0), "Enter the central area, and turn the pillar's mirror east.", chargedCrystal);
 		goUpFromCentre = new ObjectStep(this, ObjectID.STAIRCASE_10015, new WorldPoint(1888, 4639, 0), "Go up to the dark crystal.", chargedCrystal);
-		goUpToNorthToCharge =  new ObjectStep(this, ObjectID.STAIRCASE_10015, new WorldPoint(1891, 4642, 1), "Go up the stairs to the north.", chargedCrystal);
+		goUpToNorthToCharge = new ObjectStep(this, ObjectID.STAIRCASE_10015, new WorldPoint(1891, 4642, 1), "Go up the stairs to the north.", chargedCrystal);
 		useCrystalOnCrystal = new ObjectStep(this, NullObjectID.NULL_9750, new WorldPoint(1909, 4639, 2), "Use the charged crystal on the dark crystal north of you.", chargedCrystalHighlight);
 		useCrystalOnCrystal.addIcon(ItemID.NEWLY_MADE_CRYSTAL_6652);
 
@@ -1019,5 +755,269 @@ public class MourningsEndPartII extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Repair the defences", new ArrayList<>(Arrays.asList(enterDeathAltarBarrier, getDeathTalisman, enterDeathAltar, useCrystalOnAltar, leaveDeathAltar, returnToArianwyn)), deathTalisman, newlyMadeCrystal));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToArianwyn);
+
+		ConditionalStep goTalkToEssyllt = new ConditionalStep(this, enterMournerHQ);
+		goTalkToEssyllt.addStep(inMournerBasement, talkToEssyllt);
+		goTalkToEssyllt.addStep(inMournerHQ, enterMournerBasement);
+
+		steps.put(5, goTalkToEssyllt);
+
+		ConditionalStep getCrystal = new ConditionalStep(this, enterMournerHQ);
+		getCrystal.addStep(hasBlackenedCrystal, bringCrystalToArianwyn);
+		getCrystal.addStep(inNorthF2, useChisel);
+		getCrystal.addStep(inTempleStairSquare, goUpFromMiddleToNorth);
+		getCrystal.addStep(inSouthF2, goToMiddleFromSouth);
+		getCrystal.addStep(inTempleF1, goUpSouthLadder);
+		getCrystal.addStep(inCaveOrF0, goUpStairsTemple);
+		getCrystal.addStep(inMournerBasement, enterCave);
+		getCrystal.addStep(inMournerHQ, enterMournerBasement);
+
+		steps.put(10, getCrystal);
+		steps.put(15, getCrystal);
+		steps.put(20, getCrystal);
+
+		steps.put(30, talkToElunedAfterGivingCrystal);
+
+		ConditionalStep puzzle1 = new ConditionalStep(this, goBackIntoMournerHQ);
+		puzzle1.addStep(new Conditions(inBlueRoom, f1r0c3EY), searchBlueChest);
+		puzzle1.addStep(new Conditions(inTempleF1, f1r0c3EY), climbWallSupport);
+		puzzle1.addStep(new Conditions(inTempleF1, f1r1c3SY), puzzle1Pillar5);
+		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c3S), puzzle1Pillar4);
+		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle1Pillar3);
+		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle1Pillar2);
+		puzzle1.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle1Pillar1);
+		puzzle1.addStep(inTempleF1, pullDispenser1);
+		puzzle1.addStep(inTempleF2, genericGoDownToFloor1);
+		puzzle1.addStep(inTempleF0, goUpStairsTempleC1);
+		puzzle1.addStep(inCave, enterTempleOfLight);
+		puzzle1.addStep(inMournerBasement, goBackIntoMournerCave);
+		puzzle1.addStep(inMournerHQ, goBackIntoMournerBasement);
+		puzzle1.setLockingCondition(solvedPuzzle1);
+
+		ConditionalStep puzzle2 = new ConditionalStep(this, goBackIntoMournerHQ);
+		puzzle2.addStep(new Conditions(inTempleF1, f1r4c3EG), searchMagentaChest);
+		puzzle2.addStep(new Conditions(inTempleF1, f1r4c2EC), puzzle2Pillar6);
+		puzzle2.addStep(new Conditions(inTempleF1, f1r3c2NC), puzzle2Pillar5);
+		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c3WC), puzzle2Pillar4);
+		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle2Pillar3);
+		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle2Pillar2);
+		puzzle2.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle2Pillar1);
+		puzzle2.addStep(inTempleF1, pullDispenser2);
+		puzzle2.addStep(inTempleF2, genericGoDownToFloor1);
+		puzzle2.addStep(inTempleF0, genericGoUpToFloor1);
+		puzzle2.addStep(inCave, enterTempleOfLight);
+		puzzle2.addStep(inMournerBasement, goBackIntoMournerCave);
+		puzzle2.addStep(inMournerHQ, goBackIntoMournerBasement);
+		puzzle2.setLockingCondition(solvedPuzzle2);
+
+		ConditionalStep puzzle3 = new ConditionalStep(this, goBackIntoMournerHQ);
+		puzzle3.addStep(new Conditions(inYellowRoom, f0r4c0SB), searchYellowChest);
+		puzzle3.addStep(new Conditions(inTempleF0, f0r4c0SB), pullDispenser3);
+		puzzle3.addStep(new Conditions(inYellowRoom, f2r4c0DB), puzzle3Pillar9);
+		puzzle3.addStep(new Conditions(inTempleF0, f2r4c0DB), enterNorthWestRoomPuzzle3);
+		puzzle3.addStep(new Conditions(inTempleF1, f2r4c0DB), goDownFromF1Puzzle3);
+		puzzle3.addStep(new Conditions(inTempleF2, f2r4c0DB), goDownFromF2Puzzle3);
+		puzzle3.addStep(new Conditions(inTempleF2, f2r4c3WC), puzzle3Pillar8);
+		puzzle3.addStep(new Conditions(inTempleF1, f2r4c3WC), goUpToFloor2Puzzle3);
+		puzzle3.addStep(new Conditions(inTempleF2NorthRoom, f2r4c3WC), goDownFromF2NorthRoomPuzzle3);
+		puzzle3.addStep(new Conditions(inTempleF2NorthRoom, f1r4c3UC), puzzle3Pillar7);
+		puzzle3.addStep(new Conditions(inTempleF1, f1r4c3UC), goUpLadderNorthForPuzzle3);
+		puzzle3.addStep(new Conditions(inTempleF1, f1r4c3EG), puzzle3Pillar6RemoveYellow);
+		puzzle3.addStep(new Conditions(inTempleF1, f1r4c2EC), puzzle3Pillar6);
+		puzzle3.addStep(new Conditions(inTempleF1, f1r3c2NC), puzzle3Pillar5);
+		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c3WC), puzzle3Pillar4);
+		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle3Pillar3);
+		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle3Pillar2);
+		puzzle3.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle3Pillar1);
+		puzzle3.addStep(inTempleF1, pullDispenser3);
+		puzzle3.addStep(inTempleF2, genericGoDownToFloor1);
+		puzzle3.addStep(inTempleF0, genericGoUpToFloor1);
+		puzzle3.addStep(inCave, enterTempleOfLight);
+		puzzle3.addStep(inMournerBasement, goBackIntoMournerCave);
+		puzzle3.addStep(inMournerHQ, goBackIntoMournerBasement);
+		puzzle3.setLockingCondition(solvedPuzzle3);
+
+		ConditionalStep puzzle4 = new ConditionalStep(this, goBackIntoMournerHQ);
+		puzzle4.addStep(new Conditions(inCyanRoom, f2r0c0DR), searchCyanChest);
+		puzzle4.addStep(new Conditions(inTempleF0, cyanDoorOpen), enterCyanDoor);
+		puzzle4.addStep(new Conditions(inTempleF1, cyanDoorOpen), goToGroundFloorPuzzle4);
+		puzzle4.addStep(new Conditions(inTempleF1, usedRope, f2r0c0DR), goDownRope);
+		puzzle4.addStep(new Conditions(inTempleF1, f2r0c0DR), useRope);
+		puzzle4.addStep(new Conditions(inTempleF2, f2r0c0DR), goDownFromF2Puzzle4);
+		puzzle4.addStep(new Conditions(inTempleF2, f2r4c0SR, f2r2c0SNotRed), removeMirrorPuzzle4);
+		puzzle4.addStep(new Conditions(inTempleF2, f2r4c0SR), puzzle4Pillar9);
+		puzzle4.addStep(new Conditions(inYellowRoom, f0r4c0SB), yellowRoomRotateToLeave);
+		puzzle4.addStep(new Conditions(inTempleF0), goUpToFirstFloorPuzzle4);
+		puzzle4.addStep(new Conditions(inTempleF2, f2r4c3WY), puzzle4Pillar8);
+		puzzle4.addStep(new Conditions(inTempleF1, f2r4c3WY), goUpToFloor2Puzzle4);
+		puzzle4.addStep(new Conditions(inTempleF2NorthRoom, f2r4c3WY), goDownFromF2NorthRoomPuzzle4);
+		puzzle4.addStep(new Conditions(inTempleF2NorthRoom, f1r4c3UY), puzzle4Pillar7);
+		puzzle4.addStep(new Conditions(inTempleF1, f1r4c3UY), goUpLadderNorthForPuzzle4);
+		puzzle4.addStep(new Conditions(inTempleF1, f1r4c2EY), puzzle4Pillar6);
+		puzzle4.addStep(new Conditions(inTempleF1, f1r3c2NY), puzzle4Pillar5);
+		puzzle4.addStep(new Conditions(inTempleF1, f1r3c3WY), puzzle4Pillar4);
+		puzzle4.addStep(new Conditions(inTempleF1, f1r3c3WC), puzzle4Pillar3RemoveCyan);
+		puzzle4.addStep(new Conditions(inTempleF1, f1r3c4W), puzzle4Pillar3);
+		puzzle4.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle4Pillar2);
+		puzzle4.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle4Pillar1);
+		puzzle4.addStep(inTempleF1, pullDispenser4);
+		puzzle4.addStep(inTempleF2, genericGoDownToFloor1);
+		puzzle4.addStep(inTempleF0, genericGoUpToFloor1);
+		puzzle4.addStep(inCave, enterTempleOfLight);
+		puzzle4.addStep(inMournerBasement, goBackIntoMournerCave);
+		puzzle4.addStep(inMournerHQ, goBackIntoMournerBasement);
+		puzzle4.setLockingCondition(solvedPuzzle4);
+
+		puzzle5PlaceBlue = new ConditionalStep(this, puzzle5Pillar5);
+		puzzle5PlaceBlue.addStep(new Conditions(placedBlueCrystalInJumpRoom), puzzle5Pillar5RemoveMirror);
+		puzzle5PlaceBlue.addStep(new Conditions(inBlueRoom, f1r0c3EY), puzzle5Pillar6);
+		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r0c3EY), climbWallSupportPuzzle5);
+		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r1c3SY), puzzle5Pillar5);
+		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r3c3S), puzzle5Pillar4);
+		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, f1r3c3WY), pullDispenser5);
+		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, dispenserEmpty, f1r3c4W), puzzle5Pillar3);
+		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, dispenserEmpty, startColumnN), puzzle5Pillar2);
+		puzzle5PlaceBlue.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle5Pillar1);
+		puzzle5PlaceBlue.addStep(inTempleF1, pullDispenser5);
+		puzzle5PlaceBlue.addStep(inYellowRoom, climbUpRope);
+		puzzle5PlaceBlue.addStep(inTempleF2, genericGoDownToFloor1);
+		puzzle5PlaceBlue.addStep(inTempleF0, genericGoUpToFloor1);
+		puzzle5PlaceBlue.addStep(inCave, enterTempleOfLight);
+		puzzle5PlaceBlue.addStep(inMournerBasement, goBackIntoMournerCave);
+		puzzle5PlaceBlue.addStep(inMournerHQ, goBackIntoMournerBasement);
+		puzzle5PlaceBlue.setLockingCondition(placedBlueCrystalInJumpRoom);
+
+		ConditionalStep puzzle5Part2 = new ConditionalStep(this, goBackIntoMournerHQ);
+		puzzle5Part2.addStep(new Conditions(inTempleF0, f0r0c2EG, f0r0c4NB), searchMagentaYellowChest);
+		puzzle5Part2.addStep(new Conditions(inTempleF0, f2r1c3F, f0r0c2EG, f2r0c4D), puzzle5Pillar14);
+		puzzle5Part2.addStep(new Conditions(inTempleF0, f2r1c3F, f0r1c2SG, f2r0c4D), puzzle5Pillar13);
+		puzzle5Part2.addStep(new Conditions(inTempleF0, f2r1c3F, f2r1c2D, f2r0c4D), puzzle5Pillar12);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, f2r1c3F, f2r1c2D, f2r0c4D), goDownFromF1Puzzle5);
+		puzzle5Part2.addStep(new Conditions(inTempleF2, f2r1c3F, f2r1c2D, f2r0c4D), goDownFromF2Puzzle5);
+		puzzle5Part2.addStep(blueCrystalNotPlaced, resetPuzzle);
+		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r1c3F, f2r1c2D, f2r0c3E), puzzle5Pillar11);
+		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r1c3F, f2r1c2D), puzzle5Pillar10);
+		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r1c3F), puzzle5Pillar9);
+		puzzle5Part2.addStep(new Conditions(inSouthF2, f2r3c3S), puzzle5Pillar8);
+		puzzle5Part2.addStep(new Conditions(inTempleStairSquare, f2r3c3S), goUpFromMiddleToSouthPuzzle5);
+		puzzle5Part2.addStep(new Conditions(inNorthF2, f2r3c3S), goDownToMiddleFromNorthPuzzle5);
+		puzzle5Part2.addStep(new Conditions(inNorthF2, f1r3c3U), puzzle5Pillar7);
+		puzzle5Part2.addStep(new Conditions(inTempleStairSquare, f1r3c3U), goUpFromMiddleToNorthPuzzle5);
+		puzzle5Part2.addStep(new Conditions(inSouthF2, f1r3c3U), goDownToMiddleFromSouthPuzzle5);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r3c3U), goUpToFloor2Puzzle5);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r0c3EY), puzzle5Pillar5RemoveMirror);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r1c3SY), puzzle5Pillar3RotateUp);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r3c3S), puzzle5Pillar4);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, f1r3c4W), puzzle5Pillar3);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, startColumnN), puzzle5Pillar2);
+		puzzle5Part2.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle5Pillar1);
+		puzzle5Part2.addStep(inTempleF1, pullDispenser5);
+		puzzle5Part2.addStep(inTempleF2, genericGoDownToFloor1);
+		puzzle5Part2.addStep(inTempleF0, genericGoUpToFloor1);
+		puzzle5Part2.addStep(inCave, enterTempleOfLight);
+		puzzle5Part2.addStep(inMournerBasement, goBackIntoMournerCave);
+		puzzle5Part2.addStep(inMournerHQ, goBackIntoMournerBasement);
+
+		ConditionalStep deathAltarPuzzle = new ConditionalStep(this, goBackIntoMournerHQ);
+		deathAltarPuzzle.addStep(new Conditions(inCentralArea, redAtAltar, f2r1c2LG, f2r3c2WB), enterDeathAltarBarrier);
+		deathAltarPuzzle.addStep(new Conditions(inCentralArea, redAtDoor, f2r1c2LG, f2r3c2WB), turnKeyMirror);
+		deathAltarPuzzle.addStep(new Conditions(inBehindBarrierCentralArea, f2r2c0ER, f2r1c2LG, f2r3c2WB), turnKeyMirror);
+		deathAltarPuzzle.addStep(new Conditions(inTempleStairSquare, f2r2c0ER, f2r1c2LG, f2r3c2WB), goDownToCentre);
+		deathAltarPuzzle.addStep(new Conditions(inTempleStairSquare, f2r2c0ER, f2r1c2LG, f2r3c2WB), goDownToCentre);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r2c0ER, f2r1c2LG, f2r3c2WB), goDownToMiddleFromNorthPuzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c0SR, f2r1c2LG, f2r3c2WB), puzzle6Pillar17);
+		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c3WY, f2r1c2LG, f2r3c2WB), puzzle6Pillar16);
+		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c3WY, f2r1c2LG, f2r3c3W), puzzle6Pillar15);
+		deathAltarPuzzle.addStep(new Conditions(inNorthF2, f2r4c3WY, f2r1c2LG, f2r1c3N), puzzle6Pillar14);
+		deathAltarPuzzle.addStep(new Conditions(inTempleStairSquare, f2r4c3WY, f2r1c2LG, f2r1c3N), goUpFromMiddleToNorthPuzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inSouthF2, f2r4c3WY, f2r1c2LG, f2r1c3N), goDownToMiddleFromSouthPuzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r4c3WY, f2r1c2LG, f2r1c4L), puzzle6Pillar13);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r4c3WY, f2r1c2LG, f0r1c4U), puzzle6Pillar12);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF2NorthRoom, f2r4c3WY, f0r1c2U, f0r1c4U), goDownNorthLadderToF1Puzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f2r4c3WY, f0r1c2U, f0r1c4U), puzzle6Pillar11);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f2r4c3WY, f0r1c2U, f0r1c4U), goUpToFloor2Puzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF2, f1r4c3UY, f0r1c2U, f0r1c4U), puzzle6Pillar10);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f1r4c3UY, f0r1c2U, f0r1c4U), goUpNorthLadderToF2Puzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f0r4c3U, f0r1c2U, f0r1c4U), puzzle6Pillar9);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r4c3U, f0r1c2U, f0r1c4U), goUpToF1Puzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r1c3F, f0r4c3U, f0r1c2U), puzzle6Pillar8);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r1c3F, f0r4c3U), puzzle6Pillar7);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r3c3F, f0r4c3U), puzzle6Pillar6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r3c3F), puzzle6Pillar5);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f0r3c4W), puzzle6Pillar4);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF0, f1r3c4D), puzzle6Pillar3);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f1r3c4D), goDownFromF1Puzzle6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF1, f1r3c3U), pullDispenser6);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF1, startColumnN), puzzle6Pillar2);
+		deathAltarPuzzle.addStep(new Conditions(inTempleF1, dispenserEmpty), puzzle6Pillar1);
+		deathAltarPuzzle.addStep(inTempleF1, pullDispenser6);
+		deathAltarPuzzle.addStep(inTempleF2, genericGoDownToFloor1);
+		deathAltarPuzzle.addStep(inTempleF0, genericGoUpToFloor1);
+		deathAltarPuzzle.addStep(inCave, enterTempleOfLight);
+		deathAltarPuzzle.addStep(inMournerBasement, goBackIntoMournerCave);
+		deathAltarPuzzle.addStep(inMournerHQ, goBackIntoMournerBasement);
+
+		ConditionalStep addCrystal = new ConditionalStep(this, getDeathTalisman);
+		addCrystal.addStep(new Conditions(inNorthF2, hasChargedCrystal), useCrystalOnCrystal);
+		addCrystal.addStep(new Conditions(inBehindBarrierCentralArea, hasChargedCrystal), goUpFromCentre);
+		addCrystal.addStep(new Conditions(inCentralArea, hasChargedCrystal, redAtDoor), goUpFromCentre);
+		addCrystal.addStep(new Conditions(inCentralArea, hasChargedCrystal, redAtAltar), turnPillarFromTemple);
+		addCrystal.addStep(new Conditions(inDeathAltarArea, hasChargedCrystal, redAtAltar), turnPillarFromTemple);
+		addCrystal.addStep(new Conditions(inTempleStairSquare, hasChargedCrystal), goUpToNorthToCharge);
+		addCrystal.addStep(new Conditions(inSouthF2, hasChargedCrystal), goDownToMiddleFromSouthCrystal);
+		addCrystal.addStep(new Conditions(inTempleF1, hasChargedCrystal), enterFloor2Crystal);
+		addCrystal.addStep(new Conditions(inCaveOrF0, hasChargedCrystal), enterFloor1Crystal);
+		addCrystal.addStep(new Conditions(inMournerBasement, hasChargedCrystal), enterMournerCaveCrystal);
+		addCrystal.addStep(new Conditions(inMournerHQ, hasChargedCrystal), enterMournerBasementCrystal);
+		addCrystal.addStep(new Conditions(inDeathAltarArea, hasChargedCrystal), enterMournerHQCrystal);
+		addCrystal.addStep(new Conditions(inDeathAltar, hasChargedCrystal), leaveDeathAltar);
+		addCrystal.addStep(inDeathAltar, useCrystalOnAltar);
+		addCrystal.addStep(new Conditions(hasDeathTalisman, inDeathAltarArea), enterDeathAltar);
+		addCrystal.addStep(new Conditions(hasDeathTalisman, redAtAltar, inCentralArea), enterDeathAltar);
+		addCrystal.addStep(new Conditions(hasDeathTalisman, redAtDoor, inCentralArea), turnKeyMirrorCharging);
+		addCrystal.addStep(new Conditions(inDeathAltarArea, redAtAltar), getDeathTalismanInCentre);
+		addCrystal.addStep(new Conditions(inCentralArea), getDeathTalismanInCentre);
+		addCrystal.addStep(new Conditions(inDeathAltarArea), getDeathTalismanInCentreDoorCorrect);
+		addCrystal.addStep(new Conditions(redAtDoor, inBehindBarrierCentralArea), turnKeyMirrorCharging);
+		addCrystal.addStep(new Conditions(redAtDoor, inTempleStairSquare), goDownToCentreCharging);
+		addCrystal.addStep(new Conditions(redAtDoor, inTempleF2), goDownToMiddleFromSouthCharging);
+		addCrystal.addStep(new Conditions(redAtDoor, inTempleF1), goUpToF2ForCharging);
+		addCrystal.addStep(new Conditions(redAtDoor, inCaveOrF0), goUpToF1ForCharging);
+		addCrystal.addStep(new Conditions(redAtDoor, inMournerBasement), enterMournerCaveCharging);
+		addCrystal.addStep(new Conditions(redAtDoor, inMournerHQ), enterMournerBasementCharging);
+		addCrystal.addStep(new Conditions(redAtDoor), enterMournerHQCharging);
+		addCrystal.addStep(new Conditions(inIbanRoom), leavePassCentre);
+		addCrystal.addStep(new Conditions(inPassF0), enterAltarFromBehind);
+		addCrystal.addStep(new Conditions(inPassF1), enterSouthPass);
+		addCrystal.addStep(new Conditions(inWellEntrance), enterWell);
+		addCrystal.addStep(new Conditions(redAtAltar), enterUndergroundPass);
+
+		ConditionalStep doAllPuzzles = new ConditionalStep(this, talkToArianwynAfterGivingCrystal);
+		doAllPuzzles.addStep(new Conditions(enteredDeathArea), addCrystal);
+		doAllPuzzles.addStep(new Conditions(solvedPuzzle5), deathAltarPuzzle);
+		doAllPuzzles.addStep(new Conditions(solvedPuzzle3, solvedPuzzle4, placedBlueCrystalInJumpRoom), puzzle5Part2);
+		doAllPuzzles.addStep(new Conditions(solvedPuzzle3, solvedPuzzle4), puzzle5PlaceBlue);
+		doAllPuzzles.addStep(solvedPuzzle3, puzzle4);
+		doAllPuzzles.addStep(solvedPuzzle2, puzzle3);
+		doAllPuzzles.addStep(solvedPuzzle1, puzzle2);
+		doAllPuzzles.addStep(knowToUseCrystal, puzzle1);
+
+		steps.put(40, doAllPuzzles);
+
+		steps.put(50, returnToArianwyn);
+
+		return steps;
 	}
 }

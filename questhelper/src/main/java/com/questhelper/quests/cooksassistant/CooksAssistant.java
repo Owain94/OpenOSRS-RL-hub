@@ -24,7 +24,14 @@
  */
 package com.questhelper.quests.cooksassistant;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,13 +39,6 @@ import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.COOKS_ASSISTANT
@@ -47,23 +47,8 @@ public class CooksAssistant extends BasicQuestHelper
 {
 	ItemRequirement egg, milk, flour;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
+	public void setupItemRequirements()
 	{
-		setupItemRequirements();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, new NpcStep(this, NpcID.COOK_4626, new WorldPoint(3206, 3214, 0),
-			"Give the Cook in Lumbridge Castle's kitchen the required items to finish the quest.",
-			egg, milk, flour));
-		steps.get(0).addDialogStep("I'll get right on it.");
-
-		steps.put(1, steps.get(0));
-
-		return steps;
-	}
-
-	public void setupItemRequirements() {
 		egg = new ItemRequirement("Egg", ItemID.EGG);
 		egg.setTip("You can find an egg in the farm north of Lumbridge.");
 		milk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
@@ -88,5 +73,21 @@ public class CooksAssistant extends BasicQuestHelper
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Bring the cook cake ingredients", new ArrayList<>(Arrays.asList(new DetailedQuestStep(this, "Bring the cook the ingredients he needs."))), egg, flour, milk));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, new NpcStep(this, NpcID.COOK_4626, new WorldPoint(3206, 3214, 0),
+			"Give the Cook in Lumbridge Castle's kitchen the required items to finish the quest.",
+			egg, milk, flour));
+		steps.get(0).addDialogStep("I'll get right on it.");
+
+		steps.put(1, steps.get(0));
+
+		return steps;
 	}
 }

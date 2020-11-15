@@ -24,17 +24,10 @@
  */
 package com.questhelper.quests.piratestreasure;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import net.runelite.api.ItemID;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
@@ -47,6 +40,13 @@ import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
 import com.questhelper.steps.conditional.WidgetTextCondition;
 import com.questhelper.steps.conditional.ZoneCondition;
+import java.util.ArrayList;
+import java.util.Arrays;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.WidgetInfo;
 
 public class RumSmugglingStep extends ConditionalStep
 {
@@ -81,7 +81,8 @@ public class RumSmugglingStep extends ConditionalStep
 		addSteps();
 	}
 
-	private void addSteps() {
+	private void addSteps()
+	{
 		this.addStep(new Conditions(hasRumOffKaramja), bringRumToRedbeard);
 		this.addStep(new Conditions(verifiedAState, haveShippedRum, onKaramja), talkToCustomsOfficer);
 		this.addStep(new Conditions(verifiedAState, haveShippedRum, hasWhiteApron), getRumFromCrate);
@@ -98,7 +99,7 @@ public class RumSmugglingStep extends ConditionalStep
 	@Override
 	protected void updateSteps()
 	{
-		if((hadRumOffKaramja.checkCondition(client) && !hasRumOffKaramja.checkCondition(client))
+		if ((hadRumOffKaramja.checkCondition(client) && !hasRumOffKaramja.checkCondition(client))
 			|| lostRum.checkCondition(client))
 		{
 			haveShippedRum.setHasPassed(false);
@@ -120,13 +121,15 @@ public class RumSmugglingStep extends ConditionalStep
 		super.updateSteps();
 	}
 
-	private void setupZones() {
+	private void setupZones()
+	{
 		karamjaZone1 = new Zone(new WorldPoint(2688, 3235, 0), new WorldPoint(2903, 2879, 0));
 		karamjaZone2 = new Zone(new WorldPoint(2903, 2879, 0), new WorldPoint(2964, 3187, 0));
 		karamjaBoat = new Zone(new WorldPoint(2964, 3138, 0), new WorldPoint(2951, 3144, 1));
 	}
 
-	private void setupItemRequirements() {
+	private void setupItemRequirements()
+	{
 		karamjanRum = new ItemRequirement("Karamjan rum", ItemID.KARAMJAN_RUM);
 		tenBananas = new ItemRequirement("Banana", ItemID.BANANA, 10);
 		whiteApron = new ItemRequirement("White apron", ItemID.WHITE_APRON);
@@ -135,7 +138,8 @@ public class RumSmugglingStep extends ConditionalStep
 		whiteApronHanging.addAlternates(ItemID.WHITE_APRON);
 	}
 
-	private void setupConditions() {
+	private void setupConditions()
+	{
 		onKaramja = new ZoneCondition(karamjaZone1, karamjaZone2, karamjaBoat);
 		ConditionForStep offKaramja = new ZoneCondition(false, karamjaZone1, karamjaZone2, karamjaBoat);
 		ConditionForStep inPirateTreasureMenu = new WidgetTextCondition(WidgetInfo.DIARY_QUEST_WIDGET_TITLE, getQuestHelper().getQuest().getName());
@@ -166,7 +170,7 @@ public class RumSmugglingStep extends ConditionalStep
 		ConditionForStep stashedRumFromDialog = new Conditions(new WidgetTextCondition(229, 1, "You stash the rum in the crate."));
 		ConditionForStep stashedRumFromChat = new Conditions(new ChatMessageCondition("There is also some rum stashed in here too.", "There's already some rum in here...",
 			"There is some rum in here, although with no bananas to cover it. It is a little obvious."));
-		stashedRum = new Conditions(true,  LogicType.OR, stashedRumFromDialog, stashedRumFromWidget, stashedRumFromChat, employedByWydinFromWidget);
+		stashedRum = new Conditions(true, LogicType.OR, stashedRumFromDialog, stashedRumFromWidget, stashedRumFromChat, employedByWydinFromWidget);
 
 		ConditionForStep fillCrateBananas = new Conditions(new WidgetTextCondition(229, 1, "You fill the crate with bananas."));
 		fillCrateWithBananasChat = new ChatMessageCondition("The crate is full of bananas.", "The crate is already full.");
@@ -176,12 +180,13 @@ public class RumSmugglingStep extends ConditionalStep
 		ConditionForStep shippedRumFromWidget = new Conditions(inPirateTreasureMenu, new WidgetTextCondition(119, 15, "the crate has been shipped"));
 		ConditionForStep shippedRumFromDialog = new Conditions(stashedRum, crateSent);
 		ConditionForStep shippedRumFromChat = new ChatMessageCondition("There is already some rum in Wydin's store, I should go and get that first.");
-		haveShippedRum = new Conditions(true,  LogicType.OR, shippedRumFromWidget, shippedRumFromDialog, shippedRumFromChat);
+		haveShippedRum = new Conditions(true, LogicType.OR, shippedRumFromWidget, shippedRumFromDialog, shippedRumFromChat);
 
-		verifiedAState = new Conditions(true,  LogicType.OR, atStart, employedFromWidget,  employedByWydinFromWidget, stashedRumFromWidget, shippedRumFromWidget, lostRum, hadRumOffKaramja, haveRumFromWidget);
+		verifiedAState = new Conditions(true, LogicType.OR, atStart, employedFromWidget, employedByWydinFromWidget, stashedRumFromWidget, shippedRumFromWidget, lostRum, hadRumOffKaramja, haveRumFromWidget);
 	}
 
-	private void setupSteps() {
+	private void setupSteps()
+	{
 		goToKaramja = new NpcStep(getQuestHelper(), NpcID.SEAMAN_LORRIS, new WorldPoint(3027, 3222, 0),
 			"Talk to one of the Seamen on the docks in Port Sarim to go to Karamja.", new ItemRequirement("Coins", ItemID.COINS_995, 60));
 		goToKaramja.addDialogStep("Yes please.");
@@ -226,7 +231,8 @@ public class RumSmugglingStep extends ConditionalStep
 			karamjanRum);
 	}
 
-	public ArrayList<PanelDetails> panelDetails() {
+	public ArrayList<PanelDetails> panelDetails()
+	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 
 		allSteps.add(new PanelDetails("Rum smuggling", new ArrayList<>(Arrays.asList(goToKaramja, talkToZambo, talkToLuthas, addRumToCrate, addBananasToCrate, talkToLuthas))));

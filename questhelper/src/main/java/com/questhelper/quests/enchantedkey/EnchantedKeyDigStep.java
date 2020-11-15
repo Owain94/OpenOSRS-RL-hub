@@ -55,53 +55,13 @@ public class EnchantedKeyDigStep extends DetailedQuestStep
 {
 	@Inject
 	ItemManager itemManager;
-
+	int currentVar = 0;
 	@Nullable
 	private EnchantedKeySolver enchantedKeySolver;
-
-	int currentVar = 0;
 
 	public EnchantedKeyDigStep(QuestHelper questHelper, ItemRequirement... requirements)
 	{
 		super(questHelper, "Use the Enchanted Key to locate treasure.", requirements);
-	}
-
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, ArrayList<String> additionalText, Requirement... additionalRequirements)
-	{
-		super.makeOverlayHint(panelComponent, plugin, additionalText);
-		if (enchantedKeySolver == null)
-		{
-			return;
-		}
-
-		final Collection<EnchantedKeyDigLocation> digLocations = enchantedKeySolver.getPossibleLocations();
-
-		if (digLocations.size() > 1)
-		{
-			panelComponent.getChildren().add(LineComponent.builder()
-				.left("Possible locations:")
-				.build());
-		}
-		else if (digLocations.size() < 1)
-		{
-			panelComponent.getChildren().add(LineComponent.builder()
-				.left("Unable to establish dig location")
-				.build());
-		}
-		{
-			panelComponent.getChildren().add(LineComponent.builder()
-				.left("Dig location:")
-				.build());
-		}
-
-		for (EnchantedKeyDigLocation enchantedKeyDigLocation : digLocations)
-		{
-			panelComponent.getChildren().add(LineComponent.builder()
-				.left("- " + enchantedKeyDigLocation.getArea())
-				.leftColor(Color.LIGHT_GRAY)
-				.build());
-		}
 	}
 
 	@Subscribe
@@ -131,30 +91,6 @@ public class EnchantedKeyDigStep extends DetailedQuestStep
 		{
 			this.setWorldPoint(enchantedKeySolver.getPossibleLocations().iterator().next().getWorldPoint());
 		}
-	}
-
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWorldOverlayHint(graphics, plugin);
-
-		if (inCutscene)
-		{
-			return;
-		}
-		if (worldPoint == null)
-		{
-			return;
-		}
-
-		LocalPoint localLocation = LocalPoint.fromWorld(client, worldPoint);
-
-		if (localLocation == null)
-		{
-			return;
-		}
-
-		OverlayUtil.renderTileOverlay(client, graphics, localLocation, getSpadeImage(), Color.CYAN);
 	}
 
 	@Subscribe
@@ -222,6 +158,68 @@ public class EnchantedKeyDigStep extends DetailedQuestStep
 	{
 		super.shutDown();
 		this.setWorldPoint(null);
+	}
+
+	@Override
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, ArrayList<String> additionalText, Requirement... additionalRequirements)
+	{
+		super.makeOverlayHint(panelComponent, plugin, additionalText);
+		if (enchantedKeySolver == null)
+		{
+			return;
+		}
+
+		final Collection<EnchantedKeyDigLocation> digLocations = enchantedKeySolver.getPossibleLocations();
+
+		if (digLocations.size() > 1)
+		{
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("Possible locations:")
+				.build());
+		}
+		else if (digLocations.size() < 1)
+		{
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("Unable to establish dig location")
+				.build());
+		}
+		{
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("Dig location:")
+				.build());
+		}
+
+		for (EnchantedKeyDigLocation enchantedKeyDigLocation : digLocations)
+		{
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("- " + enchantedKeyDigLocation.getArea())
+				.leftColor(Color.LIGHT_GRAY)
+				.build());
+		}
+	}
+
+	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWorldOverlayHint(graphics, plugin);
+
+		if (inCutscene)
+		{
+			return;
+		}
+		if (worldPoint == null)
+		{
+			return;
+		}
+
+		LocalPoint localLocation = LocalPoint.fromWorld(client, worldPoint);
+
+		if (localLocation == null)
+		{
+			return;
+		}
+
+		OverlayUtil.renderTileOverlay(client, graphics, localLocation, getSpadeImage(), Color.CYAN);
 	}
 
 	private BufferedImage getSpadeImage()

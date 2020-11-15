@@ -62,33 +62,6 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 
 	Zone diningRoom, upstairsTrailborn, quizSpot;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goInspectGuide = new ConditionalStep(this, enterDiningRoom);
-		goInspectGuide.addStep(inDiningRoom, inspectLumbridgeGuide);
-		steps.put(0, goInspectGuide);
-
-		ConditionalStep goTalkToTrailborn = new ConditionalStep(this, goUpToTraiborn);
-		goTalkToTrailborn.addStep(inUpstairsTrailborn, talkToTraiborn);
-		steps.put(1, goTalkToTrailborn);
-		steps.put(2, goTalkToTrailborn);
-
-		ConditionalStep saveGuide = new ConditionalStep(this, mixIngredients);
-		saveGuide.addStep(new Conditions(hasCake, inDiningRoom), useCakeOnLumbridgeGuide);
-		saveGuide.addStep(hasCake, enterDiningRoomAgain);
-		saveGuide.addStep(hasRawCake, cookCake);
-		steps.put(3, saveGuide);
-		steps.put(4, saveGuide);
-		return steps;
-	}
-
 	public void setupRequirements()
 	{
 		milk = new ItemRequirement("Bucket of milk", ItemID.BUCKET_OF_MILK);
@@ -149,12 +122,6 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		return new ArrayList<>(Arrays.asList(milk, egg, flour, tin));
-	}
-
-	@Override
 	public ArrayList<PanelDetails> getPanels()
 	{
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
@@ -163,8 +130,41 @@ public class RFDLumbridgeGuide extends BasicQuestHelper
 	}
 
 	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goInspectGuide = new ConditionalStep(this, enterDiningRoom);
+		goInspectGuide.addStep(inDiningRoom, inspectLumbridgeGuide);
+		steps.put(0, goInspectGuide);
+
+		ConditionalStep goTalkToTrailborn = new ConditionalStep(this, goUpToTraiborn);
+		goTalkToTrailborn.addStep(inUpstairsTrailborn, talkToTraiborn);
+		steps.put(1, goTalkToTrailborn);
+		steps.put(2, goTalkToTrailborn);
+
+		ConditionalStep saveGuide = new ConditionalStep(this, mixIngredients);
+		saveGuide.addStep(new Conditions(hasCake, inDiningRoom), useCakeOnLumbridgeGuide);
+		saveGuide.addStep(hasCake, enterDiningRoomAgain);
+		saveGuide.addStep(hasRawCake, cookCake);
+		steps.put(3, saveGuide);
+		steps.put(4, saveGuide);
+		return steps;
+	}
+
+	@Override
 	public boolean isCompleted()
 	{
 		return (client.getVarbitValue(1896) >= 5 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		return new ArrayList<>(Arrays.asList(milk, egg, flour, tin));
 	}
 }

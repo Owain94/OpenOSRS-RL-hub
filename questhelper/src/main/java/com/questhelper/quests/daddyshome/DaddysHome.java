@@ -24,11 +24,17 @@
  */
 package com.questhelper.quests.daddyshome;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
@@ -41,12 +47,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DADDYS_HOME
@@ -56,61 +56,13 @@ public class DaddysHome extends BasicQuestHelper
 	ItemRequirement plank10, nails20, bolt5, hammer, saw, waxwoodLog3, waxwoodPlank3, bolt2, bolt3, nails2, nails4, plank, plank3, plank2, lumberyardTeleport, varrockTeleport3;
 
 	ConditionForStep removedChair, removedTable, removedTable2, removedStool, removedStool2, removedCampbed,
-			removedCarpet, hasLogs, hasPlanks, repairedCampbed, repairedCarpet, repairedStool, repairedTable,
-			repairedChair, repairedStool2, repairedTable2;
+		removedCarpet, hasLogs, hasPlanks, repairedCampbed, repairedCarpet, repairedStool, repairedTable,
+		repairedChair, repairedStool2, repairedTable2;
 
 	DetailedQuestStep talkToMarlo, talkToYarlo, removeChair, removeCarpet, removeStool,
-			removeStool2, removeTable, removeTable2, removeCampbed, talkToYarloAgain, searchCrate,
-			talkToOperator, buildChair, buildCarpet, buildStool, buildStool2, buildTable, buildTable2, buildCampbed,
-			talkToYarloOnceMore, talkToMarloToFinish;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToMarlo);
-		steps.put(1, talkToYarlo);
-
-		ConditionalStep removeItems = new ConditionalStep(this, removeCampbed);
-		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable, removedChair, removedStool2, removedTable2), talkToYarloAgain);
-		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable, removedChair, removedStool2), removeTable2);
-		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable, removedChair), removeStool2);
-		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable), removeChair);
-		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool), removeTable);
-		removeItems.addStep(new Conditions(removedCampbed, removedCarpet), removeStool);
-		removeItems.addStep(removedCampbed, removeCarpet);
-
-		steps.put(2, removeItems);
-		steps.put(3, talkToYarloAgain);
-		steps.put(4, talkToYarloAgain);
-
-		ConditionalStep repairFurniture = new ConditionalStep(this, buildCarpet);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2, repairedCampbed), talkToYarloOnceMore);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2, hasPlanks), buildCampbed);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2, hasLogs), talkToOperator);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2), searchCrate);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2), buildTable2);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair), buildStool2);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable), buildChair);
-		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool), buildTable);
-		repairFurniture.addStep(new Conditions(repairedCarpet), buildStool);
-
-		steps.put(5, repairFurniture);
-		steps.put(6, repairFurniture);
-		steps.put(7, repairFurniture);
-		steps.put(8, repairFurniture);
-		steps.put(9, repairFurniture);
-
-		steps.put(10, talkToMarloToFinish);
-		steps.put(11, talkToMarloToFinish);
-		steps.put(12, talkToMarloToFinish);
-
-		return steps;
-	}
+		removeStool2, removeTable, removeTable2, removeCampbed, talkToYarloAgain, searchCrate,
+		talkToOperator, buildChair, buildCarpet, buildStool, buildStool2, buildTable, buildTable2, buildCampbed,
+		talkToYarloOnceMore, talkToMarloToFinish;
 
 	public void setupItemRequirements()
 	{
@@ -216,5 +168,53 @@ public class DaddysHome extends BasicQuestHelper
 		ArrayList<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Helping Yarlo & Marlo", new ArrayList<>(Arrays.asList(talkToMarlo, talkToYarlo, removeCampbed, talkToYarloAgain, buildCarpet, searchCrate, talkToOperator, buildCampbed, talkToYarloOnceMore, talkToMarloToFinish)), plank10, nails20, bolt5, hammer, saw));
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToMarlo);
+		steps.put(1, talkToYarlo);
+
+		ConditionalStep removeItems = new ConditionalStep(this, removeCampbed);
+		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable, removedChair, removedStool2, removedTable2), talkToYarloAgain);
+		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable, removedChair, removedStool2), removeTable2);
+		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable, removedChair), removeStool2);
+		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool, removedTable), removeChair);
+		removeItems.addStep(new Conditions(removedCampbed, removedCarpet, removedStool), removeTable);
+		removeItems.addStep(new Conditions(removedCampbed, removedCarpet), removeStool);
+		removeItems.addStep(removedCampbed, removeCarpet);
+
+		steps.put(2, removeItems);
+		steps.put(3, talkToYarloAgain);
+		steps.put(4, talkToYarloAgain);
+
+		ConditionalStep repairFurniture = new ConditionalStep(this, buildCarpet);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2, repairedCampbed), talkToYarloOnceMore);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2, hasPlanks), buildCampbed);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2, hasLogs), talkToOperator);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2, repairedTable2), searchCrate);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair, repairedStool2), buildTable2);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable, repairedChair), buildStool2);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool, repairedTable), buildChair);
+		repairFurniture.addStep(new Conditions(repairedCarpet, repairedStool), buildTable);
+		repairFurniture.addStep(new Conditions(repairedCarpet), buildStool);
+
+		steps.put(5, repairFurniture);
+		steps.put(6, repairFurniture);
+		steps.put(7, repairFurniture);
+		steps.put(8, repairFurniture);
+		steps.put(9, repairFurniture);
+
+		steps.put(10, talkToMarloToFinish);
+		steps.put(11, talkToMarloToFinish);
+		steps.put(12, talkToMarloToFinish);
+
+		return steps;
 	}
 }

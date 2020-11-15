@@ -62,6 +62,20 @@ public class LockpickPuzzle extends QuestStep
 		this.addText("Tumbler 4: " + client.getVarbitValue(TUMBLER_ANSWERS[3]) + ".");
 	}
 
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		Widget widgetWrapper = client.getWidget(588, highlightChildID);
+		if (widgetWrapper != null)
+		{
+			graphics.setColor(new Color(0, 255, 255, 65));
+			graphics.fill(widgetWrapper.getBounds());
+			graphics.setColor(Color.CYAN);
+			graphics.draw(widgetWrapper.getBounds());
+		}
+	}
+
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
@@ -117,20 +131,6 @@ public class LockpickPuzzle extends QuestStep
 		else
 		{
 			highlightChildID = UP_WIDGET;
-		}
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		Widget widgetWrapper = client.getWidget(588, highlightChildID);
-		if (widgetWrapper != null)
-		{
-			graphics.setColor(new Color(0, 255, 255, 65));
-			graphics.fill(widgetWrapper.getBounds());
-			graphics.setColor(Color.CYAN);
-			graphics.draw(widgetWrapper.getBounds());
 		}
 	}
 }

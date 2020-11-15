@@ -62,35 +62,6 @@ public class DruidicRitual extends BasicQuestHelper
 
 	Zone dungeon, sanfewRoom;
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToKaqemeex);
-
-		ConditionalStep goTalkToSanfew = new ConditionalStep(this, goUpToSanfew);
-		goTalkToSanfew.addStep(inSanfewRoom, talkToSanfew);
-		steps.put(1, goTalkToSanfew);
-
-		ConditionalStep prepareMeats = new ConditionalStep(this, enterDungeon);
-		prepareMeats.addStep(new Conditions(inSanfewRoom, hasEnchantedRat, hasEnchantedBear, hasEnchantedBeef, hasEnchantedChicken), talkToSanfewWithMeat);
-		prepareMeats.addStep(new Conditions(hasEnchantedRat, hasEnchantedBear, hasEnchantedBeef, hasEnchantedChicken), goUpToSanfewWithMeat);
-		prepareMeats.addStep(new Conditions(inDungeon, hasEnchantedRat, hasEnchantedBear, hasEnchantedBeef), useChickenOnCauldron);
-		prepareMeats.addStep(new Conditions(inDungeon, hasEnchantedRat, hasEnchantedBear), useBeefOnCauldron);
-		prepareMeats.addStep(new Conditions(inDungeon, hasEnchantedRat), useBearOnCauldron);
-		prepareMeats.addStep(inDungeon, useRatOnCauldron);
-		steps.put(2, prepareMeats);
-
-		steps.put(3, talkToKaqemeexToFinish);
-
-		return steps;
-	}
-
 	public void setupItemRequirements()
 	{
 		rawRat = new ItemRequirement("Raw rat meat", ItemID.RAW_RAT_MEAT);
@@ -184,5 +155,34 @@ public class DruidicRitual extends BasicQuestHelper
 			new ArrayList<>(Arrays.asList(talkToKaqemeex, talkToSanfew, enterDungeon, enchantMeats, talkToSanfewWithMeat, talkToKaqemeexToFinish)), rawBear, rawBeef, rawChicken, rawRat));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToKaqemeex);
+
+		ConditionalStep goTalkToSanfew = new ConditionalStep(this, goUpToSanfew);
+		goTalkToSanfew.addStep(inSanfewRoom, talkToSanfew);
+		steps.put(1, goTalkToSanfew);
+
+		ConditionalStep prepareMeats = new ConditionalStep(this, enterDungeon);
+		prepareMeats.addStep(new Conditions(inSanfewRoom, hasEnchantedRat, hasEnchantedBear, hasEnchantedBeef, hasEnchantedChicken), talkToSanfewWithMeat);
+		prepareMeats.addStep(new Conditions(hasEnchantedRat, hasEnchantedBear, hasEnchantedBeef, hasEnchantedChicken), goUpToSanfewWithMeat);
+		prepareMeats.addStep(new Conditions(inDungeon, hasEnchantedRat, hasEnchantedBear, hasEnchantedBeef), useChickenOnCauldron);
+		prepareMeats.addStep(new Conditions(inDungeon, hasEnchantedRat, hasEnchantedBear), useBeefOnCauldron);
+		prepareMeats.addStep(new Conditions(inDungeon, hasEnchantedRat), useBearOnCauldron);
+		prepareMeats.addStep(inDungeon, useRatOnCauldron);
+		steps.put(2, prepareMeats);
+
+		steps.put(3, talkToKaqemeexToFinish);
+
+		return steps;
 	}
 }

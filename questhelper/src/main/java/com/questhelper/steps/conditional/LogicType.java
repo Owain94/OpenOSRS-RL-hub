@@ -24,7 +24,8 @@
  */
 package com.questhelper.steps.conditional;
 
-public enum LogicType {
+public enum LogicType
+{
 	AND,
 	OR,
 	NAND,

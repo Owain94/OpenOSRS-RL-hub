@@ -25,11 +25,11 @@
  */
 package com.questhelper;
 
+import com.questhelper.questhelpers.QuestHelper;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import javax.inject.Inject;
-import com.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;

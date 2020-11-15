@@ -24,10 +24,8 @@
  */
 package com.questhelper.requirements;
 
-import com.google.common.base.CaseFormat;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
 import net.runelite.api.Client;
 import net.runelite.api.Prayer;
 import net.runelite.client.ui.overlay.components.LineComponent;

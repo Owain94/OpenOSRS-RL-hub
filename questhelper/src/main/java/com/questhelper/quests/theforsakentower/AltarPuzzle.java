@@ -25,17 +25,17 @@
 package com.questhelper.quests.theforsakentower;
 
 import com.google.inject.Inject;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.OwnerStep;
 import com.questhelper.steps.conditional.ZoneCondition;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -58,20 +58,14 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 
 	@Inject
 	protected Client client;
-
-	private QuestStep currentStep;
-
 	ItemRequirement ring1, ring2, ring3, ring4;
-
 	Zone secondFloor, floor1, basement;
-
 	ConditionForStep inSecondFloor, inFloor1, inBasement;
-
 	DetailedQuestStep goUpLadder, goUpStairs, goUpToSecondFloor, restartStep, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15;
-
 	ArrayList<DetailedQuestStep> rebalanceW = new ArrayList<>();
 	ArrayList<DetailedQuestStep> rebalanceE = new ArrayList<>();
 	ArrayList<DetailedQuestStep> rebalanceC = new ArrayList<>();
+	private QuestStep currentStep;
 
 
 	public AltarPuzzle(QuestHelper questHelper)
@@ -94,6 +88,37 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 	{
 		shutDownStep();
 		currentStep = null;
+	}
+
+	@Override
+	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
+		}
+	}
+
+	@Override
+	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		if (currentStep != null)
+		{
+			currentStep.makeWorldOverlayHint(graphics, plugin);
+		}
+	}
+
+	@Override
+	public QuestStep getActiveStep()
+	{
+		if (currentStep != this)
+		{
+			return currentStep.getActiveStep();
+		}
+		else
+		{
+			return this;
+		}
 	}
 
 	@Subscribe
@@ -303,37 +328,6 @@ public class AltarPuzzle extends QuestStep implements OwnerStep
 			eventBus.unregister(currentStep);
 			currentStep.shutDown();
 			currentStep = null;
-		}
-	}
-
-	@Override
-	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... requirements)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeOverlayHint(panelComponent, plugin, requirements);
-		}
-	}
-
-	@Override
-	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		if (currentStep != null)
-		{
-			currentStep.makeWorldOverlayHint(graphics, plugin);
-		}
-	}
-
-	@Override
-	public QuestStep getActiveStep()
-	{
-		if (currentStep != this)
-		{
-			return currentStep.getActiveStep();
-		}
-		else
-		{
-			return this;
 		}
 	}
 

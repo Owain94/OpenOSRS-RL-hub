@@ -24,11 +24,19 @@
  */
 package com.questhelper.quests.onesmallfavour;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
+import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -46,14 +54,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -67,7 +67,7 @@ public class OneSmallFavour extends BasicQuestHelper
 		weathervanePillar, directionals, weatherReport, unfiredPotLid, potLid, potWithLid, breathingSalts, chickenCages5, sharpenedAxe, redMahog;
 
 	ConditionForStep inSanfewRoom, inHamBase, inDwarvenMine, brianAskingQuestion, sanfewAskingQuestion, hasGuthixRest, inGoblinCave, lamp1Empty, lamp1Full, lamp2Empty, lamp2Full,
-		lamp3Empty, lamp3Full, lamp4Empty, lamp4Full, lamp5Empty, lamp5Full,lamp6Empty, lamp6Full, lamp7Empty, lamp7Full, lamp8Empty, lamp8Full, allEmpty, allFull, hasSapphire, hasOpal,
+		lamp3Empty, lamp3Full, lamp4Empty, lamp4Full, lamp5Empty, lamp5Full, lamp6Empty, lamp6Full, lamp7Empty, lamp7Full, lamp8Empty, lamp8Full, allEmpty, allFull, hasSapphire, hasOpal,
 		hasJade, hasRedTopaz, hasPigeonCages, inScrollSpot, slagilithNearby, petraNearby, inSeersVillageUpstairs, onRoof, hasOrnament, hasWeathervanePillar, hasDirectionals, hasPot,
 		addedOrnaments, addedDirectionals, addedWeathervanePillar, hasOrUsedOrnament, hasOrUsedDirectionals, hasOrUsedWeathervanePillar, hasPotWithLid, hasPotLid, hasUnfiredPotLid;
 
@@ -83,234 +83,6 @@ public class OneSmallFavour extends BasicQuestHelper
 		useVane23OnAnvil, useVane1OnAnvil, fixAllLamps, searchVaneAgain;
 
 	Zone sanfewRoom, hamBase, dwarvenMine, goblinCave, scrollSpot, seersVillageUpstairs, roof;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToYanni);
-		steps.put(5, talkToJungleForester);
-
-		ConditionalStep conversationWithBrian = new ConditionalStep(this, talkToBrian);
-		conversationWithBrian.addStep(brianAskingQuestion, talkToBrianAnswer);
-
-		steps.put(10, conversationWithBrian);
-		steps.put(15, conversationWithBrian);
-
-		steps.put(20, talkToAggie);
-
-		ConditionalStep goTalkToJohanhus = new ConditionalStep(this, goDownToJohanhus);
-		goTalkToJohanhus.addStep(inHamBase, talkToJohanhus);
-
-		steps.put(25, goTalkToJohanhus);
-		steps.put(30, goTalkToJohanhus);
-		steps.put(35, goTalkToJohanhus);
-		steps.put(40, goTalkToJohanhus);
-
-		steps.put(45, talkToFred);
-		steps.put(50, talkToSeth);
-		steps.put(55, talkToHorvik);
-		steps.put(60, talkToApoth);
-		steps.put(62, talkToApoth);
-		steps.put(63, talkToApoth);
-
-		steps.put(65, talkToTassie);
-
-		ConditionalStep goTalkToHammerspike = new ConditionalStep(this, goDownToHammerspike);
-		goTalkToHammerspike.addStep(inDwarvenMine, talkToHammerspike);
-
-		steps.put(70, goTalkToHammerspike);
-
-		ConditionalStep goTalkToSanfew = new ConditionalStep(this, goUpToSanfew);
-		goTalkToSanfew.addStep(new Conditions(inSanfewRoom, sanfewAskingQuestion), talkToSanfewQuestion);
-		goTalkToSanfew.addStep(inSanfewRoom, talkToSanfew);
-
-		steps.put(75, goTalkToSanfew);
-
-		ConditionalStep makeGuthixRestForGnome = new ConditionalStep(this, makeGuthixRest);
-		makeGuthixRestForGnome.addStep(hasGuthixRest, talkToBleemadge);
-
-		steps.put(80, makeGuthixRestForGnome);
-		steps.put(81, makeGuthixRestForGnome);
-		steps.put(82, makeGuthixRestForGnome);
-		steps.put(83, makeGuthixRestForGnome);
-		steps.put(84, makeGuthixRestForGnome);
-
-		steps.put(86, talkToBleemadgeNoTea);
-
-		steps.put(88, talkToArhein);
-
-		steps.put(90, talkToPhantuwti);
-
-		ConditionalStep investigateWall = new ConditionalStep(this, enterGoblinCave);
-		investigateWall.addStep(inGoblinCave, searchWall);
-
-		steps.put(95, investigateWall);
-
-		steps.put(100, talkToCromperty);
-
-		steps.put(105, talkToTindel);
-
-		steps.put(110, talkToRantz);
-
-		steps.put(115, talkToGnormadium);
-
-		ConditionalStep repairLights = new ConditionalStep(this, take1);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Full, lamp8Empty, hasSapphire), put8);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Full, lamp8Empty), cutSaph);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Full), take8);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Empty, hasOpal), put7);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Empty), cutOpal);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full), take7);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Empty, hasRedTopaz), put6);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Empty), cutTopaz);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full), take6);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Empty, hasJade), put5);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Empty), cutJade);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full), take5);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Empty, hasSapphire), put4);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Empty), cutSaph);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full), take4);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Empty, hasOpal), put3);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Empty), cutOpal);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Full), take3);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Empty, hasRedTopaz), put2);
-		repairLights.addStep(new Conditions(lamp1Full, lamp2Empty), cutTopaz);
-		repairLights.addStep(lamp1Full, take2);
-		repairLights.addStep(new Conditions(lamp1Empty, hasJade), put1);
-		repairLights.addStep(lamp1Empty, cutJade);
-
-		steps.put(120, repairLights);
-
-		steps.put(125, talkToGnormadiumAgain);
-
-		steps.put(130, returnToRantz);
-
-		steps.put(135, returnToTindel);
-
-		steps.put(140, returnToCromperty);
-
-		ConditionalStep fightSlagilith = new ConditionalStep(this, getPigeonCages);
-		fightSlagilith.addStep(slagilithNearby, killSlagilith);
-		fightSlagilith.addStep(inScrollSpot, readScroll);
-		fightSlagilith.addStep(inGoblinCave, standNextToSculpture);
-		fightSlagilith.addStep(hasPigeonCages, enterGoblinCaveAgain);
-
-		steps.put(145, fightSlagilith);
-		steps.put(150, fightSlagilith);
-
-		ConditionalStep freePetra = new ConditionalStep(this, getPigeonCages);
-		freePetra.addStep(petraNearby, talkToPetra);
-		freePetra.addStep(inScrollSpot, readScroll);
-		freePetra.addStep(inGoblinCave, standNextToSculpture);
-		freePetra.addStep(hasPigeonCages, enterGoblinCaveAgain);
-
-		steps.put(152, freePetra);
-		steps.put(155, freePetra);
-
-		steps.put(160, returnToPhantuwti);
-		steps.put(165, returnToPhantuwti2);
-		steps.put(170, returnToPhantuwti2);
-
-		ConditionalStep repairVane = new ConditionalStep(this, goUpLadder);
-		repairVane.addStep(onRoof, searchVane);
-		repairVane.addStep(inSeersVillageUpstairs, goUpToRoof);
-
-		steps.put(175, repairVane);
-
-		ConditionalStep hitVane = new ConditionalStep(this, goUpLadder);
-		hitVane.addStep(onRoof, useHammerOnVane);
-		hitVane.addStep(inSeersVillageUpstairs, goUpToRoof);
-
-		steps.put(176, hitVane);
-
-		ConditionalStep getVaneBits = new ConditionalStep(this, goUpLadder);
-		getVaneBits.addStep(onRoof, searchVaneAgain);
-		getVaneBits.addStep(inSeersVillageUpstairs, goUpToRoof);
-
-		steps.put(177, getVaneBits);
-
-		ConditionalStep repairVaneParts = new ConditionalStep(this, useVane123OnAnvil);
-
-		repairVaneParts.addStep(new Conditions(addedOrnaments, addedDirectionals, hasWeathervanePillar, onRoof), useVane3);
-		repairVaneParts.addStep(new Conditions(addedOrnaments, hasDirectionals, onRoof), useVane2);
-		repairVaneParts.addStep(new Conditions(hasOrnament, onRoof), useVane1);
-		repairVaneParts.addStep(onRoof, goDownFromRoof);
-		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedOrnament, hasOrUsedWeathervanePillar, inSeersVillageUpstairs), goBackUpToRoof);
-		repairVaneParts.addStep(inSeersVillageUpstairs, goDownLadderToSeers);
-		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedOrnament, hasOrUsedWeathervanePillar), goBackUpLadder);
-		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedOrnament), useVane3OnAnvil);
-		repairVaneParts.addStep(new Conditions(hasOrUsedOrnament, hasOrUsedWeathervanePillar), useVane1OnAnvil);
-		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedWeathervanePillar), useVane2OnAnvil);
-		repairVaneParts.addStep(hasOrUsedOrnament, useVane13OnAnvil);
-		repairVaneParts.addStep(hasOrUsedWeathervanePillar, useVane12OnAnvil);
-		repairVaneParts.addStep(hasOrUsedDirectionals, useVane23OnAnvil);
-
-		steps.put(180, repairVaneParts);
-
-		ConditionalStep reportBackToPhantuwti = new ConditionalStep(this, finishWithPhantuwti);
-		reportBackToPhantuwti.addStep(inSeersVillageUpstairs, goDownLadderToPhantuwti);
-		reportBackToPhantuwti.addStep(onRoof, goFromRoofToPhantuwti);
-
-		steps.put(185, reportBackToPhantuwti);
-
-		steps.put(190, returnToArhein);
-
-		steps.put(195, returnToBleemadge);
-
-		ConditionalStep goAndReturnToSanfew = new ConditionalStep(this, returnUpToSanfew);
-		goAndReturnToSanfew.addStep(inSanfewRoom, returnToSanfew);
-		steps.put(200, goAndReturnToSanfew);
-
-		ConditionalStep dealWithHammerspike = new ConditionalStep(this, goDownToHammerspikeAgain);
-		dealWithHammerspike.addStep(inDwarvenMine, returnToHammerspike);
-
-		steps.put(205, dealWithHammerspike);
-
-		ConditionalStep sortOutGangMembers = new ConditionalStep(this, goDownToHammerspikeAgain);
-		sortOutGangMembers.addStep(inDwarvenMine, killGangMembers);
-
-		steps.put(210, sortOutGangMembers);
-		steps.put(215, sortOutGangMembers);
-		steps.put(220, sortOutGangMembers);
-		steps.put(225, dealWithHammerspike);
-
-		steps.put(230, returnToTassie);
-
-		ConditionalStep makePotAndReturnToApoth = new ConditionalStep(this, spinPotLid);
-		makePotAndReturnToApoth.addStep(hasPotWithLid, returnToApothecary);
-		makePotAndReturnToApoth.addStep(new Conditions(hasPotLid, hasPot), usePotLidOnPot);
-		makePotAndReturnToApoth.addStep(hasPotLid, pickUpPot);
-		makePotAndReturnToApoth.addStep(hasUnfiredPotLid, firePotLid);
-
-		steps.put(235, makePotAndReturnToApoth);
-
-		steps.put(240, returnToHorvik);
-
-		steps.put(245, talkToHorvikFinal);
-
-		steps.put(250, returnToSeth);
-
-		ConditionalStep goFinishWithJohanhus = new ConditionalStep(this, returnDownToJohnahus);
-		goFinishWithJohanhus.addStep(inHamBase, returnToJohnahus);
-
-		steps.put(255, goFinishWithJohanhus);
-
-		steps.put(260, returnToAggie);
-
-		steps.put(265, returnToBrian);
-
-		steps.put(270, returnToForester);
-
-		steps.put(275, returnToYanni);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -541,7 +313,7 @@ public class OneSmallFavour extends BasicQuestHelper
 		talkToTassie = new NpcStep(this, NpcID.TASSIE_SLIPCAST, new WorldPoint(3085, 3409, 0), "Talk to Tassie Slipcast in the Barbarian Village pottery building.");
 		talkToTassie.addDialogStep("Ok, I'll deal with Hammerspike!");
 
-		goDownToHammerspike = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450,0), "Go into the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
+		goDownToHammerspike = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0), "Go into the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
 		talkToHammerspike = new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Talk to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
 		talkToHammerspike.addDialogStep("Have you always been a gangster?");
 		talkToHammerspike.addDialogStep("Ok, another favour...I think I can manage that.");
@@ -690,7 +462,7 @@ public class OneSmallFavour extends BasicQuestHelper
 		goBackUpToRoof = new ObjectStep(this, ObjectID.LADDER_26118, new WorldPoint(2715, 3472, 1), "Go back up to the Seers' roof and fix the vane.");
 		useVane1 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the ornament on the weathervane.", ornament);
 		useVane2 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the directionals on the weathervane.", directionals);
-		useVane3 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the weathervane pillar on the weathervane.",weathervanePillar);
+		useVane3 = new ObjectStep(this, NullObjectID.NULL_5811, new WorldPoint(2702, 3476, 3), "Use the weathervane pillar on the weathervane.", weathervanePillar);
 		goBackUpLadder.addSubSteps(goBackUpToRoof, useVane1, useVane2, useVane3);
 
 		goFromRoofToPhantuwti = new ObjectStep(this, ObjectID.TRAPDOOR_26119, new WorldPoint(2715, 3472, 3), "Return to Phantuwti.");
@@ -709,12 +481,12 @@ public class OneSmallFavour extends BasicQuestHelper
 		returnToSanfew = new NpcStep(this, NpcID.SANFEW, new WorldPoint(2899, 3429, 1), "Return to Sanfew upstairs in the Taverley herblore store.");
 		returnToSanfew.addDialogStep("Hi there, the Gnome Pilot has agreed to take you to see the ogres!");
 
-		goDownToHammerspikeAgain = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450,0), "Return to the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
+		goDownToHammerspikeAgain = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0), "Return to the Dwarven Mine and talk to Hammerspike Stoutbeard in the west side.");
 		returnToHammerspike = new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Return to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
 		returnToHammerspike.addSubSteps(goDownToHammerspike);
 
 		killGangMembers = new NpcStep(this, NpcID.DWARF_GANG_MEMBER, new WorldPoint(2968, 9811, 0), "Kill dwarf gang members until Hammerspike gives in.");
-		talkToHammerspikeFinal =  new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Return to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
+		talkToHammerspikeFinal = new NpcStep(this, NpcID.HAMMERSPIKE_STOUTBEARD, new WorldPoint(2968, 9811, 0), "Return to Hammerspike Stoutbeard in the west cavern of the Dwarven Mine.");
 		returnToTassie = new NpcStep(this, NpcID.TASSIE_SLIPCAST, new WorldPoint(3085, 3409, 0), "Return to Tassie Slipcast in the Barbarian Village pottery building.");
 		spinPotLid = new ObjectStep(this, ObjectID.POTTERS_WHEEL_14887, new WorldPoint(3087, 3409, 0), "Spin the clay into a pot lid.", softClay);
 		pickUpPot = new ItemStep(this, "Get a pot to put your lid on. There's on in the Barbarian Village helmet shop.", pot);
@@ -785,5 +557,233 @@ public class OneSmallFavour extends BasicQuestHelper
 			killGangMembers, talkToHammerspikeFinal, returnToTassie, spinPotLid, firePotLid, pickUpPot, usePotLidOnPot, returnToApothecary, returnToHorvik, talkToHorvikFinal, returnToSeth, returnToJohnahus, returnToAggie, returnToBrian, returnToForester, returnToYanni)), bronzeBar, ironBar, steelBar, hammer));
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToYanni);
+		steps.put(5, talkToJungleForester);
+
+		ConditionalStep conversationWithBrian = new ConditionalStep(this, talkToBrian);
+		conversationWithBrian.addStep(brianAskingQuestion, talkToBrianAnswer);
+
+		steps.put(10, conversationWithBrian);
+		steps.put(15, conversationWithBrian);
+
+		steps.put(20, talkToAggie);
+
+		ConditionalStep goTalkToJohanhus = new ConditionalStep(this, goDownToJohanhus);
+		goTalkToJohanhus.addStep(inHamBase, talkToJohanhus);
+
+		steps.put(25, goTalkToJohanhus);
+		steps.put(30, goTalkToJohanhus);
+		steps.put(35, goTalkToJohanhus);
+		steps.put(40, goTalkToJohanhus);
+
+		steps.put(45, talkToFred);
+		steps.put(50, talkToSeth);
+		steps.put(55, talkToHorvik);
+		steps.put(60, talkToApoth);
+		steps.put(62, talkToApoth);
+		steps.put(63, talkToApoth);
+
+		steps.put(65, talkToTassie);
+
+		ConditionalStep goTalkToHammerspike = new ConditionalStep(this, goDownToHammerspike);
+		goTalkToHammerspike.addStep(inDwarvenMine, talkToHammerspike);
+
+		steps.put(70, goTalkToHammerspike);
+
+		ConditionalStep goTalkToSanfew = new ConditionalStep(this, goUpToSanfew);
+		goTalkToSanfew.addStep(new Conditions(inSanfewRoom, sanfewAskingQuestion), talkToSanfewQuestion);
+		goTalkToSanfew.addStep(inSanfewRoom, talkToSanfew);
+
+		steps.put(75, goTalkToSanfew);
+
+		ConditionalStep makeGuthixRestForGnome = new ConditionalStep(this, makeGuthixRest);
+		makeGuthixRestForGnome.addStep(hasGuthixRest, talkToBleemadge);
+
+		steps.put(80, makeGuthixRestForGnome);
+		steps.put(81, makeGuthixRestForGnome);
+		steps.put(82, makeGuthixRestForGnome);
+		steps.put(83, makeGuthixRestForGnome);
+		steps.put(84, makeGuthixRestForGnome);
+
+		steps.put(86, talkToBleemadgeNoTea);
+
+		steps.put(88, talkToArhein);
+
+		steps.put(90, talkToPhantuwti);
+
+		ConditionalStep investigateWall = new ConditionalStep(this, enterGoblinCave);
+		investigateWall.addStep(inGoblinCave, searchWall);
+
+		steps.put(95, investigateWall);
+
+		steps.put(100, talkToCromperty);
+
+		steps.put(105, talkToTindel);
+
+		steps.put(110, talkToRantz);
+
+		steps.put(115, talkToGnormadium);
+
+		ConditionalStep repairLights = new ConditionalStep(this, take1);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Full, lamp8Empty, hasSapphire), put8);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Full, lamp8Empty), cutSaph);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Full), take8);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Empty, hasOpal), put7);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full, lamp7Empty), cutOpal);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Full), take7);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Empty, hasRedTopaz), put6);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full, lamp6Empty), cutTopaz);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Full), take6);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Empty, hasJade), put5);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full, lamp5Empty), cutJade);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Full), take5);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Empty, hasSapphire), put4);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full, lamp4Empty), cutSaph);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Full), take4);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Empty, hasOpal), put3);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full, lamp3Empty), cutOpal);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Full), take3);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Empty, hasRedTopaz), put2);
+		repairLights.addStep(new Conditions(lamp1Full, lamp2Empty), cutTopaz);
+		repairLights.addStep(lamp1Full, take2);
+		repairLights.addStep(new Conditions(lamp1Empty, hasJade), put1);
+		repairLights.addStep(lamp1Empty, cutJade);
+
+		steps.put(120, repairLights);
+
+		steps.put(125, talkToGnormadiumAgain);
+
+		steps.put(130, returnToRantz);
+
+		steps.put(135, returnToTindel);
+
+		steps.put(140, returnToCromperty);
+
+		ConditionalStep fightSlagilith = new ConditionalStep(this, getPigeonCages);
+		fightSlagilith.addStep(slagilithNearby, killSlagilith);
+		fightSlagilith.addStep(inScrollSpot, readScroll);
+		fightSlagilith.addStep(inGoblinCave, standNextToSculpture);
+		fightSlagilith.addStep(hasPigeonCages, enterGoblinCaveAgain);
+
+		steps.put(145, fightSlagilith);
+		steps.put(150, fightSlagilith);
+
+		ConditionalStep freePetra = new ConditionalStep(this, getPigeonCages);
+		freePetra.addStep(petraNearby, talkToPetra);
+		freePetra.addStep(inScrollSpot, readScroll);
+		freePetra.addStep(inGoblinCave, standNextToSculpture);
+		freePetra.addStep(hasPigeonCages, enterGoblinCaveAgain);
+
+		steps.put(152, freePetra);
+		steps.put(155, freePetra);
+
+		steps.put(160, returnToPhantuwti);
+		steps.put(165, returnToPhantuwti2);
+		steps.put(170, returnToPhantuwti2);
+
+		ConditionalStep repairVane = new ConditionalStep(this, goUpLadder);
+		repairVane.addStep(onRoof, searchVane);
+		repairVane.addStep(inSeersVillageUpstairs, goUpToRoof);
+
+		steps.put(175, repairVane);
+
+		ConditionalStep hitVane = new ConditionalStep(this, goUpLadder);
+		hitVane.addStep(onRoof, useHammerOnVane);
+		hitVane.addStep(inSeersVillageUpstairs, goUpToRoof);
+
+		steps.put(176, hitVane);
+
+		ConditionalStep getVaneBits = new ConditionalStep(this, goUpLadder);
+		getVaneBits.addStep(onRoof, searchVaneAgain);
+		getVaneBits.addStep(inSeersVillageUpstairs, goUpToRoof);
+
+		steps.put(177, getVaneBits);
+
+		ConditionalStep repairVaneParts = new ConditionalStep(this, useVane123OnAnvil);
+
+		repairVaneParts.addStep(new Conditions(addedOrnaments, addedDirectionals, hasWeathervanePillar, onRoof), useVane3);
+		repairVaneParts.addStep(new Conditions(addedOrnaments, hasDirectionals, onRoof), useVane2);
+		repairVaneParts.addStep(new Conditions(hasOrnament, onRoof), useVane1);
+		repairVaneParts.addStep(onRoof, goDownFromRoof);
+		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedOrnament, hasOrUsedWeathervanePillar, inSeersVillageUpstairs), goBackUpToRoof);
+		repairVaneParts.addStep(inSeersVillageUpstairs, goDownLadderToSeers);
+		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedOrnament, hasOrUsedWeathervanePillar), goBackUpLadder);
+		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedOrnament), useVane3OnAnvil);
+		repairVaneParts.addStep(new Conditions(hasOrUsedOrnament, hasOrUsedWeathervanePillar), useVane1OnAnvil);
+		repairVaneParts.addStep(new Conditions(hasOrUsedDirectionals, hasOrUsedWeathervanePillar), useVane2OnAnvil);
+		repairVaneParts.addStep(hasOrUsedOrnament, useVane13OnAnvil);
+		repairVaneParts.addStep(hasOrUsedWeathervanePillar, useVane12OnAnvil);
+		repairVaneParts.addStep(hasOrUsedDirectionals, useVane23OnAnvil);
+
+		steps.put(180, repairVaneParts);
+
+		ConditionalStep reportBackToPhantuwti = new ConditionalStep(this, finishWithPhantuwti);
+		reportBackToPhantuwti.addStep(inSeersVillageUpstairs, goDownLadderToPhantuwti);
+		reportBackToPhantuwti.addStep(onRoof, goFromRoofToPhantuwti);
+
+		steps.put(185, reportBackToPhantuwti);
+
+		steps.put(190, returnToArhein);
+
+		steps.put(195, returnToBleemadge);
+
+		ConditionalStep goAndReturnToSanfew = new ConditionalStep(this, returnUpToSanfew);
+		goAndReturnToSanfew.addStep(inSanfewRoom, returnToSanfew);
+		steps.put(200, goAndReturnToSanfew);
+
+		ConditionalStep dealWithHammerspike = new ConditionalStep(this, goDownToHammerspikeAgain);
+		dealWithHammerspike.addStep(inDwarvenMine, returnToHammerspike);
+
+		steps.put(205, dealWithHammerspike);
+
+		ConditionalStep sortOutGangMembers = new ConditionalStep(this, goDownToHammerspikeAgain);
+		sortOutGangMembers.addStep(inDwarvenMine, killGangMembers);
+
+		steps.put(210, sortOutGangMembers);
+		steps.put(215, sortOutGangMembers);
+		steps.put(220, sortOutGangMembers);
+		steps.put(225, dealWithHammerspike);
+
+		steps.put(230, returnToTassie);
+
+		ConditionalStep makePotAndReturnToApoth = new ConditionalStep(this, spinPotLid);
+		makePotAndReturnToApoth.addStep(hasPotWithLid, returnToApothecary);
+		makePotAndReturnToApoth.addStep(new Conditions(hasPotLid, hasPot), usePotLidOnPot);
+		makePotAndReturnToApoth.addStep(hasPotLid, pickUpPot);
+		makePotAndReturnToApoth.addStep(hasUnfiredPotLid, firePotLid);
+
+		steps.put(235, makePotAndReturnToApoth);
+
+		steps.put(240, returnToHorvik);
+
+		steps.put(245, talkToHorvikFinal);
+
+		steps.put(250, returnToSeth);
+
+		ConditionalStep goFinishWithJohanhus = new ConditionalStep(this, returnDownToJohnahus);
+		goFinishWithJohanhus.addStep(inHamBase, returnToJohnahus);
+
+		steps.put(255, goFinishWithJohanhus);
+
+		steps.put(260, returnToAggie);
+
+		steps.put(265, returnToBrian);
+
+		steps.put(270, returnToForester);
+
+		steps.put(275, returnToYanni);
+
+		return steps;
 	}
 }

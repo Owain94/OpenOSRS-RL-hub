@@ -24,10 +24,18 @@
  */
 package com.questhelper.quests.mourningsendpart1;
 
+import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -45,14 +53,6 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.QuestDescriptor;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MOURNINGS_END_PART_I
@@ -78,102 +78,6 @@ public class MourningsEndPart1 extends BasicQuestHelper
 	ConditionalStep getItems, cleanTopSteps, repairTrousersSteps;
 
 	Zone mournerHQ, mournerHQ2, mournerBasement;
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToIslwyn);
-		steps.put(1, talkToIslwyn);
-
-		steps.put(2, talkToArianwyn);
-
-		getItems = new ConditionalStep(this, killMourner);
-		getItems.addStep(mournerItemsNearby, pickUpLoot);
-		getItems.setLockingCondition(hasAllMournerItems);
-
-		cleanTopSteps = new ConditionalStep(this, searchLaundry);
-		cleanTopSteps.addStep(hasSoap, useSoapOnTop);
-		cleanTopSteps.setLockingCondition(cleanedTop);
-
-		repairTrousersSteps = new ConditionalStep(this, talkToOronwen);
-		repairTrousersSteps.setLockingCondition(repairedTrousers);
-
-		ConditionalStep enterMournerHQ = new ConditionalStep(this, enterMournerBase);
-		enterMournerHQ.addStep(inMournerBasement, talkToEssyllt);
-		enterMournerHQ.addStep(inMournerHQ, enterBasement);
-
-		ConditionalStep prepareItems = new ConditionalStep(this, getItems);
-		prepareItems.addStep(new Conditions(hasAllMournerItems, cleanedTop, repairedTrousers), enterMournerHQ);
-		prepareItems.addStep(new Conditions(hasAllMournerItems, cleanedTop), repairTrousersSteps);
-		prepareItems.addStep(new Conditions(hasAllMournerItems), cleanTopSteps);
-
-		steps.put(3, prepareItems);
-
-		ConditionalStep getAssignment = new ConditionalStep(this, enterMournerBaseNoPass);
-		getAssignment.addStep(inMournerBasement, talkToEssyllt);
-		getAssignment.addStep(inMournerHQ, enterBasement);
-
-		steps.put(4, getAssignment);
-
-		ConditionalStep tortureGnome = new ConditionalStep(this, enterMournerBaseForGnome);
-		tortureGnome.addStep(new Conditions(greenDyed, redDyed, yellowDyed, blueDyed, inMournerBasement), talkToEssylltAfterSheep);
-		tortureGnome.addStep(new Conditions(greenDyed, redDyed, yellowDyed, blueDyed, inMournerHQ), enterBasementAfterSheep);
-		tortureGnome.addStep(new Conditions(greenDyed, redDyed, yellowDyed, blueDyed), enterBaseAfterSheep);
-		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed, yellowDyed, blueToadLoaded), shootBlueToad);
-		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed, yellowDyed), loadBlueToad);
-		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed, yellowToadLoaded), shootYellowToad);
-		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed), loadYellowToad);
-		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redToadLoaded), shootRedToad);
-		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed), loadRedToad);
-		tortureGnome.addStep(new Conditions(hasAllToads, greenToadLoaded), shootGreenToad);
-		tortureGnome.addStep(new Conditions(hasAllToads), loadGreenToad);
-		tortureGnome.addStep(new Conditions(learntAboutToads), getToads);
-		tortureGnome.addStep(new Conditions(inMournerBasement, repairedDevice), askAboutToads);
-		tortureGnome.addStep(new Conditions(inMournerBasement, releasedGnome), giveGnomeItems);
-		tortureGnome.addStep(new Conditions(inMournerBasement, talkedWithItem), releaseGnome);
-		tortureGnome.addStep(new Conditions(inMournerBasement, torturedGnome), talkToGnomeWithItems);
-		tortureGnome.addStep(new Conditions(inMournerHQ, torturedGnome), enterBasementAfterTorture);
-		tortureGnome.addStep(new Conditions(torturedGnome), enterMournerBaseAfterTorture);
-		tortureGnome.addStep(new Conditions(inMournerBasement, knowWeaknesses), useFeatherOnGnome);
-		tortureGnome.addStep(inMournerBasement, talkToGnome);
-		tortureGnome.addStep(inMournerHQ, enterBasementForGnome);
-
-		steps.put(5, tortureGnome);
-
-		ConditionalStep takeAppleToElena = new ConditionalStep(this, pickUpRottenApple);
-		takeAppleToElena.addStep(new Conditions(twoPoisoned, inMournerBasement), talkToEssylltAfterPoison);
-		takeAppleToElena.addStep(new Conditions(twoPoisoned, inMournerHQ), enterMournerBasementAfterPoison);
-		takeAppleToElena.addStep(twoPoisoned, enterMournerBaseAfterPoison);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, poisoned1), usePowderOnFood2);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, hadToxicPowder), usePowderOnFood1);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, hasToxicNaphtha), cookNaphtha);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, hasNaphthaAppleMix), useSieveOnBarrel);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, hasAppleBarrel, hasNaphtha), useNaphthaOnBarrel);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, hasAppleBarrel), getNaphtha);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, hasRottenApples), useApplesOnPress);
-		takeAppleToElena.addStep(new Conditions(receivedSieve, hasBarrel), useBarrelOnPile);
-		takeAppleToElena.addStep(receivedSieve, pickUpBarrel);
-		takeAppleToElena.addStep(givenRottenApple, talkToElenaNoApple);
-		takeAppleToElena.addStep(hasRottenApple, talkToElena);
-
-		steps.put(6, takeAppleToElena);
-
-		ConditionalStep learnTheSecret = new ConditionalStep(this, enterMournerBaseAfterPoison);
-		learnTheSecret.addStep(inMournerBasement, talkToEssylltAfterPoison);
-		learnTheSecret.addStep(inMournerHQ, enterMournerBasementAfterPoison);
-
-		steps.put(7, learnTheSecret);
-
-		steps.put(8, returnToArianwyn);
-
-		return steps;
-	}
 
 	public void setupItemRequirements()
 	{
@@ -316,8 +220,8 @@ public class MourningsEndPart1 extends BasicQuestHelper
 
 	public void loadZones()
 	{
-		mournerHQ = new Zone(new WorldPoint(2547, 3321,0), new WorldPoint(2555, 3327, 0));
-		mournerHQ2 = new Zone(new WorldPoint(2542, 3324,0), new WorldPoint(2546, 3327, 0));
+		mournerHQ = new Zone(new WorldPoint(2547, 3321, 0), new WorldPoint(2555, 3327, 0));
+		mournerHQ2 = new Zone(new WorldPoint(2542, 3324, 0), new WorldPoint(2546, 3327, 0));
 		mournerBasement = new Zone(new WorldPoint(2034, 4628, 0), new WorldPoint(2045, 4651, 0));
 	}
 
@@ -481,8 +385,8 @@ public class MourningsEndPart1 extends BasicQuestHelper
 		allSteps.add(enterWestArdougnePanel);
 
 		allSteps.add(new PanelDetails("Dye the sheep", new ArrayList<>(Arrays.asList(getToads, dyeSheep, enterBaseAfterSheep, enterBasementAfterSheep, talkToEssylltAfterSheep)), fixedDevice, ogreBellows, redDye, yellowDye, greenDye, blueDye));
- 
-		 
+
+
 		allSteps.add(new PanelDetails("Poison the citizens",
 			new ArrayList<>(Arrays.asList(pickUpRottenApple, talkToElena, pickUpBarrel, useBarrelOnPile, useApplesOnPress, getNaphtha, useNaphthaOnBarrel, useSieveOnBarrel, cookNaphtha, usePowderOnFood1, usePowderOnFood2, talkToEssylltAfterPoison)), coal20OrNaphtha));
 
@@ -491,5 +395,101 @@ public class MourningsEndPart1 extends BasicQuestHelper
 
 
 		return allSteps;
+	}
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToIslwyn);
+		steps.put(1, talkToIslwyn);
+
+		steps.put(2, talkToArianwyn);
+
+		getItems = new ConditionalStep(this, killMourner);
+		getItems.addStep(mournerItemsNearby, pickUpLoot);
+		getItems.setLockingCondition(hasAllMournerItems);
+
+		cleanTopSteps = new ConditionalStep(this, searchLaundry);
+		cleanTopSteps.addStep(hasSoap, useSoapOnTop);
+		cleanTopSteps.setLockingCondition(cleanedTop);
+
+		repairTrousersSteps = new ConditionalStep(this, talkToOronwen);
+		repairTrousersSteps.setLockingCondition(repairedTrousers);
+
+		ConditionalStep enterMournerHQ = new ConditionalStep(this, enterMournerBase);
+		enterMournerHQ.addStep(inMournerBasement, talkToEssyllt);
+		enterMournerHQ.addStep(inMournerHQ, enterBasement);
+
+		ConditionalStep prepareItems = new ConditionalStep(this, getItems);
+		prepareItems.addStep(new Conditions(hasAllMournerItems, cleanedTop, repairedTrousers), enterMournerHQ);
+		prepareItems.addStep(new Conditions(hasAllMournerItems, cleanedTop), repairTrousersSteps);
+		prepareItems.addStep(new Conditions(hasAllMournerItems), cleanTopSteps);
+
+		steps.put(3, prepareItems);
+
+		ConditionalStep getAssignment = new ConditionalStep(this, enterMournerBaseNoPass);
+		getAssignment.addStep(inMournerBasement, talkToEssyllt);
+		getAssignment.addStep(inMournerHQ, enterBasement);
+
+		steps.put(4, getAssignment);
+
+		ConditionalStep tortureGnome = new ConditionalStep(this, enterMournerBaseForGnome);
+		tortureGnome.addStep(new Conditions(greenDyed, redDyed, yellowDyed, blueDyed, inMournerBasement), talkToEssylltAfterSheep);
+		tortureGnome.addStep(new Conditions(greenDyed, redDyed, yellowDyed, blueDyed, inMournerHQ), enterBasementAfterSheep);
+		tortureGnome.addStep(new Conditions(greenDyed, redDyed, yellowDyed, blueDyed), enterBaseAfterSheep);
+		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed, yellowDyed, blueToadLoaded), shootBlueToad);
+		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed, yellowDyed), loadBlueToad);
+		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed, yellowToadLoaded), shootYellowToad);
+		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redDyed), loadYellowToad);
+		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed, redToadLoaded), shootRedToad);
+		tortureGnome.addStep(new Conditions(hasAllToads, greenDyed), loadRedToad);
+		tortureGnome.addStep(new Conditions(hasAllToads, greenToadLoaded), shootGreenToad);
+		tortureGnome.addStep(new Conditions(hasAllToads), loadGreenToad);
+		tortureGnome.addStep(new Conditions(learntAboutToads), getToads);
+		tortureGnome.addStep(new Conditions(inMournerBasement, repairedDevice), askAboutToads);
+		tortureGnome.addStep(new Conditions(inMournerBasement, releasedGnome), giveGnomeItems);
+		tortureGnome.addStep(new Conditions(inMournerBasement, talkedWithItem), releaseGnome);
+		tortureGnome.addStep(new Conditions(inMournerBasement, torturedGnome), talkToGnomeWithItems);
+		tortureGnome.addStep(new Conditions(inMournerHQ, torturedGnome), enterBasementAfterTorture);
+		tortureGnome.addStep(new Conditions(torturedGnome), enterMournerBaseAfterTorture);
+		tortureGnome.addStep(new Conditions(inMournerBasement, knowWeaknesses), useFeatherOnGnome);
+		tortureGnome.addStep(inMournerBasement, talkToGnome);
+		tortureGnome.addStep(inMournerHQ, enterBasementForGnome);
+
+		steps.put(5, tortureGnome);
+
+		ConditionalStep takeAppleToElena = new ConditionalStep(this, pickUpRottenApple);
+		takeAppleToElena.addStep(new Conditions(twoPoisoned, inMournerBasement), talkToEssylltAfterPoison);
+		takeAppleToElena.addStep(new Conditions(twoPoisoned, inMournerHQ), enterMournerBasementAfterPoison);
+		takeAppleToElena.addStep(twoPoisoned, enterMournerBaseAfterPoison);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, poisoned1), usePowderOnFood2);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, hadToxicPowder), usePowderOnFood1);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, hasToxicNaphtha), cookNaphtha);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, hasNaphthaAppleMix), useSieveOnBarrel);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, hasAppleBarrel, hasNaphtha), useNaphthaOnBarrel);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, hasAppleBarrel), getNaphtha);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, hasRottenApples), useApplesOnPress);
+		takeAppleToElena.addStep(new Conditions(receivedSieve, hasBarrel), useBarrelOnPile);
+		takeAppleToElena.addStep(receivedSieve, pickUpBarrel);
+		takeAppleToElena.addStep(givenRottenApple, talkToElenaNoApple);
+		takeAppleToElena.addStep(hasRottenApple, talkToElena);
+
+		steps.put(6, takeAppleToElena);
+
+		ConditionalStep learnTheSecret = new ConditionalStep(this, enterMournerBaseAfterPoison);
+		learnTheSecret.addStep(inMournerBasement, talkToEssylltAfterPoison);
+		learnTheSecret.addStep(inMournerHQ, enterMournerBasementAfterPoison);
+
+		steps.put(7, learnTheSecret);
+
+		steps.put(8, returnToArianwyn);
+
+		return steps;
 	}
 }

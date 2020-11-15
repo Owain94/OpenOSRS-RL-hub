@@ -24,11 +24,11 @@
  */
 package com.questhelper.steps.conditional;
 
+import com.questhelper.requirements.ItemRequirement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import net.runelite.api.Client;
-import com.questhelper.requirements.ItemRequirement;
 
 public class ItemRequirementCondition extends ConditionForStep
 {
@@ -44,7 +44,7 @@ public class ItemRequirementCondition extends ConditionForStep
 		this.logicType = LogicType.AND;
 	}
 
-	public ItemRequirementCondition(LogicType logicType,  ItemRequirement... itemRequirements)
+	public ItemRequirementCondition(LogicType logicType, ItemRequirement... itemRequirements)
 	{
 		this.itemRequirements = new ArrayList<>();
 		this.itemRequirements.addAll(Arrays.asList(itemRequirements));

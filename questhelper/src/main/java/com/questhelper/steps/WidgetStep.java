@@ -24,14 +24,14 @@
  */
 package com.questhelper.steps;
 
+import com.questhelper.QuestHelperPlugin;
+import com.questhelper.questhelpers.QuestHelper;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.Setter;
 import net.runelite.api.widgets.Widget;
-import com.questhelper.QuestHelperPlugin;
-import com.questhelper.questhelpers.QuestHelper;
 import net.runelite.api.widgets.WidgetItem;
 
 public class WidgetStep extends DetailedQuestStep
