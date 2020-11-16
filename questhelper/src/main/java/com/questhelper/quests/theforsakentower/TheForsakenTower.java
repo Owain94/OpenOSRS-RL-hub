@@ -24,16 +24,11 @@
  */
 package com.questhelper.quests.theforsakentower;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -45,6 +40,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
@@ -71,6 +71,53 @@ public class TheForsakenTower extends BasicQuestHelper
 	ConditionalStep powerPuzzle;
 
 	Zone firstFloor, secondFloor, basement;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToVulcana);
+		steps.put(1, talkToVulcana);
+		steps.put(2, talkToUndor);
+		steps.put(3, enterTheForsakenTower);
+
+		powerPuzzle = new ConditionalStep(this, goDownLadderToBasement);
+		powerPuzzle.addStep(powerPuzzleVisible, doPowerPuzzle);
+		powerPuzzle.addStep(new Conditions(inBasement, generatorStarted), inspectPowerGrid);
+		powerPuzzle.addStep(new Conditions(inBasement, hasCrank), inspectGenerator);
+		powerPuzzle.addStep(inBasement, searchCrate);
+		powerPuzzle.setLockingCondition(finishedPowerPuzzle);
+		powerPuzzle.addStep(inFirstFloor, goDownToGroundFloor);
+		powerPuzzle.addStep(inSecondFloor, goDownToFirstFloor);
+
+		ConditionalStep puzzleSteps = new ConditionalStep(this, inspectDisplayCase);
+		puzzleSteps.addStep(new Conditions(inspectedDisplayCase, finishedFurnacePuzzle, finishedPowerPuzzle, finishedPotionPuzzle), altarPuzzle);
+		puzzleSteps.addStep(new Conditions(inspectedDisplayCase, finishedFurnacePuzzle, finishedPowerPuzzle), potionPuzzle);
+		puzzleSteps.addStep(new Conditions(inspectedDisplayCase, finishedFurnacePuzzle), powerPuzzle);
+		puzzleSteps.addStep(inspectedDisplayCase, furnacePuzzleSteps);
+
+		steps.put(4, puzzleSteps);
+		steps.put(5, puzzleSteps);
+		steps.put(6, puzzleSteps);
+		steps.put(7, puzzleSteps);
+
+		ConditionalStep gettingHammer = new ConditionalStep(this, getHammer);
+		gettingHammer.addStep(hasDinhsHammer, returnToUndor);
+		gettingHammer.addStep(inBasement, goUpToGroundFloor);
+		gettingHammer.addStep(inFirstFloor, goDownToGroundFloor);
+		gettingHammer.addStep(inSecondFloor, goDownToFirstFloor);
+
+		steps.put(8, gettingHammer);
+		steps.put(9, gettingHammer);
+		steps.put(10, returnToVulcana);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -173,52 +220,5 @@ public class TheForsakenTower extends BasicQuestHelper
 		allSteps.addAll(altarPuzzle.panelDetails());
 		allSteps.add(new PanelDetails("Finishing off", new ArrayList<>(Arrays.asList(getHammer, returnToUndor, returnToVulcana))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToVulcana);
-		steps.put(1, talkToVulcana);
-		steps.put(2, talkToUndor);
-		steps.put(3, enterTheForsakenTower);
-
-		powerPuzzle = new ConditionalStep(this, goDownLadderToBasement);
-		powerPuzzle.addStep(powerPuzzleVisible, doPowerPuzzle);
-		powerPuzzle.addStep(new Conditions(inBasement, generatorStarted), inspectPowerGrid);
-		powerPuzzle.addStep(new Conditions(inBasement, hasCrank), inspectGenerator);
-		powerPuzzle.addStep(inBasement, searchCrate);
-		powerPuzzle.setLockingCondition(finishedPowerPuzzle);
-		powerPuzzle.addStep(inFirstFloor, goDownToGroundFloor);
-		powerPuzzle.addStep(inSecondFloor, goDownToFirstFloor);
-
-		ConditionalStep puzzleSteps = new ConditionalStep(this, inspectDisplayCase);
-		puzzleSteps.addStep(new Conditions(inspectedDisplayCase, finishedFurnacePuzzle, finishedPowerPuzzle, finishedPotionPuzzle), altarPuzzle);
-		puzzleSteps.addStep(new Conditions(inspectedDisplayCase, finishedFurnacePuzzle, finishedPowerPuzzle), potionPuzzle);
-		puzzleSteps.addStep(new Conditions(inspectedDisplayCase, finishedFurnacePuzzle), powerPuzzle);
-		puzzleSteps.addStep(inspectedDisplayCase, furnacePuzzleSteps);
-
-		steps.put(4, puzzleSteps);
-		steps.put(5, puzzleSteps);
-		steps.put(6, puzzleSteps);
-		steps.put(7, puzzleSteps);
-
-		ConditionalStep gettingHammer = new ConditionalStep(this, getHammer);
-		gettingHammer.addStep(hasDinhsHammer, returnToUndor);
-		gettingHammer.addStep(inBasement, goUpToGroundFloor);
-		gettingHammer.addStep(inFirstFloor, goDownToGroundFloor);
-		gettingHammer.addStep(inSecondFloor, goDownToFirstFloor);
-
-		steps.put(8, gettingHammer);
-		steps.put(9, gettingHammer);
-		steps.put(10, returnToVulcana);
-
-		return steps;
 	}
 }

@@ -33,7 +33,7 @@ public class IncantationStep extends ConditionalStep
 {
 	private final HashMap<Integer, String> words;
 
-	private final QuestStep incantationStep;
+	private QuestStep incantationStep;
 
 	public IncantationStep(QuestHelper questHelper, QuestStep incantationStep)
 	{

@@ -26,6 +26,7 @@
 package com.questhelper.requirements;
 
 import com.questhelper.steps.conditional.LogicType;
+import com.questhelper.steps.conditional.Operation;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,19 +53,9 @@ public class ItemRequirements extends ItemRequirement
 	}
 
 	@Override
-	protected Color getColor(Client client)
+	public boolean check(Client client)
 	{
-		Color color;
-
-		if (this.check(client))
-		{
-			color = Color.GREEN;
-		}
-		else
-		{
-			color = Color.RED;
-		}
-		return color;
+		return check(client, true);
 	}
 
 	public boolean check(Client client, boolean checkEquippedOnly)
@@ -84,8 +75,18 @@ public class ItemRequirements extends ItemRequirement
 	}
 
 	@Override
-	public boolean check(Client client)
+	protected Color getColor(Client client)
 	{
-		return check(client, true);
+		Color color;
+
+		if (this.check(client))
+		{
+			color = Color.GREEN;
+		}
+		else
+		{
+			color = Color.RED;
+		}
+		return color;
 	}
 }

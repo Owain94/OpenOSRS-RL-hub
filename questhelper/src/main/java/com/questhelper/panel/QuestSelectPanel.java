@@ -43,6 +43,12 @@ import net.runelite.client.util.ImageUtil;
 
 public class QuestSelectPanel extends JPanel
 {
+	@Getter
+	private final List<String> keywords = new ArrayList<>();
+
+	@Getter
+	private final QuestHelper questHelper;
+
 	private static final ImageIcon START_ICON;
 
 	static
@@ -51,12 +57,6 @@ public class QuestSelectPanel extends JPanel
 
 		START_ICON = new ImageIcon(startImg);
 	}
-
-	@Getter
-	private final List<String> keywords = new ArrayList<>();
-	@Getter
-	private final QuestHelper questHelper;
-
 	public QuestSelectPanel(QuestHelperPlugin questHelperPlugin, QuestHelperPanel questHelperPanel, QuestHelper questHelper)
 	{
 		this.questHelper = questHelper;

@@ -24,15 +24,10 @@
  */
 package com.questhelper.quests.witchspotion;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import java.util.ArrayList;
@@ -40,6 +35,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -55,6 +55,26 @@ public class WitchsPotion extends BasicQuestHelper
 	ConditionForStep hasRatTail;
 
 	QuestStep talkToWitch, killRat, returnToWitch, drinkPotion;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToWitch);
+
+		ConditionalStep getIngredients = new ConditionalStep(this, killRat);
+		getIngredients.addStep(hasRatTail, returnToWitch);
+
+		steps.put(1, getIngredients);
+
+		steps.put(2, drinkPotion);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -105,25 +125,5 @@ public class WitchsPotion extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Collections.singletonList(talkToWitch))));
 		allSteps.add(new PanelDetails("Make the potion", new ArrayList<>(Arrays.asList(killRat, returnToWitch))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToWitch);
-
-		ConditionalStep getIngredients = new ConditionalStep(this, killRat);
-		getIngredients.addStep(hasRatTail, returnToWitch);
-
-		steps.put(1, getIngredients);
-
-		steps.put(2, drinkPotion);
-
-		return steps;
 	}
 }

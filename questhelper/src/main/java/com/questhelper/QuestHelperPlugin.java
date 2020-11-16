@@ -29,11 +29,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Binder;
+import com.google.inject.CreationException;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.questhelper.panel.QuestHelperPanel;
-import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.steps.QuestStep;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +39,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.Getter;
@@ -64,7 +63,10 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
+import com.questhelper.panel.QuestHelperPanel;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.steps.QuestStep;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -74,8 +76,7 @@ import org.pf4j.Extension;
 @Extension
 @PluginDescriptor(
 	name = "Quest Helper",
-	description = "Helps you with your quests",
-	type = PluginType.UTILITY
+	description = "Helps you with your quests"
 )
 @Slf4j
 public class QuestHelperPlugin extends Plugin
@@ -114,30 +115,44 @@ public class QuestHelperPlugin extends Plugin
 	private static final String MENUOP_RFD_SIR_AMIK_VARZE = "Start Quest Helper (Sir Amik Varze)";
 	private static final String MENUOP_RFD_MONKEY_AMBASSADOR = "Start Quest Helper (Monkey Ambassador)";
 	private static final String MENUOP_RFD_FINALE = "Start Quest Helper (Finale)";
-	@Inject
-	SpriteManager spriteManager;
+
 	@Inject
 	private Client client;
+
 	@Inject
 	private ClientToolbar clientToolbar;
+
 	@Inject
 	private ClientThread clientThread;
+
 	@Inject
 	private EventBus eventBus;
+
 	@Inject
 	private OverlayManager overlayManager;
+
 	@Inject
 	private QuestHelperOverlay questHelperOverlay;
+
 	@Inject
 	private QuestHelperWidgetOverlay questHelperWidgetOverlay;
+
 	@Inject
 	private QuestHelperWorldOverlay questHelperWorldOverlay;
+
 	@Getter
 	private QuestHelper selectedQuest = null;
+
 	@Setter
 	private QuestHelper sidebarSelectedQuest = null;
+
 	private QuestStep lastStep = null;
+
 	private Map<String, QuestHelper> quests;
+
+	@Inject
+	SpriteManager spriteManager;
+
 	private QuestHelperPanel panel;
 
 	private NavigationButton navButton;
@@ -147,6 +162,7 @@ public class QuestHelperPlugin extends Plugin
 	@Override
 	protected void startUp() throws IOException
 	{
+		quests = scanAndInstantiate(getClass().getClassLoader());
 		overlayManager.add(questHelperOverlay);
 		overlayManager.add(questHelperWorldOverlay);
 		overlayManager.add(questHelperWidgetOverlay);
@@ -181,50 +197,41 @@ public class QuestHelperPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onGameTick(GameTick event) throws IOException
+	public void onGameTick(GameTick event)
 	{
-		if (eventBus != null && client != null)
+		if (sidebarSelectedQuest != null)
 		{
-			if (quests == null)
+			startUpQuest(sidebarSelectedQuest);
+			sidebarSelectedQuest = null;
+		}
+		else if (selectedQuest != null)
+		{
+			if (selectedQuest.getCurrentStep() != null)
 			{
-				quests = scanAndInstantiate(getClass().getClassLoader());
-			}
-
-			if (sidebarSelectedQuest != null)
-			{
-				startUpQuest(sidebarSelectedQuest);
-				sidebarSelectedQuest = null;
-			}
-			else if (selectedQuest != null)
-			{
-				if (selectedQuest.getCurrentStep() != null)
+				panel.updateSteps();
+				QuestStep currentStep = selectedQuest.getCurrentStep().getSidePanelStep();
+				if (currentStep != null && currentStep != lastStep)
 				{
-					panel.updateSteps();
-					QuestStep currentStep = selectedQuest.getCurrentStep().getSidePanelStep();
-					if (currentStep != null && currentStep != lastStep)
-					{
-						lastStep = currentStep;
-						panel.updateHighlight(currentStep);
-					}
-					panel.updateLocks();
+					lastStep = currentStep;
+					panel.updateHighlight(currentStep);
 				}
+				panel.updateLocks();
 			}
-			if (loadQuestList)
-			{
-				loadQuestList = false;
-				updateQuestList();
-			}
+		}
+		if (loadQuestList)
+		{
+			loadQuestList = false;
+			updateQuestList();
 		}
 	}
 
 	@Subscribe
-	public void onGameStateChanged(final GameStateChanged event) throws IOException
+	public void onGameStateChanged(final GameStateChanged event)
 	{
 		final GameState state = event.getGameState();
 
 		if (state == GameState.LOGIN_SCREEN)
 		{
-			quests = null;
 			panel.refresh(new ArrayList<>(), true);
 			if (selectedQuest != null && selectedQuest.getCurrentStep() != null)
 			{
@@ -234,7 +241,6 @@ public class QuestHelperPlugin extends Plugin
 
 		if (state == GameState.LOGGED_IN)
 		{
-			quests = scanAndInstantiate(getClass().getClassLoader());
 			loadQuestList = true;
 		}
 	}
@@ -242,19 +248,16 @@ public class QuestHelperPlugin extends Plugin
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		if (eventBus != null && client != null && quests != null)
+		if (!(client.getGameState() == GameState.LOGGED_IN))
 		{
-			if (!(client.getGameState() == GameState.LOGGED_IN))
-			{
-				return;
-			}
+			return;
+		}
 
-			if (selectedQuest != null
-				&& selectedQuest.updateQuest()
-				&& selectedQuest.getCurrentStep() == null)
-			{
-				shutDownQuest();
-			}
+		if (selectedQuest != null
+			&& selectedQuest.updateQuest()
+			&& selectedQuest.getCurrentStep() == null)
+		{
+			shutDownQuest();
 		}
 	}
 
@@ -262,83 +265,63 @@ public class QuestHelperPlugin extends Plugin
 	{
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
-			List<QuestHelper> questHelpers = new ArrayList<>();
-			if (quests != null)
-			{
-				for (Object o : quests.values().toArray())
-				{
-					if (o instanceof QuestHelper)
-					{
-						QuestHelper qh = (QuestHelper) o;
-						if (!qh.isCompleted())
-						{
-							questHelpers.add(qh);
-						}
-					}
-				}
-			}
-			if (questHelpers.size() > 0)
-			{
-				SwingUtilities.invokeLater(() -> panel.refresh(questHelpers, false));
-			}
+			List<QuestHelper> questHelpers = quests.values().stream().filter(quest -> !quest.isCompleted()).collect(Collectors.toList());
+			SwingUtilities.invokeLater(() -> panel.refresh(questHelpers, false));
 		}
 	}
 
 	@Subscribe
 	private void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		if (eventBus != null && client != null && quests != null)
+		if (event.getMenuOpcode() == MenuOpcode.RUNELITE)
 		{
-			if (event.getMenuOpcode() == MenuOpcode.RUNELITE)
+			switch (event.getOption())
 			{
-				switch (event.getOption())
-				{
-					case MENUOP_STARTHELPER:
-						event.consume();
-						String quest = Text.removeTags(event.getTarget());
-						startUpQuest(quests.get(quest));
-						break;
-					case MENUOP_STOPHELPER:
-						event.consume();
-						shutDownQuest();
-						break;
-					case MENUOP_PHOENIXGANG:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName()));
-						break;
-					case MENUOP_BLACKARMGANG:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getName()));
-						break;
-					case MENUOP_RFD_START:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_START.getName()));
-						break;
-					case MENUOP_RFD_PIRATE_PETE:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_PIRATE_PETE.getName()));
-						break;
-					case MENUOP_RFD_LUMBRIDGE_GUIDE:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_LUMBRIDGE_GUIDE.getName()));
-						break;
-					case MENUOP_RFD_SKRACH_UGLOGWEE:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SKRACH_UGLOGWEE.getName()));
-						break;
-					case MENUOP_RFD_SIR_AMIK_VARZE:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SIR_AMIK_VARZE.getName()));
-						break;
-					case MENUOP_RFD_MONKEY_AMBASSADOR:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR.getName()));
-						break;
-					case MENUOP_RFD_FINALE:
-						event.consume();
-						startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_FINALE.getName()));
-						break;
-				}
+				case MENUOP_STARTHELPER:
+					event.consume();
+					String quest = Text.removeTags(event.getTarget());
+					startUpQuest(quests.get(quest));
+					break;
+				case MENUOP_STOPHELPER:
+					event.consume();
+					shutDownQuest();
+					break;
+				case MENUOP_PHOENIXGANG:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName()));
+					break;
+				case MENUOP_BLACKARMGANG:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getName()));
+					break;
+				case MENUOP_RFD_START:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_START.getName()));
+					break;
+				case MENUOP_RFD_PIRATE_PETE:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_PIRATE_PETE.getName()));
+					break;
+				case MENUOP_RFD_LUMBRIDGE_GUIDE:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_LUMBRIDGE_GUIDE.getName()));
+					break;
+				case MENUOP_RFD_SKRACH_UGLOGWEE:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SKRACH_UGLOGWEE.getName()));
+					break;
+				case MENUOP_RFD_SIR_AMIK_VARZE:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SIR_AMIK_VARZE.getName()));
+					break;
+				case MENUOP_RFD_MONKEY_AMBASSADOR:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR.getName()));
+					break;
+				case MENUOP_RFD_FINALE:
+					event.consume();
+					startUpQuest(quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_FINALE.getName()));
+					break;
 			}
 		}
 	}
@@ -346,112 +329,107 @@ public class QuestHelperPlugin extends Plugin
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
-		if (eventBus != null && client != null && quests != null)
-		{
-			int widgetIndex = event.getParam0();
-			int widgetID = event.getParam1();
-			MenuEntry[] menuEntries = client.getMenuEntries();
-			String target = Text.removeTags(event.getTarget());
+		int widgetIndex = event.getParam0();
+		int widgetID = event.getParam1();
+		MenuEntry[] menuEntries = client.getMenuEntries();
+		String target = Text.removeTags(event.getTarget());
 
-			if (Ints.contains(QUESTLIST_WIDGET_IDS, widgetID) && "Read Journal:".equals(event.getOption()))
+		if (Ints.contains(QUESTLIST_WIDGET_IDS, widgetID) && "Read Journal:".equals(event.getOption()))
+		{
+			if (target.equals("Shield of Arrav"))
 			{
-				if (target.equals("Shield of Arrav"))
-				{
-					QuestHelper questHelperPhoenix = quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName());
-					QuestHelper questHelperBlackArm = quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getName());
-					if (questHelperBlackArm != null && !questHelperBlackArm.isCompleted()
-						|| questHelperPhoenix != null && !questHelperPhoenix.isCompleted())
-					{
-						if (selectedQuest != null &&
-							(selectedQuest.getQuest().getName().equals(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName()) ||
-								selectedQuest.getQuest().getName().equals(QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getName())))
-						{
-							menuEntries = addNewEntry(menuEntries, MENUOP_STOPHELPER, event.getTarget(), widgetIndex, widgetID);
-						}
-						else
-						{
-							if (!questHelperPhoenix.isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_PHOENIXGANG, event.getTarget(), widgetIndex, widgetID);
-							}
-							if (!questHelperBlackArm.isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_BLACKARMGANG, event.getTarget(), widgetIndex, widgetID);
-							}
-						}
-					}
-				}
-				else if (target.equals("Recipe for Disaster"))
+				QuestHelper questHelperPhoenix = quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName());
+				QuestHelper questHelperBlackArm = quests.get(QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getName());
+				if (questHelperBlackArm != null && !questHelperBlackArm.isCompleted()
+				|| questHelperPhoenix != null && !questHelperPhoenix.isCompleted())
 				{
 					if (selectedQuest != null &&
-						(selectedQuest.getQuest().getId() == QuestHelperQuest.RECIPE_FOR_DISASTER.getId()))
+						(selectedQuest.getQuest().getName().equals(QuestHelperQuest.SHIELD_OF_ARRAV_PHOENIX_GANG.getName()) ||
+							selectedQuest.getQuest().getName().equals(QuestHelperQuest.SHIELD_OF_ARRAV_BLACK_ARM_GANG.getName())))
 					{
 						menuEntries = addNewEntry(menuEntries, MENUOP_STOPHELPER, event.getTarget(), widgetIndex, widgetID);
 					}
 					else
 					{
-						if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_START.getName()).isCompleted())
+						if (!questHelperPhoenix.isCompleted())
 						{
-							menuEntries = addNewEntry(menuEntries, MENUOP_RFD_START, event.getTarget(), widgetIndex, widgetID);
+							menuEntries = addNewEntry(menuEntries, MENUOP_PHOENIXGANG, event.getTarget(), widgetIndex, widgetID);
 						}
-						else
+						if (!questHelperBlackArm.isCompleted())
 						{
-							if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_LUMBRIDGE_GUIDE.getName()).isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_RFD_LUMBRIDGE_GUIDE, event.getTarget(), widgetIndex, widgetID);
-							}
-							if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_PIRATE_PETE.getName()).isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_RFD_PIRATE_PETE, event.getTarget(), widgetIndex, widgetID);
-							}
-							if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SKRACH_UGLOGWEE.getName()).isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_RFD_SKRACH_UGLOGWEE, event.getTarget(), widgetIndex, widgetID);
-							}
-							if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SIR_AMIK_VARZE.getName()).isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_RFD_SIR_AMIK_VARZE, event.getTarget(), widgetIndex, widgetID);
-							}
-							if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR.getName()).isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_RFD_MONKEY_AMBASSADOR, event.getTarget(), widgetIndex, widgetID);
-							}
-							if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_FINALE.getName()).isCompleted())
-							{
-								menuEntries = addNewEntry(menuEntries, MENUOP_RFD_FINALE, event.getTarget(), widgetIndex, widgetID);
-							}
+							menuEntries = addNewEntry(menuEntries, MENUOP_BLACKARMGANG, event.getTarget(), widgetIndex, widgetID);
 						}
 					}
+				}
+			}
+			else if (target.equals("Recipe for Disaster"))
+			{
+				if (selectedQuest != null &&
+					(selectedQuest.getQuest().getId() == QuestHelperQuest.RECIPE_FOR_DISASTER.getId()))
+				{
+					menuEntries = addNewEntry(menuEntries, MENUOP_STOPHELPER, event.getTarget(), widgetIndex, widgetID);
 				}
 				else
 				{
-					QuestHelper questHelper = quests.get(target);
-					if (questHelper != null && !questHelper.isCompleted())
+					if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_START.getName()).isCompleted())
 					{
-						if (selectedQuest != null && selectedQuest.getQuest().getName().equals(target))
+						menuEntries = addNewEntry(menuEntries, MENUOP_RFD_START, event.getTarget(), widgetIndex, widgetID);
+					}
+					else
+					{
+						if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_LUMBRIDGE_GUIDE.getName()).isCompleted())
 						{
-							menuEntries = addNewEntry(menuEntries, MENUOP_STOPHELPER, event.getTarget(), widgetIndex, widgetID);
+							menuEntries = addNewEntry(menuEntries, MENUOP_RFD_LUMBRIDGE_GUIDE, event.getTarget(), widgetIndex, widgetID);
 						}
-						else
+						if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_PIRATE_PETE.getName()).isCompleted())
 						{
-							menuEntries = addNewEntry(menuEntries, MENUOP_STARTHELPER, event.getTarget(), widgetIndex, widgetID);
+							menuEntries = addNewEntry(menuEntries, MENUOP_RFD_PIRATE_PETE, event.getTarget(), widgetIndex, widgetID);
+						}
+						if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SKRACH_UGLOGWEE.getName()).isCompleted())
+						{
+							menuEntries = addNewEntry(menuEntries, MENUOP_RFD_SKRACH_UGLOGWEE, event.getTarget(), widgetIndex, widgetID);
+						}
+						if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_SIR_AMIK_VARZE.getName()).isCompleted())
+						{
+							menuEntries = addNewEntry(menuEntries, MENUOP_RFD_SIR_AMIK_VARZE, event.getTarget(), widgetIndex, widgetID);
+						}
+						if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR.getName()).isCompleted())
+						{
+							menuEntries = addNewEntry(menuEntries, MENUOP_RFD_MONKEY_AMBASSADOR, event.getTarget(), widgetIndex, widgetID);
+						}
+						if (!quests.get(QuestHelperQuest.RECIPE_FOR_DISASTER_FINALE.getName()).isCompleted())
+						{
+							menuEntries = addNewEntry(menuEntries, MENUOP_RFD_FINALE, event.getTarget(), widgetIndex, widgetID);
 						}
 					}
 				}
 			}
-
-			if (Ints.contains(QUESTTAB_WIDGET_IDS, widgetID)
-				&& "Quest List".equals(event.getOption())
-				&& selectedQuest != null)
+			else
 			{
-				addNewEntry(menuEntries, MENUOP_STOPHELPER, event.getTarget(), widgetIndex, widgetID);
+				QuestHelper questHelper = quests.get(target);
+				if (questHelper != null && !questHelper.isCompleted())
+				{
+					if (selectedQuest != null && selectedQuest.getQuest().getName().equals(target))
+					{
+						menuEntries = addNewEntry(menuEntries, MENUOP_STOPHELPER, event.getTarget(), widgetIndex, widgetID);
+					}
+					else
+					{
+						menuEntries = addNewEntry(menuEntries, MENUOP_STARTHELPER, event.getTarget(), widgetIndex, widgetID);
+					}
+				}
 			}
 		}
 
+		if (Ints.contains(QUESTTAB_WIDGET_IDS, widgetID)
+			&& "Quest List".equals(event.getOption())
+			&& selectedQuest != null)
+		{
+			addNewEntry(menuEntries, MENUOP_STOPHELPER, event.getTarget(), widgetIndex, widgetID);
+		}
 	}
 
-	private MenuEntry[] addNewEntry(MenuEntry[] menuEntries, String newEntry, String target, int widgetIndex, int widgetID)
-	{
+	private MenuEntry[] addNewEntry(MenuEntry[] menuEntries, String newEntry, String target, int widgetIndex, int widgetID) {
 		menuEntries = Arrays.copyOf(menuEntries, menuEntries.length + 1);
 
 		MenuEntry menuEntry = menuEntries[menuEntries.length - 1] = new MenuEntry();
@@ -478,6 +456,7 @@ public class QuestHelperPlugin extends Plugin
 		if (!questHelper.isCompleted())
 		{
 			selectedQuest = questHelper;
+			//eventBus.register(selectedQuest);
 			selectedQuest.startUp();
 			if (selectedQuest.getCurrentStep() == null)
 			{
@@ -579,9 +558,6 @@ public class QuestHelperPlugin extends Plugin
 		try
 		{
 			questHelper = clazz.newInstance();
-
-			// Handle injection immediately to avoid problems relating to
-			// us not being able to register at a later time.
 			Module questModule = (Binder binder) ->
 			{
 				binder.bind(clazz).toInstance(questHelper);
@@ -590,10 +566,9 @@ public class QuestHelperPlugin extends Plugin
 			Injector questInjector = RuneLite.getInjector().createChildInjector(questModule);
 			questInjector.injectMembers(questHelper);
 			questHelper.setInjector(questInjector);
-
 			questHelper.setQuest(quest);
 		}
-		catch (InstantiationException | IllegalAccessException ex)
+		catch (InstantiationException | IllegalAccessException | CreationException ex)
 		{
 			throw new QuestInstantiationException(ex);
 		}

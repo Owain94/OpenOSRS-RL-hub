@@ -61,6 +61,15 @@ public class Conditions extends ConditionForStep
 	}
 
 	@Override
+	public void initialize(Client client)
+	{
+		for (ConditionForStep condition : conditions)
+		{
+			condition.initialize(client);
+		}
+	}
+
+	@Override
 	public boolean checkCondition(Client client)
 	{
 		if (onlyNeedToPassOnce && hasPassed)
@@ -88,15 +97,6 @@ public class Conditions extends ConditionForStep
 		}
 
 		return false;
-	}
-
-	@Override
-	public void initialize(Client client)
-	{
-		for (ConditionForStep condition : conditions)
-		{
-			condition.initialize(client);
-		}
 	}
 
 	@Override

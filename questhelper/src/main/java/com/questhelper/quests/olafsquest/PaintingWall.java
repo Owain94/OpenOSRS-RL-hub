@@ -5,6 +5,7 @@ import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.QuestStep;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Arrays;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -15,8 +16,10 @@ public class PaintingWall extends QuestStep
 	private final int BOTTOM_VARBIT = 3542;
 	private final int LEFT_VARBIT = 3543;
 	private final int TOP_VARBIT = 3544;
-	int rightPiece, bottomPiece, leftPiece, topPiece;
+
 	private int highlightWidget = -1;
+
+	int rightPiece, bottomPiece, leftPiece, topPiece;
 
 	public PaintingWall(QuestHelper questHelper)
 	{
@@ -27,24 +30,6 @@ public class PaintingWall extends QuestStep
 	public void startUp()
 	{
 		updateSolvedPositionState();
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		Widget widgetWrapper = client.getWidget(253, 0);
-		if (widgetWrapper != null)
-		{
-			Widget widget = client.getWidget(253, highlightWidget);
-			if (widget != null)
-			{
-				graphics.setColor(new Color(0, 255, 255, 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(Color.CYAN);
-				graphics.draw(widget.getBounds());
-			}
-		}
 	}
 
 	@Subscribe
@@ -91,6 +76,24 @@ public class PaintingWall extends QuestStep
 		else
 		{
 			highlightWidget = 17;
+		}
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		Widget widgetWrapper = client.getWidget(253, 0);
+		if (widgetWrapper != null)
+		{
+			Widget widget = client.getWidget(253, highlightWidget);
+			if (widget != null)
+			{
+				graphics.setColor(new Color(0, 255, 255, 65));
+				graphics.fill(widget.getBounds());
+				graphics.setColor(Color.CYAN);
+				graphics.draw(widget.getBounds());
+			}
 		}
 	}
 }

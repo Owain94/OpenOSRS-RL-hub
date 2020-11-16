@@ -24,17 +24,17 @@
  */
 package com.questhelper.quests.doricsquest;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
@@ -47,6 +47,19 @@ public class DoricsQuest extends BasicQuestHelper
 	ItemRequirement clay, copper, iron;
 
 	QuestStep talkToDoric;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToDoric);
+		steps.put(10, talkToDoric);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -79,18 +92,5 @@ public class DoricsQuest extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Help Doric", new ArrayList<>(Collections.singletonList(talkToDoric)), clay, copper, iron));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToDoric);
-		steps.put(10, talkToDoric);
-
-		return steps;
 	}
 }

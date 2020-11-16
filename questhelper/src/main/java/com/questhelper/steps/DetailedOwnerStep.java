@@ -77,6 +77,39 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 		currentStep = null;
 	}
 
+	protected void startUpStep(QuestStep step)
+	{
+		if (currentStep == null)
+		{
+			currentStep = step;
+			//eventBus.register(currentStep);
+			currentStep.startUp();
+			return;
+		}
+
+		if (!step.equals(currentStep))
+		{
+			shutDownStep();
+			//eventBus.register(step);
+			step.startUp();
+			currentStep = step;
+		}
+	}
+
+	protected void shutDownStep()
+	{
+		if (currentStep != null)
+		{
+			eventBus.unregister(currentStep);
+			currentStep.shutDown();
+			currentStep = null;
+		}
+	}
+
+	protected void updateSteps()
+	{
+	}
+
 	@Override
 	public void makeOverlayHint(PanelComponent panelComponent, QuestHelperPlugin plugin, Requirement... additionalRequirements)
 	{
@@ -129,36 +162,6 @@ public class DetailedOwnerStep extends QuestStep implements OwnerStep
 		}
 	}
 
-	protected void startUpStep(QuestStep step)
-	{
-		if (currentStep == null)
-		{
-			currentStep = step;
-			currentStep.startUp();
-			return;
-		}
-
-		if (!step.equals(currentStep))
-		{
-			shutDownStep();
-			step.startUp();
-			currentStep = step;
-		}
-	}
-
-	protected void shutDownStep()
-	{
-		if (currentStep != null)
-		{
-			eventBus.unregister(currentStep);
-			currentStep.shutDown();
-			currentStep = null;
-		}
-	}
-
-	protected void updateSteps()
-	{
-	}
 
 	protected void setupSteps()
 	{

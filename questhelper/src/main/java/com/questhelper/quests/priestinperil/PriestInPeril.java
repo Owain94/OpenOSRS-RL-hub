@@ -68,159 +68,6 @@ public class PriestInPeril extends BasicQuestHelper
 
 	Zone underground, temple1, temple2, temple3, temple4, temple5, temple6, templeFloorOne, templeFloorTwo;
 
-	public void setupItemRequirements()
-	{
-		runeEssence = new ItemRequirement("Rune or Pure Essence", ItemID.RUNE_ESSENCE, 50);
-		runeEssence.addAlternates(ItemID.PURE_ESSENCE);
-		bucket = new ItemRequirement("Bucket", ItemID.BUCKET);
-		bucketHighlighted = new ItemRequirement("Bucket", ItemID.BUCKET);
-		bucketHighlighted.setHighlightInInventory(true);
-		runePouches = new ItemRequirement("Rune pouches for carrying essence", ItemID.SMALL_POUCH, -1);
-		runePouches.addAlternates(ItemID.MEDIUM_POUCH, ItemID.LARGE_POUCH, ItemID.GIANT_POUCH);
-		varrockTeleport = new ItemRequirement("Varrock teleports", ItemID.VARROCK_TELEPORT, 3);
-		weaponAndArmour = new ItemRequirement("Ranged or melee weapon + armour", -1, -1);
-		goldenKey = new ItemRequirement("Golden key", ItemID.GOLDEN_KEY);
-		goldenKeyHighlighted = new ItemRequirement("Golden key", ItemID.GOLDEN_KEY);
-		goldenKeyHighlighted.setHighlightInInventory(true);
-		rangedMagedGear = new ItemRequirement("Combat gear, ranged or mage to safespot", -1, -1);
-		lotsOfRuneEssence = new ItemRequirement("As much essence as you can carry, you'll need to bring 50 UNNOTED in total", ItemID.PURE_ESSENCE, -1);
-		murkyWater = new ItemRequirement("Murky water", ItemID.MURKY_WATER);
-		ironKey = new ItemRequirement("Iron key", ItemID.IRON_KEY);
-		blessedWaterHighlighted = new ItemRequirement("Blessed water", ItemID.BLESSED_WATER);
-		blessedWaterHighlighted.setHighlightInInventory(true);
-	}
-
-	public void loadZones()
-	{
-		underground = new Zone(new WorldPoint(3402, 9880, 0), new WorldPoint(3443, 9907, 0));
-		temple1 = new Zone(new WorldPoint(3409, 3483, 0), new WorldPoint(3411, 3494, 0));
-		temple2 = new Zone(new WorldPoint(3408, 3485, 0), new WorldPoint(3408, 3486, 0));
-		temple3 = new Zone(new WorldPoint(3408, 3491, 0), new WorldPoint(3408, 3492, 0));
-		temple4 = new Zone(new WorldPoint(3412, 3484, 0), new WorldPoint(3415, 3493, 0));
-		temple5 = new Zone(new WorldPoint(3416, 3483, 0), new WorldPoint(3417, 3494, 0));
-		temple6 = new Zone(new WorldPoint(3418, 3484, 0), new WorldPoint(3418, 3493, 0));
-		templeFloorOne = new Zone(new WorldPoint(3408, 3483, 1), new WorldPoint(3419, 3494, 1));
-		templeFloorTwo = new Zone(new WorldPoint(3408, 3483, 2), new WorldPoint(3419, 3494, 2));
-	}
-
-	public void setupConditions()
-	{
-		inUnderground = new ZoneCondition(underground);
-		inTempleGroundFloor = new ZoneCondition(temple1, temple2, temple3, temple4, temple5, temple6);
-		inTempleFirstFloor = new ZoneCondition(templeFloorOne);
-		inTempleSecondFloor = new ZoneCondition(templeFloorTwo);
-		inTemple = new ZoneCondition(temple1, temple2, temple3, temple4, temple5, temple6, templeFloorOne, templeFloorTwo);
-
-		hasIronKey = new ItemRequirementCondition(ironKey);
-		hasGoldenOrIronKey = new Conditions(LogicType.OR, new ItemRequirementCondition(goldenKey), hasIronKey);
-		hasBlessedOrMurkyWater = new ItemRequirementCondition(murkyWater);
-		hasBlessedWater = new ItemRequirementCondition(blessedWaterHighlighted);
-	}
-
-	public void setupSteps()
-	{
-		talkToRoald = new NpcStep(this, NpcID.KING_ROALD_5215, new WorldPoint(3222, 3473, 0), "Speak to King Roald in Varrock Castle.");
-		talkToRoald.addDialogStep("I'm looking for a quest!");
-		talkToRoald.addDialogStep("Yes.");
-		goToTemple = new ObjectStep(this, ObjectID.LARGE_DOOR_3490, new WorldPoint(3408, 3488, 0),
-			"Go to the temple east of Varrock by the river and click on the large door.", weaponAndArmour);
-		goToTemple.addDialogSteps("I'll get going.", "Roald sent me to check on Drezel.", "Sure. I'm a helpful person!");
-		goDownToDog = new ObjectStep(this, ObjectID.TRAPDOOR_1579, new WorldPoint(3405, 3507, 0), "Go down the ladder north of the temple.");
-		goDownToDog.addDialogStep("Yes.");
-		((ObjectStep) (goDownToDog)).addAlternateObjects(ObjectID.TRAPDOOR_1581);
-		killTheDog = new NpcStep(this, NpcID.TEMPLE_GUARDIAN, new WorldPoint(3405, 9901, 0),
-			"Kill the Temple Guardian (level 30). It is immune to magic so you will need to use either ranged or melee.");
-		climbUpAfterKillingDog = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(3405, 9907, 0),
-			"Climb back up the ladder and return to King Roald.");
-		returnToKingRoald = new NpcStep(this, NpcID.KING_ROALD_5215, new WorldPoint(3222, 3473, 0),
-			"Return to King Roald.");
-		returnToKingRoald.addSubSteps(climbUpAfterKillingDog);
-
-		returnToTemple = new ObjectStep(this, ObjectID.LARGE_DOOR_3490, new WorldPoint(3408, 3488, 0),
-			"Return to the temple.", bucket, lotsOfRuneEssence, rangedMagedGear);
-		killMonk = new NpcStep(this, NpcID.MONK_OF_ZAMORAK_3486, new WorldPoint(3412, 3488, 0), "Kill a Monk of Zamorak (level 30) for a golden key. You can safespot using the pews.", true, goldenKey);
-
-		goUpToFloorOneTemple = new ObjectStep(this, ObjectID.STAIRCASE_16671, new WorldPoint(3418, 3493, 0), "Go upstairs.");
-		goUpToFloorTwoTemple = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(3410, 3485, 1), "Climb up the ladder.");
-		talkToDrezel = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3418, 3489, 2), "Talk to Drezel on the top floor of the temple.");
-		talkToDrezel.addDialogSteps("So, what now?", "Yes, of course.");
-		talkToDrezel.addSubSteps(goUpToFloorOneTemple, goUpToFloorTwoTemple);
-
-		fillBucket = new ObjectStep(this, ObjectID.WELL_3485, new WorldPoint(3423, 9890, 0), "Use the bucket on the well in the central room.", bucketHighlighted);
-		fillBucket.addIcon(ItemID.BUCKET);
-
-		useKeyForKey = new DetailedQuestStep(this, "Got to the central room, and study the monuments to find which has a key on it. Use the Golden Key on it.", goldenKeyHighlighted);
-		useKeyForKey.addIcon(ItemID.GOLDEN_KEY);
-
-		goDownToFloorOneTemple = new ObjectStep(this, ObjectID.LADDER_16679, new WorldPoint(3410, 3485, 2), "Go down to the underground of the temple.", bucket);
-		goDownToGroundFloorTemple = new ObjectStep(this, ObjectID.STAIRCASE_16673, new WorldPoint(3417, 3485, 0), "Go down to the underground of the temple.", bucket);
-		enterUnderground = new ObjectStep(this, ObjectID.TRAPDOOR_1579, new WorldPoint(3405, 3507, 0), "Go down to the underground of the temple.", bucket);
-		enterUnderground.addSubSteps(goDownToFloorOneTemple, goDownToGroundFloorTemple);
-		((ObjectStep) (enterUnderground)).addAlternateObjects(ObjectID.TRAPDOOR_1581);
-
-		goUpWithWaterToSurface = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(3405, 9907, 0),
-			"Go back up to the top floor of the temple.");
-		goUpWithWaterToFirstFloor = new ObjectStep(this, ObjectID.STAIRCASE_16671, new WorldPoint(3418, 3493, 0),
-			"Go back up to the top floor of the temple.");
-		goUpWithWaterToSecondFloor = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(3410, 3485, 1),
-			"Go back up to the top floor of the temple.");
-		goUpWithWaterToSecondFloor.addSubSteps(goUpWithWaterToSurface, goUpWithWaterToFirstFloor);
-
-		openDoor = new ObjectStep(this, ObjectID.CELL_DOOR, new WorldPoint(3415, 3489, 2), "Open the cell door.", ironKey);
-		blessWater = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3418, 3489, 2), "Talk to Drezel to bless the water.", murkyWater);
-		useBlessedWater = new ObjectStep(this, ObjectID.COFFIN_3480, new WorldPoint(3413, 3487, 2), "Use the blessed water on the coffin.", blessedWaterHighlighted);
-		useBlessedWater.addIcon(ItemID.BLESSED_WATER);
-
-		talkToDrezelAfterFreeing = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3418, 3489, 2), "Talk to Drezel again.");
-
-		goDownToFloorOneAfterFreeing = new ObjectStep(this, ObjectID.LADDER_16679, new WorldPoint(3410, 3485, 2), "Go down to the underground of the temple.", lotsOfRuneEssence);
-		goDownToGroundFloorAfterFreeing = new ObjectStep(this, ObjectID.STAIRCASE_16673, new WorldPoint(3417, 3485, 0), "Go down to the underground of the temple.", lotsOfRuneEssence);
-		enterUndergroundAfterFreeing = new ObjectStep(this, ObjectID.TRAPDOOR_1579, new WorldPoint(3405, 3507, 0), "Go down to the underground of the temple.", lotsOfRuneEssence);
-		((ObjectStep) (enterUndergroundAfterFreeing)).addAlternateObjects(ObjectID.TRAPDOOR_1581);
-		talkToDrezelUnderground = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3439, 9896, 0), "Talk to Drezel in the east of the underground temple area.", lotsOfRuneEssence);
-		talkToDrezelUnderground.addSubSteps(goDownToFloorOneAfterFreeing, goDownToGroundFloorAfterFreeing, enterUndergroundAfterFreeing);
-
-		bringDrezelEssence = new BringDrezelPureEssenceStep(this);
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(runeEssence);
-		reqs.add(bucket);
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(varrockTeleport);
-		reqs.add(runePouches);
-
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		return new ArrayList<>(Collections.singletonList("Temple guardian (level 30). Can only be hurt by ranged or melee."));
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Start the quest", new ArrayList<>(Collections.singletonList(talkToRoald))));
-		allSteps.add(new PanelDetails("Go to the temple", new ArrayList<>(Arrays.asList(goToTemple, killTheDog, returnToKingRoald)), weaponAndArmour));
-		allSteps.add(new PanelDetails("Return to the temple", new ArrayList<>(Arrays.asList(returnToTemple, killMonk, talkToDrezel)), weaponAndArmour, bucket, lotsOfRuneEssence));
-		allSteps.add(new PanelDetails("Freeing Drezel", new ArrayList<>(Arrays.asList(enterUnderground, useKeyForKey, fillBucket, goUpWithWaterToSecondFloor, openDoor, blessWater, useBlessedWater, talkToDrezelAfterFreeing)), weaponAndArmour, bucket, lotsOfRuneEssence));
-		allSteps.add(new PanelDetails("Curing the Salve", new ArrayList<>(Arrays.asList(talkToDrezelUnderground, bringDrezelEssence)), runeEssence));
-
-		return allSteps;
-	}
-
 	@Override
 	public Map<Integer, QuestStep> loadSteps()
 	{
@@ -338,5 +185,158 @@ public class PriestInPeril extends BasicQuestHelper
 		// There is a 60th step before the final 61, but the 'Quest Completed!' message pops up prior to it
 
 		return steps;
+	}
+
+	public void setupItemRequirements()
+	{
+		runeEssence = new ItemRequirement("Rune or Pure Essence", ItemID.RUNE_ESSENCE, 50);
+		runeEssence.addAlternates(ItemID.PURE_ESSENCE);
+		bucket = new ItemRequirement("Bucket", ItemID.BUCKET);
+		bucketHighlighted = new ItemRequirement("Bucket", ItemID.BUCKET);
+		bucketHighlighted.setHighlightInInventory(true);
+		runePouches = new ItemRequirement("Rune pouches for carrying essence", ItemID.SMALL_POUCH, -1);
+		runePouches.addAlternates(ItemID.MEDIUM_POUCH, ItemID.LARGE_POUCH, ItemID.GIANT_POUCH);
+		varrockTeleport = new ItemRequirement("Varrock teleports", ItemID.VARROCK_TELEPORT, 3);
+		weaponAndArmour = new ItemRequirement("Ranged or melee weapon + armour", -1, -1);
+		goldenKey = new ItemRequirement("Golden key", ItemID.GOLDEN_KEY);
+		goldenKeyHighlighted = new ItemRequirement("Golden key", ItemID.GOLDEN_KEY);
+		goldenKeyHighlighted.setHighlightInInventory(true);
+		rangedMagedGear = new ItemRequirement("Combat gear, ranged or mage to safespot", -1, -1);
+		lotsOfRuneEssence = new ItemRequirement("As much essence as you can carry, you'll need to bring 50 UNNOTED in total", ItemID.PURE_ESSENCE, -1);
+		murkyWater = new ItemRequirement("Murky water", ItemID.MURKY_WATER);
+		ironKey = new ItemRequirement("Iron key", ItemID.IRON_KEY);
+		blessedWaterHighlighted = new ItemRequirement("Blessed water", ItemID.BLESSED_WATER);
+		blessedWaterHighlighted.setHighlightInInventory(true);
+	}
+
+	public void loadZones()
+	{
+		underground = new Zone(new WorldPoint(3402, 9880, 0), new WorldPoint(3443, 9907, 0));
+		temple1 = new Zone(new WorldPoint(3409, 3483, 0), new WorldPoint(3411, 3494, 0));
+		temple2 = new Zone(new WorldPoint(3408, 3485, 0), new WorldPoint(3408, 3486, 0));
+		temple3 = new Zone(new WorldPoint(3408, 3491, 0), new WorldPoint(3408, 3492, 0));
+		temple4 = new Zone(new WorldPoint(3412, 3484, 0), new WorldPoint(3415, 3493, 0));
+		temple5 = new Zone(new WorldPoint(3416, 3483, 0), new WorldPoint(3417, 3494, 0));
+		temple6 = new Zone(new WorldPoint(3418, 3484, 0), new WorldPoint(3418, 3493, 0));
+		templeFloorOne = new Zone(new WorldPoint(3408, 3483, 1), new WorldPoint(3419, 3494, 1));
+		templeFloorTwo = new Zone(new WorldPoint(3408, 3483, 2), new WorldPoint(3419, 3494, 2));
+	}
+
+	public void setupConditions()
+	{
+		inUnderground = new ZoneCondition(underground);
+		inTempleGroundFloor = new ZoneCondition(temple1, temple2, temple3, temple4, temple5, temple6);
+		inTempleFirstFloor = new ZoneCondition(templeFloorOne);
+		inTempleSecondFloor = new ZoneCondition(templeFloorTwo);
+		inTemple = new ZoneCondition(temple1, temple2, temple3, temple4, temple5, temple6, templeFloorOne, templeFloorTwo);
+
+		hasIronKey = new ItemRequirementCondition(ironKey);
+		hasGoldenOrIronKey = new Conditions(LogicType.OR, new ItemRequirementCondition(goldenKey), hasIronKey);
+		hasBlessedOrMurkyWater = new ItemRequirementCondition(murkyWater);
+		hasBlessedWater = new ItemRequirementCondition(blessedWaterHighlighted);
+	}
+
+	public void setupSteps()
+	{
+		talkToRoald = new NpcStep(this, NpcID.KING_ROALD_5215, new WorldPoint(3222, 3473, 0), "Speak to King Roald in Varrock Castle.");
+		talkToRoald.addDialogStep("I'm looking for a quest!");
+		talkToRoald.addDialogStep("Yes.");
+		goToTemple = new ObjectStep(this, ObjectID.LARGE_DOOR_3490, new WorldPoint(3408, 3488, 0),
+			"Go to the temple east of Varrock by the river and click on the large door.", weaponAndArmour);
+		goToTemple.addDialogSteps("I'll get going.", "Roald sent me to check on Drezel.", "Sure. I'm a helpful person!");
+		goDownToDog = new ObjectStep(this, ObjectID.TRAPDOOR_1579, new WorldPoint(3405, 3507, 0), "Go down the ladder north of the temple.");
+		goDownToDog.addDialogStep("Yes.");
+		((ObjectStep)(goDownToDog)).addAlternateObjects(ObjectID.TRAPDOOR_1581);
+		killTheDog = new NpcStep(this, NpcID.TEMPLE_GUARDIAN, new WorldPoint(3405, 9901, 0),
+			"Kill the Temple Guardian (level 30). It is immune to magic so you will need to use either ranged or melee.");
+		climbUpAfterKillingDog = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(3405, 9907, 0),
+			"Climb back up the ladder and return to King Roald.");
+		returnToKingRoald = new NpcStep(this, NpcID.KING_ROALD_5215, new WorldPoint(3222, 3473, 0),
+			"Return to King Roald.");
+		returnToKingRoald.addSubSteps(climbUpAfterKillingDog);
+
+		returnToTemple = new ObjectStep(this, ObjectID.LARGE_DOOR_3490, new WorldPoint(3408, 3488, 0),
+			"Return to the temple.", bucket, lotsOfRuneEssence, rangedMagedGear);
+		killMonk = new NpcStep(this, NpcID.MONK_OF_ZAMORAK_3486, new WorldPoint(3412, 3488, 0), "Kill a Monk of Zamorak (level 30) for a golden key. You can safespot using the pews.", true, goldenKey);
+
+		goUpToFloorOneTemple = new ObjectStep(this, ObjectID.STAIRCASE_16671, new WorldPoint(3418, 3493, 0), "Go upstairs.");
+		goUpToFloorTwoTemple = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(3410, 3485, 1), "Climb up the ladder.");
+		talkToDrezel = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3418, 3489, 2), "Talk to Drezel on the top floor of the temple.");
+		talkToDrezel.addDialogSteps("So, what now?", "Yes, of course.");
+		talkToDrezel.addSubSteps(goUpToFloorOneTemple, goUpToFloorTwoTemple);
+
+		fillBucket = new ObjectStep(this, ObjectID.WELL_3485, new WorldPoint(3423, 9890, 0), "Use the bucket on the well in the central room.", bucketHighlighted);
+		fillBucket.addIcon(ItemID.BUCKET);
+
+		useKeyForKey = new DetailedQuestStep(this,  "Got to the central room, and study the monuments to find which has a key on it. Use the Golden Key on it.", goldenKeyHighlighted);
+		useKeyForKey.addIcon(ItemID.GOLDEN_KEY);
+
+		goDownToFloorOneTemple = new ObjectStep(this, ObjectID.LADDER_16679, new WorldPoint(3410, 3485, 2), "Go down to the underground of the temple.", bucket);
+		goDownToGroundFloorTemple = new ObjectStep(this, ObjectID.STAIRCASE_16673, new WorldPoint(3417, 3485, 0), "Go down to the underground of the temple.", bucket);
+		enterUnderground = new ObjectStep(this, ObjectID.TRAPDOOR_1579, new WorldPoint(3405, 3507, 0), "Go down to the underground of the temple.", bucket);
+		enterUnderground.addSubSteps(goDownToFloorOneTemple, goDownToGroundFloorTemple);
+		((ObjectStep)(enterUnderground)).addAlternateObjects(ObjectID.TRAPDOOR_1581);
+
+		goUpWithWaterToSurface = new ObjectStep(this, ObjectID.LADDER_17385, new WorldPoint(3405, 9907, 0),
+			"Go back up to the top floor of the temple.");
+		goUpWithWaterToFirstFloor = new ObjectStep(this, ObjectID.STAIRCASE_16671, new WorldPoint(3418, 3493, 0),
+			"Go back up to the top floor of the temple.");
+		goUpWithWaterToSecondFloor = new ObjectStep(this, ObjectID.LADDER_16683, new WorldPoint(3410, 3485, 1),
+			"Go back up to the top floor of the temple.");
+		goUpWithWaterToSecondFloor.addSubSteps(goUpWithWaterToSurface, goUpWithWaterToFirstFloor);
+
+		openDoor = new ObjectStep(this, ObjectID.CELL_DOOR, new WorldPoint(3415, 3489, 2), "Open the cell door.", ironKey);
+		blessWater = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3418, 3489, 2), "Talk to Drezel to bless the water.", murkyWater);
+		useBlessedWater = new ObjectStep(this, ObjectID.COFFIN_3480, new WorldPoint(3413, 3487, 2), "Use the blessed water on the coffin.", blessedWaterHighlighted);
+		useBlessedWater.addIcon(ItemID.BLESSED_WATER);
+
+		talkToDrezelAfterFreeing = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3418, 3489, 2), "Talk to Drezel again.");
+
+		goDownToFloorOneAfterFreeing = new ObjectStep(this, ObjectID.LADDER_16679, new WorldPoint(3410, 3485, 2), "Go down to the underground of the temple.", lotsOfRuneEssence);
+		goDownToGroundFloorAfterFreeing = new ObjectStep(this, ObjectID.STAIRCASE_16673, new WorldPoint(3417, 3485, 0), "Go down to the underground of the temple.", lotsOfRuneEssence);
+		enterUndergroundAfterFreeing = new ObjectStep(this, ObjectID.TRAPDOOR_1579, new WorldPoint(3405, 3507, 0), "Go down to the underground of the temple.", lotsOfRuneEssence);
+		((ObjectStep)(enterUndergroundAfterFreeing)).addAlternateObjects(ObjectID.TRAPDOOR_1581);
+		talkToDrezelUnderground = new NpcStep(this, NpcID.DREZEL, new WorldPoint(3439, 9896, 0), "Talk to Drezel in the east of the underground temple area.", lotsOfRuneEssence);
+		talkToDrezelUnderground.addSubSteps(goDownToFloorOneAfterFreeing, goDownToGroundFloorAfterFreeing, enterUndergroundAfterFreeing);
+
+		bringDrezelEssence = new BringDrezelPureEssenceStep(this);
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(varrockTeleport);
+		reqs.add(runePouches);
+
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		ArrayList<ItemRequirement> reqs = new ArrayList<>();
+		reqs.add(runeEssence);
+		reqs.add(bucket);
+		return reqs;
+	}
+
+	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		return new ArrayList<>(Collections.singletonList("Temple guardian (level 30). Can only be hurt by ranged or melee."));
+	}
+
+	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+		allSteps.add(new PanelDetails("Start the quest", new ArrayList<>(Collections.singletonList(talkToRoald))));
+		allSteps.add(new PanelDetails("Go to the temple", new ArrayList<>(Arrays.asList(goToTemple, killTheDog, returnToKingRoald)), weaponAndArmour));
+		allSteps.add(new PanelDetails("Return to the temple", new ArrayList<>(Arrays.asList(returnToTemple, killMonk, talkToDrezel)), weaponAndArmour, bucket, lotsOfRuneEssence));
+		allSteps.add(new PanelDetails("Freeing Drezel", new ArrayList<>(Arrays.asList(enterUnderground, useKeyForKey, fillBucket, goUpWithWaterToSecondFloor, openDoor, blessWater, useBlessedWater, talkToDrezelAfterFreeing)), weaponAndArmour, bucket, lotsOfRuneEssence));
+		allSteps.add(new PanelDetails("Curing the Salve", new ArrayList<>(Arrays.asList(talkToDrezelUnderground, bringDrezelEssence)), runeEssence));
+
+		return allSteps;
 	}
 }

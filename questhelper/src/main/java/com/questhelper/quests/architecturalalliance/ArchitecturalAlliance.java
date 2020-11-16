@@ -24,15 +24,10 @@
  */
 package com.questhelper.quests.architecturalalliance;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.VarbitCondition;
 import java.util.ArrayList;
@@ -41,6 +36,11 @@ import java.util.HashMap;
 import java.util.Map;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.ARCHITECTURAL_ALLIANCE
@@ -50,6 +50,30 @@ public class ArchitecturalAlliance extends BasicQuestHelper
 	ConditionForStep talkedToHosaStart, talkedToHosa, talkedToArcis, talkedToLovada, talkedToPiliar, talkedToShayda;
 
 	DetailedQuestStep talkToHosa, talkToHosaAsArchitect, talkToArcis, talkToLovada, talkToPiliar, talkToShayda, talkToHosaToFinish;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep repairStatue = new ConditionalStep(this, talkToHosa);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada, talkedToShayda), talkToHosaToFinish);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada), talkToShayda);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar), talkToLovada);
+		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis), talkToPiliar);
+		repairStatue.addStep(talkedToHosa, talkToArcis);
+		repairStatue.addStep(talkedToHosaStart, talkToHosaAsArchitect);
+
+		steps.put(0, repairStatue);
+		steps.put(1, talkToHosaAsArchitect);
+		steps.put(2, talkToHosaAsArchitect);
+		steps.put(3, talkToHosaAsArchitect);
+		steps.put(4, talkToHosaAsArchitect);
+
+		return steps;
+	}
 
 	public void setupConditions()
 	{
@@ -82,30 +106,6 @@ public class ArchitecturalAlliance extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Repairing the statue", new ArrayList<>(Arrays.asList(talkToHosa, talkToArcis, talkToPiliar, talkToShayda, talkToLovada, talkToHosaToFinish))));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep repairStatue = new ConditionalStep(this, talkToHosa);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada, talkedToShayda), talkToHosaToFinish);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar, talkedToLovada), talkToShayda);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis, talkedToPiliar), talkToLovada);
-		repairStatue.addStep(new Conditions(talkedToHosa, talkedToArcis), talkToPiliar);
-		repairStatue.addStep(talkedToHosa, talkToArcis);
-		repairStatue.addStep(talkedToHosaStart, talkToHosaAsArchitect);
-
-		steps.put(0, repairStatue);
-		steps.put(1, talkToHosaAsArchitect);
-		steps.put(2, talkToHosaAsArchitect);
-		steps.put(3, talkToHosaAsArchitect);
-		steps.put(4, talkToHosaAsArchitect);
-
-		return steps;
 	}
 }
 

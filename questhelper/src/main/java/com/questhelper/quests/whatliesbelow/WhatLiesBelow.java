@@ -24,18 +24,10 @@
  */
 package com.questhelper.quests.whatliesbelow;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
 import com.questhelper.steps.conditional.ZoneCondition;
@@ -48,6 +40,14 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.WHAT_LIES_BELOW
@@ -65,6 +65,57 @@ public class WhatLiesBelow extends BasicQuestHelper
 	NpcStep killOutlaws;
 
 	Zone chaosAltar;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToRat);
+
+		ConditionalStep getIntel = new ConditionalStep(this, killOutlaws);
+		getIntel.addStep(hasFullFolder, bringFolderToRat);
+
+		steps.put(10, getIntel);
+
+		steps.put(20, talkToRatAfterFolder);
+
+		steps.put(25, talkToSurok);
+
+		steps.put(30, talkToSurokNoLetter);
+		steps.put(40, talkToSurokNoLetter);
+		steps.put(45, talkToSurokNoLetter);
+		steps.put(46, talkToSurokNoLetter);
+
+		ConditionalStep chargeWand = new ConditionalStep(this, enterChaosAltar);
+		chargeWand.addStep(inChaosAltar, useWandOnAltar);
+
+		steps.put(50, chargeWand);
+
+		steps.put(55, bringWandToSurok);
+
+		steps.put(60, talkToRatAfterSurok);
+
+		steps.put(70, talkToRatAfterSurokNoLetter);
+		steps.put(71, talkToRatAfterSurokNoLetter);
+		steps.put(72, talkToRatAfterSurokNoLetter);
+
+		steps.put(80, talkToZaff);
+		steps.put(81, talkToZaff);
+		ConditionalStep defeatSurok = new ConditionalStep(this, talkToSurokToFight);
+		defeatSurok.addStep(inBattle, fightRoald);
+
+		steps.put(110, defeatSurok);
+		steps.put(115, defeatSurok);
+		steps.put(120, defeatSurok);
+		steps.put(140, talkToRatToFinish);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -145,7 +196,7 @@ public class WhatLiesBelow extends BasicQuestHelper
 
 		talkToZaff = new NpcStep(this, NpcID.ZAFF, new WorldPoint(3202, 3434, 0), "Talk to Zaff in the Varrock staff shop.");
 		talkToZaff.addDialogStep("Rat Burgiss sent me!");
-		talkToSurokToFight = new NpcStep(this, NpcID.SUROK_MAGIS_4160, new WorldPoint(3211, 3493, 0), "Prepare to fight King Roald (level 47), then go talk to Surok Magis in the Varrock Library.", beaconRing);
+		talkToSurokToFight =  new NpcStep(this, NpcID.SUROK_MAGIS_4160, new WorldPoint(3211, 3493, 0), "Prepare to fight King Roald (level 47), then go talk to Surok Magis in the Varrock Library.", beaconRing);
 		talkToSurokToFight.addDialogStep("Bring it on!");
 		fightRoald = new NpcStep(this, NpcID.KING_ROALD_4163, new WorldPoint(3211, 3493, 0), "Fight King Roald. When he's at 1hp, right-click operate the beacon ring.", beaconRing);
 		talkToRatToFinish = new NpcStep(this, NpcID.RAT_BURGISS, new WorldPoint(3266, 3333, 0), "Return to Rat Burgiss south of Varrock to finish the quest.");
@@ -187,56 +238,5 @@ public class WhatLiesBelow extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Help Surok", new ArrayList<>(Arrays.asList(talkToSurok, enterChaosAltar, useWandOnAltar, bringWandToSurok)), chaosRunes15, chaosTalismanOrAbyss, bowl));
 		allSteps.add(new PanelDetails("Defeat Surok", new ArrayList<>(Arrays.asList(talkToRatAfterSurok, talkToZaff, talkToSurokToFight, fightRoald, talkToRatToFinish))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToRat);
-
-		ConditionalStep getIntel = new ConditionalStep(this, killOutlaws);
-		getIntel.addStep(hasFullFolder, bringFolderToRat);
-
-		steps.put(10, getIntel);
-
-		steps.put(20, talkToRatAfterFolder);
-
-		steps.put(25, talkToSurok);
-
-		steps.put(30, talkToSurokNoLetter);
-		steps.put(40, talkToSurokNoLetter);
-		steps.put(45, talkToSurokNoLetter);
-		steps.put(46, talkToSurokNoLetter);
-
-		ConditionalStep chargeWand = new ConditionalStep(this, enterChaosAltar);
-		chargeWand.addStep(inChaosAltar, useWandOnAltar);
-
-		steps.put(50, chargeWand);
-
-		steps.put(55, bringWandToSurok);
-
-		steps.put(60, talkToRatAfterSurok);
-
-		steps.put(70, talkToRatAfterSurokNoLetter);
-		steps.put(71, talkToRatAfterSurokNoLetter);
-		steps.put(72, talkToRatAfterSurokNoLetter);
-
-		steps.put(80, talkToZaff);
-		steps.put(81, talkToZaff);
-		ConditionalStep defeatSurok = new ConditionalStep(this, talkToSurokToFight);
-		defeatSurok.addStep(inBattle, fightRoald);
-
-		steps.put(110, defeatSurok);
-		steps.put(115, defeatSurok);
-		steps.put(120, defeatSurok);
-		steps.put(140, talkToRatToFinish);
-
-		return steps;
 	}
 }

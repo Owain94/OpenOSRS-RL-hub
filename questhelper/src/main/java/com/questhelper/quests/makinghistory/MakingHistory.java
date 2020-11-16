@@ -24,19 +24,9 @@
  */
 package com.questhelper.quests.makinghistory;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.DigStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -52,6 +42,16 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MAKING_HISTORY
@@ -70,6 +70,49 @@ public class MakingHistory extends BasicQuestHelper
 	ConditionalStep dronSteps, ghostSteps, keySteps;
 
 	Zone castle;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToJorral);
+
+		keySteps = new ConditionalStep(this, talkToSilverMerchant);
+		keySteps.addStep(hasChest, openChest);
+		keySteps.addStep(gotKey, dig);
+		keySteps.setLockingCondition(finishedKey);
+
+		dronSteps = new ConditionalStep(this, talkToBlanin);
+		dronSteps.addStep(talkedtoBlanin, talkToDron);
+		dronSteps.setLockingCondition(finishedFrem);
+
+		ghostSteps = new ConditionalStep(this, talkToDroalak);
+		ghostSteps.addStep(talkedToMelina, returnToDroalak);
+		ghostSteps.addStep(talkedToDroalak, talkToMelina);
+		ghostSteps.setLockingCondition(finishedGhost);
+
+		ConditionalStep getItems = new ConditionalStep(this, keySteps);
+		getItems.addStep(handedInEverything, continueTalkingToJorral);
+		getItems.addStep(new Conditions(finishedKey, finishedFrem, finishedGhost), returnToJorral);
+		getItems.addStep(new Conditions(finishedKey, finishedFrem), ghostSteps);
+		getItems.addStep(finishedKey, dronSteps);
+
+		steps.put(1, getItems);
+
+		ConditionalStep goTalkToLathas = new ConditionalStep(this, goUpToLathas);
+		goTalkToLathas.addStep(inCastle, talkToLathas);
+
+		steps.put(2, goTalkToLathas);
+
+		steps.put(3, finishQuest);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -207,48 +250,5 @@ public class MakingHistory extends BasicQuestHelper
 		allSteps.add(ghostPanel);
 		allSteps.add(finishingPanel);
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToJorral);
-
-		keySteps = new ConditionalStep(this, talkToSilverMerchant);
-		keySteps.addStep(hasChest, openChest);
-		keySteps.addStep(gotKey, dig);
-		keySteps.setLockingCondition(finishedKey);
-
-		dronSteps = new ConditionalStep(this, talkToBlanin);
-		dronSteps.addStep(talkedtoBlanin, talkToDron);
-		dronSteps.setLockingCondition(finishedFrem);
-
-		ghostSteps = new ConditionalStep(this, talkToDroalak);
-		ghostSteps.addStep(talkedToMelina, returnToDroalak);
-		ghostSteps.addStep(talkedToDroalak, talkToMelina);
-		ghostSteps.setLockingCondition(finishedGhost);
-
-		ConditionalStep getItems = new ConditionalStep(this, keySteps);
-		getItems.addStep(handedInEverything, continueTalkingToJorral);
-		getItems.addStep(new Conditions(finishedKey, finishedFrem, finishedGhost), returnToJorral);
-		getItems.addStep(new Conditions(finishedKey, finishedFrem), ghostSteps);
-		getItems.addStep(finishedKey, dronSteps);
-
-		steps.put(1, getItems);
-
-		ConditionalStep goTalkToLathas = new ConditionalStep(this, goUpToLathas);
-		goTalkToLathas.addStep(inCastle, talkToLathas);
-
-		steps.put(2, goTalkToLathas);
-
-		steps.put(3, finishQuest);
-
-		return steps;
 	}
 }

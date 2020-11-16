@@ -26,22 +26,27 @@ package com.questhelper.steps.choice;
 
 import java.awt.Color;
 import lombok.Getter;
-import net.runelite.api.Client;
+import net.runelite.api.*;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 
 public class WidgetChoiceStep
 {
 	@Getter
 	private final String choice;
-	private final int choiceById;
-	@Getter
-	private final int groupId;
-	private final int childId;
-	private final int TEXT_HIGHLIGHT_COLOR = Color.CYAN.darker().getRGB();
+
 	private String excludedString;
 	private int excludedGroupId;
 	private int excludedChildId;
+
+	private final int choiceById;
+
+	@Getter
+	private final int groupId;
+	private final int childId;
+
+	private final int TEXT_HIGHLIGHT_COLOR = Color.CYAN.darker().getRGB();
 
 	public WidgetChoiceStep(String choice, int groupId, int childId)
 	{

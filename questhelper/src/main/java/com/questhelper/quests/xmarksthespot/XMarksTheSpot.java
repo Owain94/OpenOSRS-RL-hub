@@ -24,14 +24,7 @@
  */
 package com.questhelper.quests.xmarksthespot;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.DigStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +32,13 @@ import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.DigStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.QuestDescriptor;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.X_MARKS_THE_SPOT
@@ -49,13 +49,31 @@ public class XMarksTheSpot extends BasicQuestHelper
 
 	QuestStep speakVeosLumbridge, digOutsideBob, digCastle, digDraynor, digMartin, speakVeosSarim, speakVeosSarimWithoutCasket;
 
-	private void setupRequirements()
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
 	{
+		setupRequirements();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, speakVeosLumbridge);
+		steps.put(1, steps.get(0));
+		steps.put(2, digOutsideBob);
+		steps.put(3, digCastle);
+		steps.put(4, digDraynor);
+		steps.put(5, digMartin);
+		steps.put(6, speakVeosSarim);
+		steps.put(7, speakVeosSarimWithoutCasket);
+
+		return steps;
+	}
+
+	private void setupRequirements() {
 		spade = new ItemRequirement("Spade", ItemID.SPADE);
 	}
 
-	private void setupSteps()
-	{
+	private void setupSteps() {
 		speakVeosLumbridge = new NpcStep(this, NpcID.VEOS_8484, new WorldPoint(3228, 3242, 0),
 			"Talk to Veos in The Sheared Ram pub in Lumbridge to start the quest.");
 		speakVeosLumbridge.addDialogStep("I'm looking for a quest.");
@@ -104,25 +122,5 @@ public class XMarksTheSpot extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Solve the clue scroll", new ArrayList<>(Arrays.asList(digOutsideBob, digCastle, digDraynor, digMartin))));
 		allSteps.add(new PanelDetails("Bring the casket to Veos", new ArrayList<>(Arrays.asList(speakVeosSarim))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupRequirements();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, speakVeosLumbridge);
-		steps.put(1, steps.get(0));
-		steps.put(2, digOutsideBob);
-		steps.put(3, digCastle);
-		steps.put(4, digDraynor);
-		steps.put(5, digMartin);
-		steps.put(6, speakVeosSarim);
-		steps.put(7, speakVeosSarimWithoutCasket);
-
-		return steps;
 	}
 }

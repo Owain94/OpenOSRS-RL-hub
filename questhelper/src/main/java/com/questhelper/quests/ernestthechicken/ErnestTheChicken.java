@@ -25,17 +25,12 @@
  */
 package com.questhelper.quests.ernestthechicken;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ChatMessageCondition;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
@@ -53,6 +48,11 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.ERNEST_THE_CHICKEN
@@ -73,6 +73,78 @@ public class ErnestTheChicken extends BasicQuestHelper
 	ConditionalStep getGaugeAndTube, getCan;
 
 	Zone manorGround1, secretRoom, manorGround3, firstFloor, secondFloor, basement, roomCD, emptyRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToVeronica);
+
+		getGaugeAndTube = new ConditionalStep(this, enterManor);
+		getGaugeAndTube.addStep(new Conditions(hasKey, hasPressureGauge, inGroundFloor), getTube);
+		getGaugeAndTube.addStep(new Conditions(hasKey, hasPressureGauge), enterManorWithKey);
+		getGaugeAndTube.addStep(new Conditions(killedFish, hasKey), searchFountain);
+		getGaugeAndTube.addStep(new Conditions(hasPoisonedFishFood, hasKey), useFishFoodOnFountain);
+		getGaugeAndTube.addStep(new Conditions(hasPoisonedFishFood, hasSpade), searchCompost);
+		getGaugeAndTube.addStep(new Conditions(hasPoisonedFishFood), pickupSpade);
+		getGaugeAndTube.addStep(new Conditions(hasFishFood, hasPoison), usePoisonOnFishFood);
+		getGaugeAndTube.addStep(new Conditions(inGroundFloor, hasFishFood), pickupPoison);
+		getGaugeAndTube.addStep(new Conditions(inFirstFloor, hasFishFood), goDownToGroundFloor);
+		getGaugeAndTube.addStep(inFirstFloor, pickupFishFood);
+		getGaugeAndTube.addStep(inGroundFloor, goToFirstFloor);
+		getGaugeAndTube.setLockingCondition(new Conditions(hasPressureGauge, hasRubberTube));
+
+		getCan = new ConditionalStep(this, enterManor);
+		getCan.addStep(new Conditions(isLeverADown, isLeverEDown), pullUpLeverE);
+		getCan.addStep(new Conditions(isLeverBDown, isLeverCDown, isLeverDDown, isLeverFDown, isLeverEDown), pullUpLeverB);
+		getCan.addStep(new Conditions(isLeverEDown, isLeverFDown, isLeverDUp), pullUpLeverD);
+		getCan.addStep(new Conditions(new Conditions(LogicType.NAND, inRoomCD), isLeverBUp, isLeverCDown, isLeverFUp), pullDownLeverF);
+		getCan.addStep(new Conditions(isLeverFDown, isLeverEDown, isLeverCDown), pullUpLeverE);
+		getCan.addStep(new Conditions(isLeverFDown, isLeverEUp, isLeverCDown), pickupOilCan);
+		getCan.addStep(new Conditions(isLeverEDown, isLeverFDown), pullDownLeverC);
+		getCan.addStep(new Conditions(inRoomCD, isLeverCDown), pullUpLeverC);
+		getCan.addStep(new Conditions(new Conditions(LogicType.OR, inRoomCD, inEmptyRoom), isLeverDUp), pullDownLeverD);
+		getCan.addStep(new Conditions(isLeverBDown, isLeverDDown), pullUpLeverB);
+		getCan.addStep(new Conditions(isLeverADown, isLeverDDown), pullUpLeverA);
+		getCan.addStep(new Conditions(isLeverDDown, isLeverEDown), pullDownLeverF);
+		getCan.addStep(new Conditions(isLeverDDown), pullDownLeverE);
+		getCan.addStep(new Conditions(isLeverADown, isLeverBDown), pullDownLeverD);
+		getCan.addStep(new Conditions(isLeverADown), pullDownLeverB);
+		getCan.addStep(inBasement, pullDownLeverA);
+		getCan.addStep(inSecretRoom, goDownLadder);
+		getCan.addStep(inGroundFloor, searchBookcase);
+		getCan.setLockingCondition(hasOilCan);
+
+		ConditionalStep initialOddensteinConversation = new ConditionalStep(this, goToFirstFloorToFinish);
+		initialOddensteinConversation.addStep(inSecondFloor, talkToOddenstein);
+		initialOddensteinConversation.addStep(inFirstFloor, goToSecondFloor);
+		initialOddensteinConversation.addStep(inSecretRoom, pullLeverToLeave);
+		initialOddensteinConversation.addStep(inBasement, goUpFromBasement);
+
+		ConditionalStep finishOddensteinConversation = new ConditionalStep(this, goToFirstFloorToFinish);
+		finishOddensteinConversation.addStep(inSecondFloor, talkToOddenteinAgain);
+		finishOddensteinConversation.addStep(inFirstFloor, goToSecondFloor);
+		finishOddensteinConversation.addStep(inSecretRoom, pullLeverToLeave);
+		finishOddensteinConversation.addStep(inBasement, goUpFromBasement);
+
+		ConditionalStep getAllItems = new ConditionalStep(this, getGaugeAndTube);
+		getAllItems.addStep(new Conditions(hasPressureGauge, hasRubberTube, hasOilCan), initialOddensteinConversation);
+		getAllItems.addStep(new Conditions(hasPressureGauge, hasRubberTube), getCan);
+
+		ConditionalStep completeQuest = new ConditionalStep(this, getGaugeAndTube);
+		completeQuest.addStep(new Conditions(hasPressureGauge, hasRubberTube, hasOilCan), finishOddensteinConversation);
+		completeQuest.addStep(new Conditions(hasPressureGauge, hasRubberTube), getCan);
+
+		steps.put(1, getAllItems);
+		steps.put(2, completeQuest);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -208,77 +280,5 @@ public class ErnestTheChicken extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Bring items to Oddenstein", new ArrayList<>(Arrays.asList(talkToOddenstein, talkToOddenteinAgain))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToVeronica);
-
-		getGaugeAndTube = new ConditionalStep(this, enterManor);
-		getGaugeAndTube.addStep(new Conditions(hasKey, hasPressureGauge, inGroundFloor), getTube);
-		getGaugeAndTube.addStep(new Conditions(hasKey, hasPressureGauge), enterManorWithKey);
-		getGaugeAndTube.addStep(new Conditions(killedFish, hasKey), searchFountain);
-		getGaugeAndTube.addStep(new Conditions(hasPoisonedFishFood, hasKey), useFishFoodOnFountain);
-		getGaugeAndTube.addStep(new Conditions(hasPoisonedFishFood, hasSpade), searchCompost);
-		getGaugeAndTube.addStep(new Conditions(hasPoisonedFishFood), pickupSpade);
-		getGaugeAndTube.addStep(new Conditions(hasFishFood, hasPoison), usePoisonOnFishFood);
-		getGaugeAndTube.addStep(new Conditions(inGroundFloor, hasFishFood), pickupPoison);
-		getGaugeAndTube.addStep(new Conditions(inFirstFloor, hasFishFood), goDownToGroundFloor);
-		getGaugeAndTube.addStep(inFirstFloor, pickupFishFood);
-		getGaugeAndTube.addStep(inGroundFloor, goToFirstFloor);
-		getGaugeAndTube.setLockingCondition(new Conditions(hasPressureGauge, hasRubberTube));
-
-		getCan = new ConditionalStep(this, enterManor);
-		getCan.addStep(new Conditions(isLeverADown, isLeverEDown), pullUpLeverE);
-		getCan.addStep(new Conditions(isLeverBDown, isLeverCDown, isLeverDDown, isLeverFDown, isLeverEDown), pullUpLeverB);
-		getCan.addStep(new Conditions(isLeverEDown, isLeverFDown, isLeverDUp), pullUpLeverD);
-		getCan.addStep(new Conditions(new Conditions(LogicType.NAND, inRoomCD), isLeverBUp, isLeverCDown, isLeverFUp), pullDownLeverF);
-		getCan.addStep(new Conditions(isLeverFDown, isLeverEDown, isLeverCDown), pullUpLeverE);
-		getCan.addStep(new Conditions(isLeverFDown, isLeverEUp, isLeverCDown), pickupOilCan);
-		getCan.addStep(new Conditions(isLeverEDown, isLeverFDown), pullDownLeverC);
-		getCan.addStep(new Conditions(inRoomCD, isLeverCDown), pullUpLeverC);
-		getCan.addStep(new Conditions(new Conditions(LogicType.OR, inRoomCD, inEmptyRoom), isLeverDUp), pullDownLeverD);
-		getCan.addStep(new Conditions(isLeverBDown, isLeverDDown), pullUpLeverB);
-		getCan.addStep(new Conditions(isLeverADown, isLeverDDown), pullUpLeverA);
-		getCan.addStep(new Conditions(isLeverDDown, isLeverEDown), pullDownLeverF);
-		getCan.addStep(new Conditions(isLeverDDown), pullDownLeverE);
-		getCan.addStep(new Conditions(isLeverADown, isLeverBDown), pullDownLeverD);
-		getCan.addStep(new Conditions(isLeverADown), pullDownLeverB);
-		getCan.addStep(inBasement, pullDownLeverA);
-		getCan.addStep(inSecretRoom, goDownLadder);
-		getCan.addStep(inGroundFloor, searchBookcase);
-		getCan.setLockingCondition(hasOilCan);
-
-		ConditionalStep initialOddensteinConversation = new ConditionalStep(this, goToFirstFloorToFinish);
-		initialOddensteinConversation.addStep(inSecondFloor, talkToOddenstein);
-		initialOddensteinConversation.addStep(inFirstFloor, goToSecondFloor);
-		initialOddensteinConversation.addStep(inSecretRoom, pullLeverToLeave);
-		initialOddensteinConversation.addStep(inBasement, goUpFromBasement);
-
-		ConditionalStep finishOddensteinConversation = new ConditionalStep(this, goToFirstFloorToFinish);
-		finishOddensteinConversation.addStep(inSecondFloor, talkToOddenteinAgain);
-		finishOddensteinConversation.addStep(inFirstFloor, goToSecondFloor);
-		finishOddensteinConversation.addStep(inSecretRoom, pullLeverToLeave);
-		finishOddensteinConversation.addStep(inBasement, goUpFromBasement);
-
-		ConditionalStep getAllItems = new ConditionalStep(this, getGaugeAndTube);
-		getAllItems.addStep(new Conditions(hasPressureGauge, hasRubberTube, hasOilCan), initialOddensteinConversation);
-		getAllItems.addStep(new Conditions(hasPressureGauge, hasRubberTube), getCan);
-
-		ConditionalStep completeQuest = new ConditionalStep(this, getGaugeAndTube);
-		completeQuest.addStep(new Conditions(hasPressureGauge, hasRubberTube, hasOilCan), finishOddensteinConversation);
-		completeQuest.addStep(new Conditions(hasPressureGauge, hasRubberTube), getCan);
-
-		steps.put(1, getAllItems);
-		steps.put(2, completeQuest);
-
-		return steps;
 	}
 }

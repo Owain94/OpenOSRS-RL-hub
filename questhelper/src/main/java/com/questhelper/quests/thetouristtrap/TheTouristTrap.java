@@ -25,18 +25,11 @@
 package com.questhelper.quests.thetouristtrap;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.Operation;
@@ -54,6 +47,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -79,6 +79,109 @@ public class TheTouristTrap extends BasicQuestHelper
 	DetailedQuestStep escapeJail, climbSlope, climbCliff, climbDownCliff;
 
 	Zone jail, slope, camp, upstairs, cliff, secondCliff, mine1, deepMine, deepMineP1, deepMineP2P1, deepMineP2P2, miningRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToIrena);
+		steps.put(1, talkToCaptain);
+		steps.put(2, talkToCaptain);
+		steps.put(3, talkToCaptain);
+
+		ConditionalStep escapeJailSteps = new ConditionalStep(this, escapeJail);
+		escapeJailSteps.addStep(onSecondCliff, climbDownCliff);
+		escapeJailSteps.addStep(onCliff, climbCliff);
+		escapeJailSteps.addStep(onSlope, climbSlope);
+
+		ConditionalStep getSlaveClothes = new ConditionalStep(this, enterCamp);
+		getSlaveClothes.addStep(inJailEscape, escapeJailSteps);
+		getSlaveClothes.addStep(inCamp, talkToSlave);
+		steps.put(4, getSlaveClothes);
+		steps.put(5, getSlaveClothes);
+		steps.put(6, getSlaveClothes);
+		steps.put(7, getSlaveClothes);
+
+		ConditionalStep goTalkToGuard = new ConditionalStep(this, enterCamp);
+		goTalkToGuard.addStep(inJailEscape, escapeJailSteps);
+		goTalkToGuard.addStep(inMine1, talkToGuard);
+		goTalkToGuard.addStep(inCamp, enterMine);
+		steps.put(8, goTalkToGuard);
+		steps.put(9, goTalkToGuard);
+
+		ConditionalStep goTalkToShabim = new ConditionalStep(this, talkToShabim);
+		goTalkToShabim.addStep(inJailEscape, escapeJailSteps);
+		goTalkToShabim.addStep(inCamp, leaveCamp);
+		goTalkToShabim.addStep(inMine1, leaveMine);
+		steps.put(10, goTalkToShabim);
+
+		ConditionalStep goGetPlans = new ConditionalStep(this, enterCampForTask);
+		goGetPlans.addStep(inJailEscape, escapeJailSteps);
+		goGetPlans.addStep(hasPlans, returnToShabim);
+		goGetPlans.addStep(new Conditions(inUpstairs, distractedSiad), searchChest);
+		goGetPlans.addStep(new Conditions(inUpstairs, searchedBookcase), talkToSiad);
+		goGetPlans.addStep(inUpstairs, searchBookcase);
+		goGetPlans.addStep(inCamp, goUpToSiad);
+		goGetPlans.addStep(inMine1, leaveMine);
+		steps.put(11, goGetPlans);
+		steps.put(12, goGetPlans);
+
+		ConditionalStep makeDart = new ConditionalStep(this, useAnvil);
+		makeDart.addStep(inJailEscape, escapeJailSteps);
+		makeDart.addStep(hasDart, bringPrototypeToShabim);
+		makeDart.addStep(hasTip, useFeatherOnTip);
+		steps.put(13, makeDart);
+		steps.put(14, makeDart);
+		steps.put(15, makeDart);
+
+		ConditionalStep returnWithPineapple = new ConditionalStep(this, enterCampWithPineapple);
+		returnWithPineapple.addStep(inJailEscape, escapeJailSteps);
+		returnWithPineapple.addStep(inMine1, talkToGuardWithPineapple);
+		returnWithPineapple.addStep(inCamp, enterMineWithPineapple);
+		steps.put(16, returnWithPineapple);
+
+		ConditionalStep captureAna = new ConditionalStep(this, enterCampAfterPineapple);
+		captureAna.addStep(inJailEscape, escapeJailSteps);
+		captureAna.addStep(new Conditions(anaFree), talkToAna);
+		captureAna.addStep(new Conditions(inCamp, anaOnCart), talkToDriver);
+		captureAna.addStep(new Conditions(inCamp, hasAnaInBarrel), useBarrelOnCart);
+		captureAna.addStep(new Conditions(inCamp, anaPlacedOnCartOfLift, anaOnSurfaceInBarrel), searchWinchBarrel);
+		captureAna.addStep(new Conditions(inCamp, anaOnSurface, anaPlacedOnCartOfLift), operateWinch);
+		captureAna.addStep(new Conditions(inMine1, anaOnSurface, anaPlacedOnCartOfLift), leaveMineForAna);
+		captureAna.addStep(new Conditions(inDeepMineP1, hasAnaInBarrel), sendAnaUp);
+		captureAna.addStep(new Conditions(inDeepMineP1, anaOnSurface, anaPlacedOnCartOfLift), leaveDeepMine);
+		captureAna.addStep(new Conditions(inDeepMineP1, anaPlacedOnCartOfLift), searchBarrelsForAna);
+		captureAna.addStep(new Conditions(inDeepMineP2, hasAnaInBarrel), useBarrelOnMineCart);
+		captureAna.addStep(new Conditions(inDeepMineP2, anaPlacedOnCartOfLift), returnInMineCart);
+		captureAna.addStep(new Conditions(inDeepMineP2, hasBarrel), useBarrelOnAna);
+		captureAna.addStep(new Conditions(inDeepMineP1, hasBarrel), enterMineCart);
+		captureAna.addStep(inMiningRoom, mineRocks);
+		captureAna.addStep(hasAnaInBarrel, returnToIrena);
+		captureAna.addStep(inDeepMine, getBarrel);
+		captureAna.addStep(inMine1, enterDeepMine);
+		captureAna.addStep(inCamp, enterMineAfterPineapple);
+		steps.put(17, captureAna);
+		steps.put(18, captureAna);
+		steps.put(19, captureAna);
+		steps.put(20, captureAna);
+		steps.put(21, captureAna);
+		steps.put(22, captureAna);
+		steps.put(23, captureAna);
+		steps.put(24, captureAna);
+		steps.put(25, captureAna);
+		steps.put(26, captureAna);
+
+		steps.put(27, talkToIrenaToFinish);
+		steps.put(28, talkToIrenaToFinish);
+		steps.put(29, talkToIrenaToFinish);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -146,7 +249,7 @@ public class TheTouristTrap extends BasicQuestHelper
 		slope = new Zone(new WorldPoint(3282, 3032, 0), new WorldPoint(3283, 3037, 0));
 		cliff = new Zone(new WorldPoint(3279, 3037, 0), new WorldPoint(3281, 3038, 0));
 		secondCliff = new Zone(new WorldPoint(3273, 3035, 0), new WorldPoint(3278, 3039, 0));
-		mine1 = new Zone(new WorldPoint(3266, 9410, 0), new WorldPoint(3282, 9466, 0));
+		mine1 = new Zone(new WorldPoint(3266,9410, 0), new WorldPoint(3282, 9466, 0));
 		deepMine = new Zone(new WorldPoint(3282, 9408, 0), new WorldPoint(3326, 9470, 0));
 		deepMineP1 = new Zone(new WorldPoint(3283, 9409, 0), new WorldPoint(3314, 9427, 0));
 		deepMineP2P1 = new Zone(new WorldPoint(3315, 9416, 0), new WorldPoint(3326, 9470, 0));
@@ -269,10 +372,17 @@ public class TheTouristTrap extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<String> getNotes()
+	{
+		return new ArrayList<>(Collections.singletonList("Almost any deviation from the steps listed here will often result in you being thrown into jail, or to an inconvenient location. If you'd wish to avoid this, try to follow the helper to the letter."));
+	}
+
+	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		return new ArrayList<>(Arrays.asList(desertTop, desertBottom, desertBoot, bronzeBar3, hammer, feather50));
 	}
+
 
 	@Override
 	public ArrayList<ItemRequirement> getItemRecommended()
@@ -284,12 +394,6 @@ public class TheTouristTrap extends BasicQuestHelper
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Collections.singletonList("Mercenary Captain (level 47)"));
-	}
-
-	@Override
-	public ArrayList<String> getNotes()
-	{
-		return new ArrayList<>(Collections.singletonList("Almost any deviation from the steps listed here will often result in you being thrown into jail, or to an inconvenient location. If you'd wish to avoid this, try to follow the helper to the letter."));
 	}
 
 	@Override
@@ -308,108 +412,5 @@ public class TheTouristTrap extends BasicQuestHelper
 			slaveTop, slaveRobe, slaveBoot));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToIrena);
-		steps.put(1, talkToCaptain);
-		steps.put(2, talkToCaptain);
-		steps.put(3, talkToCaptain);
-
-		ConditionalStep escapeJailSteps = new ConditionalStep(this, escapeJail);
-		escapeJailSteps.addStep(onSecondCliff, climbDownCliff);
-		escapeJailSteps.addStep(onCliff, climbCliff);
-		escapeJailSteps.addStep(onSlope, climbSlope);
-
-		ConditionalStep getSlaveClothes = new ConditionalStep(this, enterCamp);
-		getSlaveClothes.addStep(inJailEscape, escapeJailSteps);
-		getSlaveClothes.addStep(inCamp, talkToSlave);
-		steps.put(4, getSlaveClothes);
-		steps.put(5, getSlaveClothes);
-		steps.put(6, getSlaveClothes);
-		steps.put(7, getSlaveClothes);
-
-		ConditionalStep goTalkToGuard = new ConditionalStep(this, enterCamp);
-		goTalkToGuard.addStep(inJailEscape, escapeJailSteps);
-		goTalkToGuard.addStep(inMine1, talkToGuard);
-		goTalkToGuard.addStep(inCamp, enterMine);
-		steps.put(8, goTalkToGuard);
-		steps.put(9, goTalkToGuard);
-
-		ConditionalStep goTalkToShabim = new ConditionalStep(this, talkToShabim);
-		goTalkToShabim.addStep(inJailEscape, escapeJailSteps);
-		goTalkToShabim.addStep(inCamp, leaveCamp);
-		goTalkToShabim.addStep(inMine1, leaveMine);
-		steps.put(10, goTalkToShabim);
-
-		ConditionalStep goGetPlans = new ConditionalStep(this, enterCampForTask);
-		goGetPlans.addStep(inJailEscape, escapeJailSteps);
-		goGetPlans.addStep(hasPlans, returnToShabim);
-		goGetPlans.addStep(new Conditions(inUpstairs, distractedSiad), searchChest);
-		goGetPlans.addStep(new Conditions(inUpstairs, searchedBookcase), talkToSiad);
-		goGetPlans.addStep(inUpstairs, searchBookcase);
-		goGetPlans.addStep(inCamp, goUpToSiad);
-		goGetPlans.addStep(inMine1, leaveMine);
-		steps.put(11, goGetPlans);
-		steps.put(12, goGetPlans);
-
-		ConditionalStep makeDart = new ConditionalStep(this, useAnvil);
-		makeDart.addStep(inJailEscape, escapeJailSteps);
-		makeDart.addStep(hasDart, bringPrototypeToShabim);
-		makeDart.addStep(hasTip, useFeatherOnTip);
-		steps.put(13, makeDart);
-		steps.put(14, makeDart);
-		steps.put(15, makeDart);
-
-		ConditionalStep returnWithPineapple = new ConditionalStep(this, enterCampWithPineapple);
-		returnWithPineapple.addStep(inJailEscape, escapeJailSteps);
-		returnWithPineapple.addStep(inMine1, talkToGuardWithPineapple);
-		returnWithPineapple.addStep(inCamp, enterMineWithPineapple);
-		steps.put(16, returnWithPineapple);
-
-		ConditionalStep captureAna = new ConditionalStep(this, enterCampAfterPineapple);
-		captureAna.addStep(inJailEscape, escapeJailSteps);
-		captureAna.addStep(new Conditions(anaFree), talkToAna);
-		captureAna.addStep(new Conditions(inCamp, anaOnCart), talkToDriver);
-		captureAna.addStep(new Conditions(inCamp, hasAnaInBarrel), useBarrelOnCart);
-		captureAna.addStep(new Conditions(inCamp, anaPlacedOnCartOfLift, anaOnSurfaceInBarrel), searchWinchBarrel);
-		captureAna.addStep(new Conditions(inCamp, anaOnSurface, anaPlacedOnCartOfLift), operateWinch);
-		captureAna.addStep(new Conditions(inMine1, anaOnSurface, anaPlacedOnCartOfLift), leaveMineForAna);
-		captureAna.addStep(new Conditions(inDeepMineP1, hasAnaInBarrel), sendAnaUp);
-		captureAna.addStep(new Conditions(inDeepMineP1, anaOnSurface, anaPlacedOnCartOfLift), leaveDeepMine);
-		captureAna.addStep(new Conditions(inDeepMineP1, anaPlacedOnCartOfLift), searchBarrelsForAna);
-		captureAna.addStep(new Conditions(inDeepMineP2, hasAnaInBarrel), useBarrelOnMineCart);
-		captureAna.addStep(new Conditions(inDeepMineP2, anaPlacedOnCartOfLift), returnInMineCart);
-		captureAna.addStep(new Conditions(inDeepMineP2, hasBarrel), useBarrelOnAna);
-		captureAna.addStep(new Conditions(inDeepMineP1, hasBarrel), enterMineCart);
-		captureAna.addStep(inMiningRoom, mineRocks);
-		captureAna.addStep(hasAnaInBarrel, returnToIrena);
-		captureAna.addStep(inDeepMine, getBarrel);
-		captureAna.addStep(inMine1, enterDeepMine);
-		captureAna.addStep(inCamp, enterMineAfterPineapple);
-		steps.put(17, captureAna);
-		steps.put(18, captureAna);
-		steps.put(19, captureAna);
-		steps.put(20, captureAna);
-		steps.put(21, captureAna);
-		steps.put(22, captureAna);
-		steps.put(23, captureAna);
-		steps.put(24, captureAna);
-		steps.put(25, captureAna);
-		steps.put(26, captureAna);
-
-		steps.put(27, talkToIrenaToFinish);
-		steps.put(28, talkToIrenaToFinish);
-		steps.put(29, talkToIrenaToFinish);
-
-		return steps;
 	}
 }

@@ -24,25 +24,14 @@
  */
 package com.questhelper.quests.dragonslayer;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
 import com.questhelper.steps.conditional.ObjectCondition;
 import com.questhelper.steps.conditional.VarbitCondition;
 import com.questhelper.steps.conditional.VarplayerCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +42,17 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.DRAGON_SLAYER
@@ -85,6 +85,107 @@ public class DragonSlayer extends BasicQuestHelper
 		roomToBasement1, roomToBasement2, zombieRoom, melzarRoom1, melzarRoom2, demonRoom1, demonRoom2, lastMelzarRoom1, lastMelzarRoom2,
 		shipHull, shipDeck, crandorSurface, crandorUnderground, elvargArea, karamjaVolcano;
 
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, startQuest);
+
+		steps.put(1, talkToOziach);
+
+		ConditionalStep askQuestions = new ConditionalStep(this, returnToGuildmaster);
+		askQuestions.addStep(new Conditions(askedAboutShip, askedAboutShield, askedAboutMelzar, askedAboutThalzar), askAboutLozar);
+		askQuestions.addStep(new Conditions(askedAboutShip, askedAboutShield, askedAboutMelzar), askAboutThalzar);
+		askQuestions.addStep(new Conditions(askedAboutShip, askedAboutShield), askAboutMelzar);
+		askQuestions.addStep(askedAboutShip, askAboutShield);
+
+		getThalzarPiece = new ConditionalStep(this, talkToOracle);
+		getThalzarPiece.addStep(new Conditions(thalzarDoorOpened, inDwarvenMines, thalzarChest2Nearby), searchThalzarChest2);
+		getThalzarPiece.addStep(new Conditions(thalzarDoorOpened, inDwarvenMines), searchThalzarChest);
+		getThalzarPiece.addStep(new Conditions(inDwarvenMines, silkUsed, lobsterPotUsed, unfiredBowlUsed), useMindBombOnDoor);
+		getThalzarPiece.addStep(new Conditions(inDwarvenMines, silkUsed, lobsterPotUsed), useUnfiredBowlOnDoor);
+		getThalzarPiece.addStep(new Conditions(inDwarvenMines, silkUsed), usePotOnDoor);
+		getThalzarPiece.addStep(new Conditions(askedOracleAboutMap, inDwarvenMines), useSilkOnDoor);
+		getThalzarPiece.addStep(askedOracleAboutMap, goIntoDwarvenMine);
+		getThalzarPiece.setLockingCondition(hasMapPart1);
+		getThalzarPiece.setBlocker(true);
+
+		getLozarPiece = new ConditionalStep(this, optionsForLozarPiece);
+		getLozarPiece.setLockingCondition(hasMapPart2);
+
+		getMelzarPiece = new ConditionalStep(this, enterMelzarsMaze);
+		getMelzarPiece.addStep(inLastMelzarRoom, openMelzarChest);
+		getMelzarPiece.addStep(new Conditions(inDemonRoom, hasDemonKey), openGreenDoor);
+		getMelzarPiece.addStep(inDemonRoom, killLesserDemon);
+		getMelzarPiece.addStep(new Conditions(inMelzarRoom, hasMelzarKey), openMagntaDoor);
+		getMelzarPiece.addStep(inMelzarRoom, killMelzar);
+		getMelzarPiece.addStep(new Conditions(inZombieRoom, hasZombieKey), openBlueDoor);
+		getMelzarPiece.addStep(inZombieRoom, killZombie);
+		getMelzarPiece.addStep(inRoomToBasement, goDownBasementEntryLadder);
+		getMelzarPiece.addStep(inLadderRoom, goDownLadderRoomLadder);
+		getMelzarPiece.addStep(inPostSkeletonRoom, goDownSkeletonLadder);
+		getMelzarPiece.addStep(new Conditions(inSkeletonRoom, hasSkeletonKey), openYellowDoor);
+		getMelzarPiece.addStep(inSkeletonRoom, killSkeleton);
+		getMelzarPiece.addStep(inPostGhostRoom, goUpGhostLadder);
+		getMelzarPiece.addStep(new Conditions(inGhostRoom, hasGhostKey), openOrangeDoor);
+		getMelzarPiece.addStep(inGhostRoom, killGhost);
+		getMelzarPiece.addStep(inPostRatRoom, goUpRatLadder);
+		getMelzarPiece.addStep(new Conditions(inRatRoom, hasRatKey), openRedDoor);
+		getMelzarPiece.addStep(inRatRoom, killRat);
+		getMelzarPiece.setLockingCondition(hasMapPart3);
+
+		getShieldSteps = new ConditionalStep(this, getShield);
+		getShieldSteps.setLockingCondition(hasShield);
+
+		ConditionalStep getBoat = new ConditionalStep(this, talkToKlarense);
+		getBoat.addStep(new Conditions(hasBoughtBoat, inShipHull, hasRepairedHullTwice), repairShip3);
+		getBoat.addStep(new Conditions(hasBoughtBoat, inShipHull, hasRepairedHullOnce), repairShip2);
+		getBoat.addStep(new Conditions(hasBoughtBoat, inShipHull), repairShip);
+		getBoat.addStep(new Conditions(hasBoughtBoat, onShipDeck), goDownShipLadder);
+		getBoat.addStep(new Conditions(hasBoughtBoat, hasRepairedHullTwice), boardShip3);
+		getBoat.addStep(new Conditions(hasBoughtBoat, hasRepairedHullOnce), boardShip2);
+		getBoat.addStep(new Conditions(hasBoughtBoat), boardShip1);
+		getBoat.setLockingCondition(fullyRepairedHull);
+
+		ConditionalStep getCaptain = new ConditionalStep(this, repairMap);
+		getCaptain.addStep(hasFullMap, talkToNed);
+
+		ConditionalStep getMapAndBoat = new ConditionalStep(this, askQuestions);
+		getMapAndBoat.addStep(new Conditions(hasMapPart1, hasMapPart2, hasMapPart3, askedAllQuestions, hasShield, fullyRepairedHull), getCaptain);
+		getMapAndBoat.addStep(new Conditions(hasMapPart1, hasMapPart2, hasMapPart3, askedAllQuestions, hasShield), getBoat);
+		getMapAndBoat.addStep(new Conditions(hasMapPart1, hasMapPart2, hasMapPart3, askedAllQuestions), getShieldSteps);
+		getMapAndBoat.addStep(new Conditions(LogicType.OR, inMelzarsMaze, new Conditions(hasMapPart1, hasMapPart2, askedAllQuestions)), getMelzarPiece);
+		getMapAndBoat.addStep(new Conditions(hasMapPart1, askedAllQuestions), getLozarPiece);
+		getMapAndBoat.addStep(askedAllQuestions, getThalzarPiece);
+
+		steps.put(2, getMapAndBoat);
+		steps.put(3, getMapAndBoat);
+		steps.put(6, getMapAndBoat);
+
+		ConditionalStep goToCrandor = new ConditionalStep(this, boardShipToGo);
+		goToCrandor.addStep(onShipDeck, talkToNedOnShip);
+		steps.put(7, goToCrandor);
+
+		ConditionalStep killingElvarg = new ConditionalStep(this, repairShipAgainAndSail);
+		killingElvarg.addStep(inElvargArea, killElvarg);
+		killingElvarg.addStep(new Conditions(inCrandorUnderground, unlockedShortcut), enterElvargArea);
+		killingElvarg.addStep(new Conditions(inKaramjaVolcano, unlockedShortcut), returnThroughShortcut);
+		killingElvarg.addStep(inCrandorUnderground, unlockShortcut);
+		killingElvarg.addStep(onCrandorSurface, enterCrandorHole);
+		killingElvarg.addStep(unlockedShortcut, goDownIntoKaramjaVolcano);
+
+		steps.put(8, killingElvarg);
+
+		steps.put(9, finishQuest);
+
+		return steps;
+	}
+
 	public void setupItemRequirements()
 	{
 		unfiredBowl = new ItemRequirement("Unfired bowl", ItemID.UNFIRED_BOWL);
@@ -110,7 +211,7 @@ public class DragonSlayer extends BasicQuestHelper
 		skeletonKey = new ItemRequirement("Key", ItemID.KEY_1545);
 		zombieKey = new ItemRequirement("Key", ItemID.KEY_1546);
 		melzarKey = new ItemRequirement("Key", ItemID.KEY_1547);
-		demonKey = new ItemRequirement("Key", ItemID.KEY_1548);
+		demonKey = 	new ItemRequirement("Key", ItemID.KEY_1548);
 		combatGear = new ItemRequirement("Combat equipment and food", -1, -1);
 		antidragonShield = new ItemRequirement("Anti-dragon shield", ItemID.ANTIDRAGON_SHIELD);
 		antidragonShieldEquipped = new ItemRequirement("Anti-dragon shield", ItemID.ANTIDRAGON_SHIELD, 1, true);
@@ -148,14 +249,14 @@ public class DragonSlayer extends BasicQuestHelper
 		roomToBasement1 = new Zone(new WorldPoint(2937, 3237, 0), new WorldPoint(2940, 3245, 0));
 		roomToBasement2 = new Zone(new WorldPoint(2932, 3240, 0), new WorldPoint(2936, 3242, 0));
 
-		zombieRoom = new Zone(new WorldPoint(2931, 9639, 0), new WorldPoint(2933, 9644, 0));
-		melzarRoom1 = new Zone(new WorldPoint(2927, 9643, 0), new WorldPoint(2930, 9651, 0));
-		melzarRoom2 = new Zone(new WorldPoint(2931, 9646, 0), new WorldPoint(2931, 9651, 0));
+		zombieRoom = new Zone(new WorldPoint(2931, 9639, 0), new WorldPoint( 2933, 9644, 0));
+		melzarRoom1 = new Zone(new WorldPoint(2927, 9643, 0), new WorldPoint( 2930, 9651, 0));
+		melzarRoom2 = new Zone(new WorldPoint(2931, 9646, 0), new WorldPoint( 2931, 9651, 0));
 
-		demonRoom1 = new Zone(new WorldPoint(2924, 9652, 0), new WorldPoint(2933, 9655, 0));
-		demonRoom2 = new Zone(new WorldPoint(2934, 9647, 0), new WorldPoint(2933, 9658, 0));
+		demonRoom1 = new Zone(new WorldPoint(2924, 9652, 0), new WorldPoint( 2933, 9655, 0));
+		demonRoom2 = new Zone(new WorldPoint(2934, 9647, 0), new WorldPoint( 2933, 9658, 0));
 		melzarsMaze = new Zone(new WorldPoint(2922, 3237, 0), new WorldPoint(2942, 9658, 0));
-		melzarsBasement = new Zone(new WorldPoint(2920, 9639, 0), new WorldPoint(1, 2, 0));
+		melzarsBasement = new Zone(new WorldPoint(2920, 9639, 0), new WorldPoint(1,2,0));
 
 		lastMelzarRoom1 = new Zone(new WorldPoint(2924, 9656, 0), new WorldPoint(2942, 9656, 0));
 		lastMelzarRoom2 = new Zone(new WorldPoint(2926, 9657, 0), new WorldPoint(2942, 9657, 0));
@@ -260,13 +361,13 @@ public class DragonSlayer extends BasicQuestHelper
 		talkToOracle = new NpcStep(this, NpcID.ORACLE, new WorldPoint(3014, 3501, 0), "Talk to the Oracle on top of Ice Mountain.", silk, lobsterPot, mindBomb, unfiredBowl);
 		talkToOracle.addDialogStep("I seek a piece of the map to the island of Crandor.");
 
-		goIntoDwarvenMine = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0), "Go down the ladder in the dwarven camp to the south into the Dwarven Mines.", silk, lobsterPot, mindBomb, unfiredBowl);
+		goIntoDwarvenMine = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450,0), "Go down the ladder in the dwarven camp to the south into the Dwarven Mines.", silk, lobsterPot, mindBomb, unfiredBowl);
 
 		useSilkOnDoor = new ObjectStep(this, ObjectID.MAGIC_DOOR_25115, new WorldPoint(3050, 9840, 0), "Go to the north east of the Dwarven Mines and use the silk on the magic door.", silk, lobsterPot, mindBomb, unfiredBowl);
 		useSilkOnDoor.addIcon(ItemID.SILK);
 		usePotOnDoor = new ObjectStep(this, ObjectID.MAGIC_DOOR_25115, new WorldPoint(3050, 9840, 0), "Go to the north east of the Dwarven Mines and use the lobster pot on the magic door.", lobsterPot, mindBomb, unfiredBowl);
 		usePotOnDoor.addIcon(ItemID.LOBSTER_POT);
-		useUnfiredBowlOnDoor = new ObjectStep(this, ObjectID.MAGIC_DOOR_25115, new WorldPoint(3050, 9840, 0), "Go to the north east of the Dwarven Mines and use the unfired bowl on the magic door.", mindBomb, unfiredBowl);
+		useUnfiredBowlOnDoor = new ObjectStep(this, ObjectID.MAGIC_DOOR_25115, new WorldPoint(3050, 9840, 0), "Go to the north east of the Dwarven Mines and use the unfired bowl on the magic door.",  mindBomb, unfiredBowl);
 		useUnfiredBowlOnDoor.addIcon(ItemID.UNFIRED_BOWL);
 		useMindBombOnDoor = new ObjectStep(this, ObjectID.MAGIC_DOOR_25115, new WorldPoint(3050, 9840, 0), "Go to the north east of the Dwarven Mines and use the wizard's mind bomb on the magic door (BE CAREFUL NOT TO DRINK IT).", lobsterPot, mindBomb, unfiredBowl);
 		useMindBombOnDoor.addIcon(ItemID.WIZARDS_MIND_BOMB);
@@ -358,6 +459,21 @@ public class DragonSlayer extends BasicQuestHelper
 	}
 
 	@Override
+	public ArrayList<String> getCombatRequirements()
+	{
+		ArrayList<String> reqs = new ArrayList<>();
+		reqs.add("Zombie rats (level 3)");
+		reqs.add("Ghosts (level 19)");
+		reqs.add("Skeletons (level 22)");
+		reqs.add("Zombies (level 24)");
+		reqs.add("Melzar the Mad (level 43)");
+		reqs.add("Lesser demon (level 82) (safespottable)");
+		reqs.add("Elvarg (level 83)");
+
+		return reqs;
+	}
+
+	@Override
 	public ArrayList<ItemRequirement> getItemRequirements()
 	{
 		ArrayList<ItemRequirement> reqs = new ArrayList<>();
@@ -384,21 +500,6 @@ public class DragonSlayer extends BasicQuestHelper
 		reqs.add(edgevilleTeleport);
 		reqs.add(ringsOfRecoil);
 		reqs.add(antifirePotion);
-
-		return reqs;
-	}
-
-	@Override
-	public ArrayList<String> getCombatRequirements()
-	{
-		ArrayList<String> reqs = new ArrayList<>();
-		reqs.add("Zombie rats (level 3)");
-		reqs.add("Ghosts (level 19)");
-		reqs.add("Skeletons (level 22)");
-		reqs.add("Zombies (level 24)");
-		reqs.add("Melzar the Mad (level 43)");
-		reqs.add("Lesser demon (level 82) (safespottable)");
-		reqs.add("Elvarg (level 83)");
 
 		return reqs;
 	}
@@ -446,106 +547,5 @@ public class DragonSlayer extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Finish the quest", new ArrayList<>(Collections.singletonList(finishQuest))));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, startQuest);
-
-		steps.put(1, talkToOziach);
-
-		ConditionalStep askQuestions = new ConditionalStep(this, returnToGuildmaster);
-		askQuestions.addStep(new Conditions(askedAboutShip, askedAboutShield, askedAboutMelzar, askedAboutThalzar), askAboutLozar);
-		askQuestions.addStep(new Conditions(askedAboutShip, askedAboutShield, askedAboutMelzar), askAboutThalzar);
-		askQuestions.addStep(new Conditions(askedAboutShip, askedAboutShield), askAboutMelzar);
-		askQuestions.addStep(askedAboutShip, askAboutShield);
-
-		getThalzarPiece = new ConditionalStep(this, talkToOracle);
-		getThalzarPiece.addStep(new Conditions(thalzarDoorOpened, inDwarvenMines, thalzarChest2Nearby), searchThalzarChest2);
-		getThalzarPiece.addStep(new Conditions(thalzarDoorOpened, inDwarvenMines), searchThalzarChest);
-		getThalzarPiece.addStep(new Conditions(inDwarvenMines, silkUsed, lobsterPotUsed, unfiredBowlUsed), useMindBombOnDoor);
-		getThalzarPiece.addStep(new Conditions(inDwarvenMines, silkUsed, lobsterPotUsed), useUnfiredBowlOnDoor);
-		getThalzarPiece.addStep(new Conditions(inDwarvenMines, silkUsed), usePotOnDoor);
-		getThalzarPiece.addStep(new Conditions(askedOracleAboutMap, inDwarvenMines), useSilkOnDoor);
-		getThalzarPiece.addStep(askedOracleAboutMap, goIntoDwarvenMine);
-		getThalzarPiece.setLockingCondition(hasMapPart1);
-		getThalzarPiece.setBlocker(true);
-
-		getLozarPiece = new ConditionalStep(this, optionsForLozarPiece);
-		getLozarPiece.setLockingCondition(hasMapPart2);
-
-		getMelzarPiece = new ConditionalStep(this, enterMelzarsMaze);
-		getMelzarPiece.addStep(inLastMelzarRoom, openMelzarChest);
-		getMelzarPiece.addStep(new Conditions(inDemonRoom, hasDemonKey), openGreenDoor);
-		getMelzarPiece.addStep(inDemonRoom, killLesserDemon);
-		getMelzarPiece.addStep(new Conditions(inMelzarRoom, hasMelzarKey), openMagntaDoor);
-		getMelzarPiece.addStep(inMelzarRoom, killMelzar);
-		getMelzarPiece.addStep(new Conditions(inZombieRoom, hasZombieKey), openBlueDoor);
-		getMelzarPiece.addStep(inZombieRoom, killZombie);
-		getMelzarPiece.addStep(inRoomToBasement, goDownBasementEntryLadder);
-		getMelzarPiece.addStep(inLadderRoom, goDownLadderRoomLadder);
-		getMelzarPiece.addStep(inPostSkeletonRoom, goDownSkeletonLadder);
-		getMelzarPiece.addStep(new Conditions(inSkeletonRoom, hasSkeletonKey), openYellowDoor);
-		getMelzarPiece.addStep(inSkeletonRoom, killSkeleton);
-		getMelzarPiece.addStep(inPostGhostRoom, goUpGhostLadder);
-		getMelzarPiece.addStep(new Conditions(inGhostRoom, hasGhostKey), openOrangeDoor);
-		getMelzarPiece.addStep(inGhostRoom, killGhost);
-		getMelzarPiece.addStep(inPostRatRoom, goUpRatLadder);
-		getMelzarPiece.addStep(new Conditions(inRatRoom, hasRatKey), openRedDoor);
-		getMelzarPiece.addStep(inRatRoom, killRat);
-		getMelzarPiece.setLockingCondition(hasMapPart3);
-
-		getShieldSteps = new ConditionalStep(this, getShield);
-		getShieldSteps.setLockingCondition(hasShield);
-
-		ConditionalStep getBoat = new ConditionalStep(this, talkToKlarense);
-		getBoat.addStep(new Conditions(hasBoughtBoat, inShipHull, hasRepairedHullTwice), repairShip3);
-		getBoat.addStep(new Conditions(hasBoughtBoat, inShipHull, hasRepairedHullOnce), repairShip2);
-		getBoat.addStep(new Conditions(hasBoughtBoat, inShipHull), repairShip);
-		getBoat.addStep(new Conditions(hasBoughtBoat, onShipDeck), goDownShipLadder);
-		getBoat.addStep(new Conditions(hasBoughtBoat, hasRepairedHullTwice), boardShip3);
-		getBoat.addStep(new Conditions(hasBoughtBoat, hasRepairedHullOnce), boardShip2);
-		getBoat.addStep(new Conditions(hasBoughtBoat), boardShip1);
-		getBoat.setLockingCondition(fullyRepairedHull);
-
-		ConditionalStep getCaptain = new ConditionalStep(this, repairMap);
-		getCaptain.addStep(hasFullMap, talkToNed);
-
-		ConditionalStep getMapAndBoat = new ConditionalStep(this, askQuestions);
-		getMapAndBoat.addStep(new Conditions(hasMapPart1, hasMapPart2, hasMapPart3, askedAllQuestions, hasShield, fullyRepairedHull), getCaptain);
-		getMapAndBoat.addStep(new Conditions(hasMapPart1, hasMapPart2, hasMapPart3, askedAllQuestions, hasShield), getBoat);
-		getMapAndBoat.addStep(new Conditions(hasMapPart1, hasMapPart2, hasMapPart3, askedAllQuestions), getShieldSteps);
-		getMapAndBoat.addStep(new Conditions(LogicType.OR, inMelzarsMaze, new Conditions(hasMapPart1, hasMapPart2, askedAllQuestions)), getMelzarPiece);
-		getMapAndBoat.addStep(new Conditions(hasMapPart1, askedAllQuestions), getLozarPiece);
-		getMapAndBoat.addStep(askedAllQuestions, getThalzarPiece);
-
-		steps.put(2, getMapAndBoat);
-		steps.put(3, getMapAndBoat);
-		steps.put(6, getMapAndBoat);
-
-		ConditionalStep goToCrandor = new ConditionalStep(this, boardShipToGo);
-		goToCrandor.addStep(onShipDeck, talkToNedOnShip);
-		steps.put(7, goToCrandor);
-
-		ConditionalStep killingElvarg = new ConditionalStep(this, repairShipAgainAndSail);
-		killingElvarg.addStep(inElvargArea, killElvarg);
-		killingElvarg.addStep(new Conditions(inCrandorUnderground, unlockedShortcut), enterElvargArea);
-		killingElvarg.addStep(new Conditions(inKaramjaVolcano, unlockedShortcut), returnThroughShortcut);
-		killingElvarg.addStep(inCrandorUnderground, unlockShortcut);
-		killingElvarg.addStep(onCrandorSurface, enterCrandorHole);
-		killingElvarg.addStep(unlockedShortcut, goDownIntoKaramjaVolcano);
-
-		steps.put(8, killingElvarg);
-
-		steps.put(9, finishQuest);
-
-		return steps;
 	}
 }

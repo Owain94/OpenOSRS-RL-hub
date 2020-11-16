@@ -27,23 +27,14 @@ package com.questhelper.quests.tribaltotem;
 
 import com.google.common.collect.ImmutableMap;
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.ItemRequirementCondition;
-import com.questhelper.steps.conditional.ObjectCondition;
-import com.questhelper.steps.conditional.WidgetTextCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
+import com.questhelper.steps.conditional.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -51,120 +42,125 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
 
 @QuestDescriptor(
-	quest = QuestHelperQuest.TRIBAL_TOTEM
+        quest = QuestHelperQuest.TRIBAL_TOTEM
 )
 public class TribalTotem extends BasicQuestHelper
 {
-	ItemRequirement coins, amuletOfGlory, ardougneTeleports, addressLabel, totem;
+    ItemRequirement coins, amuletOfGlory, ardougneTeleports, addressLabel, totem;
 
-	QuestStep talkToKangaiMau, investigateCrate, useLabel, talkToEmployee, talkToCromperty, enterPassword, solvePassword, climbStairs, searchChest, leaveHouse, talkToKangaiMauAgain;
+    QuestStep talkToKangaiMau, investigateCrate, useLabel, talkToEmployee, talkToCromperty, enterPassword, solvePassword, climbStairs, searchChest, leaveHouse, talkToKangaiMauAgain;
 
-	ConditionForStep hasLabel, inEntrance, inMiddleRoom, openedLockWidget, inStairway, investigatedStairs, isUpstairs, chestOpened, hasTotem;
+    ConditionForStep hasLabel, inEntrance, inMiddleRoom, openedLockWidget, inStairway, investigatedStairs, isUpstairs, chestOpened, hasTotem;
 
-	Zone houseGroundFloorEntrance, houseGroundFloorMiddleRoom, houseGroundFloor, houseFirstFloor;
+    Zone houseGroundFloorEntrance, houseGroundFloorMiddleRoom, houseGroundFloor, houseFirstFloor;
 
-	public void setupItemRequirements()
-	{
-		coins = new ItemRequirement("Coins or more for boat trips", ItemID.COINS, 90);
-		amuletOfGlory = new ItemRequirement("Amulet of glory", ItemCollections.getAmuletOfGlories());
-		ardougneTeleports = new ItemRequirement("Ardougne teleports", ItemID.ARDOUGNE_TELEPORT);
-		addressLabel = new ItemRequirement("Address label", ItemID.ADDRESS_LABEL);
-		addressLabel.setHighlightInInventory(true);
-		totem = new ItemRequirement("Totem", ItemID.TOTEM);
-	}
+    @Override
+    public Map<Integer, QuestStep> loadSteps()
+    {
+        loadZones();
+        setupItemRequirements();
+        setupConditions();
+        setupSteps();
 
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		ArrayList<ItemRequirement> reqs = new ArrayList<>();
-		reqs.add(coins);
-		reqs.add(amuletOfGlory);
-		reqs.add(ardougneTeleports);
-		return reqs;
-	}
+        ConditionalStep useLabelOnCrate = new ConditionalStep(this, investigateCrate);
+        useLabelOnCrate.addStep(hasLabel, useLabel);
 
-	public void loadZones()
-	{
-		houseGroundFloorEntrance = new Zone(new WorldPoint(2637, 3320, 0), new WorldPoint(2639, 3325, 0));
-		houseGroundFloorMiddleRoom = new Zone(new WorldPoint(2634, 3322, 0), new WorldPoint(2636, 3324, 0));
-		houseGroundFloor = new Zone(new WorldPoint(2629, 3321, 0), new WorldPoint(2633, 3325, 0));
-		houseFirstFloor = new Zone(new WorldPoint(2630, 3318, 1), new WorldPoint(2639, 3323, 1));
-	}
+        ConditionalStep navigateMansion = new ConditionalStep(this, talkToCromperty);
+        navigateMansion.addStep(hasTotem, talkToKangaiMauAgain);
+        navigateMansion.addStep(new Conditions(openedLockWidget, inMiddleRoom), solvePassword);
+        navigateMansion.addStep(inStairway, climbStairs);
+        navigateMansion.addStep(isUpstairs, searchChest);
+        navigateMansion.addStep(inEntrance, enterPassword);
+        navigateMansion.addStep(inMiddleRoom, enterPassword);
 
-	public void setupConditions()
-	{
-		hasLabel = new ItemRequirementCondition(addressLabel);
-		inEntrance = new ZoneCondition(houseGroundFloorEntrance);
-		inMiddleRoom = new ZoneCondition(houseGroundFloorMiddleRoom);
-		openedLockWidget = new WidgetTextCondition(369, 54, "Combination Lock Door");
-		inStairway = new ZoneCondition(houseGroundFloor);
-		investigatedStairs = new WidgetTextCondition(229, 1, "Your trained senses as a thief enable you to see that there is a trap<br>in these stairs. You make a note of its location for future reference<br>when using these stairs.");
-		isUpstairs = new ZoneCondition(houseFirstFloor);
-		chestOpened = new ObjectCondition(ObjectID.CHEST_2710);
-		hasTotem = new ItemRequirementCondition(totem);
-	}
+        return new ImmutableMap.Builder<Integer, QuestStep>()
+                .put(0, talkToKangaiMau)
+                .put(1, useLabelOnCrate)
+                .put(2, talkToEmployee)
+                .put(3, talkToCromperty)
+                .put(4, navigateMansion)
+                .build();
+    }
 
-	public void setupSteps()
-	{
-		talkToKangaiMau = new NpcStep(this, NpcID.KANGAI_MAU, new WorldPoint(2794, 3182, 0), "Talk to Kangai Mau in the Brimhaven food store.");
-		talkToKangaiMau.addDialogSteps("I'm in search of adventure!", "Ok, I will get it back.");
+    public void setupItemRequirements()
+    {
+        coins = new ItemRequirement("Coins or more for boat trips", ItemID.COINS, 90);
+        amuletOfGlory = new ItemRequirement("Amulet of glory", ItemCollections.getAmuletOfGlories());
+        ardougneTeleports = new ItemRequirement("Ardougne teleports", ItemID.ARDOUGNE_TELEPORT);
+        addressLabel = new ItemRequirement("Address label", ItemID.ADDRESS_LABEL);
+        addressLabel.setHighlightInInventory(true);
+        totem = new ItemRequirement("Totem", ItemID.TOTEM);
+    }
 
-		investigateCrate = new ObjectStep(this, ObjectID.CRATE_2707, new WorldPoint(2650, 3273, 0), "Travel to the GPDT depot in Ardougne and investigate the most northeastern crate for a label.");
-		useLabel = new ObjectStep(this, ObjectID.CRATE_2708, new WorldPoint(2650, 3271, 0), "Use the label on the highlighted crate.", addressLabel);
-		useLabel.addIcon(ItemID.ADDRESS_LABEL);
-		talkToEmployee = new NpcStep(this, NpcID.GPDT_EMPLOYEE, new WorldPoint(2647, 3272, 0), "Talk to a nearby GPDT employee.", true);
-		talkToEmployee.addDialogStep("So, when are you going to deliver this crate?");
+    @Override
+    public ArrayList<ItemRequirement> getItemRecommended()
+    {
+        ArrayList<ItemRequirement> reqs = new ArrayList<>();
+        reqs.add(coins);
+        reqs.add(amuletOfGlory);
+        reqs.add(ardougneTeleports);
+        return reqs;
+    }
 
-		talkToCromperty = new NpcStep(this, NpcID.WIZARD_CROMPERTY, new WorldPoint(2683, 3326, 0), "Talk to Wizard Cromperty in north east Ardougne.");
-		talkToCromperty.addDialogSteps("Chat.", "So what have you invented?", "Can I be teleported please?", "Yes, that sounds good. Teleport me!");
+    public void loadZones()
+    {
+        houseGroundFloorEntrance = new Zone(new WorldPoint(2637, 3320, 0), new WorldPoint(2639, 3325, 0));
+        houseGroundFloorMiddleRoom = new Zone(new WorldPoint(2634, 3322, 0), new WorldPoint(2636, 3324, 0));
+        houseGroundFloor = new Zone(new WorldPoint(2629, 3321, 0), new WorldPoint(2633, 3325, 0));
+        houseFirstFloor = new Zone(new WorldPoint(2630, 3318, 1), new WorldPoint(2639, 3323, 1));
+    }
 
-		enterPassword = new ObjectStep(this, ObjectID.DOOR_2705, new WorldPoint(2634, 3323, 0), "Try and open the door to the west.");
-		solvePassword = new PuzzleStep(this);
-		climbStairs = new ObjectStep(this, ObjectID.STAIRS_2711, new WorldPoint(2632, 3323, 0), "FIRST Right-click 'Investigate' the stairs to disable a trap, then climb the stairs.");
+    public void setupConditions()
+    {
+        hasLabel = new ItemRequirementCondition(addressLabel);
+        inEntrance = new ZoneCondition(houseGroundFloorEntrance);
+        inMiddleRoom = new ZoneCondition(houseGroundFloorMiddleRoom);
+        openedLockWidget = new WidgetTextCondition(369, 54,"Combination Lock Door");
+        inStairway = new ZoneCondition(houseGroundFloor);
+        investigatedStairs = new WidgetTextCondition(229, 1, "Your trained senses as a thief enable you to see that there is a trap<br>in these stairs. You make a note of its location for future reference<br>when using these stairs.");
+        isUpstairs = new ZoneCondition(houseFirstFloor);
+        chestOpened = new ObjectCondition(ObjectID.CHEST_2710);
+        hasTotem = new ItemRequirementCondition(totem);
+    }
 
-		searchChest = new ObjectStep(this, ObjectID.CHEST_2709, new WorldPoint(2638, 3324, 1), "Open the chest on the top floor and search it for the totem.");
-		((ObjectStep) (searchChest)).addAlternateObjects(ObjectID.CHEST_2710);
+    public void setupSteps()
+    {
+        talkToKangaiMau = new NpcStep(this, NpcID.KANGAI_MAU, new WorldPoint(2794, 3182, 0), "Talk to Kangai Mau in the Brimhaven food store.");
+        talkToKangaiMau.addDialogSteps("I'm in search of adventure!", "Ok, I will get it back.");
 
-		leaveHouse = new DetailedQuestStep(this, "Travel back to Brimhaven.");
-		talkToKangaiMauAgain = new NpcStep(this, NpcID.KANGAI_MAU, new WorldPoint(2794, 3182, 0), "Return to Kangai Mau in Brimhaven.", totem);
-	}
+        investigateCrate = new ObjectStep(this, ObjectID.CRATE_2707, new WorldPoint(2650, 3273, 0), "Travel to the GPDT depot in Ardougne and investigate the most northeastern crate for a label.");
+        useLabel = new ObjectStep(this, ObjectID.CRATE_2708, new WorldPoint(2650, 3271, 0), "Use the label on the highlighted crate.", addressLabel);
+        useLabel.addIcon(ItemID.ADDRESS_LABEL);
+        talkToEmployee = new NpcStep(this, NpcID.GPDT_EMPLOYEE, new WorldPoint(2647, 3272, 0), "Talk to a nearby GPDT employee.", true);
+        talkToEmployee.addDialogStep("So, when are you going to deliver this crate?");
 
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Retrieving the totem",
-			new ArrayList<>(Arrays.asList(talkToKangaiMau, investigateCrate, useLabel, talkToEmployee, talkToCromperty, enterPassword, solvePassword, climbStairs, searchChest, talkToKangaiMauAgain))));
-		return allSteps;
-	}
+        talkToCromperty = new NpcStep(this, NpcID.WIZARD_CROMPERTY, new WorldPoint(2683, 3326, 0), "Talk to Wizard Cromperty in north east Ardougne.");
+        talkToCromperty.addDialogSteps("Chat.", "So what have you invented?", "Can I be teleported please?", "Yes, that sounds good. Teleport me!");
 
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
+        enterPassword = new ObjectStep(this, ObjectID.DOOR_2705, new WorldPoint(2634, 3323, 0), "Try and open the door to the west.");
+        solvePassword = new PuzzleStep(this);
+        climbStairs = new ObjectStep(this, ObjectID.STAIRS_2711, new WorldPoint(2632, 3323, 0), "FIRST Right-click 'Investigate' the stairs to disable a trap, then climb the stairs.");
 
-		ConditionalStep useLabelOnCrate = new ConditionalStep(this, investigateCrate);
-		useLabelOnCrate.addStep(hasLabel, useLabel);
+        searchChest = new ObjectStep(this, ObjectID.CHEST_2709, new WorldPoint(2638, 3324, 1), "Open the chest on the top floor and search it for the totem.");
+        ((ObjectStep)(searchChest)).addAlternateObjects(ObjectID.CHEST_2710);
 
-		ConditionalStep navigateMansion = new ConditionalStep(this, talkToCromperty);
-		navigateMansion.addStep(hasTotem, talkToKangaiMauAgain);
-		navigateMansion.addStep(new Conditions(openedLockWidget, inMiddleRoom), solvePassword);
-		navigateMansion.addStep(inStairway, climbStairs);
-		navigateMansion.addStep(isUpstairs, searchChest);
-		navigateMansion.addStep(inEntrance, enterPassword);
-		navigateMansion.addStep(inMiddleRoom, enterPassword);
+        leaveHouse = new DetailedQuestStep(this, "Travel back to Brimhaven.");
+        talkToKangaiMauAgain = new NpcStep(this, NpcID.KANGAI_MAU, new WorldPoint(2794, 3182, 0), "Return to Kangai Mau in Brimhaven.", totem);
+    }
 
-		return new ImmutableMap.Builder<Integer, QuestStep>()
-			.put(0, talkToKangaiMau)
-			.put(1, useLabelOnCrate)
-			.put(2, talkToEmployee)
-			.put(3, talkToCromperty)
-			.put(4, navigateMansion)
-			.build();
-	}
+    @Override
+    public ArrayList<PanelDetails> getPanels()
+    {
+        ArrayList<PanelDetails> allSteps = new ArrayList<>();
+        allSteps.add(new PanelDetails("Retrieving the totem",
+                new ArrayList<>(Arrays.asList(talkToKangaiMau, investigateCrate, useLabel, talkToEmployee, talkToCromperty, enterPassword, solvePassword, climbStairs, searchChest, talkToKangaiMauAgain))));
+        return allSteps;
+    }
 }

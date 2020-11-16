@@ -25,19 +25,12 @@
 package com.questhelper.quests.makingfriendswithmyarm;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.InInstanceCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -56,6 +49,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM
@@ -85,6 +85,170 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 	Zone strongholdFloor1, strongholdFloor2, prison, roof, weissArrivalArea, cliff1, cliff2, cliff3, cliff4, cliff5, outsideWeiss1, outsideWeiss2, outsideWeiss3,
 		outsideWeiss4, outsideWeiss5, weiss, sneakArea1, sneakArea2, sneakArea3, sneakArea4, sneakArea5, cave1, cave2, cave3, cave4, water1, water2, water3, water4,
 		weissPrison;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startingOffSteps = new ConditionalStep(this, enterStronghold);
+		startingOffSteps.addStep(inStrongholdFloor1, talkToBurntmeat);
+		startingOffSteps.addStep(inPrison, goUpToBurntmeat);
+		startingOffSteps.addStep(inStrongholdFloor2, goDownToBurntmeat);
+
+		steps.put(0, startingOffSteps);
+		steps.put(1, startingOffSteps);
+		steps.put(5, startingOffSteps);
+		ConditionalStep talkToArmOnRoofSteps = new ConditionalStep(this, enterStrongholdAfterStart);
+		talkToArmOnRoofSteps.addStep(new Conditions(onRoof), talkToMyArmUpstairs);
+		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor2), goUpToMyArmAfterStart);
+		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
+		talkToArmOnRoofSteps.addStep(new Conditions(inPrison), goUpAfterStart);
+
+		steps.put(10, talkToArmOnRoofSteps);
+		steps.put(15, talkToArmOnRoofSteps);
+
+		steps.put(20, talkToLarry);
+		steps.put(25, talkToLarryAgain);
+
+		steps.put(30, boardBoat);
+
+		ConditionalStep arrivingInWeissSteps = new ConditionalStep(this, boardBoat);
+		arrivingInWeissSteps.addStep(inWeissArrivalArea, attemptToMine);
+
+		steps.put(35, arrivingInWeissSteps);
+
+		ConditionalStep addTheRope = new ConditionalStep(this, boardBoat);
+		addTheRope.addStep(new Conditions(onCliff2, hasRope), useRope);
+		addTheRope.addStep(new Conditions(onCliff1, hasPickaxe, hasRope), climbRocks2);
+		addTheRope.addStep(new Conditions(inWeissArrivalArea, hasPickaxe, hasRope), climbRocks);
+		addTheRope.addStep(new Conditions(inWeissArrivalArea, hasRope), searchBoatForPickaxe);
+		addTheRope.addStep(new Conditions(inWeissArrivalArea, hasPickaxe), searchBoatForRope);
+		addTheRope.addStep(inWeissArrivalArea, searchBoatForRopeAndPickaxe);
+
+		steps.put(40, addTheRope);
+		steps.put(41, addTheRope);
+
+		ConditionalStep scalingTheMountain = new ConditionalStep(this, boardBoat);
+		scalingTheMountain.addStep(new Conditions(onCliff5), passTree);
+		scalingTheMountain.addStep(new Conditions(onCliff4), climbRocks3);
+		scalingTheMountain.addStep(new Conditions(onCliff3), crossLedge);
+		scalingTheMountain.addStep(new Conditions(onCliff2), climbRope);
+		scalingTheMountain.addStep(new Conditions(onCliff1), climbRocks2);
+		scalingTheMountain.addStep(new Conditions(inWeissArrivalArea, hasPickaxe), climbRocks);
+		scalingTheMountain.addStep(new Conditions(inWeissArrivalArea), searchBoatForRope);
+
+		ConditionalStep goTalkToBoulder = new ConditionalStep(this, scalingTheMountain);
+		goTalkToBoulder.addStep(isOutsideWeiss, talkToBoulder);
+
+		steps.put(45, goTalkToBoulder);
+		steps.put(46, goTalkToBoulder);
+
+		ConditionalStep sneakIntoWeiss = new ConditionalStep(this, scalingTheMountain);
+		sneakIntoWeiss.addStep(new Conditions(inCave1, inInstance), enterNarrowHole);
+		sneakIntoWeiss.addStep(new Conditions(inSneakArea5, inInstance), enterHole);
+		sneakIntoWeiss.addStep(new Conditions(inSneakArea4, inInstance), goNorth);
+		sneakIntoWeiss.addStep(new Conditions(inSneakArea3, inInstance), goWestSneak3);
+		sneakIntoWeiss.addStep(new Conditions(inSneakArea2, inInstance), goWestSneak2);
+		sneakIntoWeiss.addStep(new Conditions(inSneakArea1, inInstance), goWestSneak1);
+		sneakIntoWeiss.addStep(new Conditions(inWeiss, inInstance), goSouthSneak);
+		sneakIntoWeiss.addStep(inWeiss, crossFence);
+
+		steps.put(50, sneakIntoWeiss);
+		steps.put(55, sneakIntoWeiss);
+		steps.put(60, sneakIntoWeiss);
+
+		ConditionalStep sneakThroughCaves = new ConditionalStep(this, scalingTheMountain);
+		sneakThroughCaves.addStep(new Conditions(new Conditions(LogicType.OR, inWater3, inCave4), rowMade), mineCave);
+		sneakThroughCaves.addStep(new Conditions(LogicType.OR, inWater3, inCave4), placeRocks);
+		sneakThroughCaves.addStep(new Conditions(inCave3, inInstance), enterWater2);
+		sneakThroughCaves.addStep(new Conditions(inWater2, inInstance), leaveWater1);
+		sneakThroughCaves.addStep(new Conditions(inWater1, inInstance), waterSpot1);
+		sneakThroughCaves.addStep(new Conditions(inCave2, inInstance), enterWater);
+		sneakThroughCaves.addStep(inWeiss, crossFence);
+
+		steps.put(65, sneakThroughCaves);
+		steps.put(70, sneakThroughCaves);
+
+		steps.put(75, talkToMother);
+		steps.put(80, talkToMother);
+		steps.put(81, talkToMother);
+		steps.put(82, talkToMother);
+
+		steps.put(85, talkToMyArmAfterMeeting);
+		steps.put(86, talkToMyArmAfterMeeting);
+
+		steps.put(90, talkToMyArmAfterMeeting);
+		steps.put(95, talkToMyArmAfterMeeting);
+		steps.put(100, talkToMyArmAfterMeeting);
+		steps.put(101, talkToMyArmAfterMeeting);
+		steps.put(105, talkToMyArmAfterMeeting);
+
+		steps.put(110, talkToWom);
+		steps.put(115, talkToWom);
+
+		steps.put(120, buildCoffin);
+		steps.put(122, talkToApoth);
+		steps.put(125, buildCoffin);
+		steps.put(127, talkToApoth);
+		steps.put(132, talkToWomAfterPrep);
+
+
+		ConditionalStep takeWomToWeiss = new ConditionalStep(this, pickUpCoffin);
+		takeWomToWeiss.addStep(new Conditions(pickedUpWom, inWeiss), talkToMyArmWithWom);
+		takeWomToWeiss.addStep(new Conditions(pickedUpWom,
+			new Conditions(LogicType.OR, onCliff1, onCliff2, onCliff3, onCliff4, onCliff5, inWeissArrivalArea)), enterCaveWithWom);
+		takeWomToWeiss.addStep(pickedUpWom, takeBoatWithWom);
+
+		steps.put(135, takeWomToWeiss);
+
+		steps.put(140, talkToMyArmAfterGivingWom);
+
+		ConditionalStep prisonSteps = new ConditionalStep(this, takeBoatToPrison);
+		prisonSteps.addStep(new Conditions(secondBossNearby, hasPutOutFire), killMother);
+		prisonSteps.addStep(new Conditions(secondBossNearby, hasBucketOfWater), useBucketOnFire);
+		prisonSteps.addStep(new Conditions(secondBossNearby, hasBucket), useBucketOnWater);
+		prisonSteps.addStep(secondBossNearby, pickUpBucket);
+		prisonSteps.addStep(new Conditions(inWeissPrison, firstBossNearby), killDontKnowWhat);
+		prisonSteps.addStep(new Conditions(inWeissPrison, oddMushroomDied), talkToSnowflake);
+		prisonSteps.addStep(inWeissPrison, talkToOddMushroom);
+		prisonSteps.addStep(inWeiss, talkToBoulderToEnterPrison);
+		prisonSteps.addStep(new Conditions(LogicType.OR, onCliff1, onCliff2, onCliff3, onCliff4, onCliff5, inWeissArrivalArea), enterCaveToPrison);
+
+		steps.put(145, prisonSteps);
+		steps.put(146, prisonSteps);
+		steps.put(147, prisonSteps);
+		steps.put(148, prisonSteps);
+		steps.put(149, prisonSteps);
+		steps.put(150, prisonSteps);
+		steps.put(155, prisonSteps);
+		steps.put(160, prisonSteps);
+		steps.put(165, prisonSteps);
+		steps.put(170, prisonSteps);
+
+		steps.put(175, talkToMyArmAfterFight);
+		steps.put(178, talkToWomAfterFight);
+		steps.put(180, talkToSnowflakeAfterFight);
+
+		ConditionalStep getDungForSnowflake = new ConditionalStep(this, pickUpBucketForDung);
+		getDungForSnowflake.addStep(hasDung, bringDungToSnowflake);
+		getDungForSnowflake.addStep(hasBucket, pickUpGoatDung);
+		getDungForSnowflake.addStep(hasBucketOfWater, emptyBucket);
+
+		steps.put(185, getDungForSnowflake);
+		steps.put(186, getDungForSnowflake);
+
+		steps.put(190, talkToSnowflakeAfterDung);
+		steps.put(195, readNotes);
+
+		steps.put(196, talkToSnowflakeToFinish);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -315,7 +479,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		goWestSneak3 = new DetailedQuestStep(this, new WorldPoint(2856, 3923, 0), "Wait a few seconds, then run west to the next point.");
 		goNorth = new DetailedQuestStep(this, new WorldPoint(2859, 3939, 0), "Wait a few seconds, then run north to the next point.");
 
-		enterHole = new ObjectStep(this, ObjectID.HOLE_33227, new WorldPoint(2854, 3944, 0), "Wait a few seconds, and run into the hole.");
+		enterHole = new ObjectStep(this, ObjectID.HOLE_33227, new WorldPoint(2854, 3944,0), "Wait a few seconds, and run into the hole.");
 		goSouthSneak.addSubSteps(goWestSneak1, goWestSneak2, goWestSneak3, goNorth, enterHole);
 		enterNarrowHole = new ObjectStep(this, ObjectID.NARROW_GAP, new WorldPoint(7248, 2978, 0), "Enter the narrow gap to the south quickly.");
 
@@ -325,7 +489,7 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 		leaveWater1 = new ObjectStep(this, ObjectID.WATERS_EDGE, new WorldPoint(2730, 5781, 0), "Wait a few seconds, then swim to the east shore.");
 		waterSpot1.addSubSteps(enterWater, leaveWater1);
 
-		enterWater2 = new ObjectStep(this, NullObjectID.NULL_33331, new WorldPoint(2734, 5792, 0), "Enter the water.");
+		enterWater2 = new ObjectStep(this,  NullObjectID.NULL_33331, new WorldPoint(2734, 5792, 0), "Enter the water.");
 
 		mineCave = new ObjectStep(this, ObjectID.CAVE_EXIT_33247, new WorldPoint(2737, 5817, 0), "Mine the cave exit.", pickaxe);
 
@@ -405,15 +569,15 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
-	{
-		return new ArrayList<>(Arrays.asList(hammer, saw, boltOfCloth, mahogPlanks5, cadavaBerries, combatRangeMelee));
-	}
-
-	@Override
 	public ArrayList<ItemRequirement> getItemRecommended()
 	{
 		return new ArrayList<>(Arrays.asList(draynorTele, trollTele, varrockTele));
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRequirements()
+	{
+		return new ArrayList<>(Arrays.asList(hammer, saw, boltOfCloth, mahogPlanks5, cadavaBerries, combatRangeMelee));
 	}
 
 	@Override
@@ -439,169 +603,5 @@ public class MakingFriendsWithMyArm extends BasicQuestHelper
 			pickUpGoatDung, bringDungToSnowflake, readNotes, talkToSnowflakeToFinish))));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startingOffSteps = new ConditionalStep(this, enterStronghold);
-		startingOffSteps.addStep(inStrongholdFloor1, talkToBurntmeat);
-		startingOffSteps.addStep(inPrison, goUpToBurntmeat);
-		startingOffSteps.addStep(inStrongholdFloor2, goDownToBurntmeat);
-
-		steps.put(0, startingOffSteps);
-		steps.put(1, startingOffSteps);
-		steps.put(5, startingOffSteps);
-		ConditionalStep talkToArmOnRoofSteps = new ConditionalStep(this, enterStrongholdAfterStart);
-		talkToArmOnRoofSteps.addStep(new Conditions(onRoof), talkToMyArmUpstairs);
-		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor2), goUpToMyArmAfterStart);
-		talkToArmOnRoofSteps.addStep(new Conditions(inStrongholdFloor1), goUpFromF1ToMyArm);
-		talkToArmOnRoofSteps.addStep(new Conditions(inPrison), goUpAfterStart);
-
-		steps.put(10, talkToArmOnRoofSteps);
-		steps.put(15, talkToArmOnRoofSteps);
-
-		steps.put(20, talkToLarry);
-		steps.put(25, talkToLarryAgain);
-
-		steps.put(30, boardBoat);
-
-		ConditionalStep arrivingInWeissSteps = new ConditionalStep(this, boardBoat);
-		arrivingInWeissSteps.addStep(inWeissArrivalArea, attemptToMine);
-
-		steps.put(35, arrivingInWeissSteps);
-
-		ConditionalStep addTheRope = new ConditionalStep(this, boardBoat);
-		addTheRope.addStep(new Conditions(onCliff2, hasRope), useRope);
-		addTheRope.addStep(new Conditions(onCliff1, hasPickaxe, hasRope), climbRocks2);
-		addTheRope.addStep(new Conditions(inWeissArrivalArea, hasPickaxe, hasRope), climbRocks);
-		addTheRope.addStep(new Conditions(inWeissArrivalArea, hasRope), searchBoatForPickaxe);
-		addTheRope.addStep(new Conditions(inWeissArrivalArea, hasPickaxe), searchBoatForRope);
-		addTheRope.addStep(inWeissArrivalArea, searchBoatForRopeAndPickaxe);
-
-		steps.put(40, addTheRope);
-		steps.put(41, addTheRope);
-
-		ConditionalStep scalingTheMountain = new ConditionalStep(this, boardBoat);
-		scalingTheMountain.addStep(new Conditions(onCliff5), passTree);
-		scalingTheMountain.addStep(new Conditions(onCliff4), climbRocks3);
-		scalingTheMountain.addStep(new Conditions(onCliff3), crossLedge);
-		scalingTheMountain.addStep(new Conditions(onCliff2), climbRope);
-		scalingTheMountain.addStep(new Conditions(onCliff1), climbRocks2);
-		scalingTheMountain.addStep(new Conditions(inWeissArrivalArea, hasPickaxe), climbRocks);
-		scalingTheMountain.addStep(new Conditions(inWeissArrivalArea), searchBoatForRope);
-
-		ConditionalStep goTalkToBoulder = new ConditionalStep(this, scalingTheMountain);
-		goTalkToBoulder.addStep(isOutsideWeiss, talkToBoulder);
-
-		steps.put(45, goTalkToBoulder);
-		steps.put(46, goTalkToBoulder);
-
-		ConditionalStep sneakIntoWeiss = new ConditionalStep(this, scalingTheMountain);
-		sneakIntoWeiss.addStep(new Conditions(inCave1, inInstance), enterNarrowHole);
-		sneakIntoWeiss.addStep(new Conditions(inSneakArea5, inInstance), enterHole);
-		sneakIntoWeiss.addStep(new Conditions(inSneakArea4, inInstance), goNorth);
-		sneakIntoWeiss.addStep(new Conditions(inSneakArea3, inInstance), goWestSneak3);
-		sneakIntoWeiss.addStep(new Conditions(inSneakArea2, inInstance), goWestSneak2);
-		sneakIntoWeiss.addStep(new Conditions(inSneakArea1, inInstance), goWestSneak1);
-		sneakIntoWeiss.addStep(new Conditions(inWeiss, inInstance), goSouthSneak);
-		sneakIntoWeiss.addStep(inWeiss, crossFence);
-
-		steps.put(50, sneakIntoWeiss);
-		steps.put(55, sneakIntoWeiss);
-		steps.put(60, sneakIntoWeiss);
-
-		ConditionalStep sneakThroughCaves = new ConditionalStep(this, scalingTheMountain);
-		sneakThroughCaves.addStep(new Conditions(new Conditions(LogicType.OR, inWater3, inCave4), rowMade), mineCave);
-		sneakThroughCaves.addStep(new Conditions(LogicType.OR, inWater3, inCave4), placeRocks);
-		sneakThroughCaves.addStep(new Conditions(inCave3, inInstance), enterWater2);
-		sneakThroughCaves.addStep(new Conditions(inWater2, inInstance), leaveWater1);
-		sneakThroughCaves.addStep(new Conditions(inWater1, inInstance), waterSpot1);
-		sneakThroughCaves.addStep(new Conditions(inCave2, inInstance), enterWater);
-		sneakThroughCaves.addStep(inWeiss, crossFence);
-
-		steps.put(65, sneakThroughCaves);
-		steps.put(70, sneakThroughCaves);
-
-		steps.put(75, talkToMother);
-		steps.put(80, talkToMother);
-		steps.put(81, talkToMother);
-		steps.put(82, talkToMother);
-
-		steps.put(85, talkToMyArmAfterMeeting);
-		steps.put(86, talkToMyArmAfterMeeting);
-
-		steps.put(90, talkToMyArmAfterMeeting);
-		steps.put(95, talkToMyArmAfterMeeting);
-		steps.put(100, talkToMyArmAfterMeeting);
-		steps.put(101, talkToMyArmAfterMeeting);
-		steps.put(105, talkToMyArmAfterMeeting);
-
-		steps.put(110, talkToWom);
-		steps.put(115, talkToWom);
-
-		steps.put(120, buildCoffin);
-		steps.put(122, talkToApoth);
-		steps.put(125, buildCoffin);
-		steps.put(127, talkToApoth);
-		steps.put(132, talkToWomAfterPrep);
-
-
-		ConditionalStep takeWomToWeiss = new ConditionalStep(this, pickUpCoffin);
-		takeWomToWeiss.addStep(new Conditions(pickedUpWom, inWeiss), talkToMyArmWithWom);
-		takeWomToWeiss.addStep(new Conditions(pickedUpWom,
-			new Conditions(LogicType.OR, onCliff1, onCliff2, onCliff3, onCliff4, onCliff5, inWeissArrivalArea)), enterCaveWithWom);
-		takeWomToWeiss.addStep(pickedUpWom, takeBoatWithWom);
-
-		steps.put(135, takeWomToWeiss);
-
-		steps.put(140, talkToMyArmAfterGivingWom);
-
-		ConditionalStep prisonSteps = new ConditionalStep(this, takeBoatToPrison);
-		prisonSteps.addStep(new Conditions(secondBossNearby, hasPutOutFire), killMother);
-		prisonSteps.addStep(new Conditions(secondBossNearby, hasBucketOfWater), useBucketOnFire);
-		prisonSteps.addStep(new Conditions(secondBossNearby, hasBucket), useBucketOnWater);
-		prisonSteps.addStep(secondBossNearby, pickUpBucket);
-		prisonSteps.addStep(new Conditions(inWeissPrison, firstBossNearby), killDontKnowWhat);
-		prisonSteps.addStep(new Conditions(inWeissPrison, oddMushroomDied), talkToSnowflake);
-		prisonSteps.addStep(inWeissPrison, talkToOddMushroom);
-		prisonSteps.addStep(inWeiss, talkToBoulderToEnterPrison);
-		prisonSteps.addStep(new Conditions(LogicType.OR, onCliff1, onCliff2, onCliff3, onCliff4, onCliff5, inWeissArrivalArea), enterCaveToPrison);
-
-		steps.put(145, prisonSteps);
-		steps.put(146, prisonSteps);
-		steps.put(147, prisonSteps);
-		steps.put(148, prisonSteps);
-		steps.put(149, prisonSteps);
-		steps.put(150, prisonSteps);
-		steps.put(155, prisonSteps);
-		steps.put(160, prisonSteps);
-		steps.put(165, prisonSteps);
-		steps.put(170, prisonSteps);
-
-		steps.put(175, talkToMyArmAfterFight);
-		steps.put(178, talkToWomAfterFight);
-		steps.put(180, talkToSnowflakeAfterFight);
-
-		ConditionalStep getDungForSnowflake = new ConditionalStep(this, pickUpBucketForDung);
-		getDungForSnowflake.addStep(hasDung, bringDungToSnowflake);
-		getDungForSnowflake.addStep(hasBucket, pickUpGoatDung);
-		getDungForSnowflake.addStep(hasBucketOfWater, emptyBucket);
-
-		steps.put(185, getDungForSnowflake);
-		steps.put(186, getDungForSnowflake);
-
-		steps.put(190, talkToSnowflakeAfterDung);
-		steps.put(195, readNotes);
-
-		steps.put(196, talkToSnowflakeToFinish);
-
-		return steps;
 	}
 }

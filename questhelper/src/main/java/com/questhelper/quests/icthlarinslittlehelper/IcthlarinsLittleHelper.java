@@ -26,20 +26,12 @@ package com.questhelper.quests.icthlarinslittlehelper;
 
 import com.questhelper.ItemCollections;
 import com.questhelper.NpcCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
 import com.questhelper.requirements.FollowerRequirement;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.NpcCondition;
@@ -57,6 +49,14 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.ICTHLARINS_LITTLE_HELPER
@@ -84,6 +84,119 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 	ObjectStep pickUpAnyJar, pickUpAnyJarAgain;
 
 	Zone soph, pyramid, northPyramid, northPyramid2, eastRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToWanderer);
+		steps.put(1, talkToWandererAgain);
+		steps.put(2, enterRock);
+
+		ConditionalStep firstMemory = new ConditionalStep(this, enterRock);
+		firstMemory.addStep(puzzleOpen, solveDoorPuzzle);
+		firstMemory.addStep(inNorthPyramid, openWestDoor);
+		firstMemory.addStep(inPyramid, jumpPit);
+		firstMemory.addStep(inSoph, touchPyramidDoor);
+
+		steps.put(3, firstMemory);
+		steps.put(4, firstMemory);
+
+		ConditionalStep talkToSphinxSteps = new ConditionalStep(this, enterRock);
+		talkToSphinxSteps.addStep(inSoph, talkToSphinx);
+
+		steps.put(5, talkToSphinxSteps);
+
+		ConditionalStep talkToHighPriestSteps = new ConditionalStep(this, enterRock);
+		talkToHighPriestSteps.addStep(new Conditions(inSoph, givenToken), talkToHighPriestWithoutToken);
+		talkToHighPriestSteps.addStep(inSoph, talkToHighPriest);
+
+		steps.put(6, talkToHighPriestSteps);
+
+		ConditionalStep takeTheJar = new ConditionalStep(this, enterRock);
+		takeTheJar.addStep(new Conditions(inNorthPyramid, hasJar), returnOverPit);
+		takeTheJar.addStep(new Conditions(inNorthPyramid, hasCrondisJar, killedGuardian), pickUpCrondisJarAgain);
+		takeTheJar.addStep(new Conditions(inNorthPyramid, killedGuardian), pickUpAnyJarAgain);
+		takeTheJar.addStep(new Conditions(inNorthPyramid, hasCrondisJar), pickUpCrondisJar);
+		takeTheJar.addStep(inNorthPyramid, pickUpAnyJar);
+		takeTheJar.addStep(inPyramid, jumpPitAgain);
+		takeTheJar.addStep(inSoph, openPyramidDoor);
+
+		steps.put(7, takeTheJar);
+		steps.put(8, takeTheJar);
+		steps.put(9, takeTheJar);
+		steps.put(10, takeTheJar);
+		steps.put(11, takeTheJar);
+
+		ConditionalStep returnTheJar = new ConditionalStep(this, enterRock);
+		returnTheJar.addStep(puzzleOpen, solvePuzzleAgain);
+		returnTheJar.addStep(new Conditions(inNorthPyramid, hasCrondisJar), dropCrondisJar);
+		returnTheJar.addStep(inNorthPyramid, dropJar);
+		returnTheJar.addStep(inPyramid, jumpOverPitAgain);
+		returnTheJar.addStep(inSoph, openPyramidDoor);
+
+		steps.put(12, returnTheJar);
+		steps.put(13, returnTheJar);
+
+		ConditionalStep afterPlacingJarSteps = new ConditionalStep(this, enterRock);
+		afterPlacingJarSteps.addStep(inSoph, returnToHighPriest);
+		afterPlacingJarSteps.addStep(inPyramid, leavePyramid);
+
+		steps.put(14, afterPlacingJarSteps);
+
+		ConditionalStep prepareItems = new ConditionalStep(this, enterRockWithItems);
+		prepareItems.addStep(new Conditions(inSoph, givenEmbalmerAllItems, givenCarpenterLogs), talkToCarpenterOnceMore);
+		prepareItems.addStep(new Conditions(inSoph, givenEmbalmerAllItems, talkedToCarpenter), talkToCarpenterAgain);
+		prepareItems.addStep(new Conditions(inSoph, givenEmbalmerAllItems), talkToCarpenter);
+		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen, givenSap, givenSalt), talkToEmbalmerAgainNoSaltNoSap);
+		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, givenLinen, givenSap), talkToEmbalmerAgainNoLinenNoSap);
+		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, givenLinen, givenSalt), talkToEmbalmerAgainNoLinenNoSalt);
+		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen, givenSalt), talkToEmbalmerAgainNoSalt);
+		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen, givenSap), talkToEmbalmerAgainNoSap);
+		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, givenLinen), talkToEmbalmerAgainNoLinen);
+		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen), talkToEmbalmerAgain);
+		prepareItems.addStep(new Conditions(inSoph, hasLinen), talkToEmbalmer);
+		prepareItems.addStep(inSoph, buyLinen);
+
+		steps.put(15, prepareItems);
+
+		ConditionalStep goToRitual = new ConditionalStep(this, enterRock);
+		goToRitual.addStep(new Conditions(inEastRoom, posessedPriestNearby), killPriest);
+		goToRitual.addStep(inEastRoom, talkToHighPriestInPyramid);
+		goToRitual.addStep(inNorthPyramid, enterEastRoomAgain);
+		goToRitual.addStep(inPyramid, jumpPitWithSymbol);
+		goToRitual.addStep(inSoph, openPyramidDoorWithSymbol);
+
+		steps.put(16, goToRitual);
+
+		ConditionalStep placeSymbol = new ConditionalStep(this, enterRock);
+		placeSymbol.addStep(inEastRoom, useSymbolOnSarcopagus);
+		placeSymbol.addStep(inPyramid, enterEastRoom);
+
+		steps.put(17, placeSymbol);
+
+		steps.put(18, leaveEastRoom);
+
+		steps.put(19, goToRitual);
+		steps.put(20, goToRitual);
+		steps.put(21, goToRitual);
+
+		steps.put(22, goToRitual);
+		steps.put(23, goToRitual);
+		steps.put(24, goToRitual);
+
+		ConditionalStep finishTheQuest = new ConditionalStep(this, enterRock);
+		finishTheQuest.addStep(inPyramid, leavePyramidToFinish);
+		finishTheQuest.addStep(inSoph, talkToHighPriestToFinish);
+
+		steps.put(25, finishTheQuest);
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -281,15 +394,15 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		return new ArrayList<>(Collections.singletonList(food));
-	}
-
-	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
 		return new ArrayList<>(Arrays.asList("Level 75 or 81 guardian", "Possessed priest (level 91)"));
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		return new ArrayList<>(Collections.singletonList(food));
 	}
 
 	@Override
@@ -311,118 +424,5 @@ public class IcthlarinsLittleHelper extends BasicQuestHelper
 			new ArrayList<>(Arrays.asList(openPyramidDoorWithSymbol, jumpPitWithSymbol, enterEastRoom, useSymbolOnSarcopagus, leaveEastRoom, jumpPitWithSymbolAgain, enterEastRoomAgain, killPriest, talkToHighPriestInPyramid, leavePyramidToFinish)), cat));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToWanderer);
-		steps.put(1, talkToWandererAgain);
-		steps.put(2, enterRock);
-
-		ConditionalStep firstMemory = new ConditionalStep(this, enterRock);
-		firstMemory.addStep(puzzleOpen, solveDoorPuzzle);
-		firstMemory.addStep(inNorthPyramid, openWestDoor);
-		firstMemory.addStep(inPyramid, jumpPit);
-		firstMemory.addStep(inSoph, touchPyramidDoor);
-
-		steps.put(3, firstMemory);
-		steps.put(4, firstMemory);
-
-		ConditionalStep talkToSphinxSteps = new ConditionalStep(this, enterRock);
-		talkToSphinxSteps.addStep(inSoph, talkToSphinx);
-
-		steps.put(5, talkToSphinxSteps);
-
-		ConditionalStep talkToHighPriestSteps = new ConditionalStep(this, enterRock);
-		talkToHighPriestSteps.addStep(new Conditions(inSoph, givenToken), talkToHighPriestWithoutToken);
-		talkToHighPriestSteps.addStep(inSoph, talkToHighPriest);
-
-		steps.put(6, talkToHighPriestSteps);
-
-		ConditionalStep takeTheJar = new ConditionalStep(this, enterRock);
-		takeTheJar.addStep(new Conditions(inNorthPyramid, hasJar), returnOverPit);
-		takeTheJar.addStep(new Conditions(inNorthPyramid, hasCrondisJar, killedGuardian), pickUpCrondisJarAgain);
-		takeTheJar.addStep(new Conditions(inNorthPyramid, killedGuardian), pickUpAnyJarAgain);
-		takeTheJar.addStep(new Conditions(inNorthPyramid, hasCrondisJar), pickUpCrondisJar);
-		takeTheJar.addStep(inNorthPyramid, pickUpAnyJar);
-		takeTheJar.addStep(inPyramid, jumpPitAgain);
-		takeTheJar.addStep(inSoph, openPyramidDoor);
-
-		steps.put(7, takeTheJar);
-		steps.put(8, takeTheJar);
-		steps.put(9, takeTheJar);
-		steps.put(10, takeTheJar);
-		steps.put(11, takeTheJar);
-
-		ConditionalStep returnTheJar = new ConditionalStep(this, enterRock);
-		returnTheJar.addStep(puzzleOpen, solvePuzzleAgain);
-		returnTheJar.addStep(new Conditions(inNorthPyramid, hasCrondisJar), dropCrondisJar);
-		returnTheJar.addStep(inNorthPyramid, dropJar);
-		returnTheJar.addStep(inPyramid, jumpOverPitAgain);
-		returnTheJar.addStep(inSoph, openPyramidDoor);
-
-		steps.put(12, returnTheJar);
-		steps.put(13, returnTheJar);
-
-		ConditionalStep afterPlacingJarSteps = new ConditionalStep(this, enterRock);
-		afterPlacingJarSteps.addStep(inSoph, returnToHighPriest);
-		afterPlacingJarSteps.addStep(inPyramid, leavePyramid);
-
-		steps.put(14, afterPlacingJarSteps);
-
-		ConditionalStep prepareItems = new ConditionalStep(this, enterRockWithItems);
-		prepareItems.addStep(new Conditions(inSoph, givenEmbalmerAllItems, givenCarpenterLogs), talkToCarpenterOnceMore);
-		prepareItems.addStep(new Conditions(inSoph, givenEmbalmerAllItems, talkedToCarpenter), talkToCarpenterAgain);
-		prepareItems.addStep(new Conditions(inSoph, givenEmbalmerAllItems), talkToCarpenter);
-		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen, givenSap, givenSalt), talkToEmbalmerAgainNoSaltNoSap);
-		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, givenLinen, givenSap), talkToEmbalmerAgainNoLinenNoSap);
-		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, givenLinen, givenSalt), talkToEmbalmerAgainNoLinenNoSalt);
-		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen, givenSalt), talkToEmbalmerAgainNoSalt);
-		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen, givenSap), talkToEmbalmerAgainNoSap);
-		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, givenLinen), talkToEmbalmerAgainNoLinen);
-		prepareItems.addStep(new Conditions(inSoph, talkedToEmbalmer, hasLinen), talkToEmbalmerAgain);
-		prepareItems.addStep(new Conditions(inSoph, hasLinen), talkToEmbalmer);
-		prepareItems.addStep(inSoph, buyLinen);
-
-		steps.put(15, prepareItems);
-
-		ConditionalStep goToRitual = new ConditionalStep(this, enterRock);
-		goToRitual.addStep(new Conditions(inEastRoom, posessedPriestNearby), killPriest);
-		goToRitual.addStep(inEastRoom, talkToHighPriestInPyramid);
-		goToRitual.addStep(inNorthPyramid, enterEastRoomAgain);
-		goToRitual.addStep(inPyramid, jumpPitWithSymbol);
-		goToRitual.addStep(inSoph, openPyramidDoorWithSymbol);
-
-		steps.put(16, goToRitual);
-
-		ConditionalStep placeSymbol = new ConditionalStep(this, enterRock);
-		placeSymbol.addStep(inEastRoom, useSymbolOnSarcopagus);
-		placeSymbol.addStep(inPyramid, enterEastRoom);
-
-		steps.put(17, placeSymbol);
-
-		steps.put(18, leaveEastRoom);
-
-		steps.put(19, goToRitual);
-		steps.put(20, goToRitual);
-		steps.put(21, goToRitual);
-
-		steps.put(22, goToRitual);
-		steps.put(23, goToRitual);
-		steps.put(24, goToRitual);
-
-		ConditionalStep finishTheQuest = new ConditionalStep(this, enterRock);
-		finishTheQuest.addStep(inPyramid, leavePyramidToFinish);
-		finishTheQuest.addStep(inSoph, talkToHighPriestToFinish);
-
-		steps.put(25, finishTheQuest);
-		return steps;
 	}
 }

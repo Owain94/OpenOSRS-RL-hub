@@ -65,7 +65,7 @@ public class RFDAwowogei extends BasicQuestHelper
 	ItemRequirement cookedSnake, cookedSnakeHighlighted, mAmulet, gorillaGreegree, ninjaGreegree, zombieGreegree, bananaHighlighted, monkeyNutsHighlighted, ropeHighlighted,
 		knife, pestleAndMortar, tchikiNuts, tchikiNutsHighlighted, redBanana, redBananaHighlighted, snakeCorpse, snakeCorpseHighlighted,
 		rawStuffedSnake, rawStuffedSnakeHighlighted, slicedBanana, greegreeEquipped, paste, combatGear;
-
+	
 	Requirement protectMelee;
 
 	ConditionForStep inDiningRoom, askedAboutBanana, askedAboutNut, onCrashIsland, inSnakeHole, inNutHole, inTempleDungeon, hasRawStuffedSnake,
@@ -76,6 +76,49 @@ public class RFDAwowogei extends BasicQuestHelper
 		enterZombieDungeon, enterCookingHole, cookSnake, enterDiningRoomAgain, useSnakeOnAwowogei;
 
 	Zone diningRoom, crashIsland, snakeHole, nutHole, templeDungeon, cookRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupRequirements();
+		setupConditions();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goInspectSkrach = new ConditionalStep(this, enterDiningRoom);
+		goInspectSkrach.addStep(inDiningRoom, inspectAwowogei);
+		steps.put(0, goInspectSkrach);
+
+		steps.put(5, talkToAwowogei);
+
+		steps.put(10, talkToWiseMonkeys);
+
+		ConditionalStep prepareMeal = new ConditionalStep(this, useBananaOnWiseMonkeys);
+		prepareMeal.addStep(new Conditions(new Conditions(inDiningRoom, hasCookedsnake)), useSnakeOnAwowogei);
+		prepareMeal.addStep(new Conditions(hasCookedsnake), enterDiningRoomAgain);
+		prepareMeal.addStep(new Conditions(hasRawStuffedSnake, inCookRoom), cookSnake);
+		prepareMeal.addStep(new Conditions(hasRawStuffedSnake, inTempleDungeon), enterCookingHole);
+		prepareMeal.addStep(new Conditions(hasRawStuffedSnake), enterZombieDungeon);
+		prepareMeal.addStep(new Conditions(hasSnakeCorpse, hasSlicedRedBanana, hasPaste), stuffSnake);
+		prepareMeal.addStep(new Conditions(hasSnakeCorpse, hasRedBanana, hasPaste), sliceBanana);
+		prepareMeal.addStep(new Conditions(hasSnakeCorpse, hasRedBanana, hasTchikiNut), grindNuts);
+		prepareMeal.addStep(new Conditions(askedAboutNut, hasSnakeCorpse, hasRedBanana, inNutHole), takeNuts);
+		prepareMeal.addStep(new Conditions(askedAboutNut, hasSnakeCorpse, hasRedBanana), enterNutHole);
+		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, onCrashIsland, hasSnakeCorpse), returnToApeAtoll);
+		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, inSnakeHole, hasSnakeCorpse), leaveSnakeHole);
+		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, hasSnakeCorpse), useRopeOnTree);
+		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, inSnakeHole), killSnake);
+		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, onCrashIsland), enterCrashHole);
+		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut), goToCrashIsland);
+		prepareMeal.addStep(askedAboutBanana, useNutsOnWiseMonkeys);
+		steps.put(15, prepareMeal);
+		steps.put(20, prepareMeal);
+		steps.put(30, prepareMeal);
+		steps.put(40, prepareMeal);
+		return steps;
+	}
 
 	public void setupRequirements()
 	{
@@ -197,7 +240,7 @@ public class RFDAwowogei extends BasicQuestHelper
 		stuffSnake = new DetailedQuestStep(this, "Use the paste on the snake to stuff it.", paste, slicedBanana, snakeCorpseHighlighted);
 
 		enterZombieDungeon = new ObjectStep(this, ObjectID.TRAPDOOR_4880, new WorldPoint(2807, 2785, 0), "Enter the trapdoor in the monkey temple.", zombieGreegree, rawStuffedSnake);
-		((ObjectStep) (enterZombieDungeon)).addAlternateObjects(ObjectID.TRAPDOOR_4879);
+		((ObjectStep)(enterZombieDungeon)).addAlternateObjects(ObjectID.TRAPDOOR_4879);
 		enterCookingHole = new ObjectStep(this, ObjectID.EXIT_16061, new WorldPoint(2805, 9199, 0), "Enter the hole just under where you entered,", zombieGreegree, rawStuffedSnake);
 		cookSnake = new ObjectStep(this, NullObjectID.NULL_26175, new WorldPoint(3056, 5485, 0), "Go across the hot rocks with the zombie greegree equipped. Cook the stuffed snake on the rock at the end of the room.", zombieGreegree, rawStuffedSnakeHighlighted);
 		cookSnake.addIcon(ItemID.RAW_STUFFED_SNAKE);
@@ -206,66 +249,6 @@ public class RFDAwowogei extends BasicQuestHelper
 		useSnakeOnAwowogei = new ObjectStep(this, ObjectID.AWOWOGEI_12347, new WorldPoint(1865, 5319, 0), "Give the snake to Awowogei to finish the quest.", cookedSnakeHighlighted);
 		useSnakeOnAwowogei.addIcon(ItemID.STUFFED_SNAKE);
 		useSnakeOnAwowogei.addSubSteps(enterDiningRoomAgain);
-	}
-
-	@Override
-	public ArrayList<PanelDetails> getPanels()
-	{
-		ArrayList<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Collections.singletonList(inspectAwowogei))));
-		allSteps.add(new PanelDetails("Saving Awowogei", new ArrayList<>(Arrays.asList(talkToAwowogei, talkToWiseMonkeys, useBananaOnWiseMonkeys, useNutsOnWiseMonkeys, goToCrashIsland, enterCrashHole, killSnake, leaveSnakeHole,
-			returnToApeAtoll, useRopeOnTree, enterNutHole, takeNuts, grindNuts, sliceBanana, stuffSnake, enterZombieDungeon, enterCookingHole, cookSnake, useSnakeOnAwowogei)),
-			mAmulet, bananaHighlighted, monkeyNutsHighlighted, ropeHighlighted, knife, pestleAndMortar, zombieGreegree, ninjaGreegree, gorillaGreegree));
-		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupRequirements();
-		setupConditions();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goInspectSkrach = new ConditionalStep(this, enterDiningRoom);
-		goInspectSkrach.addStep(inDiningRoom, inspectAwowogei);
-		steps.put(0, goInspectSkrach);
-
-		steps.put(5, talkToAwowogei);
-
-		steps.put(10, talkToWiseMonkeys);
-
-		ConditionalStep prepareMeal = new ConditionalStep(this, useBananaOnWiseMonkeys);
-		prepareMeal.addStep(new Conditions(new Conditions(inDiningRoom, hasCookedsnake)), useSnakeOnAwowogei);
-		prepareMeal.addStep(new Conditions(hasCookedsnake), enterDiningRoomAgain);
-		prepareMeal.addStep(new Conditions(hasRawStuffedSnake, inCookRoom), cookSnake);
-		prepareMeal.addStep(new Conditions(hasRawStuffedSnake, inTempleDungeon), enterCookingHole);
-		prepareMeal.addStep(new Conditions(hasRawStuffedSnake), enterZombieDungeon);
-		prepareMeal.addStep(new Conditions(hasSnakeCorpse, hasSlicedRedBanana, hasPaste), stuffSnake);
-		prepareMeal.addStep(new Conditions(hasSnakeCorpse, hasRedBanana, hasPaste), sliceBanana);
-		prepareMeal.addStep(new Conditions(hasSnakeCorpse, hasRedBanana, hasTchikiNut), grindNuts);
-		prepareMeal.addStep(new Conditions(askedAboutNut, hasSnakeCorpse, hasRedBanana, inNutHole), takeNuts);
-		prepareMeal.addStep(new Conditions(askedAboutNut, hasSnakeCorpse, hasRedBanana), enterNutHole);
-		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, onCrashIsland, hasSnakeCorpse), returnToApeAtoll);
-		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, inSnakeHole, hasSnakeCorpse), leaveSnakeHole);
-		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, hasSnakeCorpse), useRopeOnTree);
-		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, inSnakeHole), killSnake);
-		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut, onCrashIsland), enterCrashHole);
-		prepareMeal.addStep(new Conditions(askedAboutBanana, askedAboutNut), goToCrashIsland);
-		prepareMeal.addStep(askedAboutBanana, useNutsOnWiseMonkeys);
-		steps.put(15, prepareMeal);
-		steps.put(20, prepareMeal);
-		steps.put(30, prepareMeal);
-		steps.put(40, prepareMeal);
-		return steps;
-	}
-
-	@Override
-	public boolean isCompleted()
-	{
-		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR.getId()) >= 50 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
 	}
 
 	@Override
@@ -284,5 +267,22 @@ public class RFDAwowogei extends BasicQuestHelper
 	public ArrayList<String> getNotes()
 	{
 		return new ArrayList<>(Collections.singletonList("If you don't have the ninja/gorilla/zombie greegrees ready, it's recommended you get them all in a single run to Zooknock to save time."));
+	}
+
+	@Override
+	public ArrayList<PanelDetails> getPanels()
+	{
+		ArrayList<PanelDetails> allSteps = new ArrayList<>();
+		allSteps.add(new PanelDetails("Starting off", new ArrayList<>(Collections.singletonList(inspectAwowogei))));
+		allSteps.add(new PanelDetails("Saving Awowogei", new ArrayList<>(Arrays.asList(talkToAwowogei, talkToWiseMonkeys, useBananaOnWiseMonkeys, useNutsOnWiseMonkeys, goToCrashIsland, enterCrashHole, killSnake, leaveSnakeHole,
+			returnToApeAtoll, useRopeOnTree, enterNutHole, takeNuts, grindNuts, sliceBanana, stuffSnake, enterZombieDungeon, enterCookingHole, cookSnake, useSnakeOnAwowogei)),
+			mAmulet, bananaHighlighted, monkeyNutsHighlighted, ropeHighlighted, knife, pestleAndMortar, zombieGreegree, ninjaGreegree, gorillaGreegree));
+		return allSteps;
+	}
+
+	@Override
+	public boolean isCompleted()
+	{
+		return (client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER_MONKEY_AMBASSADOR.getId()) >= 50 || client.getVarbitValue(QuestVarbits.QUEST_RECIPE_FOR_DISASTER.getId()) < 3);
 	}
 }

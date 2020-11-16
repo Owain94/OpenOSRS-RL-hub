@@ -24,18 +24,10 @@
  */
 package com.questhelper.quests.trollromance;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.NpcCondition;
@@ -48,6 +40,14 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.TROLL_ROMANCE
@@ -66,6 +66,65 @@ public class TrollRomance extends BasicQuestHelper
 	ObjectStep pickFlowers;
 
 	Zone strongholdFloor1, strongholdFloor2, prison, trollweiss, flowerLocation, trollCave;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startingOffSteps = new ConditionalStep(this, enterStronghold);
+		startingOffSteps.addStep(inStrongholdFloor1, talkToUg);
+		startingOffSteps.addStep(inPrison, goUpToUg);
+		startingOffSteps.addStep(inStrongholdFloor2, goDownToUg);
+
+		steps.put(0, startingOffSteps);
+
+		steps.put(5, talkToAga);
+		steps.put(10, talkToTenzing);
+		steps.put(15, talkToDunstan);
+		steps.put(20, talkToDunstanAgain);
+
+		ConditionalStep getSled = new ConditionalStep(this, useTarOnWax);
+		getSled.addStep(hasWax, useWaxOnSled);
+
+		steps.put(22, getSled);
+
+		ConditionalStep getFlower = new ConditionalStep(this, enterTrollCave);
+		getFlower.addStep(atFlowerLocation, pickFlowers);
+		getFlower.addStep(new Conditions(inTrollweiss, isSledEquipped), sledSouth);
+		getFlower.addStep(inTrollweiss, equipSled);
+		getFlower.addStep(inTrollCave, leaveTrollCave);
+
+		steps.put(25, getFlower);
+
+		ConditionalStep bringFlowerToUg = new ConditionalStep(this, enterStrongholdAgain);
+		bringFlowerToUg.addStep(inStrongholdFloor1, talkToUgWithFlowers);
+		bringFlowerToUg.addStep(inPrison, goUpToUgAgain);
+		bringFlowerToUg.addStep(inStrongholdFloor2, goDownToUgAgain);
+
+		steps.put(30, bringFlowerToUg);
+
+		ConditionalStep defeatArrg = new ConditionalStep(this, enterStrongholdForFight);
+		defeatArrg.addStep(fightableArrgNearby, killArrg);
+		defeatArrg.addStep(inStrongholdFloor1, challengeArrg);
+		defeatArrg.addStep(inPrison, goUpToUgForFight);
+		defeatArrg.addStep(inStrongholdFloor2, goDownToUgForFight);
+
+		steps.put(35, defeatArrg);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, enterStrongholdForEnd);
+		finishQuest.addStep(inStrongholdFloor1, returnToUg);
+		finishQuest.addStep(inPrison, goUpToUgForEnd);
+		finishQuest.addStep(inStrongholdFloor2, goDownToUgForEnd);
+
+		steps.put(40, finishQuest);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -198,6 +257,7 @@ public class TrollRomance extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(ironBar, mapleLog, rope, cakeTin, swampTar, bucketOfWax, combatGear));
 	}
 
+
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -217,64 +277,5 @@ public class TrollRomance extends BasicQuestHelper
 
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startingOffSteps = new ConditionalStep(this, enterStronghold);
-		startingOffSteps.addStep(inStrongholdFloor1, talkToUg);
-		startingOffSteps.addStep(inPrison, goUpToUg);
-		startingOffSteps.addStep(inStrongholdFloor2, goDownToUg);
-
-		steps.put(0, startingOffSteps);
-
-		steps.put(5, talkToAga);
-		steps.put(10, talkToTenzing);
-		steps.put(15, talkToDunstan);
-		steps.put(20, talkToDunstanAgain);
-
-		ConditionalStep getSled = new ConditionalStep(this, useTarOnWax);
-		getSled.addStep(hasWax, useWaxOnSled);
-
-		steps.put(22, getSled);
-
-		ConditionalStep getFlower = new ConditionalStep(this, enterTrollCave);
-		getFlower.addStep(atFlowerLocation, pickFlowers);
-		getFlower.addStep(new Conditions(inTrollweiss, isSledEquipped), sledSouth);
-		getFlower.addStep(inTrollweiss, equipSled);
-		getFlower.addStep(inTrollCave, leaveTrollCave);
-
-		steps.put(25, getFlower);
-
-		ConditionalStep bringFlowerToUg = new ConditionalStep(this, enterStrongholdAgain);
-		bringFlowerToUg.addStep(inStrongholdFloor1, talkToUgWithFlowers);
-		bringFlowerToUg.addStep(inPrison, goUpToUgAgain);
-		bringFlowerToUg.addStep(inStrongholdFloor2, goDownToUgAgain);
-
-		steps.put(30, bringFlowerToUg);
-
-		ConditionalStep defeatArrg = new ConditionalStep(this, enterStrongholdForFight);
-		defeatArrg.addStep(fightableArrgNearby, killArrg);
-		defeatArrg.addStep(inStrongholdFloor1, challengeArrg);
-		defeatArrg.addStep(inPrison, goUpToUgForFight);
-		defeatArrg.addStep(inStrongholdFloor2, goDownToUgForFight);
-
-		steps.put(35, defeatArrg);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, enterStrongholdForEnd);
-		finishQuest.addStep(inStrongholdFloor1, returnToUg);
-		finishQuest.addStep(inPrison, goUpToUgForEnd);
-		finishQuest.addStep(inStrongholdFloor2, goDownToUgForEnd);
-
-		steps.put(40, finishQuest);
-
-		return steps;
 	}
 }

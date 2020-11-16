@@ -54,6 +54,19 @@ public class ChanceChallenge extends DetailedOwnerStep
 		solutions.put(30, new ArrayList<>(Arrays.asList(6, 6, 5, 5, 4, 4)));
 	}
 
+	public void setupSteps()
+	{
+		talk = new NpcStep(getQuestHelper(), NpcID.ETHEREAL_FLUKE, new WorldPoint(1737, 5068, 2), "Talk to the Ethereal Fluke, and solve his puzzle.");
+		talk.addDialogStep("Suppose I may as well have a go.");
+
+		spinD1 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17019, new WorldPoint(1735, 5064, 2), "Flip the centre west die.");
+		spinD2 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17024, new WorldPoint(1737, 5063, 2), "Flip the centre east die.");
+		spinD3 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17023, new WorldPoint(1732, 5067, 2), "Flip the north west die.");
+		spinD4 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17020, new WorldPoint(1732, 5060, 2), "Flip the south west die.");
+		spinD5 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17022, new WorldPoint(1739, 5067, 2), "Flip the north east die.");
+		spinD6 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17021, new WorldPoint(1739, 5060, 2), "Flip the south east die.");
+	}
+
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
@@ -131,25 +144,6 @@ public class ChanceChallenge extends DetailedOwnerStep
 		checkSolutions(die16A, die16B, die25A, die25B, die34A, die34B);
 	}
 
-	public void setupSteps()
-	{
-		talk = new NpcStep(getQuestHelper(), NpcID.ETHEREAL_FLUKE, new WorldPoint(1737, 5068, 2), "Talk to the Ethereal Fluke, and solve his puzzle.");
-		talk.addDialogStep("Suppose I may as well have a go.");
-
-		spinD1 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17019, new WorldPoint(1735, 5064, 2), "Flip the centre west die.");
-		spinD2 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17024, new WorldPoint(1737, 5063, 2), "Flip the centre east die.");
-		spinD3 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17023, new WorldPoint(1732, 5067, 2), "Flip the north west die.");
-		spinD4 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17020, new WorldPoint(1732, 5060, 2), "Flip the south west die.");
-		spinD5 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17022, new WorldPoint(1739, 5067, 2), "Flip the north east die.");
-		spinD6 = new ObjectStep(getQuestHelper(), NullObjectID.NULL_17021, new WorldPoint(1739, 5060, 2), "Flip the south east die.");
-	}
-
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(talk, spinD1, spinD2, spinD3, spinD4, spinD5, spinD6);
-	}
-
 	public void checkSolutions(int d1, int d2, int d3, int d4, int d5, int d6)
 	{
 		ArrayList<Integer> solution = solutions.get(currentGoal);
@@ -182,6 +176,12 @@ public class ChanceChallenge extends DetailedOwnerStep
 		{
 			startUpStep(spinD6);
 		}
+	}
+
+	@Override
+	public Collection<QuestStep> getSteps()
+	{
+		return Arrays.asList(talk, spinD1, spinD2, spinD3, spinD4, spinD5, spinD6);
 	}
 
 	public Collection<QuestStep> getDisplaySteps()

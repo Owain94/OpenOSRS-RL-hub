@@ -36,7 +36,7 @@ public class ChatMessageCondition extends ConditionForStep
 
 	private ConditionForStep condition;
 
-	private final ArrayList<String> messages;
+	private ArrayList<String> messages;
 
 	public ChatMessageCondition(String... message)
 	{
@@ -55,8 +55,7 @@ public class ChatMessageCondition extends ConditionForStep
 		return hasReceivedChatMessage;
 	}
 
-	public void validateCondition(Client client, String chatMessage)
-	{
+	public void validateCondition(Client client, String chatMessage) {
 		if (!hasReceivedChatMessage)
 		{
 			if (messages.contains(chatMessage))

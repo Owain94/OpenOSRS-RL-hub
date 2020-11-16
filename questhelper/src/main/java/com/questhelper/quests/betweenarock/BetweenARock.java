@@ -25,18 +25,10 @@
 package com.questhelper.quests.betweenarock;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -52,6 +44,14 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.BETWEEN_A_ROCK
@@ -68,12 +68,100 @@ public class BetweenARock extends BasicQuestHelper
 	QuestStep enterDwarfCave, enterDwarfCave2, talkToFerryman, talkToDondakan, travelBackWithFerryman, talkToBoatman, talkToEngineer, talkToRolad, enterDwarvenMine, killScorpion,
 		searchCart, mineRock, goBackUpToRolad, returnToRolad, readEntireBook, travelToKeldagrim, enterDwarfCaveWithBook, enterDwarfCave2WithBook, talkToFerrymanWithBook, talkToDondakanWithBook,
 		useGoldBarOnDondakan, makeGoldCannonball, enterDwarfCaveWithCannonball, enterDwarfCave2WithCannonball, talkToFerrymanWithCannonball, useGoldCannonballOnDondakan, talkToDondakanAfterShot,
-		readBookAgain, talkToEngineerAgain, travelBackWithFerrymanAgain, travelToKeldagrimAgain, talkToBoatmanAgain, useGoldBarOnAnvil, enterKhorvakRoom, talkToKhorvak, assembleSchematic, enterDwarfCaveWithHelmet,
+		readBookAgain, talkToEngineerAgain, travelBackWithFerrymanAgain, travelToKeldagrimAgain, talkToBoatmanAgain, useGoldBarOnAnvil, enterKhorvakRoom, talkToKhorvak, assembleSchematic,  enterDwarfCaveWithHelmet,
 		enterDwarfCave2WithHelmet, talkToFerrymanWithHelmet, talkToDondakanWithHelmet, mine6GoldOre, talkToDondakanForEnd, talkToSecondFlame, finishQuest;
 
 	NpcStep killAvatar;
 
 	Zone trollRoom, dwarfEntrance, dwarfMine, keldagrim, keldagrim2, dwarvenMine, khorvakRoom, realm;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep goToDondakan = new ConditionalStep(this, enterDwarfCave);
+		goToDondakan.addStep(inDwarfMine, talkToDondakan);
+		goToDondakan.addStep(inDwarfEntrance, talkToFerryman);
+		goToDondakan.addStep(inTrollRoom, enterDwarfCave2);
+
+		steps.put(0, goToDondakan);
+
+		ConditionalStep talkToDwarvenEngineer = new ConditionalStep(this, travelToKeldagrim);
+		talkToDwarvenEngineer.addStep(inKeldagrim, talkToEngineer);
+		talkToDwarvenEngineer.addStep(inDwarfEntrance, talkToBoatman);
+		talkToDwarvenEngineer.addStep(inDwarfMine, travelBackWithFerryman);
+
+		steps.put(10, talkToDwarvenEngineer);
+
+		steps.put(20, talkToRolad);
+
+		ConditionalStep getPages = new ConditionalStep(this, enterDwarvenMine);
+		getPages.addStep(new Conditions(inDwarvenMine, hasPages), goBackUpToRolad);
+		getPages.addStep(new Conditions(hasPages), returnToRolad);
+		getPages.addStep(new Conditions(inDwarvenMine, hasPage2, hasPage1), mineRock);
+		getPages.addStep(new Conditions(inDwarvenMine, hasPage2), killScorpion);
+		getPages.addStep(inDwarvenMine, searchCart);
+
+		steps.put(30, getPages);
+
+		steps.put(40, readEntireBook);
+
+		ConditionalStep returnToDondakan = new ConditionalStep(this, enterDwarfCaveWithBook);
+		returnToDondakan.addStep(inDwarfMine, talkToDondakanWithBook);
+		returnToDondakan.addStep(inDwarfEntrance, talkToFerrymanWithBook);
+		returnToDondakan.addStep(inTrollRoom, enterDwarfCave2WithBook);
+
+		steps.put(50, returnToDondakan);
+
+		ConditionalStep giveGoldBar = new ConditionalStep(this, enterDwarfCaveWithBook);
+		giveGoldBar.addStep(shotGoldCannonball, talkToDondakanAfterShot);
+		giveGoldBar.addStep(new Conditions(inDwarfMine, hasCannonball), useGoldCannonballOnDondakan);
+		giveGoldBar.addStep(new Conditions(inDwarfEntrance, hasCannonball), talkToFerrymanWithCannonball);
+		giveGoldBar.addStep(new Conditions(inTrollRoom, hasCannonball), enterDwarfCave2WithCannonball);
+		giveGoldBar.addStep(hasCannonball, enterDwarfCaveWithCannonball);
+		giveGoldBar.addStep(hasUsedGoldBar, makeGoldCannonball);
+		giveGoldBar.addStep(inDwarfMine, useGoldBarOnDondakan);
+		giveGoldBar.addStep(inDwarfEntrance, talkToFerrymanWithBook);
+		giveGoldBar.addStep(inTrollRoom, enterDwarfCave2WithBook);
+
+		steps.put(60, giveGoldBar);
+
+		steps.put(70, talkToDondakanAfterShot);
+
+		ConditionalStep sortSchematics = new ConditionalStep(this, readBookAgain);
+		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet, inDwarfMine), talkToDondakanWithHelmet);
+		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet, inDwarfEntrance), talkToFerrymanWithHelmet);
+		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet, inTrollRoom), enterDwarfCave2WithHelmet);
+		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet), enterDwarfCaveWithHelmet);
+		sortSchematics.addStep(new Conditions(hasSolvedSchematic), useGoldBarOnAnvil);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, hasKhorvakSchematic), assembleSchematic);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, hasKhorvakSchematic), assembleSchematic);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, inKhorvakRoom), talkToKhorvak);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, hasGoldHelmet), enterKhorvakRoom);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer), useGoldBarOnAnvil);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, inKeldagrim), talkToEngineerAgain);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, inDwarfEntrance), talkToBoatmanAgain);
+		sortSchematics.addStep(new Conditions(hasBaseSchematic, inDwarfMine), travelBackWithFerrymanAgain);
+		sortSchematics.addStep(hasBaseSchematic, travelToKeldagrimAgain);
+
+		steps.put(80, sortSchematics);
+
+		ConditionalStep completeQuest = new ConditionalStep(this, talkToDondakanForEnd);
+		completeQuest.addStep(avatarNearby, killAvatar);
+		completeQuest.addStep(new Conditions(inRealm, has6Ore), talkToSecondFlame);
+		completeQuest.addStep(inRealm, mine6GoldOre);
+
+		steps.put(90, completeQuest);
+
+		steps.put(100, finishQuest);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -188,7 +276,7 @@ public class BetweenARock extends BasicQuestHelper
 			"Talk to Rolad at the Ice Mountain entrance to the Dwarven Mine. If you don't have an ammo mould, buy one from Nulodion whilst you're here.", pickaxe);
 		talkToRolad.addDialogStep("I'll be back later.");
 
-		enterDwarvenMine = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450, 0), "Enter the Dwarven Mine.", pickaxe);
+		enterDwarvenMine = new ObjectStep(this, ObjectID.TRAPDOOR_11867, new WorldPoint(3019, 3450,0), "Enter the Dwarven Mine.", pickaxe);
 
 		searchCart = new DetailedQuestStep(this, "Search the mine carts for a page.");
 
@@ -283,6 +371,7 @@ public class BetweenARock extends BasicQuestHelper
 		return reqs;
 	}
 
+
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -302,93 +391,5 @@ public class BetweenARock extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Solving the schematic", new ArrayList<>(Arrays.asList(readBookAgain, talkToEngineerAgain, useGoldBarOnAnvil, talkToKhorvak, assembleSchematic)), goldBars3, hammer));
 		allSteps.add(new PanelDetails("Into the hard place", new ArrayList<>(Arrays.asList(talkToDondakanWithHelmet, mine6GoldOre, talkToSecondFlame, killAvatar, finishQuest)), goldHelmet, solvedSchematic, coins5, pickaxe, combatGear));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep goToDondakan = new ConditionalStep(this, enterDwarfCave);
-		goToDondakan.addStep(inDwarfMine, talkToDondakan);
-		goToDondakan.addStep(inDwarfEntrance, talkToFerryman);
-		goToDondakan.addStep(inTrollRoom, enterDwarfCave2);
-
-		steps.put(0, goToDondakan);
-
-		ConditionalStep talkToDwarvenEngineer = new ConditionalStep(this, travelToKeldagrim);
-		talkToDwarvenEngineer.addStep(inKeldagrim, talkToEngineer);
-		talkToDwarvenEngineer.addStep(inDwarfEntrance, talkToBoatman);
-		talkToDwarvenEngineer.addStep(inDwarfMine, travelBackWithFerryman);
-
-		steps.put(10, talkToDwarvenEngineer);
-
-		steps.put(20, talkToRolad);
-
-		ConditionalStep getPages = new ConditionalStep(this, enterDwarvenMine);
-		getPages.addStep(new Conditions(inDwarvenMine, hasPages), goBackUpToRolad);
-		getPages.addStep(new Conditions(hasPages), returnToRolad);
-		getPages.addStep(new Conditions(inDwarvenMine, hasPage2, hasPage1), mineRock);
-		getPages.addStep(new Conditions(inDwarvenMine, hasPage2), killScorpion);
-		getPages.addStep(inDwarvenMine, searchCart);
-
-		steps.put(30, getPages);
-
-		steps.put(40, readEntireBook);
-
-		ConditionalStep returnToDondakan = new ConditionalStep(this, enterDwarfCaveWithBook);
-		returnToDondakan.addStep(inDwarfMine, talkToDondakanWithBook);
-		returnToDondakan.addStep(inDwarfEntrance, talkToFerrymanWithBook);
-		returnToDondakan.addStep(inTrollRoom, enterDwarfCave2WithBook);
-
-		steps.put(50, returnToDondakan);
-
-		ConditionalStep giveGoldBar = new ConditionalStep(this, enterDwarfCaveWithBook);
-		giveGoldBar.addStep(shotGoldCannonball, talkToDondakanAfterShot);
-		giveGoldBar.addStep(new Conditions(inDwarfMine, hasCannonball), useGoldCannonballOnDondakan);
-		giveGoldBar.addStep(new Conditions(inDwarfEntrance, hasCannonball), talkToFerrymanWithCannonball);
-		giveGoldBar.addStep(new Conditions(inTrollRoom, hasCannonball), enterDwarfCave2WithCannonball);
-		giveGoldBar.addStep(hasCannonball, enterDwarfCaveWithCannonball);
-		giveGoldBar.addStep(hasUsedGoldBar, makeGoldCannonball);
-		giveGoldBar.addStep(inDwarfMine, useGoldBarOnDondakan);
-		giveGoldBar.addStep(inDwarfEntrance, talkToFerrymanWithBook);
-		giveGoldBar.addStep(inTrollRoom, enterDwarfCave2WithBook);
-
-		steps.put(60, giveGoldBar);
-
-		steps.put(70, talkToDondakanAfterShot);
-
-		ConditionalStep sortSchematics = new ConditionalStep(this, readBookAgain);
-		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet, inDwarfMine), talkToDondakanWithHelmet);
-		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet, inDwarfEntrance), talkToFerrymanWithHelmet);
-		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet, inTrollRoom), enterDwarfCave2WithHelmet);
-		sortSchematics.addStep(new Conditions(hasSolvedSchematic, hasGoldHelmet), enterDwarfCaveWithHelmet);
-		sortSchematics.addStep(new Conditions(hasSolvedSchematic), useGoldBarOnAnvil);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, hasKhorvakSchematic), assembleSchematic);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, hasKhorvakSchematic), assembleSchematic);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, inKhorvakRoom), talkToKhorvak);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer, hasGoldHelmet), enterKhorvakRoom);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, hasSchematicEngineer), useGoldBarOnAnvil);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, inKeldagrim), talkToEngineerAgain);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, inDwarfEntrance), talkToBoatmanAgain);
-		sortSchematics.addStep(new Conditions(hasBaseSchematic, inDwarfMine), travelBackWithFerrymanAgain);
-		sortSchematics.addStep(hasBaseSchematic, travelToKeldagrimAgain);
-
-		steps.put(80, sortSchematics);
-
-		ConditionalStep completeQuest = new ConditionalStep(this, talkToDondakanForEnd);
-		completeQuest.addStep(avatarNearby, killAvatar);
-		completeQuest.addStep(new Conditions(inRealm, has6Ore), talkToSecondFlame);
-		completeQuest.addStep(inRealm, mine6GoldOre);
-
-		steps.put(90, completeQuest);
-
-		steps.put(100, finishQuest);
-
-		return steps;
 	}
 }

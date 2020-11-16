@@ -47,16 +47,22 @@ import net.runelite.client.eventbus.Subscribe;
 public class ValveStep extends DetailedOwnerStep
 {
 
-	private final int GALLONS_NORTH = 7;
-	private final int GALLONS_SOUTH = 4;
 	DetailedQuestStep readNote, setNorthValve, setSouthValve, setNorthValveNoHighlight, setSouthValveNoHighlight, cutTree;
-	ConditionForStep atNorthValve, atSouthValve;
-	ItemRequirement scentedTop, scentedLegs, scentedShoes, oldNote;
+
 	private int valveTotalValue;
 	private int northTurns;
 	private int southTurns;
+
+	private final int GALLONS_NORTH = 7;
+	private final int GALLONS_SOUTH = 4;
+
 	private Zone northValveArea;
 	private Zone southValveArea;
+
+	ConditionForStep atNorthValve, atSouthValve;
+
+	ItemRequirement scentedTop, scentedLegs, scentedShoes, oldNote;
+
 	private boolean foundSum = false;
 	private boolean solving = false;
 	private boolean solved = false;
@@ -105,30 +111,6 @@ public class ValveStep extends DetailedOwnerStep
 				startUpStep(cutTree);
 			}
 		}
-	}
-
-	@Override
-	protected void setupSteps()
-	{
-		setupRequirements();
-		setupZones();
-		setupConditions();
-
-		readNote = new DetailedQuestStep(getQuestHelper(), "Read the Old Note to find out the amount of water the Blisterwood Tree needs.", oldNote, scentedTop, scentedLegs, scentedShoes);
-
-		setNorthValve = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37997, new WorldPoint(3621, 3364, 0), "Turn the northern valve to the highlighted value.");
-		setSouthValve = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37998, new WorldPoint(3621, 3359, 0), "Turn the southern valve to the highlighted value.");
-		setNorthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37997, new WorldPoint(3621, 3364, 0), "Turn the northern valve to the highlighted value.");
-		setSouthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37998, new WorldPoint(3621, 3359, 0), "Turn the southern valve to the highlighted value.");
-
-		cutTree = new ObjectStep(getQuestHelper(), ObjectID.BLISTERWOOD_TREE, new WorldPoint(3635, 3362, 0),
-			"Gather 8 logs from the Blisterwood tree.", scentedTop, scentedLegs, scentedShoes);
-	}
-
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(readNote, setNorthValve, setSouthValve, setNorthValveNoHighlight, setSouthValveNoHighlight, cutTree);
 	}
 
 	@Subscribe
@@ -244,7 +226,7 @@ public class ValveStep extends DetailedOwnerStep
 		}
 	}
 
-	protected void setupRequirements()
+	protected  void setupRequirements()
 	{
 		scentedTop = new ItemRequirement("Vyre noble top", ItemID.VYRE_NOBLE_TOP, 1, true);
 		scentedTop.setTip("You can get a replacement from a chest in Old Man Ral's basement.");
@@ -266,5 +248,29 @@ public class ValveStep extends DetailedOwnerStep
 	{
 		atNorthValve = new ZoneCondition(northValveArea);
 		atSouthValve = new ZoneCondition(southValveArea);
+	}
+
+	@Override
+	protected void setupSteps()
+	{
+		setupRequirements();
+		setupZones();
+		setupConditions();
+
+		readNote = new DetailedQuestStep(getQuestHelper(), "Read the Old Note to find out the amount of water the Blisterwood Tree needs.", oldNote, scentedTop, scentedLegs, scentedShoes);
+
+		setNorthValve = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37997, new WorldPoint(3621, 3364, 0), "Turn the northern valve to the highlighted value.");
+		setSouthValve = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37998, new WorldPoint(3621, 3359, 0), "Turn the southern valve to the highlighted value.");
+		setNorthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37997, new WorldPoint(3621, 3364, 0), "Turn the northern valve to the highlighted value.");
+		setSouthValveNoHighlight = new ObjectStep(getQuestHelper(), ObjectID.VALVE_37998, new WorldPoint(3621, 3359, 0), "Turn the southern valve to the highlighted value.");
+
+		cutTree =  new ObjectStep(getQuestHelper(), ObjectID.BLISTERWOOD_TREE, new WorldPoint(3635, 3362, 0),
+			"Gather 8 logs from the Blisterwood tree.", scentedTop, scentedLegs, scentedShoes);
+	}
+
+	@Override
+	public Collection<QuestStep> getSteps()
+	{
+		return Arrays.asList(readNote, setNorthValve, setSouthValve, setNorthValveNoHighlight, setSouthValveNoHighlight, cutTree);
 	}
 }

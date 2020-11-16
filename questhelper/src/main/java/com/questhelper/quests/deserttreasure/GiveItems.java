@@ -1,7 +1,7 @@
 package com.questhelper.quests.deserttreasure;
 
-import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.NpcStep;
 import java.util.ArrayList;
 import net.runelite.api.ItemID;
@@ -28,7 +28,7 @@ public class GiveItems extends NpcStep
 		super(questHelper, npcID, worldPoint, text, itemRequirements);
 		magicLogs = new ItemRequirement("Magic logs", ItemID.MAGIC_LOGS, 12);
 		magicLogs.addAlternates(NullItemID.NULL_1514);
-		steelBars = new ItemRequirement("Steel bar", ItemID.STEEL_BAR, 6);
+		steelBars = new ItemRequirement("Steel bar", ItemID.STEEL_BAR,  6);
 		steelBars.addAlternates(NullItemID.NULL_2354);
 		moltenGlass = new ItemRequirement("Molten glass", ItemID.MOLTEN_GLASS, 6);
 		moltenGlass.addAlternates(NullItemID.NULL_1776);
