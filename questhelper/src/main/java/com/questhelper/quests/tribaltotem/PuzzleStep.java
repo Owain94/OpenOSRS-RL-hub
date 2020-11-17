@@ -28,107 +28,97 @@ package com.questhelper.quests.tribaltotem;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.steps.QuestStep;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.HashMap;
-import java.util.Map;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 
-public class PuzzleStep extends QuestStep
-{
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
-	private final String ENTRY_ONE = "K";
-	private final String ENTRY_TWO = "U";
-	private final String ENTRY_THREE = "R";
-	private final String ENTRY_FOUR = "T";
+public class PuzzleStep extends QuestStep {
 
-	private final int SLOT_ONE = 42;
-	private final int SLOT_TWO = 43;
-	private final int SLOT_THREE = 44;
-	private final int SLOT_FOUR = 45;
+    private final String ENTRY_ONE = "K";
+    private final String ENTRY_TWO = "U";
+    private final String ENTRY_THREE = "R";
+    private final String ENTRY_FOUR = "T";
 
-	private final int ARROW_ONE_LEFT = 46;
-	private final int ARROW_ONE_RIGHT = 47;
-	private final int ARROW_TWO_LEFT = 48;
-	private final int ARROW_TWO_RIGHT = 49;
-	private final int ARROW_THREE_LEFT = 50;
-	private final int ARROW_THREE_RIGHT = 51;
-	private final int ARROW_FOUR_LEFT = 52;
-	private final int ARROW_FOUR_RIGHT = 53;
+    private final int SLOT_ONE = 42;
+    private final int SLOT_TWO = 43;
+    private final int SLOT_THREE = 44;
+    private final int SLOT_FOUR = 45;
 
-	private final int COMPLETE = 55;
+    private final int ARROW_ONE_LEFT = 46;
+    private final int ARROW_ONE_RIGHT = 47;
+    private final int ARROW_TWO_LEFT = 48;
+    private final int ARROW_TWO_RIGHT = 49;
+    private final int ARROW_THREE_LEFT = 50;
+    private final int ARROW_THREE_RIGHT = 51;
+    private final int ARROW_FOUR_LEFT = 52;
+    private final int ARROW_FOUR_RIGHT = 53;
 
-	private final HashMap<Integer, Integer> highlightButtons = new HashMap<>();
+    private final int COMPLETE = 55;
 
-	public PuzzleStep(QuestHelper questHelper)
-	{
-		super(questHelper, "Click the highlighted arrows to move the slots to the solution 'KURT'.");
-		highlightButtons.put(1, ARROW_ONE_RIGHT);
-		highlightButtons.put(2, ARROW_TWO_RIGHT);
-		highlightButtons.put(3, ARROW_THREE_RIGHT);
-		highlightButtons.put(4, ARROW_FOUR_RIGHT);
-	}
+    private final HashMap<Integer, Integer> highlightButtons = new HashMap<>();
 
-	@Subscribe
-	public void onGameTick(GameTick gameTick)
-	{
-		updateSolvedPositionState();
-	}
+    public PuzzleStep(QuestHelper questHelper) {
+        super(questHelper, "Click the highlighted arrows to move the slots to the solution 'KURT'.");
+        highlightButtons.put(1, ARROW_ONE_RIGHT);
+        highlightButtons.put(2, ARROW_TWO_RIGHT);
+        highlightButtons.put(3, ARROW_THREE_RIGHT);
+        highlightButtons.put(4, ARROW_FOUR_RIGHT);
+    }
 
-	private void updateSolvedPositionState()
-	{
-		highlightButtons.replace(1, matchStateToSolution(SLOT_ONE, ENTRY_ONE, ARROW_ONE_RIGHT, ARROW_ONE_LEFT));
-		highlightButtons.replace(2, matchStateToSolution(SLOT_TWO, ENTRY_TWO, ARROW_TWO_RIGHT, ARROW_TWO_LEFT));
-		highlightButtons.replace(3, matchStateToSolution(SLOT_THREE, ENTRY_THREE, ARROW_THREE_RIGHT, ARROW_THREE_LEFT));
-		highlightButtons.replace(4, matchStateToSolution(SLOT_FOUR, ENTRY_FOUR, ARROW_FOUR_RIGHT, ARROW_FOUR_LEFT));
-		if (highlightButtons.get(1) + highlightButtons.get(2) + highlightButtons.get(3) + highlightButtons.get(4) == 0)
-		{
-			highlightButtons.put(5, COMPLETE);
-		}
-		else
-		{
-			highlightButtons.put(5, 0);
-		}
-	}
+    @Subscribe
+    public void onGameTick(GameTick gameTick)
+    {
+        updateSolvedPositionState();
+    }
 
-	private int matchStateToSolution(int slot, String target, int arrowRightId, int arrowLeftId)
-	{
-		Widget widget = client.getWidget(369, slot);
-		if (widget == null)
-		{
-			return 0;
-		}
-		char current = widget.getText().charAt(0);
-		int currentPos = (int) current - (int) 'A';
-		int id = Math.floorMod(currentPos - target.charAt(0), 26) < Math.floorMod(target.charAt(0) - currentPos, 26) ? arrowRightId : arrowLeftId;
-		if (current != target.charAt(0))
-		{
-			return id;
-		}
-		return 0;
-	}
+    private void updateSolvedPositionState()
+    {
+        highlightButtons.replace(1, matchStateToSolution(SLOT_ONE, ENTRY_ONE, ARROW_ONE_RIGHT, ARROW_ONE_LEFT));
+        highlightButtons.replace(2, matchStateToSolution(SLOT_TWO, ENTRY_TWO, ARROW_TWO_RIGHT, ARROW_TWO_LEFT));
+        highlightButtons.replace(3, matchStateToSolution(SLOT_THREE, ENTRY_THREE, ARROW_THREE_RIGHT, ARROW_THREE_LEFT));
+        highlightButtons.replace(4, matchStateToSolution(SLOT_FOUR, ENTRY_FOUR,ARROW_FOUR_RIGHT, ARROW_FOUR_LEFT));
+        if (highlightButtons.get(1) + highlightButtons.get(2) + highlightButtons.get(3) + highlightButtons.get(4) == 0)
+        {
+            highlightButtons.put(5, COMPLETE);
+        } else {
+            highlightButtons.put(5, 0);
+        }
+    }
 
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
-		{
-			if (entry.getValue() == 0)
-			{
-				continue;
-			}
+    private int matchStateToSolution(int slot, String target, int arrowRightId, int arrowLeftId)
+    {
+        Widget widget = client.getWidget(369, slot);
+        if (widget == null) return 0;
+        char current = widget.getText().charAt(0);
+        int currentPos = (int)current - (int)'A';
+        int id = Math.floorMod(currentPos - target.charAt(0), 26) < Math.floorMod(target.charAt(0) - currentPos, 26) ? arrowRightId : arrowLeftId;
+        if(current != target.charAt(0)) return id;
+        return 0;
+    }
 
-			Widget widget = client.getWidget(369, entry.getValue());
-			if (widget != null)
-			{
-				graphics.setColor(new Color(0, 255, 255, 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(Color.CYAN);
-				graphics.draw(widget.getBounds());
-			}
-		}
-	}
+    @Override
+    public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+    {
+        super.makeWidgetOverlayHint(graphics, plugin);
+        for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
+        {
+            if (entry.getValue() == 0)
+            {
+                continue;
+            }
+
+            Widget widget = client.getWidget(369, entry.getValue());
+            if (widget != null)
+            {
+                graphics.setColor(new Color(0, 255, 255, 65));
+                graphics.fill(widget.getBounds());
+                graphics.setColor(Color.CYAN);
+                graphics.draw(widget.getBounds());
+            }
+        }
+    }
 }

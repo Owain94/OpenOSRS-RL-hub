@@ -26,9 +26,12 @@ public class PuzzleStep extends QuestStep
 	private final int ROTATE = 3;
 	private final int SELECTED = 4;
 	private final int SELECT_BUTTON = 5;
-	private final HashMap<Integer, Integer>[] pieces = new HashMap[3];
-	private final HashMap<Integer, Integer>[] solvedPieces = new HashMap[3];
+
 	private HashMap<Integer, Integer> highlightButtons = new HashMap<>();
+
+	private final HashMap<Integer, Integer>[] pieces = new HashMap[3];
+
+	private final HashMap<Integer, Integer>[] solvedPieces = new HashMap[3];
 
 	public PuzzleStep(QuestHelper questHelper)
 	{
@@ -101,33 +104,11 @@ public class PuzzleStep extends QuestStep
 		updateSolvedPositionState();
 	}
 
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
-		{
-			if (entry.getValue() == 0)
-			{
-				continue;
-			}
-
-			Widget widget = client.getWidget(462, entry.getKey());
-			if (widget != null)
-			{
-				graphics.setColor(new Color(0, 255, 255, 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(Color.CYAN);
-				graphics.draw(widget.getBounds());
-			}
-		}
-	}
-
 	private void updateSolvedPositionState()
 	{
 		int currentPiece;
 
-		HashMap<Integer, Integer>[] piecesCurrentState = new HashMap[3];
+		HashMap<Integer, Integer>[] piecesCurrentState =  new HashMap[3];
 
 		HashMap<Integer, Integer> highlightButtonsTmp = new HashMap<>();
 
@@ -211,5 +192,27 @@ public class PuzzleStep extends QuestStep
 		}
 
 		highlightButtons = highlightButtonsTmp;
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
+		{
+			if (entry.getValue() == 0)
+			{
+				continue;
+			}
+
+			Widget widget = client.getWidget(462, entry.getKey());
+			if (widget != null)
+			{
+				graphics.setColor(new Color(0, 255, 255, 65));
+				graphics.fill(widget.getBounds());
+				graphics.setColor(Color.CYAN);
+				graphics.draw(widget.getBounds());
+			}
+		}
 	}
 }

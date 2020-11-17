@@ -25,21 +25,12 @@
 package com.questhelper.quests.lunardiplomacy;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedOwnerStep;
-import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.DigStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -57,6 +48,15 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.DetailedQuestStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.LUNAR_DIPLOMACY
@@ -110,6 +110,187 @@ public class LunarDiplomacy extends BasicQuestHelper
 	Zone baseOfStairs, coveF1, boatF0, boatF1, boatF2, boatF3, boatLunar1, boatLunar2, lunarDock, lunarIsle, yagaHouse, airAltar,
 		waterAltar, earthAltar, fireAltar, lunarMine, centreOfDream, chanceDream, numbersDream, treeDream, memoryDream, raceDream,
 		mimicDream, fightArena;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		setupConditionalSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToLokar);
+		steps.put(10, talkToBrundt);
+		steps.put(20, talkToLokarAgain);
+
+		ConditionalStep talkingToBentley = new ConditionalStep(this, boardingTheBoat);
+		talkingToBentley.addStep(onBoatF2, talkToBentley);
+		steps.put(30, talkingToBentley);
+
+		ConditionalStep talkingToJack = new ConditionalStep(this, boardingTheBoat);
+		talkingToJack.addStep(onBoatF1, talkToJack);
+		talkingToJack.addStep(onBoatF2, climbDownSouthStairs);
+		steps.put(40, talkingToJack);
+
+		ConditionalStep talkingToBentleyAfterJack = new ConditionalStep(this, boardingTheBoat);
+		talkingToBentleyAfterJack.addStep(onBoatF1, climbUpSouthStairs);
+		talkingToBentleyAfterJack.addStep(onBoatF2, talkToBentleyAfterJack);
+		steps.put(45, talkingToBentleyAfterJack);
+
+		ConditionalStep talkingToJackAgain = new ConditionalStep(this, boardingTheBoat);
+		talkingToJackAgain.addStep(onBoatF1, talkToJackAgain);
+		talkingToJackAgain.addStep(onBoatF2, goDownToJackAgain);
+		steps.put(50, talkingToJackAgain);
+
+		ConditionalStep talkingToShultz = new ConditionalStep(this, boardingTheBoat);
+		talkingToShultz.addStep(onBoatF2, talkToShultz);
+		talkingToShultz.addStep(onBoatF1, goUpToShultz);
+		steps.put(60, talkingToShultz);
+
+		ConditionalStep talkingToBurns = new ConditionalStep(this, boardingTheBoat);
+		talkingToBurns.addStep(onBoatF3, goDownToBurns1);
+		talkingToBurns.addStep(onBoatF2, goDownToBurns2);
+		talkingToBurns.addStep(onBoatF1, goDownToBurns3);
+		talkingToBurns.addStep(onBoatF0, talkToBurns);
+		steps.put(70, talkingToBurns);
+
+		ConditionalStep talkingToLee = new ConditionalStep(this, boardingTheBoat);
+		talkingToLee.addStep(onBoatF3, talkToLee);
+		talkingToLee.addStep(onBoatF2, goUpToLee3);
+		talkingToLee.addStep(onBoatF1, goUpToLee2);
+		talkingToLee.addStep(onBoatF0, goUpToLee1);
+		steps.put(80, talkingToLee);
+
+		ConditionalStep talkingToDavey = new ConditionalStep(this, boardingTheBoat);
+		talkingToDavey.addStep(onBoatF3, goDownToDavey);
+		talkingToDavey.addStep(onBoatF2, talkToDavey);
+		steps.put(90, talkingToDavey);
+
+		ConditionalStep talkingToCabinBoyAgain = new ConditionalStep(this, boardingTheBoat);
+		talkingToCabinBoyAgain.addStep(onBoatF3, talkToCabinBoy);
+		talkingToCabinBoyAgain.addStep(onBoatF2, goUpToCabinBoy);
+		steps.put(100, talkingToCabinBoyAgain);
+
+		ConditionalStep removingSymbols = new ConditionalStep(this, getLensAndBullseye);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon, revealedChart, revealedChest, revealedPillar), useLanternOnCrate);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon, revealedChart, revealedChest), useLanternOnPillar);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF3, revealedCannon, revealedChart), goDownToChest1);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF2, revealedCannon, revealedChart), goDownToChest2);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF1, revealedCannon, revealedChart), goDownToChest3);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon, revealedChart), useLanternOnChest);
+
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF3, revealedCannon), goDownToChart);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF2, revealedCannon), useLanternOnChart);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF1, revealedCannon), goUpToChart2);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon), goUpToChart1);
+
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF3), useLanternOnCannon);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF2), goUpToCannon3);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF1), goUpToCannon2);
+		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0), goUpToCannon1);
+
+		removingSymbols.addStep(hasEmeraldLanternLit, boardingTheBoat);
+		removingSymbols.addStep(hasEmeraldLantern, lightLantern);
+		removingSymbols.addStep(hasBullseye, replaceLens);
+		removingSymbols.addStep(hasLitBullseye, extinguishLantern);
+		steps.put(110, removingSymbols);
+		steps.put(112, removingSymbols);
+		steps.put(114, removingSymbols);
+		steps.put(116, removingSymbols);
+		steps.put(118, removingSymbols);
+
+		steps.put(120, setSail);
+
+		ConditionalStep enteringTheTown = new ConditionalStep(this, enteringTheIsland);
+		enteringTheTown.addStep(onLunarIsle, enterTown);
+		steps.put(125, enteringTheTown);
+
+		ConditionalStep talkingToTheOneirmancer = new ConditionalStep(this, enteringTheIsland);
+		talkingToTheOneirmancer.addStep(onLunarIsle, talkToOneiromancer);
+		steps.put(130, talkingToTheOneirmancer);
+
+		ConditionalStep talkingToYaga = new ConditionalStep(this, returnToTalkToYaga);
+		talkingToYaga.addStep(inYagaHouse, talkToYaga);
+		talkingToYaga.addStep(onLunarIsle, enterChickenHouse);
+		steps.put(135, talkingToYaga);
+
+		ConditionalStep makingThePotion = new ConditionalStep(this, fillVial);
+		makingThePotion.addStep(new Conditions(hasSleepPotion, hasSleepPotion), bringPotionToOneiromancer);
+		makingThePotion.addStep(new Conditions(hasSleepPotion), returnToOneWithPotion);
+		makingThePotion.addStep(new Conditions(hasGroundTooth, hasGuamAndMarrentilPotion), addToothToPotion);
+		makingThePotion.addStep(new Conditions(hasTooth, hasGuamAndMarrentilPotion), grindTooth);
+		makingThePotion.addStep(new Conditions(toothNearby, hasGuamAndMarrentilPotion), pickUpTooth);
+		makingThePotion.addStep(new Conditions(hasGuamAndMarrentilPotion, onLunarIsle), killSuqahForTooth);
+		makingThePotion.addStep(hasGuamAndMarrentilPotion, returnToMakePotion);
+		makingThePotion.addStep(hasMarrentillPotion, addGuamToMarrentill);
+		makingThePotion.addStep(hasGuamPotion, addMarrentil);
+		makingThePotion.addStep(hasWaterVial, addGuam);
+		makingThePotion.addStep(inYagaHouse, leaveChickenHouse);
+		steps.put(140, makingThePotion);
+
+		ConditionalStep makingTheLunarStaff = new ConditionalStep(this, enterAirAltar);
+		makingTheLunarStaff.addStep(new Conditions(onLunarIsle, hasLunarStaff), talkToOneiromancerWithStaff);
+		makingTheLunarStaff.addStep(hasLunarStaff, returnWithStaff);
+		makingTheLunarStaff.addStep(new Conditions(hasStaffP3, inEarthAltar), useOnEarth);
+		makingTheLunarStaff.addStep(hasStaffP3, enterEarthAltar);
+		makingTheLunarStaff.addStep(new Conditions(hasStaffP2, inWaterAltar), useOnWater);
+		makingTheLunarStaff.addStep(hasStaffP2, enterWaterAltar);
+		makingTheLunarStaff.addStep(new Conditions(hasStaffP1, inFireAltar), useOnFire);
+		makingTheLunarStaff.addStep(hasStaffP1, enterFireAltar);
+		makingTheLunarStaff.addStep(inAirAltar, useOnAir);
+		steps.put(145, makingTheLunarStaff);
+
+		ConditionalStep gettingRestOfEquipment = new ConditionalStep(this, makingHelm);
+		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape, hadAmulet, hadRing, hadClothes), bringItemsToOneiromancer);
+		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape, hadAmulet, hadRing), gettingClothes);
+		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape, hadAmulet), gettingRing);
+		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape), gettingAmulet);
+		gettingRestOfEquipment.addStep(hadHelm, gettingCape);
+		steps.put(155, gettingRestOfEquipment);
+
+		ConditionalStep enterDream = new ConditionalStep(this, useVialOnKindling);
+		enterDream.addStep(new Conditions(hasSoakedKindling, litBrazier), useKindlingOnBrazier);
+		enterDream.addStep(hasSoakedKindling, lightBrazier);
+		steps.put(160, enterDream);
+
+		ConditionalStep startingDream = new ConditionalStep(this, enterDream);
+		startingDream.addStep(inCentreOfDream, talkToEthereal);
+		steps.put(165, startingDream);
+
+		ConditionalStep challenges = new ConditionalStep(this, enterDream);
+		challenges.addStep(new Conditions(inCentreOfDream, needToTalkAtMiddle), talkToEthereal);
+		challenges.addStep(new Conditions(inNumbersDream, startedNumberChallenge), doNumberChallenge);
+		challenges.addStep(inMimicDream, doMimicChallenge);
+		challenges.addStep(inNumbersDream, startNumber);
+		challenges.addStep(inChanceDream, doChanceChallenge);
+		challenges.addStep(inMemoryDream, doMemoryChallenge);
+		challenges.addStep(new Conditions(inTreeDream, doingTreeChallenge), doTreeChallenge);
+		challenges.addStep(inTreeDream, startTreeChallenge);
+		challenges.addStep(new Conditions(inRaceDream, startedRaceChallenge), doRaceChallenge);
+		challenges.addStep(inRaceDream, startRace);
+		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic, finishedChance, finishedMemory, finishedTree), talkWithEtherealToFight);
+		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic, finishedChance, finishedMemory), goToTrees);
+		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic, finishedChance), goToMemory);
+		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic), goToChance);
+		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers), goToMimic);
+		challenges.addStep(new Conditions(inCentreOfDream, finishedRace), goToNumbers);
+		challenges.addStep(inCentreOfDream, goToRace);
+		steps.put(170, challenges);
+
+		ConditionalStep fightingYourself = new ConditionalStep(this, enterDream);
+		fightingYourself.addStep(inFightArena, fightMe);
+		fightingYourself.addStep(inCentreOfDream, talkWithEtherealToFight);
+		steps.put(175, fightingYourself);
+
+		ConditionalStep reportingToOne = new ConditionalStep(this, finishQuest);
+		reportingToOne.addStep(inCentreOfDream, leaveLecturn);
+		steps.put(180, reportingToOne);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -752,186 +933,5 @@ public class LunarDiplomacy extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Tree challenge", new ArrayList<>(Arrays.asList(goToTrees, doTreeChallenge))));
 		allSteps.add(new PanelDetails("Final challenge", new ArrayList<>(Arrays.asList(talkWithEtherealToFight, fightMe, leaveLecturn, finishQuest))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		setupConditionalSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToLokar);
-		steps.put(10, talkToBrundt);
-		steps.put(20, talkToLokarAgain);
-
-		ConditionalStep talkingToBentley = new ConditionalStep(this, boardingTheBoat);
-		talkingToBentley.addStep(onBoatF2, talkToBentley);
-		steps.put(30, talkingToBentley);
-
-		ConditionalStep talkingToJack = new ConditionalStep(this, boardingTheBoat);
-		talkingToJack.addStep(onBoatF1, talkToJack);
-		talkingToJack.addStep(onBoatF2, climbDownSouthStairs);
-		steps.put(40, talkingToJack);
-
-		ConditionalStep talkingToBentleyAfterJack = new ConditionalStep(this, boardingTheBoat);
-		talkingToBentleyAfterJack.addStep(onBoatF1, climbUpSouthStairs);
-		talkingToBentleyAfterJack.addStep(onBoatF2, talkToBentleyAfterJack);
-		steps.put(45, talkingToBentleyAfterJack);
-
-		ConditionalStep talkingToJackAgain = new ConditionalStep(this, boardingTheBoat);
-		talkingToJackAgain.addStep(onBoatF1, talkToJackAgain);
-		talkingToJackAgain.addStep(onBoatF2, goDownToJackAgain);
-		steps.put(50, talkingToJackAgain);
-
-		ConditionalStep talkingToShultz = new ConditionalStep(this, boardingTheBoat);
-		talkingToShultz.addStep(onBoatF2, talkToShultz);
-		talkingToShultz.addStep(onBoatF1, goUpToShultz);
-		steps.put(60, talkingToShultz);
-
-		ConditionalStep talkingToBurns = new ConditionalStep(this, boardingTheBoat);
-		talkingToBurns.addStep(onBoatF3, goDownToBurns1);
-		talkingToBurns.addStep(onBoatF2, goDownToBurns2);
-		talkingToBurns.addStep(onBoatF1, goDownToBurns3);
-		talkingToBurns.addStep(onBoatF0, talkToBurns);
-		steps.put(70, talkingToBurns);
-
-		ConditionalStep talkingToLee = new ConditionalStep(this, boardingTheBoat);
-		talkingToLee.addStep(onBoatF3, talkToLee);
-		talkingToLee.addStep(onBoatF2, goUpToLee3);
-		talkingToLee.addStep(onBoatF1, goUpToLee2);
-		talkingToLee.addStep(onBoatF0, goUpToLee1);
-		steps.put(80, talkingToLee);
-
-		ConditionalStep talkingToDavey = new ConditionalStep(this, boardingTheBoat);
-		talkingToDavey.addStep(onBoatF3, goDownToDavey);
-		talkingToDavey.addStep(onBoatF2, talkToDavey);
-		steps.put(90, talkingToDavey);
-
-		ConditionalStep talkingToCabinBoyAgain = new ConditionalStep(this, boardingTheBoat);
-		talkingToCabinBoyAgain.addStep(onBoatF3, talkToCabinBoy);
-		talkingToCabinBoyAgain.addStep(onBoatF2, goUpToCabinBoy);
-		steps.put(100, talkingToCabinBoyAgain);
-
-		ConditionalStep removingSymbols = new ConditionalStep(this, getLensAndBullseye);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon, revealedChart, revealedChest, revealedPillar), useLanternOnCrate);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon, revealedChart, revealedChest), useLanternOnPillar);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF3, revealedCannon, revealedChart), goDownToChest1);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF2, revealedCannon, revealedChart), goDownToChest2);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF1, revealedCannon, revealedChart), goDownToChest3);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon, revealedChart), useLanternOnChest);
-
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF3, revealedCannon), goDownToChart);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF2, revealedCannon), useLanternOnChart);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF1, revealedCannon), goUpToChart2);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0, revealedCannon), goUpToChart1);
-
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF3), useLanternOnCannon);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF2), goUpToCannon3);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF1), goUpToCannon2);
-		removingSymbols.addStep(new Conditions(hasEmeraldLanternLit, onBoatF0), goUpToCannon1);
-
-		removingSymbols.addStep(hasEmeraldLanternLit, boardingTheBoat);
-		removingSymbols.addStep(hasEmeraldLantern, lightLantern);
-		removingSymbols.addStep(hasBullseye, replaceLens);
-		removingSymbols.addStep(hasLitBullseye, extinguishLantern);
-		steps.put(110, removingSymbols);
-		steps.put(112, removingSymbols);
-		steps.put(114, removingSymbols);
-		steps.put(116, removingSymbols);
-		steps.put(118, removingSymbols);
-
-		steps.put(120, setSail);
-
-		ConditionalStep enteringTheTown = new ConditionalStep(this, enteringTheIsland);
-		enteringTheTown.addStep(onLunarIsle, enterTown);
-		steps.put(125, enteringTheTown);
-
-		ConditionalStep talkingToTheOneirmancer = new ConditionalStep(this, enteringTheIsland);
-		talkingToTheOneirmancer.addStep(onLunarIsle, talkToOneiromancer);
-		steps.put(130, talkingToTheOneirmancer);
-
-		ConditionalStep talkingToYaga = new ConditionalStep(this, returnToTalkToYaga);
-		talkingToYaga.addStep(inYagaHouse, talkToYaga);
-		talkingToYaga.addStep(onLunarIsle, enterChickenHouse);
-		steps.put(135, talkingToYaga);
-
-		ConditionalStep makingThePotion = new ConditionalStep(this, fillVial);
-		makingThePotion.addStep(new Conditions(hasSleepPotion, hasSleepPotion), bringPotionToOneiromancer);
-		makingThePotion.addStep(new Conditions(hasSleepPotion), returnToOneWithPotion);
-		makingThePotion.addStep(new Conditions(hasGroundTooth, hasGuamAndMarrentilPotion), addToothToPotion);
-		makingThePotion.addStep(new Conditions(hasTooth, hasGuamAndMarrentilPotion), grindTooth);
-		makingThePotion.addStep(new Conditions(toothNearby, hasGuamAndMarrentilPotion), pickUpTooth);
-		makingThePotion.addStep(new Conditions(hasGuamAndMarrentilPotion, onLunarIsle), killSuqahForTooth);
-		makingThePotion.addStep(hasGuamAndMarrentilPotion, returnToMakePotion);
-		makingThePotion.addStep(hasMarrentillPotion, addGuamToMarrentill);
-		makingThePotion.addStep(hasGuamPotion, addMarrentil);
-		makingThePotion.addStep(hasWaterVial, addGuam);
-		makingThePotion.addStep(inYagaHouse, leaveChickenHouse);
-		steps.put(140, makingThePotion);
-
-		ConditionalStep makingTheLunarStaff = new ConditionalStep(this, enterAirAltar);
-		makingTheLunarStaff.addStep(new Conditions(onLunarIsle, hasLunarStaff), talkToOneiromancerWithStaff);
-		makingTheLunarStaff.addStep(hasLunarStaff, returnWithStaff);
-		makingTheLunarStaff.addStep(new Conditions(hasStaffP3, inEarthAltar), useOnEarth);
-		makingTheLunarStaff.addStep(hasStaffP3, enterEarthAltar);
-		makingTheLunarStaff.addStep(new Conditions(hasStaffP2, inWaterAltar), useOnWater);
-		makingTheLunarStaff.addStep(hasStaffP2, enterWaterAltar);
-		makingTheLunarStaff.addStep(new Conditions(hasStaffP1, inFireAltar), useOnFire);
-		makingTheLunarStaff.addStep(hasStaffP1, enterFireAltar);
-		makingTheLunarStaff.addStep(inAirAltar, useOnAir);
-		steps.put(145, makingTheLunarStaff);
-
-		ConditionalStep gettingRestOfEquipment = new ConditionalStep(this, makingHelm);
-		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape, hadAmulet, hadRing, hadClothes), bringItemsToOneiromancer);
-		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape, hadAmulet, hadRing), gettingClothes);
-		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape, hadAmulet), gettingRing);
-		gettingRestOfEquipment.addStep(new Conditions(hadHelm, hadCape), gettingAmulet);
-		gettingRestOfEquipment.addStep(hadHelm, gettingCape);
-		steps.put(155, gettingRestOfEquipment);
-
-		ConditionalStep enterDream = new ConditionalStep(this, useVialOnKindling);
-		enterDream.addStep(new Conditions(hasSoakedKindling, litBrazier), useKindlingOnBrazier);
-		enterDream.addStep(hasSoakedKindling, lightBrazier);
-		steps.put(160, enterDream);
-
-		ConditionalStep startingDream = new ConditionalStep(this, enterDream);
-		startingDream.addStep(inCentreOfDream, talkToEthereal);
-		steps.put(165, startingDream);
-
-		ConditionalStep challenges = new ConditionalStep(this, enterDream);
-		challenges.addStep(new Conditions(inCentreOfDream, needToTalkAtMiddle), talkToEthereal);
-		challenges.addStep(new Conditions(inNumbersDream, startedNumberChallenge), doNumberChallenge);
-		challenges.addStep(inMimicDream, doMimicChallenge);
-		challenges.addStep(inNumbersDream, startNumber);
-		challenges.addStep(inChanceDream, doChanceChallenge);
-		challenges.addStep(inMemoryDream, doMemoryChallenge);
-		challenges.addStep(new Conditions(inTreeDream, doingTreeChallenge), doTreeChallenge);
-		challenges.addStep(inTreeDream, startTreeChallenge);
-		challenges.addStep(new Conditions(inRaceDream, startedRaceChallenge), doRaceChallenge);
-		challenges.addStep(inRaceDream, startRace);
-		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic, finishedChance, finishedMemory, finishedTree), talkWithEtherealToFight);
-		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic, finishedChance, finishedMemory), goToTrees);
-		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic, finishedChance), goToMemory);
-		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers, finishedMimic), goToChance);
-		challenges.addStep(new Conditions(inCentreOfDream, finishedRace, finishedNumbers), goToMimic);
-		challenges.addStep(new Conditions(inCentreOfDream, finishedRace), goToNumbers);
-		challenges.addStep(inCentreOfDream, goToRace);
-		steps.put(170, challenges);
-
-		ConditionalStep fightingYourself = new ConditionalStep(this, enterDream);
-		fightingYourself.addStep(inFightArena, fightMe);
-		fightingYourself.addStep(inCentreOfDream, talkWithEtherealToFight);
-		steps.put(175, fightingYourself);
-
-		ConditionalStep reportingToOne = new ConditionalStep(this, finishQuest);
-		reportingToOne.addStep(inCentreOfDream, leaveLecturn);
-		steps.put(180, reportingToOne);
-
-		return steps;
 	}
 }

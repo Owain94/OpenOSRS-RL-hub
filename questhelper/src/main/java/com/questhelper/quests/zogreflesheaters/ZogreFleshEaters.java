@@ -24,19 +24,11 @@
  */
 package com.questhelper.quests.zogreflesheaters;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -54,6 +46,14 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.widgets.WidgetInfo;
 
 @QuestDescriptor(
@@ -76,6 +76,77 @@ public class ZogreFleshEaters extends BasicQuestHelper
 		goDownToBoss, searchStand, pickUpOgreArtefact, returnArtefactToGrish;
 
 	Zone surface, tombF2, sith, tombF0, tombF2ToBoss;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep talkToGrishSteps = new ConditionalStep(this, talkToGrish);
+		talkToGrishSteps.addStep(askedAboutSickies, talkToGrishOfferHelp);
+
+		steps.put(0, talkToGrishSteps);
+		steps.put(2, talkToGuard);
+
+		ConditionalStep explore = new ConditionalStep(this, climbBarricade);
+		explore.addStep(new Conditions(hasOrShownHamBook, hasOrShownNecroBook, hasOrShownSignedPortrait), bringSignedPortraitToZavistic);
+		explore.addStep(new Conditions(hasOrShownHamBook, hasOrShownNecroBook, hasGoodPort, usedTankardOnBartender), usePortraitOnBartender);
+		explore.addStep(new Conditions(hasTankard, hasOrShownHamBook, hasOrShownNecroBook, hasGoodPort), useTankardOnBartender);
+		explore.addStep(new Conditions(hasTankard, atSith, hasOrShownHamBook, hasOrShownNecroBook, hasPapyrus), usePapyrusOnSith);
+		explore.addStep(new Conditions(hasTankard, atSith, hasOrShownHamBook, hasOrShownNecroBook), searchDrawers);
+		explore.addStep(new Conditions(hasTankard, atSith, hasOrShownHamBook), searchCupboard);
+		explore.addStep(new Conditions(hasTankard, atSith, askedSithToLookAround), searchWardrobe);
+		explore.addStep(new Conditions(hasTankard, talkedToZavistic, atSith), talkToSith);
+		explore.addStep(new Conditions(hasTankard, talkedToZavistic), goUpToSith);
+
+		explore.addStep(new Conditions(hasTankard, hasTornPage, hasBlackPrism), talkToZavistic);
+		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage, openedCoffin), searchCoffinProperly);
+		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage, usedKnife), openCoffin);
+		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage, searchedCoffin), useKnifeOnCoffin);
+		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage), searchCoffin);
+		explore.addStep(new Conditions(inTombF2, hasTankard), searchLectern);
+		explore.addStep(new Conditions(inTombF2, hasBackpack), openBackpack);
+		explore.addStep(inTombF2, searchSkeleton);
+		explore.addStep(inSurface, goDownStairs);
+		steps.put(3, explore);
+
+		ConditionalStep poisonSith = new ConditionalStep(this, goUpToSithAgain);
+		poisonSith.addStep(atSith, usePotionOnTea);
+
+		steps.put(4, poisonSith);
+		steps.put(5, poisonSith);
+
+		ConditionalStep askSithQuestions = new ConditionalStep(this, goDownstairsFromSith);
+		askSithQuestions.addStep(new Conditions(sithTransformed, atSith), talkToSithForAnswers);
+		askSithQuestions.addStep(sithTransformed, goUpToOgreSith);
+		steps.put(6, askSithQuestions);
+
+		ConditionalStep askAboutDiseaseAndOgres = new ConditionalStep(this, goUpToOgreSith);
+		askAboutDiseaseAndOgres.addStep(new Conditions(askedAboutGettingRidOfUndead, askedAboutDisease, atSith), talkToGrishForKeyUpstairs);
+		askAboutDiseaseAndOgres.addStep(new Conditions(askedAboutGettingRidOfUndead, askedAboutDisease), talkToGrishForKey);
+		askAboutDiseaseAndOgres.addStep(new Conditions(atSith, askedAboutGettingRidOfUndead, askedAboutDisease), askAboutRemovingDisease);
+		askAboutDiseaseAndOgres.addStep(atSith, askAboutRemovingUndead);
+		steps.put(8, askAboutDiseaseAndOgres);
+
+		ConditionalStep goKillBash = new ConditionalStep(this, talkToGrishForBow);
+		goKillBash.addStep(inTombF0, searchStand);
+		goKillBash.addStep(new Conditions(inTombF2ToBoss, askedAboutBow), goDownToBoss);
+		goKillBash.addStep(new Conditions(inTombF2, askedAboutBow), enterDoors);
+		goKillBash.addStep(new Conditions(inSurface, askedAboutBow), goDownStairsForBoss);
+		goKillBash.addStep(askedAboutBow, climbBarricadeForBoss);
+
+		steps.put(10, goKillBash);
+
+		ConditionalStep returnRelic = new ConditionalStep(this, returnArtefactToGrish);
+		returnRelic.addStep(ogreRelicNearby, pickUpOgreArtefact);
+		steps.put(12, returnRelic);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -273,6 +344,7 @@ public class ZogreFleshEaters extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(combatGear));
 	}
 
+
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -291,76 +363,5 @@ public class ZogreFleshEaters extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Help the ogres", new ArrayList<>(Arrays.asList(talkToGrishForKey, talkToGrishForBow, climbBarricadeForBoss, goDownStairsForBoss, enterDoors, goDownToBoss, searchStand, pickUpOgreArtefact, returnArtefactToGrish)), combatGear));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep talkToGrishSteps = new ConditionalStep(this, talkToGrish);
-		talkToGrishSteps.addStep(askedAboutSickies, talkToGrishOfferHelp);
-
-		steps.put(0, talkToGrishSteps);
-		steps.put(2, talkToGuard);
-
-		ConditionalStep explore = new ConditionalStep(this, climbBarricade);
-		explore.addStep(new Conditions(hasOrShownHamBook, hasOrShownNecroBook, hasOrShownSignedPortrait), bringSignedPortraitToZavistic);
-		explore.addStep(new Conditions(hasOrShownHamBook, hasOrShownNecroBook, hasGoodPort, usedTankardOnBartender), usePortraitOnBartender);
-		explore.addStep(new Conditions(hasTankard, hasOrShownHamBook, hasOrShownNecroBook, hasGoodPort), useTankardOnBartender);
-		explore.addStep(new Conditions(hasTankard, atSith, hasOrShownHamBook, hasOrShownNecroBook, hasPapyrus), usePapyrusOnSith);
-		explore.addStep(new Conditions(hasTankard, atSith, hasOrShownHamBook, hasOrShownNecroBook), searchDrawers);
-		explore.addStep(new Conditions(hasTankard, atSith, hasOrShownHamBook), searchCupboard);
-		explore.addStep(new Conditions(hasTankard, atSith, askedSithToLookAround), searchWardrobe);
-		explore.addStep(new Conditions(hasTankard, talkedToZavistic, atSith), talkToSith);
-		explore.addStep(new Conditions(hasTankard, talkedToZavistic), goUpToSith);
-
-		explore.addStep(new Conditions(hasTankard, hasTornPage, hasBlackPrism), talkToZavistic);
-		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage, openedCoffin), searchCoffinProperly);
-		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage, usedKnife), openCoffin);
-		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage, searchedCoffin), useKnifeOnCoffin);
-		explore.addStep(new Conditions(inTombF2, hasTankard, hasTornPage), searchCoffin);
-		explore.addStep(new Conditions(inTombF2, hasTankard), searchLectern);
-		explore.addStep(new Conditions(inTombF2, hasBackpack), openBackpack);
-		explore.addStep(inTombF2, searchSkeleton);
-		explore.addStep(inSurface, goDownStairs);
-		steps.put(3, explore);
-
-		ConditionalStep poisonSith = new ConditionalStep(this, goUpToSithAgain);
-		poisonSith.addStep(atSith, usePotionOnTea);
-
-		steps.put(4, poisonSith);
-		steps.put(5, poisonSith);
-
-		ConditionalStep askSithQuestions = new ConditionalStep(this, goDownstairsFromSith);
-		askSithQuestions.addStep(new Conditions(sithTransformed, atSith), talkToSithForAnswers);
-		askSithQuestions.addStep(sithTransformed, goUpToOgreSith);
-		steps.put(6, askSithQuestions);
-
-		ConditionalStep askAboutDiseaseAndOgres = new ConditionalStep(this, goUpToOgreSith);
-		askAboutDiseaseAndOgres.addStep(new Conditions(askedAboutGettingRidOfUndead, askedAboutDisease, atSith), talkToGrishForKeyUpstairs);
-		askAboutDiseaseAndOgres.addStep(new Conditions(askedAboutGettingRidOfUndead, askedAboutDisease), talkToGrishForKey);
-		askAboutDiseaseAndOgres.addStep(new Conditions(atSith, askedAboutGettingRidOfUndead, askedAboutDisease), askAboutRemovingDisease);
-		askAboutDiseaseAndOgres.addStep(atSith, askAboutRemovingUndead);
-		steps.put(8, askAboutDiseaseAndOgres);
-
-		ConditionalStep goKillBash = new ConditionalStep(this, talkToGrishForBow);
-		goKillBash.addStep(inTombF0, searchStand);
-		goKillBash.addStep(new Conditions(inTombF2ToBoss, askedAboutBow), goDownToBoss);
-		goKillBash.addStep(new Conditions(inTombF2, askedAboutBow), enterDoors);
-		goKillBash.addStep(new Conditions(inSurface, askedAboutBow), goDownStairsForBoss);
-		goKillBash.addStep(askedAboutBow, climbBarricadeForBoss);
-
-		steps.put(10, goKillBash);
-
-		ConditionalStep returnRelic = new ConditionalStep(this, returnArtefactToGrish);
-		returnRelic.addStep(ogreRelicNearby, pickUpOgreArtefact);
-		steps.put(12, returnRelic);
-
-		return steps;
 	}
 }

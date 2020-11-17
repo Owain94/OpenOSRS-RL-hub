@@ -24,18 +24,10 @@
  */
 package com.questhelper.quests.asoulsbane;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -50,6 +42,14 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.A_SOULS_BANE
@@ -68,6 +68,67 @@ public class ASoulsBane extends BasicQuestHelper
 	NpcStep killHopelessCreatures, killHeads;
 
 	Zone rageRoom, fearRoom, confusionRoom, hopelessRoom, hopeRoom, tolnaRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToLauna);
+
+		ConditionalStep firstRoomSteps = new ConditionalStep(this, useRopeOnRift);
+		firstRoomSteps.addStep(hasSpear, killBears);
+		firstRoomSteps.addStep(hasBattleaxe, killGoblins);
+		firstRoomSteps.addStep(hasSword, killUnicorn);
+		firstRoomSteps.addStep(hasMace, killRats);
+		firstRoomSteps.addStep(hasWeapon, killAnimals);
+		firstRoomSteps.addStep(inAngerRoom, takeWeapon);
+		firstRoomSteps.addStep(ropeUsed, enterRift);
+
+		ConditionalStep secondRoomSteps = new ConditionalStep(this, enterRift);
+		secondRoomSteps.addStep(new Conditions(inFearRoom, reaperNearby), killReaper);
+		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole0), lookInsideHole0);
+		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole1), lookInsideHole1);
+		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole2), lookInsideHole2);
+		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole3), lookInsideHole3);
+		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole4), lookInsideHole4);
+		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole5), lookInsideHole5);
+		secondRoomSteps.addStep(inAngerRoom, leaveAngerRoom);
+
+		ConditionalStep thirdRoomSteps = new ConditionalStep(this, enterRift);
+		thirdRoomSteps.addStep(inConfusionRoom, killRealConfusionBeast);
+		thirdRoomSteps.addStep(inFearRoom, leaveFearRoom);
+
+		ConditionalStep fourthRoomSteps = new ConditionalStep(this, enterRift);
+		fourthRoomSteps.addStep(inHopelessRoom, killHopelessCreatures);
+		fourthRoomSteps.addStep(inConfusionRoom, leaveConfusionRoom);
+
+		ConditionalStep tolnaRoomSteps = new ConditionalStep(this, enterRift);
+		tolnaRoomSteps.addStep(inTolnaRoom, killHeads);
+		tolnaRoomSteps.addStep(inHopeRoom, leaveHopelessRoom);
+
+		ConditionalStep tolnaSaveSteps = new ConditionalStep(this, enterRift);
+		tolnaSaveSteps.addStep(inTolnaRoom, talkToTolna);
+
+		steps.put(1, firstRoomSteps);
+		steps.put(2, firstRoomSteps);
+		steps.put(3, secondRoomSteps);
+		steps.put(4, secondRoomSteps);
+		steps.put(5, thirdRoomSteps);
+		steps.put(6, thirdRoomSteps);
+		steps.put(7, fourthRoomSteps);
+		steps.put(8, fourthRoomSteps);
+		steps.put(9, tolnaRoomSteps);
+		steps.put(10, tolnaRoomSteps);
+		steps.put(11, tolnaSaveSteps);
+		steps.put(12, talkToTolnaAgain);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -146,16 +207,16 @@ public class ASoulsBane extends BasicQuestHelper
 		killAnimals = new DetailedQuestStep(this, "");
 		killAnimals.setText(killText);
 
-		killBears = new NpcStep(this, NpcID.ANGRY_BEAR, new WorldPoint(3027, 5232, 0), "", true);
+		killBears = new NpcStep(this, NpcID.ANGRY_BEAR, new WorldPoint(3027, 5232, 0),  "", true);
 		killBears.setText(killText);
 
-		killGoblins = new NpcStep(this, NpcID.ANGRY_GOBLIN, new WorldPoint(3027, 5232, 0), "", true);
+		killGoblins = new NpcStep(this, NpcID.ANGRY_GOBLIN, new WorldPoint(3027, 5232, 0),  "", true);
 		killGoblins.setText(killText);
 
-		killRats = new NpcStep(this, NpcID.ANGRY_GIANT_RAT, new WorldPoint(3027, 5232, 0), "", true);
+		killRats = new NpcStep(this, NpcID.ANGRY_GIANT_RAT, new WorldPoint(3027, 5232, 0),  "", true);
 		killRats.setText(killText);
 
-		killUnicorn = new NpcStep(this, NpcID.ANGRY_UNICORN, new WorldPoint(3027, 5232, 0), "", true);
+		killUnicorn = new NpcStep(this, NpcID.ANGRY_UNICORN, new WorldPoint(3027, 5232, 0),  "", true);
 		killUnicorn.setText(killText);
 
 		killAnimals.addSubSteps(killBears, killGoblins, killRats, killUnicorn);
@@ -221,66 +282,5 @@ public class ASoulsBane extends BasicQuestHelper
 			new ArrayList<>(Arrays.asList(killHeads, talkToTolna, talkToTolnaAgain)), combatGear));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToLauna);
-
-		ConditionalStep firstRoomSteps = new ConditionalStep(this, useRopeOnRift);
-		firstRoomSteps.addStep(hasSpear, killBears);
-		firstRoomSteps.addStep(hasBattleaxe, killGoblins);
-		firstRoomSteps.addStep(hasSword, killUnicorn);
-		firstRoomSteps.addStep(hasMace, killRats);
-		firstRoomSteps.addStep(hasWeapon, killAnimals);
-		firstRoomSteps.addStep(inAngerRoom, takeWeapon);
-		firstRoomSteps.addStep(ropeUsed, enterRift);
-
-		ConditionalStep secondRoomSteps = new ConditionalStep(this, enterRift);
-		secondRoomSteps.addStep(new Conditions(inFearRoom, reaperNearby), killReaper);
-		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole0), lookInsideHole0);
-		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole1), lookInsideHole1);
-		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole2), lookInsideHole2);
-		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole3), lookInsideHole3);
-		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole4), lookInsideHole4);
-		secondRoomSteps.addStep(new Conditions(inFearRoom, inHole5), lookInsideHole5);
-		secondRoomSteps.addStep(inAngerRoom, leaveAngerRoom);
-
-		ConditionalStep thirdRoomSteps = new ConditionalStep(this, enterRift);
-		thirdRoomSteps.addStep(inConfusionRoom, killRealConfusionBeast);
-		thirdRoomSteps.addStep(inFearRoom, leaveFearRoom);
-
-		ConditionalStep fourthRoomSteps = new ConditionalStep(this, enterRift);
-		fourthRoomSteps.addStep(inHopelessRoom, killHopelessCreatures);
-		fourthRoomSteps.addStep(inConfusionRoom, leaveConfusionRoom);
-
-		ConditionalStep tolnaRoomSteps = new ConditionalStep(this, enterRift);
-		tolnaRoomSteps.addStep(inTolnaRoom, killHeads);
-		tolnaRoomSteps.addStep(inHopeRoom, leaveHopelessRoom);
-
-		ConditionalStep tolnaSaveSteps = new ConditionalStep(this, enterRift);
-		tolnaSaveSteps.addStep(inTolnaRoom, talkToTolna);
-
-		steps.put(1, firstRoomSteps);
-		steps.put(2, firstRoomSteps);
-		steps.put(3, secondRoomSteps);
-		steps.put(4, secondRoomSteps);
-		steps.put(5, thirdRoomSteps);
-		steps.put(6, thirdRoomSteps);
-		steps.put(7, fourthRoomSteps);
-		steps.put(8, fourthRoomSteps);
-		steps.put(9, tolnaRoomSteps);
-		steps.put(10, tolnaRoomSteps);
-		steps.put(11, tolnaSaveSteps);
-		steps.put(12, talkToTolnaAgain);
-
-		return steps;
 	}
 }

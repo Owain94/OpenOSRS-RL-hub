@@ -24,16 +24,11 @@
  */
 package com.questhelper.quests.romeoandjuliet;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
 import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -42,6 +37,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -59,6 +59,35 @@ public class RomeoAndJuliet extends BasicQuestHelper
 	QuestStep talkToRomeo, goUpToJuliet, talkToJuliet, giveLetterToRomeo, talkToLawrence, talkToApothecary, goUpToJuliet2, givePotionToJuliet, finishQuest;
 
 	Zone julietRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToRomeo);
+
+		ConditionalStep tellJulietAboutRomeo = new ConditionalStep(this, goUpToJuliet);
+		tellJulietAboutRomeo.addStep(inJulietRoom, talkToJuliet);
+
+		steps.put(10, tellJulietAboutRomeo);
+		steps.put(20, giveLetterToRomeo);
+		steps.put(30, talkToLawrence);
+		steps.put(40, talkToApothecary);
+
+		ConditionalStep bringPotionToJuliet = new ConditionalStep(this, talkToApothecary);
+		bringPotionToJuliet.addStep(new Conditions(hasPotion, inJulietRoom), givePotionToJuliet);
+		bringPotionToJuliet.addStep(hasPotion, goUpToJuliet2);
+
+		steps.put(50, bringPotionToJuliet);
+		steps.put(60, finishQuest);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -121,34 +150,5 @@ public class RomeoAndJuliet extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Hatching a plan", new ArrayList<>(Arrays.asList(talkToLawrence, talkToApothecary)), cadavaBerry));
 		allSteps.add(new PanelDetails("Enact the plan", new ArrayList<>(Arrays.asList(givePotionToJuliet, finishQuest))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToRomeo);
-
-		ConditionalStep tellJulietAboutRomeo = new ConditionalStep(this, goUpToJuliet);
-		tellJulietAboutRomeo.addStep(inJulietRoom, talkToJuliet);
-
-		steps.put(10, tellJulietAboutRomeo);
-		steps.put(20, giveLetterToRomeo);
-		steps.put(30, talkToLawrence);
-		steps.put(40, talkToApothecary);
-
-		ConditionalStep bringPotionToJuliet = new ConditionalStep(this, talkToApothecary);
-		bringPotionToJuliet.addStep(new Conditions(hasPotion, inJulietRoom), givePotionToJuliet);
-		bringPotionToJuliet.addStep(hasPotion, goUpToJuliet2);
-
-		steps.put(50, bringPotionToJuliet);
-		steps.put(60, finishQuest);
-
-		return steps;
 	}
 }

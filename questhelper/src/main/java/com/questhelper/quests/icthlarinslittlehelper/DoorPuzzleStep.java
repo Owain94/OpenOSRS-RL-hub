@@ -80,31 +80,6 @@ public class DoorPuzzleStep extends QuestStep
 		updateSolvedPositionState();
 	}
 
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		Widget widgetWrapper = client.getWidget(147, 0);
-		if (widgetWrapper != null)
-		{
-			for (int i = 0; i < 20; i++)
-			{
-				if (clickSquares[i] == 1)
-				{
-					int START_WIDGET_ID = 9;
-					Widget widget = client.getWidget(147, START_WIDGET_ID + i);
-					if (widget != null)
-					{
-						graphics.setColor(new Color(0, 255, 255, 65));
-						graphics.fill(widget.getBounds());
-						graphics.setColor(Color.CYAN);
-						graphics.draw(widget.getBounds());
-					}
-				}
-			}
-		}
-	}
-
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
@@ -183,6 +158,31 @@ public class DoorPuzzleStep extends QuestStep
 					if (clickY < 3)
 					{
 						currentState[(clickY + 1) * 5 + cell - 1] = (currentState[(clickY + 1) * 5 + cell - 1] + 1) % 2;
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		Widget widgetWrapper = client.getWidget(147, 0);
+		if (widgetWrapper != null)
+		{
+			for (int i = 0; i < 20; i++)
+			{
+				if (clickSquares[i] == 1)
+				{
+					int START_WIDGET_ID = 9;
+					Widget widget = client.getWidget(147, START_WIDGET_ID + i);
+					if (widget != null)
+					{
+						graphics.setColor(new Color(0, 255, 255, 65));
+						graphics.fill(widget.getBounds());
+						graphics.setColor(Color.CYAN);
+						graphics.draw(widget.getBounds());
 					}
 				}
 			}

@@ -1,8 +1,8 @@
 package com.questhelper.quests.betweenarock;
 
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestHelperPlugin;
 import com.questhelper.questhelpers.QuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.DetailedQuestStep;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -27,9 +27,12 @@ public class PuzzleStep extends DetailedQuestStep
 	private final int SELECTED = 4;
 	private final int SELECT_BUTTON = 5;
 	private final int PIECE_ID = 6;
-	private final HashMap<Integer, Integer>[] pieces = new HashMap[3];
-	private final HashMap<Integer, Integer>[] solvedPieces = new HashMap[3];
+
 	private HashMap<Integer, Integer> highlightButtons = new HashMap<>();
+
+	private final HashMap<Integer, Integer>[] pieces = new HashMap[3];
+
+	private final HashMap<Integer, Integer>[] solvedPieces = new HashMap[3];
 
 	public PuzzleStep(QuestHelper questHelper, ItemRequirement item)
 	{
@@ -82,28 +85,6 @@ public class PuzzleStep extends DetailedQuestStep
 	public void startUp()
 	{
 		updateSolvedPositionState();
-	}
-
-	@Override
-	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
-	{
-		super.makeWidgetOverlayHint(graphics, plugin);
-		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
-		{
-			if (entry.getValue() == 0)
-			{
-				continue;
-			}
-
-			Widget widget = client.getWidget(114, entry.getKey());
-			if (widget != null)
-			{
-				graphics.setColor(new Color(0, 255, 255, 65));
-				graphics.fill(widget.getBounds());
-				graphics.setColor(Color.CYAN);
-				graphics.draw(widget.getBounds());
-			}
-		}
 	}
 
 	@Subscribe
@@ -213,6 +194,28 @@ public class PuzzleStep extends DetailedQuestStep
 		}
 
 		highlightButtons = highlightButtonsTmp;
+	}
+
+	@Override
+	public void makeWidgetOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
+	{
+		super.makeWidgetOverlayHint(graphics, plugin);
+		for (Map.Entry<Integer, Integer> entry : highlightButtons.entrySet())
+		{
+			if (entry.getValue() == 0)
+			{
+				continue;
+			}
+
+			Widget widget = client.getWidget(114, entry.getKey());
+			if (widget != null)
+			{
+				graphics.setColor(new Color(0, 255, 255, 65));
+				graphics.fill(widget.getBounds());
+				graphics.setColor(Color.CYAN);
+				graphics.draw(widget.getBounds());
+			}
+		}
 	}
 }
 

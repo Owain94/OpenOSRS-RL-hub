@@ -13,7 +13,7 @@ import net.runelite.client.eventbus.Subscribe;
 
 public class BringDrezelPureEssenceStep extends NpcStep
 {
-	ItemRequirement essence = new ItemRequirement("Rune/Pure essence", ItemID.RUNE_ESSENCE, 50);
+	ItemRequirement essence = new ItemRequirement("Rune/Pure essence",ItemID.RUNE_ESSENCE, 50);
 
 	public BringDrezelPureEssenceStep(QuestHelper questHelper)
 	{
@@ -32,6 +32,6 @@ public class BringDrezelPureEssenceStep extends NpcStep
 		int numEssence = 60 - client.getVarpValue(302);
 		essence.setQuantity(numEssence);
 		this.setRequirements(new ArrayList<>(Collections.singletonList(essence)));
-		this.setText("Bring Drezel " + numEssence + " UNNOTED rune/pure essence in the underground of the Salve Temple.");
+		this.setText("Bring Drezel " + numEssence  + " UNNOTED rune/pure essence in the underground of the Salve Temple.");
 	}
 }

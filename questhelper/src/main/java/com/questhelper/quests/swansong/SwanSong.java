@@ -24,18 +24,11 @@
  */
 package com.questhelper.quests.swansong;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.NpcCondition;
@@ -52,6 +45,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.SWAN_SONG
@@ -73,6 +73,73 @@ public class SwanSong extends BasicQuestHelper
 	FishMonkfish fishAndCookMonkfish;
 
 	Zone colonyEntrance, basement;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToHerman);
+		steps.put(5, talkToHerman);
+		steps.put(10, talkToWom);
+		steps.put(15, talkToWom);
+		steps.put(20, talkToWom);
+		steps.put(30, talkToWomAtColony);
+		steps.put(40, talkToWomAtColony);
+
+		ConditionalStep defeatTrolls = new ConditionalStep(this, enterColony);
+		defeatTrolls.addStep(inColonyEntrance, kill79Trolls);
+		steps.put(50, defeatTrolls);
+
+		steps.put(55, talkToHermanInBuilding);
+		steps.put(60, talkToHermanInBuilding);
+		steps.put(65, talkToHermanInBuilding);
+
+		ConditionalStep completeTasks = new ConditionalStep(this, talkToFranklin);
+		completeTasks.addStep(new Conditions(talkedToArnold, finishedFranklin), fishAndCookMonkfish);
+		completeTasks.addStep(finishedFranklin, talkToArnold);
+		completeTasks.addStep(wallsFixed, talkToFranklinAgain);
+		completeTasks.addStep(litLog, repairWall);
+		completeTasks.addStep(addedLog, useTinderbox);
+		completeTasks.addStep(talkedToFranklin, useLog);
+
+		steps.put(70, completeTasks);
+
+		steps.put(80, talkToHermanAfterTasks);
+
+		ConditionalStep goTalkToFru = new ConditionalStep(this, enterWizardsBasement);
+		goTalkToFru.addStep(inBasement, talkToFruscone);
+
+		steps.put(90, goTalkToFru);
+		steps.put(95, goTalkToFru);
+
+		steps.put(100, talkToMalignius);
+		steps.put(110, talkToMalignius);
+		steps.put(120, talkToCrafter);
+
+		ConditionalStep getPotToMal = new ConditionalStep(this, makeAirtightPot);
+		getPotToMal.addStep(hasAirtightPot, talkToMaligniusWithPot);
+
+		steps.put(130, getPotToMal);
+
+		steps.put(140, talkToHermanWithPot);
+
+		ConditionalStep bossFight = new ConditionalStep(this, talkToHermanForFinalFight);
+		bossFight.addStep(queenNearby, killQueen);
+		steps.put(150, talkToHermanForFinalFight);
+		steps.put(160, talkToHermanForFinalFight);
+
+		steps.put(170, killQueen);
+
+		steps.put(180, talkToHermanToFinish);
+		steps.put(190, talkToHermanToFinish);
+		steps.put(200, talkToHermanToFinish);
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -208,6 +275,7 @@ public class SwanSong extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(mist10, lava10, blood5, bones7, pot, potLid, ironBar5, log, tinderbox));
 	}
 
+
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -235,73 +303,6 @@ public class SwanSong extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Making an army", new ArrayList<>(Arrays.asList(talkToFruscone, talkToMalignius, talkToCrafter, makeAirtightPot, talkToMaligniusWithPot)), bones7, pot, potLid, combatGearRanged));
 		allSteps.add(new PanelDetails("Defeating the trolls", new ArrayList<>(Arrays.asList(talkToHermanForFinalFight, killQueen, talkToHermanToFinish)), combatGearRanged));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToHerman);
-		steps.put(5, talkToHerman);
-		steps.put(10, talkToWom);
-		steps.put(15, talkToWom);
-		steps.put(20, talkToWom);
-		steps.put(30, talkToWomAtColony);
-		steps.put(40, talkToWomAtColony);
-
-		ConditionalStep defeatTrolls = new ConditionalStep(this, enterColony);
-		defeatTrolls.addStep(inColonyEntrance, kill79Trolls);
-		steps.put(50, defeatTrolls);
-
-		steps.put(55, talkToHermanInBuilding);
-		steps.put(60, talkToHermanInBuilding);
-		steps.put(65, talkToHermanInBuilding);
-
-		ConditionalStep completeTasks = new ConditionalStep(this, talkToFranklin);
-		completeTasks.addStep(new Conditions(talkedToArnold, finishedFranklin), fishAndCookMonkfish);
-		completeTasks.addStep(finishedFranklin, talkToArnold);
-		completeTasks.addStep(wallsFixed, talkToFranklinAgain);
-		completeTasks.addStep(litLog, repairWall);
-		completeTasks.addStep(addedLog, useTinderbox);
-		completeTasks.addStep(talkedToFranklin, useLog);
-
-		steps.put(70, completeTasks);
-
-		steps.put(80, talkToHermanAfterTasks);
-
-		ConditionalStep goTalkToFru = new ConditionalStep(this, enterWizardsBasement);
-		goTalkToFru.addStep(inBasement, talkToFruscone);
-
-		steps.put(90, goTalkToFru);
-		steps.put(95, goTalkToFru);
-
-		steps.put(100, talkToMalignius);
-		steps.put(110, talkToMalignius);
-		steps.put(120, talkToCrafter);
-
-		ConditionalStep getPotToMal = new ConditionalStep(this, makeAirtightPot);
-		getPotToMal.addStep(hasAirtightPot, talkToMaligniusWithPot);
-
-		steps.put(130, getPotToMal);
-
-		steps.put(140, talkToHermanWithPot);
-
-		ConditionalStep bossFight = new ConditionalStep(this, talkToHermanForFinalFight);
-		bossFight.addStep(queenNearby, killQueen);
-		steps.put(150, talkToHermanForFinalFight);
-		steps.put(160, talkToHermanForFinalFight);
-
-		steps.put(170, killQueen);
-
-		steps.put(180, talkToHermanToFinish);
-		steps.put(190, talkToHermanToFinish);
-		steps.put(200, talkToHermanToFinish);
-		return steps;
 	}
 }
 

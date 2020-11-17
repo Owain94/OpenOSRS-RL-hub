@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.11"
+version = "0.0.12"
 
+project.extra["PluginProvider"] = "Zoinkwiz"
 project.extra["PluginName"] = "Quest Helper"
 project.extra["PluginDescription"] = "An in-game interactive guide for quests"
 

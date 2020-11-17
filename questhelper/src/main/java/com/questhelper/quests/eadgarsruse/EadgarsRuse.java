@@ -24,12 +24,12 @@
  */
 package com.questhelper.quests.eadgarsruse;
 
+import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
@@ -84,11 +84,160 @@ public class EadgarsRuse extends BasicQuestHelper
 	Zone sanfewRoom, tenzingHut, mountainPath1, mountainPath2, mountainPath3, mountainPath4, mountainPath5, trollArea1, prison, strongholdFloor1, strongholdFloor2, eadgarsCave,
 		trollheimArea, storeroom;
 
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		if (freedEadgar.checkCondition(client))
+		{
+			travelToEadgarPanel = new PanelDetails("Travel to Eadgar", new ArrayList<>(Arrays.asList(travelToTenzing, climbOverStile, climbOverRocks, enterSecretEntrance, goUpStairsPrison, goUpToTopFloorStronghold, enterEadgarsCave, talkToEadgar)));
+		}
+		else
+		{
+			travelToEadgarPanel = new PanelDetails("Travel to Eadgar", new ArrayList<>(Arrays.asList(travelToTenzing, climbOverStile, climbOverRocks, enterSecretEntrance, getBerryKey, freeEadgar, goUpStairsPrison, goUpToTopFloorStronghold, enterEadgarsCave, talkToEadgar)));
+		}
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		ConditionalStep startQuest = new ConditionalStep(this, goUpToSanfew);
+		startQuest.addStep(inSanfewRoom, talkToSanfew);
+
+		steps.put(0, startQuest);
+
+		ConditionalStep enterTheStronghold = new ConditionalStep(this, getCoinsOrBoots);
+		enterTheStronghold.addStep(new Conditions(inEadgarsCave, freedEadgar), talkToEadgar);
+		enterTheStronghold.addStep(new Conditions(inTrollheimArea, freedEadgar), enterEadgarsCave);
+		enterTheStronghold.addStep(new Conditions(inStrongholdFloor2, freedEadgar), exitStronghold);
+		enterTheStronghold.addStep(new Conditions(inStrongholdFloor1, freedEadgar), goUpToTopFloorStronghold);
+		enterTheStronghold.addStep(new Conditions(inPrison, freedEadgar), goUpStairsPrison);
+		enterTheStronghold.addStep(new Conditions(inPrison, hasCellKey2), freeEadgar);
+		enterTheStronghold.addStep(inPrison, freeEadgar);
+		enterTheStronghold.addStep(inTrollArea1, enterSecretEntrance);
+		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
+		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
+		enterTheStronghold.addStep(hasClimbingBoots, travelToTenzing);
+		enterTheStronghold.addStep(hasCoins, buyClimbingBoots);
+
+		steps.put(10, enterTheStronghold);
+
+		ConditionalStep talkToCooksAboutGoutweed = new ConditionalStep(this, getCoinsOrBoots);
+		talkToCooksAboutGoutweed.addStep(inEadgarsCave, leaveEadgarsCave);
+		talkToCooksAboutGoutweed.addStep(inTrollheimArea, enterStronghold);
+		talkToCooksAboutGoutweed.addStep(inStrongholdFloor2, goDownSouthStairs);
+		talkToCooksAboutGoutweed.addStep(inStrongholdFloor1, talkToCook);
+		talkToCooksAboutGoutweed.addStep(inPrison, goUpStairsPrison);
+		talkToCooksAboutGoutweed.addStep(inTrollArea1, enterSecretEntrance);
+		talkToCooksAboutGoutweed.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
+		talkToCooksAboutGoutweed.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
+		talkToCooksAboutGoutweed.addStep(hasClimbingBoots, travelToTenzing);
+		talkToCooksAboutGoutweed.addStep(hasCoins, buyClimbingBoots);
+
+		steps.put(15, talkToCooksAboutGoutweed);
+
+		ConditionalStep returnToEadgar = new ConditionalStep(this, getCoinsOrBoots);
+		returnToEadgar.addStep(inEadgarsCave, talkToEadgarFromCook);
+		returnToEadgar.addStep(inTrollheimArea, enterEadgarsCaveFromCook);
+		returnToEadgar.addStep(inStrongholdFloor2, exitStrongholdFromCook);
+		returnToEadgar.addStep(inStrongholdFloor1, goUpToTopFloorStrongholdFromCook);
+		returnToEadgar.addStep(inPrison, goUpStairsPrison);
+		returnToEadgar.addStep(inTrollArea1, enterSecretEntrance);
+		returnToEadgar.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
+		returnToEadgar.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
+		returnToEadgar.addStep(hasClimbingBoots, travelToTenzing);
+
+
+		steps.put(25, returnToEadgar);
+
+		ConditionalStep poisonTheParrot = new ConditionalStep(this, talkToPete);
+		poisonTheParrot.addStep(new Conditions(hasParrot, inEadgarsCave), talkToEadgarWithParrot);
+		poisonTheParrot.addStep(hasParrot, enterEadgarsCaveWithParrot);
+		poisonTheParrot.addStep(hasAlcoChunks, useChunksOnParrot);
+		poisonTheParrot.addStep(new Conditions(askedAboutAlcohol, askedAboutPineapple), useVodkaOnChunks);
+		poisonTheParrot.addStep(askedAboutPineapple, talkToPeteAboutAlcohol);
+		poisonTheParrot.addStep(askedAboutAlcohol, talkToPeteAboutPineapple);
+
+		steps.put(30, poisonTheParrot);
+
+		ConditionalStep useParrotOnRack = new ConditionalStep(this, enterPrisonWithParrot);
+		useParrotOnRack.addStep(inTrollheimArea, enterStrongholdWithParrot);
+		useParrotOnRack.addStep(inStrongholdFloor2, goDownNorthStairsWithParrot);
+		useParrotOnRack.addStep(inStrongholdFloor1, goDownToPrisonWithParrot);
+		useParrotOnRack.addStep(inPrison, parrotOnRack);
+		useParrotOnRack.addStep(inEadgarsCave, leaveEadgarsCaveWithParrot);
+
+		steps.put(50, useParrotOnRack);
+
+		ConditionalStep bringItemsToEadgar = new ConditionalStep(this, talkToTegid);
+		bringItemsToEadgar.addStep(new Conditions(hasRobe, inEadgarsCave), talkToEadgarWithItems);
+		bringItemsToEadgar.addStep(hasRobe, enterEadgarsCaveWithItems);
+
+		steps.put(60, bringItemsToEadgar);
+		steps.put(70, bringItemsToEadgar);
+
+		ConditionalStep makePotion = new ConditionalStep(this, pickThistle);
+		makePotion.addStep(new Conditions(hasTrollPotion, inEadgarsCave), giveTrollPotionToEadgar);
+		makePotion.addStep(hasTrollPotion, enterEadgarsCaveWithTrollPotion);
+		makePotion.addStep(hasGroundThistle, useGroundThistleOnRanarr);
+		makePotion.addStep(hasDriedThistle, grindThistle);
+		makePotion.addStep(new Conditions(hasThistle, fireNearby), useThistleOnFire);
+		makePotion.addStep(new Conditions(hasLog, hasTinderbox, hasThistle), lightFire);
+		makePotion.addStep(hasThistle, useThistleOnTrollFire);
+		makePotion.addStep(inEadgarsCave, leaveEadgarsCaveForThistle);
+
+		steps.put(80, makePotion);
+
+		ConditionalStep fetchParrot = new ConditionalStep(this, enterPrisonForParrot);
+		fetchParrot.addStep(inTrollheimArea, enterStrongholdForParrot);
+		fetchParrot.addStep(inStrongholdFloor2, goDownNorthStairsForParrot);
+		fetchParrot.addStep(inStrongholdFloor1, goDownToPrisonForParrot);
+		fetchParrot.addStep(inPrison, getParrotFromRack);
+		fetchParrot.addStep(inEadgarsCave, leaveEadgarsCaveForParrot);
+		steps.put(85, fetchParrot);
+
+		ConditionalStep returnParrotToEadgar = new ConditionalStep(this, enterEadgarCaveWithTrainedParrot);
+		returnParrotToEadgar.addStep(inEadgarsCave, talkToEadgarWithTrainedParrot);
+		returnParrotToEadgar.addStep(inTrollheimArea, enterEadgarCaveWithTrainedParrot);
+		returnParrotToEadgar.addStep(inStrongholdFloor2, leaveStrongholdWithParrot);
+		returnParrotToEadgar.addStep(inStrongholdFloor1, goUpToTopFloorWithParrot);
+		returnParrotToEadgar.addStep(inPrison, leavePrisonWithParrot);
+
+		steps.put(86, returnParrotToEadgar);
+
+		ConditionalStep bringManToBurntmeat = new ConditionalStep(this, enterStrongholdWithScarecrow);
+		bringManToBurntmeat.addStep(inEadgarsCave, leaveEadgarsCaveWithScarecrow);
+		bringManToBurntmeat.addStep(inStrongholdFloor2, goDownSouthStairsWithScarecrow);
+		bringManToBurntmeat.addStep(inStrongholdFloor1, talkToCookWithScarecrow);
+		bringManToBurntmeat.addStep(inPrison, goUpStairsPrison);
+
+		steps.put(87, talkToCooksAboutGoutweed);
+
+		ConditionalStep getTheGoutweed = new ConditionalStep(this, talkToBurntmeat);
+		getTheGoutweed.addStep(new Conditions(inSanfewRoom, hasGoutweed), returnToSanfew);
+		getTheGoutweed.addStep(hasGoutweed, returnUpToSanfew);
+		getTheGoutweed.addStep(new Conditions(inStoreroom, hasStoreroomKey), getGoutweed);
+		getTheGoutweed.addStep(hasStoreroomKey, goDownToStoreroom);
+		getTheGoutweed.addStep(foundOutAboutKey, searchDrawers);
+
+		steps.put(90, getTheGoutweed);
+
+		ConditionalStep returnGoutWeed = new ConditionalStep(this, goDownToStoreroom);
+		returnGoutWeed.addStep(new Conditions(inSanfewRoom, hasGoutweed), returnToSanfew);
+		returnGoutWeed.addStep(hasGoutweed, returnUpToSanfew);
+		returnGoutWeed.addStep(inStoreroom, getGoutweed);
+
+		steps.put(100, returnGoutWeed);
+
+		return steps;
+	}
+
 	public void setupItemRequirements()
 	{
 		climbingBoots = new ItemRequirement("Climbing boots", ItemID.CLIMBING_BOOTS);
 		climbingBootsEquipped = new ItemRequirement("Climbing boots", ItemID.CLIMBING_BOOTS, 1, true);
-		climbingBootsOr12Coins = new ItemRequirement("Climbing boots or 12 coins", -1, -1);
+		climbingBootsOr12Coins =  new ItemRequirement("Climbing boots or 12 coins", -1, -1);
 		vodka = new ItemRequirement("Vodka", ItemID.VODKA);
 		pineappleChunks = new ItemRequirement("Pineapple chunks", ItemID.PINEAPPLE_CHUNKS);
 		logs2 = new ItemRequirement("Logs", ItemID.LOGS, 2);
@@ -190,7 +339,7 @@ public class EadgarsRuse extends BasicQuestHelper
 		inTrollheimArea = new ZoneCondition(trollheimArea);
 
 		askedAboutAlcohol = new Conditions(true, LogicType.AND, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "Just recently."));
-		askedAboutPineapple = new Conditions(true, LogicType.AND, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "fruit and grain mostly"));
+		askedAboutPineapple =  new Conditions(true, LogicType.AND, new WidgetTextCondition(WidgetInfo.DIALOG_NPC_TEXT, "fruit and grain mostly"));
 		hasAlcoChunks = new ItemRequirementCondition(alcoChunks);
 		hasParrot = new ItemRequirementCondition(parrot);
 		hasRobe = new ItemRequirementCondition(robe);
@@ -443,154 +592,5 @@ public class EadgarsRuse extends BasicQuestHelper
 
 		allSteps.add(new PanelDetails("Get the Goutweed", new ArrayList<>(Arrays.asList(enterStrongholdWithScarecrow, searchDrawers, goDownToStoreroom, enterStoreroomDoor, getGoutweed, returnToSanfew))));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		if (freedEadgar.checkCondition(client))
-		{
-			travelToEadgarPanel = new PanelDetails("Travel to Eadgar", new ArrayList<>(Arrays.asList(travelToTenzing, climbOverStile, climbOverRocks, enterSecretEntrance, goUpStairsPrison, goUpToTopFloorStronghold, enterEadgarsCave, talkToEadgar)));
-		}
-		else
-		{
-			travelToEadgarPanel = new PanelDetails("Travel to Eadgar", new ArrayList<>(Arrays.asList(travelToTenzing, climbOverStile, climbOverRocks, enterSecretEntrance, getBerryKey, freeEadgar, goUpStairsPrison, goUpToTopFloorStronghold, enterEadgarsCave, talkToEadgar)));
-		}
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		ConditionalStep startQuest = new ConditionalStep(this, goUpToSanfew);
-		startQuest.addStep(inSanfewRoom, talkToSanfew);
-
-		steps.put(0, startQuest);
-
-		ConditionalStep enterTheStronghold = new ConditionalStep(this, getCoinsOrBoots);
-		enterTheStronghold.addStep(new Conditions(inEadgarsCave, freedEadgar), talkToEadgar);
-		enterTheStronghold.addStep(new Conditions(inTrollheimArea, freedEadgar), enterEadgarsCave);
-		enterTheStronghold.addStep(new Conditions(inStrongholdFloor2, freedEadgar), exitStronghold);
-		enterTheStronghold.addStep(new Conditions(inStrongholdFloor1, freedEadgar), goUpToTopFloorStronghold);
-		enterTheStronghold.addStep(new Conditions(inPrison, freedEadgar), goUpStairsPrison);
-		enterTheStronghold.addStep(new Conditions(inPrison, hasCellKey2), freeEadgar);
-		enterTheStronghold.addStep(inPrison, freeEadgar);
-		enterTheStronghold.addStep(inTrollArea1, enterSecretEntrance);
-		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
-		enterTheStronghold.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
-		enterTheStronghold.addStep(hasClimbingBoots, travelToTenzing);
-		enterTheStronghold.addStep(hasCoins, buyClimbingBoots);
-
-		steps.put(10, enterTheStronghold);
-
-		ConditionalStep talkToCooksAboutGoutweed = new ConditionalStep(this, getCoinsOrBoots);
-		talkToCooksAboutGoutweed.addStep(inEadgarsCave, leaveEadgarsCave);
-		talkToCooksAboutGoutweed.addStep(inTrollheimArea, enterStronghold);
-		talkToCooksAboutGoutweed.addStep(inStrongholdFloor2, goDownSouthStairs);
-		talkToCooksAboutGoutweed.addStep(inStrongholdFloor1, talkToCook);
-		talkToCooksAboutGoutweed.addStep(inPrison, goUpStairsPrison);
-		talkToCooksAboutGoutweed.addStep(inTrollArea1, enterSecretEntrance);
-		talkToCooksAboutGoutweed.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
-		talkToCooksAboutGoutweed.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
-		talkToCooksAboutGoutweed.addStep(hasClimbingBoots, travelToTenzing);
-		talkToCooksAboutGoutweed.addStep(hasCoins, buyClimbingBoots);
-
-		steps.put(15, talkToCooksAboutGoutweed);
-
-		ConditionalStep returnToEadgar = new ConditionalStep(this, getCoinsOrBoots);
-		returnToEadgar.addStep(inEadgarsCave, talkToEadgarFromCook);
-		returnToEadgar.addStep(inTrollheimArea, enterEadgarsCaveFromCook);
-		returnToEadgar.addStep(inStrongholdFloor2, exitStrongholdFromCook);
-		returnToEadgar.addStep(inStrongholdFloor1, goUpToTopFloorStrongholdFromCook);
-		returnToEadgar.addStep(inPrison, goUpStairsPrison);
-		returnToEadgar.addStep(inTrollArea1, enterSecretEntrance);
-		returnToEadgar.addStep(new Conditions(hasClimbingBoots, onMountainPath), climbOverRocks);
-		returnToEadgar.addStep(new Conditions(hasClimbingBoots, inTenzingHut), climbOverStile);
-		returnToEadgar.addStep(hasClimbingBoots, travelToTenzing);
-
-
-		steps.put(25, returnToEadgar);
-
-		ConditionalStep poisonTheParrot = new ConditionalStep(this, talkToPete);
-		poisonTheParrot.addStep(new Conditions(hasParrot, inEadgarsCave), talkToEadgarWithParrot);
-		poisonTheParrot.addStep(hasParrot, enterEadgarsCaveWithParrot);
-		poisonTheParrot.addStep(hasAlcoChunks, useChunksOnParrot);
-		poisonTheParrot.addStep(new Conditions(askedAboutAlcohol, askedAboutPineapple), useVodkaOnChunks);
-		poisonTheParrot.addStep(askedAboutPineapple, talkToPeteAboutAlcohol);
-		poisonTheParrot.addStep(askedAboutAlcohol, talkToPeteAboutPineapple);
-
-		steps.put(30, poisonTheParrot);
-
-		ConditionalStep useParrotOnRack = new ConditionalStep(this, enterPrisonWithParrot);
-		useParrotOnRack.addStep(inTrollheimArea, enterStrongholdWithParrot);
-		useParrotOnRack.addStep(inStrongholdFloor2, goDownNorthStairsWithParrot);
-		useParrotOnRack.addStep(inStrongholdFloor1, goDownToPrisonWithParrot);
-		useParrotOnRack.addStep(inPrison, parrotOnRack);
-		useParrotOnRack.addStep(inEadgarsCave, leaveEadgarsCaveWithParrot);
-
-		steps.put(50, useParrotOnRack);
-
-		ConditionalStep bringItemsToEadgar = new ConditionalStep(this, talkToTegid);
-		bringItemsToEadgar.addStep(new Conditions(hasRobe, inEadgarsCave), talkToEadgarWithItems);
-		bringItemsToEadgar.addStep(hasRobe, enterEadgarsCaveWithItems);
-
-		steps.put(60, bringItemsToEadgar);
-		steps.put(70, bringItemsToEadgar);
-
-		ConditionalStep makePotion = new ConditionalStep(this, pickThistle);
-		makePotion.addStep(new Conditions(hasTrollPotion, inEadgarsCave), giveTrollPotionToEadgar);
-		makePotion.addStep(hasTrollPotion, enterEadgarsCaveWithTrollPotion);
-		makePotion.addStep(hasGroundThistle, useGroundThistleOnRanarr);
-		makePotion.addStep(hasDriedThistle, grindThistle);
-		makePotion.addStep(new Conditions(hasThistle, fireNearby), useThistleOnFire);
-		makePotion.addStep(new Conditions(hasLog, hasTinderbox, hasThistle), lightFire);
-		makePotion.addStep(hasThistle, useThistleOnTrollFire);
-		makePotion.addStep(inEadgarsCave, leaveEadgarsCaveForThistle);
-
-		steps.put(80, makePotion);
-
-		ConditionalStep fetchParrot = new ConditionalStep(this, enterPrisonForParrot);
-		fetchParrot.addStep(inTrollheimArea, enterStrongholdForParrot);
-		fetchParrot.addStep(inStrongholdFloor2, goDownNorthStairsForParrot);
-		fetchParrot.addStep(inStrongholdFloor1, goDownToPrisonForParrot);
-		fetchParrot.addStep(inPrison, getParrotFromRack);
-		fetchParrot.addStep(inEadgarsCave, leaveEadgarsCaveForParrot);
-		steps.put(85, fetchParrot);
-
-		ConditionalStep returnParrotToEadgar = new ConditionalStep(this, enterEadgarCaveWithTrainedParrot);
-		returnParrotToEadgar.addStep(inEadgarsCave, talkToEadgarWithTrainedParrot);
-		returnParrotToEadgar.addStep(inTrollheimArea, enterEadgarCaveWithTrainedParrot);
-		returnParrotToEadgar.addStep(inStrongholdFloor2, leaveStrongholdWithParrot);
-		returnParrotToEadgar.addStep(inStrongholdFloor1, goUpToTopFloorWithParrot);
-		returnParrotToEadgar.addStep(inPrison, leavePrisonWithParrot);
-
-		steps.put(86, returnParrotToEadgar);
-
-		ConditionalStep bringManToBurntmeat = new ConditionalStep(this, enterStrongholdWithScarecrow);
-		bringManToBurntmeat.addStep(inEadgarsCave, leaveEadgarsCaveWithScarecrow);
-		bringManToBurntmeat.addStep(inStrongholdFloor2, goDownSouthStairsWithScarecrow);
-		bringManToBurntmeat.addStep(inStrongholdFloor1, talkToCookWithScarecrow);
-		bringManToBurntmeat.addStep(inPrison, goUpStairsPrison);
-
-		steps.put(87, talkToCooksAboutGoutweed);
-
-		ConditionalStep getTheGoutweed = new ConditionalStep(this, talkToBurntmeat);
-		getTheGoutweed.addStep(new Conditions(inSanfewRoom, hasGoutweed), returnToSanfew);
-		getTheGoutweed.addStep(hasGoutweed, returnUpToSanfew);
-		getTheGoutweed.addStep(new Conditions(inStoreroom, hasStoreroomKey), getGoutweed);
-		getTheGoutweed.addStep(hasStoreroomKey, goDownToStoreroom);
-		getTheGoutweed.addStep(foundOutAboutKey, searchDrawers);
-
-		steps.put(90, getTheGoutweed);
-
-		ConditionalStep returnGoutWeed = new ConditionalStep(this, goDownToStoreroom);
-		returnGoutWeed.addStep(new Conditions(inSanfewRoom, hasGoutweed), returnToSanfew);
-		returnGoutWeed.addStep(hasGoutweed, returnUpToSanfew);
-		returnGoutWeed.addStep(inStoreroom, getGoutweed);
-
-		steps.put(100, returnGoutWeed);
-
-		return steps;
 	}
 }

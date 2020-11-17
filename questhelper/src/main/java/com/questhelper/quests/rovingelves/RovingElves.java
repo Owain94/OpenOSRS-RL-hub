@@ -24,19 +24,11 @@
  */
 package com.questhelper.quests.rovingelves;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -51,6 +43,14 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.ROVING_ELVES
@@ -65,6 +65,41 @@ public class RovingElves extends BasicQuestHelper
 		searchFallsCrate, useKeyOnFallsDoor, plantSeed, returnToIslwyn;
 
 	Zone glarialTomb, deadTreeIsland, ledge, hudonIsland, falls, throneRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToIslwyn);
+		steps.put(1, talkToIslwyn);
+		steps.put(2, talkToEluned);
+
+		ConditionalStep getTheSeed = new ConditionalStep(this, enterGlarialsTombstone);
+		getTheSeed.addStep(hasSeed, returnSeedToEluned);
+		getTheSeed.addStep(seedNearby, pickUpSeed);
+		getTheSeed.addStep(inGlarialsTomb, killGuardian);
+
+		steps.put(3, getTheSeed);
+
+		ConditionalStep plantingTheSeed = new ConditionalStep(this, boardRaft);
+		plantingTheSeed.addStep(inThroneRoom, plantSeed);
+		plantingTheSeed.addStep(new Conditions(inFalls, hasKey), useKeyOnFallsDoor);
+		plantingTheSeed.addStep(inFalls, searchFallsCrate);
+		plantingTheSeed.addStep(onLedge, enterFalls);
+		plantingTheSeed.addStep(onDeadTreeIsland, useRopeOnTree);
+		plantingTheSeed.addStep(onHudonIsland, useRopeOnRock);
+
+		steps.put(4, plantingTheSeed);
+
+		steps.put(5, returnToIslwyn);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -180,40 +215,5 @@ public class RovingElves extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Plant the seed",
 			new ArrayList<>(Arrays.asList(boardRaft, useRopeOnRock, useRopeOnTree, enterFalls, searchFallsCrate, useKeyOnFallsDoor, plantSeed, returnToIslwyn)), spade, rope, blessedSeed));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToIslwyn);
-		steps.put(1, talkToIslwyn);
-		steps.put(2, talkToEluned);
-
-		ConditionalStep getTheSeed = new ConditionalStep(this, enterGlarialsTombstone);
-		getTheSeed.addStep(hasSeed, returnSeedToEluned);
-		getTheSeed.addStep(seedNearby, pickUpSeed);
-		getTheSeed.addStep(inGlarialsTomb, killGuardian);
-
-		steps.put(3, getTheSeed);
-
-		ConditionalStep plantingTheSeed = new ConditionalStep(this, boardRaft);
-		plantingTheSeed.addStep(inThroneRoom, plantSeed);
-		plantingTheSeed.addStep(new Conditions(inFalls, hasKey), useKeyOnFallsDoor);
-		plantingTheSeed.addStep(inFalls, searchFallsCrate);
-		plantingTheSeed.addStep(onLedge, enterFalls);
-		plantingTheSeed.addStep(onDeadTreeIsland, useRopeOnTree);
-		plantingTheSeed.addStep(onHudonIsland, useRopeOnRock);
-
-		steps.put(4, plantingTheSeed);
-
-		steps.put(5, returnToIslwyn);
-
-		return steps;
 	}
 }

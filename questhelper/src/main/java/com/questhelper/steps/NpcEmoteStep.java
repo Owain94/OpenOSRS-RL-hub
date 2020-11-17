@@ -31,6 +31,8 @@ import com.questhelper.steps.emote.QuestEmote;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import net.runelite.api.ScriptID;
 import net.runelite.api.coords.WorldPoint;
@@ -40,8 +42,8 @@ import net.runelite.client.util.ImageUtil;
 
 public class NpcEmoteStep extends NpcStep
 {
-	private final QuestEmote emote;
 	private boolean hasScrolled;
+	private final QuestEmote emote;
 
 	public NpcEmoteStep(QuestHelper questHelper, int npcID, QuestEmote emote, String text, Requirement... requirements)
 	{

@@ -25,19 +25,12 @@
 package com.questhelper.quests.thelosttribe;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcEmoteStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.Operation;
 import com.questhelper.steps.conditional.VarbitCondition;
@@ -52,6 +45,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.THE_LOST_TRIBE
@@ -73,6 +73,50 @@ public class TheLostTribe extends BasicQuestHelper
 		goIntoHamLair, goToDukeWithSilverware, travelToMakePeace;
 
 	Zone basement, lumbridgeF0, lumbridgeF1, lumbridgeF2, tunnels, mines, hamBase;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		setupConditionalSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, goTalkToSigmundToStart);
+		steps.put(1, findGoblinWitnessSteps);
+		steps.put(2, goTalkToDukeAfterHans);
+		steps.put(3, goMineRubble);
+
+		ConditionalStep goGrabBrooch = new ConditionalStep(this, enterTunnels);
+		goGrabBrooch.addStep(hasBrooch, goShowBroochToDuke);
+		goGrabBrooch.addStep(inTunnels, grabBrooch);
+		steps.put(4, goGrabBrooch);
+
+		ConditionalStep getBook = new ConditionalStep(this, searchBookcase);
+		getBook.addStep(hasBook, readBook);
+		steps.put(5, getBook);
+
+		steps.put(6, talkToGenerals);
+
+		ConditionalStep makeContactSteps = new ConditionalStep(this, goTravelToMistag);
+		makeContactSteps.addStep(inMines, emoteAtMistag);
+		makeContactSteps.addStep(inTunnels, walkToMistag);
+
+		steps.put(7, makeContactSteps);
+		steps.put(8, goTalkToDukeAfterEmote);
+
+		ConditionalStep revealSigmund = new ConditionalStep(this, goGetKey);
+		revealSigmund.addStep(foundSilverware, goToDukeWithSilverware);
+		revealSigmund.addStep(foundRobes, goIntoHamLair);
+		revealSigmund.addStep(hasKey, goOpenRobeChest);
+		steps.put(9, revealSigmund);
+
+		steps.put(10, travelToMakePeace);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -147,7 +191,7 @@ public class TheLostTribe extends BasicQuestHelper
 		talkToBob.addDialogStep("Do you know what happened in the castle cellar?");
 
 		talkToAllAboutCellar = new NpcStep(this, NpcID.COOK_4626, "Talk to the Cook, Hans, Father Aereck, and Bob in Lumbridge until one tells you about seeing a goblin.");
-		((NpcStep) (talkToAllAboutCellar)).addAlternateNpcs(NpcID.FATHER_AERECK);
+		((NpcStep)(talkToAllAboutCellar)).addAlternateNpcs(NpcID.FATHER_AERECK);
 		talkToAllAboutCellar.addDialogSteps("Do you know what happened in the castle cellar?");
 		talkToAllAboutCellar.addSubSteps(talkToHans, talkToBob);
 
@@ -312,49 +356,5 @@ public class TheLostTribe extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Resolving tensions", new ArrayList<>(Arrays.asList(goGetKey, goOpenRobeChest, goIntoHamLair, goToDukeWithSilverware, travelToMakePeace)), lightSource));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		setupConditionalSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, goTalkToSigmundToStart);
-		steps.put(1, findGoblinWitnessSteps);
-		steps.put(2, goTalkToDukeAfterHans);
-		steps.put(3, goMineRubble);
-
-		ConditionalStep goGrabBrooch = new ConditionalStep(this, enterTunnels);
-		goGrabBrooch.addStep(hasBrooch, goShowBroochToDuke);
-		goGrabBrooch.addStep(inTunnels, grabBrooch);
-		steps.put(4, goGrabBrooch);
-
-		ConditionalStep getBook = new ConditionalStep(this, searchBookcase);
-		getBook.addStep(hasBook, readBook);
-		steps.put(5, getBook);
-
-		steps.put(6, talkToGenerals);
-
-		ConditionalStep makeContactSteps = new ConditionalStep(this, goTravelToMistag);
-		makeContactSteps.addStep(inMines, emoteAtMistag);
-		makeContactSteps.addStep(inTunnels, walkToMistag);
-
-		steps.put(7, makeContactSteps);
-		steps.put(8, goTalkToDukeAfterEmote);
-
-		ConditionalStep revealSigmund = new ConditionalStep(this, goGetKey);
-		revealSigmund.addStep(foundSilverware, goToDukeWithSilverware);
-		revealSigmund.addStep(foundRobes, goIntoHamLair);
-		revealSigmund.addStep(hasKey, goOpenRobeChest);
-		steps.put(9, revealSigmund);
-
-		steps.put(10, travelToMakePeace);
-
-		return steps;
 	}
 }

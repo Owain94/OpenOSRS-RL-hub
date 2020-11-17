@@ -25,18 +25,11 @@
 package com.questhelper.quests.thefremennikisles;
 
 import com.questhelper.ItemCollections;
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
@@ -46,6 +39,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
@@ -81,6 +81,199 @@ public class TheFremennikIsles extends BasicQuestHelper
 	PanelDetails prepareForRepairPanel, prepareForCombatPanel;
 
 	ArrayList<ItemRequirement> items;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		setupPanels();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToMord);
+
+		ConditionalStep goTalkToGjuki = new ConditionalStep(this, travelToJatizso);
+		goTalkToGjuki.addStep(inIslands, talkToGjuki);
+
+		steps.put(5, goTalkToGjuki);
+		steps.put(10, goTalkToGjuki);
+
+		ConditionalStep finishGjukiDialog = new ConditionalStep(this, travelToJatizso);
+		finishGjukiDialog.addStep(inIslands, continueTalkingToGjuki);
+		steps.put(20, finishGjukiDialog);
+
+		ConditionalStep getMithrilOre = new ConditionalStep(this, travelToJatizso);
+		getMithrilOre.addStep(inIslands, bringOreToGjuki);
+		steps.put(30, getMithrilOre);
+
+		ConditionalStep continueTalkingToGjukiAfterOre = new ConditionalStep(this, travelToJatizso);
+		continueTalkingToGjukiAfterOre.addStep(inIslands, talkToGjukiAfterOre);
+
+		steps.put(40, continueTalkingToGjukiAfterOre);
+
+		ConditionalStep spyOnMawnis = new ConditionalStep(this, travelToJatizso);
+		spyOnMawnis.addStep(jestering1, performForMawnis);
+		spyOnMawnis.addStep(new Conditions(hasJesterOutfit, inNeitiznot), talkToSlug);
+		spyOnMawnis.addStep(new Conditions(new Conditions(LogicType.OR, inJatizso, inTrollLands), hasJesterOutfit), returnToRellekkaFromJatizso);
+		spyOnMawnis.addStep(hasJesterOutfit, travelToNeitiznot);
+		spyOnMawnis.addStep(inJatizso, getJesterOutfit);
+
+		steps.put(50, spyOnMawnis);
+
+		ConditionalStep spyOnMawnisP2 = new ConditionalStep(this, travelToJatizso);
+		spyOnMawnisP2.addStep(jestering1, performForMawnis);
+		spyOnMawnisP2.addStep(new Conditions(hasJesterOutfit, inNeitiznot), goSpyOnMawnis);
+		spyOnMawnisP2.addStep(new Conditions(new Conditions(LogicType.OR, inJatizso, inTrollLands), hasJesterOutfit), returnToRellekkaFromJatizso);
+		spyOnMawnisP2.addStep(hasJesterOutfit, travelToNeitiznot);
+		spyOnMawnisP2.addStep(inJatizso, getJesterOutfit);
+
+		steps.put(55, spyOnMawnisP2);
+
+		ConditionalStep reportToSlug = new ConditionalStep(this, travelToNeitiznot);
+		reportToSlug.addStep(inNeitiznot, tellSlugReport1);
+
+		steps.put(60, reportToSlug);
+		steps.put(70, reportToSlug);
+		steps.put(80, reportToSlug);
+
+		ConditionalStep talkToMawnisToHelp = new ConditionalStep(this, travelToNeitiznot);
+		talkToMawnisToHelp.addStep(new Conditions(inNeitiznot), talkToMawnis);
+		talkToMawnisToHelp.addStep(new Conditions(LogicType.OR, inJatizso, inTrollLands), returnToRellekkaFromJatizso);
+
+		steps.put(90, talkToMawnisToHelp);
+
+		ConditionalStep bringMawnisItems = new ConditionalStep(this, travelToNeitiznot);
+		bringMawnisItems.addStep(new Conditions(inNeitiznot), talkToMawnisWithLogs);
+		bringMawnisItems.addStep(new Conditions(LogicType.OR, inJatizso, inTrollLands), returnToRellekkaFromJatizso);
+
+		steps.put(100, bringMawnisItems);
+		steps.put(110, bringMawnisItems);
+		steps.put(120, bringMawnisItems);
+
+		ConditionalStep talkToMawnisAfterItemsSteps = new ConditionalStep(this, travelToNeitiznot);
+		talkToMawnisAfterItemsSteps.addStep(new Conditions(inNeitiznot), talkToMawnisAfterItems);
+		talkToMawnisAfterItemsSteps.addStep(new Conditions(LogicType.OR, inJatizso, inTrollLands), returnToRellekkaFromJatizso);
+
+		steps.put(130, talkToMawnisAfterItemsSteps);
+
+		ConditionalStep repairBridges = new ConditionalStep(this, travelToNeitiznot);
+		repairBridges.addStep(new Conditions(inNeitiznotOrTrollLands, repairedBridge1, repairedBridge2), talkToMawnisAfterRepair);
+		repairBridges.addStep(new Conditions(inNeitiznotOrTrollLands, repairedBridge1), repairBridge2);
+		repairBridges.addStep(new Conditions(inNeitiznotOrTrollLands), repairBridge1);
+		repairBridges.addStep(new Conditions(inJatizso), returnToRellekkaFromJatizso);
+
+		steps.put(140, repairBridges);
+
+		ConditionalStep reportAfterBridgeRepair = new ConditionalStep(this, travelToNeitiznot);
+		reportAfterBridgeRepair.addStep(inNeitiznotOrTrollLands, talkToMawnisAfterRepair);
+		reportAfterBridgeRepair.addStep(inJatizso, returnToRellekkaFromJatizso);
+
+		steps.put(150, reportAfterBridgeRepair);
+
+		ConditionalStep reportBackToGjuki = new ConditionalStep(this, travelToJatizsoToReport);
+		reportBackToGjuki.addStep(inNeitiznotOrTrollLands, leaveNeitiznotToReport);
+		reportBackToGjuki.addStep(inJatizso, talkToGjukiToReport);
+
+		steps.put(160, reportBackToGjuki);
+		steps.put(170, reportBackToGjuki);
+		steps.put(180, reportBackToGjuki);
+		steps.put(190, reportBackToGjuki);
+
+		ConditionalStep collectTax = new ConditionalStep(this, travelToJatizsoToReport);
+		collectTax.addStep(new Conditions(inJatizso, collectedValigga, collectedKeepa, collectedSkuli, collectedHring), talkToGjukiAfterCollection1);
+		collectTax.addStep(new Conditions(inJatizso, collectedValigga, collectedKeepa, collectedSkuli), collectFromHring);
+		collectTax.addStep(new Conditions(inJatizso, collectedValigga, collectedKeepa), collectFromSkuli);
+		collectTax.addStep(new Conditions(inJatizso, collectedKeepa), collectFromVanligga);
+		collectTax.addStep(inJatizso, collectFromKeepa);
+
+		steps.put(200, collectTax);
+
+		ConditionalStep collectTaxOnBeards = new ConditionalStep(this, travelToJatizsoToReport);
+		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum, collectedSkuli, collectedKeepa, collectedFlosi), talkToGjukiAfterCollection2);
+		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum, collectedSkuli, collectedKeepa), collectFromFlosi);
+		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum, collectedSkuli), collectFromKeepaAgain);
+		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum), collectFromSkuliAgain);
+		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring), collectFromRaum);
+		collectTaxOnBeards.addStep(inJatizso, collectFromHringAgain);
+
+		steps.put(210, collectTaxOnBeards);
+
+		ConditionalStep returnToSpyAgain = new ConditionalStep(this, travelToNeitiznotToSpyAgain);
+		returnToSpyAgain.addStep(inNeitiznotOrTrollLands, talkToSlugToSpyAgain);
+		returnToSpyAgain.addStep(inJatizso, returnToRellekkaFromJatizsoToSpyAgain);
+
+		steps.put(230, returnToSpyAgain);
+
+		ConditionalStep spyOnMawnisAgain = new ConditionalStep(this, travelToNeitiznotToSpyAgain);
+		spyOnMawnisAgain.addStep(jestering1, performForMawnisAgain);
+		spyOnMawnisAgain.addStep(inNeitiznotOrTrollLands, goSpyOnMawnisAgain);
+		spyOnMawnisAgain.addStep(inJatizso, returnToRellekkaFromJatizsoToSpyAgain);
+
+		steps.put(235, spyOnMawnisAgain);
+
+		ConditionalStep reportBackToSlug = new ConditionalStep(this, travelToNeitiznotToSpyAgain);
+		reportBackToSlug.addStep(inNeitiznotOrTrollLands, reportBackToSlugAgain);
+		reportBackToSlug.addStep(inJatizso, returnToRellekkaFromJatizsoToSpyAgain);
+
+		steps.put(240, reportBackToSlug);
+		steps.put(250, reportBackToSlug);
+
+		ConditionalStep reportBackToGjukiAgain = new ConditionalStep(this, travelToJatizsoAfterSpy2);
+		reportBackToGjukiAgain.addStep(inJatizso, talkToGjukiAfterSpy2);
+		reportBackToGjukiAgain.addStep(inNeitiznotOrTrollLands, returnToRellekkaFromNeitiznotAfterSpy2);
+
+		steps.put(260, reportBackToGjukiAgain);
+
+		ConditionalStep reportBackToMawnisWithDecree = new ConditionalStep(this, travelToNeitiznotWithDecree);
+		reportBackToMawnisWithDecree.addStep(inNeitiznotOrTrollLands, talkToMawnisWithDecree);
+		reportBackToMawnisWithDecree.addStep(inJatizso, returnToRellekkaFromJatizsoWithDecree);
+
+		steps.put(270, reportBackToMawnisWithDecree);
+
+		ConditionalStep reportBackToMawnisAfterDecree = new ConditionalStep(this, travelToNeitiznotAfterDecree);
+		reportBackToMawnisAfterDecree.addStep(inNeitiznotOrTrollLands, talkToMawnisAfterDecree);
+		reportBackToMawnisAfterDecree.addStep(inJatizso, returnToRellekkaFromJatizsoAfterDecree);
+
+		steps.put(275, reportBackToMawnisAfterDecree);
+
+		ConditionalStep makeArmour = new ConditionalStep(this, travelToNeitiznotAfterDecree);
+		makeArmour.addStep(inNeitiznotOrTrollLands, getYakArmour);
+		makeArmour.addStep(inJatizso, returnToRellekkaFromJatizsoAfterDecree);
+
+		steps.put(280, makeArmour);
+
+		ConditionalStep makeShieldSteps = new ConditionalStep(this, travelToNeitiznotAfterDecree);
+		makeShieldSteps.addStep(inNeitiznotOrTrollLands, makeShield);
+		makeShieldSteps.addStep(inJatizso, returnToRellekkaFromJatizsoAfterDecree);
+
+		steps.put(290, makeShieldSteps);
+
+		ConditionalStep goToKillKing = new ConditionalStep(this, travelToNeitiznotAfterDecree);
+		goToKillKing.addStep(new Conditions(inKingCave), killKing);
+		goToKillKing.addStep(new Conditions(inTrollCave, killedTrolls), enterKingRoom);
+		goToKillKing.addStep(inTrollCave, killTrolls);
+		goToKillKing.addStep(inIslands, enterCave);
+
+		steps.put(300, goToKillKing);
+		steps.put(310, goToKillKing);
+
+		ConditionalStep removeHead = new ConditionalStep(this, travelToNeitiznotAfterDecree);
+		removeHead.addStep(new Conditions(inKingCave), decapitateKing);
+		removeHead.addStep(new Conditions(inTrollCave, killedTrolls), enterKingRoom);
+		removeHead.addStep(inTrollCave, killTrolls);
+		removeHead.addStep(inIslands, enterCave);
+
+		steps.put(320, removeHead);
+
+		steps.put(325, finishQuest);
+		steps.put(330, finishQuestGivenHead);
+		steps.put(331, finishQuestGivenHead);
+		steps.put(332, finishQuestGivenHead);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -286,7 +479,7 @@ public class TheFremennikIsles extends BasicQuestHelper
 		collectFromKeepaAgain.addDialogStep("But rules are rules. Pay up!");
 		collectFromFlosi = new NpcStep(this, NpcID.FLOSI_DALKSSON, new WorldPoint(2418, 3813, 0), "Collect tax from Flossi in north east Jatizso.");
 		collectFromFlosi.addDialogStep("But rules are rules. Pay up!");
-		talkToGjukiAfterCollection2 = new NpcStep(this, NpcID.KING_GJUKI_SORVOTT_IV, new WorldPoint(2407, 3804, 0), "Report back to King Gjuki Sorvott IV on Jatizso.");
+		talkToGjukiAfterCollection2 =  new NpcStep(this, NpcID.KING_GJUKI_SORVOTT_IV, new WorldPoint(2407, 3804, 0), "Report back to King Gjuki Sorvott IV on Jatizso.");
 
 		travelToNeitiznotToSpyAgain = new NpcStep(this, NpcID.MARIA_GUNNARS_1883, new WorldPoint(2644, 3710, 0), "Travel to Neitiznot with Maria Gunnars.");
 		returnToRellekkaFromJatizsoToSpyAgain = new NpcStep(this, NpcID.MORD_GUNNARS_1940, new WorldPoint(2420, 3781, 0), "Return to Rellekka with Mord.");
@@ -371,198 +564,5 @@ public class TheFremennikIsles extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Killing the king", new ArrayList<>(Arrays.asList(enterCave, killTrolls, enterKingRoom, killKing, decapitateKing, finishQuest)), yakBottom, yakTop, roundShield, meleeWeapon, food));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		setupPanels();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToMord);
-
-		ConditionalStep goTalkToGjuki = new ConditionalStep(this, travelToJatizso);
-		goTalkToGjuki.addStep(inIslands, talkToGjuki);
-
-		steps.put(5, goTalkToGjuki);
-		steps.put(10, goTalkToGjuki);
-
-		ConditionalStep finishGjukiDialog = new ConditionalStep(this, travelToJatizso);
-		finishGjukiDialog.addStep(inIslands, continueTalkingToGjuki);
-		steps.put(20, finishGjukiDialog);
-
-		ConditionalStep getMithrilOre = new ConditionalStep(this, travelToJatizso);
-		getMithrilOre.addStep(inIslands, bringOreToGjuki);
-		steps.put(30, getMithrilOre);
-
-		ConditionalStep continueTalkingToGjukiAfterOre = new ConditionalStep(this, travelToJatizso);
-		continueTalkingToGjukiAfterOre.addStep(inIslands, talkToGjukiAfterOre);
-
-		steps.put(40, continueTalkingToGjukiAfterOre);
-
-		ConditionalStep spyOnMawnis = new ConditionalStep(this, travelToJatizso);
-		spyOnMawnis.addStep(jestering1, performForMawnis);
-		spyOnMawnis.addStep(new Conditions(hasJesterOutfit, inNeitiznot), talkToSlug);
-		spyOnMawnis.addStep(new Conditions(new Conditions(LogicType.OR, inJatizso, inTrollLands), hasJesterOutfit), returnToRellekkaFromJatizso);
-		spyOnMawnis.addStep(hasJesterOutfit, travelToNeitiznot);
-		spyOnMawnis.addStep(inJatizso, getJesterOutfit);
-
-		steps.put(50, spyOnMawnis);
-
-		ConditionalStep spyOnMawnisP2 = new ConditionalStep(this, travelToJatizso);
-		spyOnMawnisP2.addStep(jestering1, performForMawnis);
-		spyOnMawnisP2.addStep(new Conditions(hasJesterOutfit, inNeitiznot), goSpyOnMawnis);
-		spyOnMawnisP2.addStep(new Conditions(new Conditions(LogicType.OR, inJatizso, inTrollLands), hasJesterOutfit), returnToRellekkaFromJatizso);
-		spyOnMawnisP2.addStep(hasJesterOutfit, travelToNeitiznot);
-		spyOnMawnisP2.addStep(inJatizso, getJesterOutfit);
-
-		steps.put(55, spyOnMawnisP2);
-
-		ConditionalStep reportToSlug = new ConditionalStep(this, travelToNeitiznot);
-		reportToSlug.addStep(inNeitiznot, tellSlugReport1);
-
-		steps.put(60, reportToSlug);
-		steps.put(70, reportToSlug);
-		steps.put(80, reportToSlug);
-
-		ConditionalStep talkToMawnisToHelp = new ConditionalStep(this, travelToNeitiznot);
-		talkToMawnisToHelp.addStep(new Conditions(inNeitiznot), talkToMawnis);
-		talkToMawnisToHelp.addStep(new Conditions(LogicType.OR, inJatizso, inTrollLands), returnToRellekkaFromJatizso);
-
-		steps.put(90, talkToMawnisToHelp);
-
-		ConditionalStep bringMawnisItems = new ConditionalStep(this, travelToNeitiznot);
-		bringMawnisItems.addStep(new Conditions(inNeitiznot), talkToMawnisWithLogs);
-		bringMawnisItems.addStep(new Conditions(LogicType.OR, inJatizso, inTrollLands), returnToRellekkaFromJatizso);
-
-		steps.put(100, bringMawnisItems);
-		steps.put(110, bringMawnisItems);
-		steps.put(120, bringMawnisItems);
-
-		ConditionalStep talkToMawnisAfterItemsSteps = new ConditionalStep(this, travelToNeitiznot);
-		talkToMawnisAfterItemsSteps.addStep(new Conditions(inNeitiznot), talkToMawnisAfterItems);
-		talkToMawnisAfterItemsSteps.addStep(new Conditions(LogicType.OR, inJatizso, inTrollLands), returnToRellekkaFromJatizso);
-
-		steps.put(130, talkToMawnisAfterItemsSteps);
-
-		ConditionalStep repairBridges = new ConditionalStep(this, travelToNeitiznot);
-		repairBridges.addStep(new Conditions(inNeitiznotOrTrollLands, repairedBridge1, repairedBridge2), talkToMawnisAfterRepair);
-		repairBridges.addStep(new Conditions(inNeitiznotOrTrollLands, repairedBridge1), repairBridge2);
-		repairBridges.addStep(new Conditions(inNeitiznotOrTrollLands), repairBridge1);
-		repairBridges.addStep(new Conditions(inJatizso), returnToRellekkaFromJatizso);
-
-		steps.put(140, repairBridges);
-
-		ConditionalStep reportAfterBridgeRepair = new ConditionalStep(this, travelToNeitiznot);
-		reportAfterBridgeRepair.addStep(inNeitiznotOrTrollLands, talkToMawnisAfterRepair);
-		reportAfterBridgeRepair.addStep(inJatizso, returnToRellekkaFromJatizso);
-
-		steps.put(150, reportAfterBridgeRepair);
-
-		ConditionalStep reportBackToGjuki = new ConditionalStep(this, travelToJatizsoToReport);
-		reportBackToGjuki.addStep(inNeitiznotOrTrollLands, leaveNeitiznotToReport);
-		reportBackToGjuki.addStep(inJatizso, talkToGjukiToReport);
-
-		steps.put(160, reportBackToGjuki);
-		steps.put(170, reportBackToGjuki);
-		steps.put(180, reportBackToGjuki);
-		steps.put(190, reportBackToGjuki);
-
-		ConditionalStep collectTax = new ConditionalStep(this, travelToJatizsoToReport);
-		collectTax.addStep(new Conditions(inJatizso, collectedValigga, collectedKeepa, collectedSkuli, collectedHring), talkToGjukiAfterCollection1);
-		collectTax.addStep(new Conditions(inJatizso, collectedValigga, collectedKeepa, collectedSkuli), collectFromHring);
-		collectTax.addStep(new Conditions(inJatizso, collectedValigga, collectedKeepa), collectFromSkuli);
-		collectTax.addStep(new Conditions(inJatizso, collectedKeepa), collectFromVanligga);
-		collectTax.addStep(inJatizso, collectFromKeepa);
-
-		steps.put(200, collectTax);
-
-		ConditionalStep collectTaxOnBeards = new ConditionalStep(this, travelToJatizsoToReport);
-		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum, collectedSkuli, collectedKeepa, collectedFlosi), talkToGjukiAfterCollection2);
-		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum, collectedSkuli, collectedKeepa), collectFromFlosi);
-		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum, collectedSkuli), collectFromKeepaAgain);
-		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring, collectedRaum), collectFromSkuliAgain);
-		collectTaxOnBeards.addStep(new Conditions(inJatizso, collectedHring), collectFromRaum);
-		collectTaxOnBeards.addStep(inJatizso, collectFromHringAgain);
-
-		steps.put(210, collectTaxOnBeards);
-
-		ConditionalStep returnToSpyAgain = new ConditionalStep(this, travelToNeitiznotToSpyAgain);
-		returnToSpyAgain.addStep(inNeitiznotOrTrollLands, talkToSlugToSpyAgain);
-		returnToSpyAgain.addStep(inJatizso, returnToRellekkaFromJatizsoToSpyAgain);
-
-		steps.put(230, returnToSpyAgain);
-
-		ConditionalStep spyOnMawnisAgain = new ConditionalStep(this, travelToNeitiznotToSpyAgain);
-		spyOnMawnisAgain.addStep(jestering1, performForMawnisAgain);
-		spyOnMawnisAgain.addStep(inNeitiznotOrTrollLands, goSpyOnMawnisAgain);
-		spyOnMawnisAgain.addStep(inJatizso, returnToRellekkaFromJatizsoToSpyAgain);
-
-		steps.put(235, spyOnMawnisAgain);
-
-		ConditionalStep reportBackToSlug = new ConditionalStep(this, travelToNeitiznotToSpyAgain);
-		reportBackToSlug.addStep(inNeitiznotOrTrollLands, reportBackToSlugAgain);
-		reportBackToSlug.addStep(inJatizso, returnToRellekkaFromJatizsoToSpyAgain);
-
-		steps.put(240, reportBackToSlug);
-		steps.put(250, reportBackToSlug);
-
-		ConditionalStep reportBackToGjukiAgain = new ConditionalStep(this, travelToJatizsoAfterSpy2);
-		reportBackToGjukiAgain.addStep(inJatizso, talkToGjukiAfterSpy2);
-		reportBackToGjukiAgain.addStep(inNeitiznotOrTrollLands, returnToRellekkaFromNeitiznotAfterSpy2);
-
-		steps.put(260, reportBackToGjukiAgain);
-
-		ConditionalStep reportBackToMawnisWithDecree = new ConditionalStep(this, travelToNeitiznotWithDecree);
-		reportBackToMawnisWithDecree.addStep(inNeitiznotOrTrollLands, talkToMawnisWithDecree);
-		reportBackToMawnisWithDecree.addStep(inJatizso, returnToRellekkaFromJatizsoWithDecree);
-
-		steps.put(270, reportBackToMawnisWithDecree);
-
-		ConditionalStep reportBackToMawnisAfterDecree = new ConditionalStep(this, travelToNeitiznotAfterDecree);
-		reportBackToMawnisAfterDecree.addStep(inNeitiznotOrTrollLands, talkToMawnisAfterDecree);
-		reportBackToMawnisAfterDecree.addStep(inJatizso, returnToRellekkaFromJatizsoAfterDecree);
-
-		steps.put(275, reportBackToMawnisAfterDecree);
-
-		ConditionalStep makeArmour = new ConditionalStep(this, travelToNeitiznotAfterDecree);
-		makeArmour.addStep(inNeitiznotOrTrollLands, getYakArmour);
-		makeArmour.addStep(inJatizso, returnToRellekkaFromJatizsoAfterDecree);
-
-		steps.put(280, makeArmour);
-
-		ConditionalStep makeShieldSteps = new ConditionalStep(this, travelToNeitiznotAfterDecree);
-		makeShieldSteps.addStep(inNeitiznotOrTrollLands, makeShield);
-		makeShieldSteps.addStep(inJatizso, returnToRellekkaFromJatizsoAfterDecree);
-
-		steps.put(290, makeShieldSteps);
-
-		ConditionalStep goToKillKing = new ConditionalStep(this, travelToNeitiznotAfterDecree);
-		goToKillKing.addStep(new Conditions(inKingCave), killKing);
-		goToKillKing.addStep(new Conditions(inTrollCave, killedTrolls), enterKingRoom);
-		goToKillKing.addStep(inTrollCave, killTrolls);
-		goToKillKing.addStep(inIslands, enterCave);
-
-		steps.put(300, goToKillKing);
-		steps.put(310, goToKillKing);
-
-		ConditionalStep removeHead = new ConditionalStep(this, travelToNeitiznotAfterDecree);
-		removeHead.addStep(new Conditions(inKingCave), decapitateKing);
-		removeHead.addStep(new Conditions(inTrollCave, killedTrolls), enterKingRoom);
-		removeHead.addStep(inTrollCave, killTrolls);
-		removeHead.addStep(inIslands, enterCave);
-
-		steps.put(320, removeHead);
-
-		steps.put(325, finishQuest);
-		steps.put(330, finishQuestGivenHead);
-		steps.put(331, finishQuestGivenHead);
-		steps.put(332, finishQuestGivenHead);
-
-		return steps;
 	}
 }

@@ -21,6 +21,33 @@ public class NumberChallenge extends DetailedOwnerStep
 		super(questHelper, "Select the correct numbers to finish the pattern.");
 	}
 
+	@Override
+	protected void setupSteps()
+	{
+		press0 = new ObjectStep(getQuestHelper(), ObjectID.ZERO, new WorldPoint(1783, 5062, 2),
+			"Press the zero.");
+		press1 = new ObjectStep(getQuestHelper(), ObjectID.ONE, new WorldPoint(1786, 5065, 2),
+			"Press the one.");
+		press2 = new ObjectStep(getQuestHelper(), ObjectID.TWO, new WorldPoint(1787, 5063, 2),
+			"Press the two.");
+		press3 = new ObjectStep(getQuestHelper(), ObjectID.THREE, new WorldPoint(1786, 5061, 2),
+			"Press the three.");
+		press4 = new ObjectStep(getQuestHelper(), ObjectID.FOUR, new WorldPoint(1784, 5060, 2),
+			"Press the four.");
+		press5 = new ObjectStep(getQuestHelper(), ObjectID.FIVE, new WorldPoint(1781, 5061, 2),
+			"Press the five.");
+		press6 = new ObjectStep(getQuestHelper(), ObjectID.SIX, new WorldPoint(1780, 5063, 2),
+			"Press the six.");
+		press7 = new ObjectStep(getQuestHelper(), ObjectID.SEVEN, new WorldPoint(1781, 5065, 2),
+			"Press the seven.");
+		press8 = new ObjectStep(getQuestHelper(), ObjectID.EIGHT, new WorldPoint(1782, 5066, 2),
+			"Press the eight.");
+		press9 = new ObjectStep(getQuestHelper(), ObjectID.NINE, new WorldPoint(1784, 5067, 2),
+			"Press the nine.");
+
+		catchStep = new DetailedQuestStep(getQuestHelper(), "Press the numbers to finish the pattern.");
+	}
+
 	@Subscribe
 	@Override
 	public void onVarbitChanged(VarbitChanged varbitChanged)
@@ -84,39 +111,6 @@ public class NumberChallenge extends DetailedOwnerStep
 		}
 	}
 
-	@Override
-	protected void setupSteps()
-	{
-		press0 = new ObjectStep(getQuestHelper(), ObjectID.ZERO, new WorldPoint(1783, 5062, 2),
-			"Press the zero.");
-		press1 = new ObjectStep(getQuestHelper(), ObjectID.ONE, new WorldPoint(1786, 5065, 2),
-			"Press the one.");
-		press2 = new ObjectStep(getQuestHelper(), ObjectID.TWO, new WorldPoint(1787, 5063, 2),
-			"Press the two.");
-		press3 = new ObjectStep(getQuestHelper(), ObjectID.THREE, new WorldPoint(1786, 5061, 2),
-			"Press the three.");
-		press4 = new ObjectStep(getQuestHelper(), ObjectID.FOUR, new WorldPoint(1784, 5060, 2),
-			"Press the four.");
-		press5 = new ObjectStep(getQuestHelper(), ObjectID.FIVE, new WorldPoint(1781, 5061, 2),
-			"Press the five.");
-		press6 = new ObjectStep(getQuestHelper(), ObjectID.SIX, new WorldPoint(1780, 5063, 2),
-			"Press the six.");
-		press7 = new ObjectStep(getQuestHelper(), ObjectID.SEVEN, new WorldPoint(1781, 5065, 2),
-			"Press the seven.");
-		press8 = new ObjectStep(getQuestHelper(), ObjectID.EIGHT, new WorldPoint(1782, 5066, 2),
-			"Press the eight.");
-		press9 = new ObjectStep(getQuestHelper(), ObjectID.NINE, new WorldPoint(1784, 5067, 2),
-			"Press the nine.");
-
-		catchStep = new DetailedQuestStep(getQuestHelper(), "Press the numbers to finish the pattern.");
-	}
-
-	@Override
-	public Collection<QuestStep> getSteps()
-	{
-		return Arrays.asList(press0, press1, press2, press3, press4, press5, press6, press7, press8, press9, catchStep);
-	}
-
 	private void setupStepFromState(QuestStep choice1, QuestStep choice2)
 	{
 		if (client.getVarbitValue(2421) == 0)
@@ -127,6 +121,12 @@ public class NumberChallenge extends DetailedOwnerStep
 		{
 			startUpStep(choice2);
 		}
+	}
+
+	@Override
+	public Collection<QuestStep> getSteps()
+	{
+		return Arrays.asList(press0, press1, press2, press3, press4, press5, press6, press7, press8, press9, catchStep);
 	}
 
 	public Collection<QuestStep> getDisplaySteps()

@@ -24,20 +24,12 @@
  */
 package com.questhelper.quests.shadowofthestorm;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedOwnerStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
-import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -54,6 +46,14 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.SHADOW_OF_THE_STORM
@@ -81,6 +81,89 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 	DetailedOwnerStep searchKiln;
 
 	IncantationStep readIncantation, incantRitual;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		Map<Integer, QuestStep> steps = new HashMap<>();
+		setupZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+
+		steps.put(0, talkToReen);
+		steps.put(10, talkToBadden);
+
+		ConditionalStep infiltrateCult = new ConditionalStep(this, pickMushroom);
+		infiltrateCult.addStep(new Conditions(hasDyedSilverlight, hasImplement, inRuin), talkToEvilDave);
+		infiltrateCult.addStep(new Conditions(hasDyedSilverlight, inRuin), pickUpStrangeImplement);
+		infiltrateCult.addStep(hasDyedSilverlight, goIntoRuin);
+		infiltrateCult.addStep(hasMushroom, dyeSilverlight);
+		steps.put(20, infiltrateCult);
+
+		ConditionalStep goTalkToDenath = new ConditionalStep(this, enterRuinNoDark);
+		goTalkToDenath.addStep(inThroneRoom, talkToDenath);
+		goTalkToDenath.addStep(inRuin, enterPortal);
+		steps.put(30, goTalkToDenath);
+
+		ConditionalStep completeSubTasks = new ConditionalStep(this, enterRuinNoDark);
+		completeSubTasks.addStep(new Conditions(hasBook, hasSigil, inThroneRoom), talkToMatthewAfterBook);
+		completeSubTasks.addStep(new Conditions(hasBook, hasSigil, inRuin), enterPortalAfterBook);
+		completeSubTasks.addStep(new Conditions(hasBook, hasSigil), enterRuinAfterBook);
+		completeSubTasks.addStep(new Conditions(talkedToGolem, hasSigil), searchKiln);
+		completeSubTasks.addStep(new Conditions(talkedToMatthew, hasSigil), talkToGolem);
+		completeSubTasks.addStep(new Conditions(talkedToMatthew, hasSigilMould), smeltSigil);
+		completeSubTasks.addStep(new Conditions(inThroneRoom, hasSigilMould), talkToMatthew);
+		completeSubTasks.addStep(inThroneRoom, talkToJennifer);
+		completeSubTasks.addStep(inRuin, enterPortal);
+		steps.put(40, completeSubTasks);
+		steps.put(50, completeSubTasks);
+		steps.put(60, completeSubTasks);
+
+		ConditionalStep startRitual = new ConditionalStep(this, enterRuinForRitual);
+		startRitual.addStep(inThroneRoom, talkToDenathForRitual);
+		startRitual.addStep(inRuin, enterPortalForRitual);
+		steps.put(70, startRitual);
+
+		ConditionalStep performRitual = new ConditionalStep(this, enterRuinForRitual);
+		performRitual.addStep(inCircleSpot, readIncantation);
+		performRitual.addStep(inThroneRoom, standInCircle);
+		performRitual.addStep(inRuin, enterPortalForRitual);
+		steps.put(80, performRitual);
+
+		ConditionalStep prepareForSecondRitual = new ConditionalStep(this, enterRuinForDave);
+		prepareForSecondRitual.addStep(sigilNearby, pickUpSigil);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemMoved, inThroneRoom), talkToMatthewToStartFight);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemMoved, inRuin), enterPortalAfterRecruiting);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemMoved), enterRuinAfterRecruiting);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemReprogrammed), talkToGolemAfterReprogramming);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemRejected), useImplementOnGolem);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved), talkToTheGolemAfterRitual);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved), talkToReenAfterRitual);
+		prepareForSecondRitual.addStep(new Conditions(hasImplement, evilDaveMoved, inRuin), goUpToBadden);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, inRuin), pickUpImplementAfterRitual);
+		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved), talkToBaddenAfterRitual);
+		prepareForSecondRitual.addStep(inRuin, tellDaveToReturn);
+		prepareForSecondRitual.addStep(inThroneRoom, leavePortal);
+
+		steps.put(90, prepareForSecondRitual);
+		steps.put(100, prepareForSecondRitual);
+
+		ConditionalStep summonAgrith = new ConditionalStep(this, enterRuinAfterRecruiting);
+		summonAgrith.addStep(inSecondCircleSpot, incantRitual);
+		summonAgrith.addStep(inThroneRoom, standInCircleAgain);
+		summonAgrith.addStep(inRuin, enterPortalAfterRecruiting);
+		steps.put(110, summonAgrith);
+
+		ConditionalStep defeatAgrith = new ConditionalStep(this, enterRuinForFight);
+		defeatAgrith.addStep(inThroneRoom, killDemon);
+		defeatAgrith.addStep(inRuin, enterPortalForFight);
+		steps.put(120, defeatAgrith);
+
+		steps.put(124, unequipDarklight);
+
+		return steps;
+	}
 
 	private void setupZones()
 	{
@@ -231,15 +314,11 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<ItemRequirement> getItemRequirements()
+	public ArrayList<String> getNotes()
 	{
-		return new ArrayList<>(Arrays.asList(silverlight, darkItems, silverBar));
-	}
-
-	@Override
-	public ArrayList<ItemRequirement> getItemRecommended()
-	{
-		return new ArrayList<>(Arrays.asList(combatGear, coinsForCarpet));
+		return new ArrayList<>(Arrays.asList("You will need 3 black items for a part of the quest. Potential items would be:",
+			"- Desert shirt/robe dyed with black mushroom ink", "- Black armour", "- Priest gown top/bottom", "- Black wizard hat",
+			"- Dark mystic", "- Ghostly robes", "- Shade robes", "- Black dragonhide", "- Black cape", "- One of the various black holiday event items"));
 	}
 
 	@Override
@@ -249,11 +328,15 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 	}
 
 	@Override
-	public ArrayList<String> getNotes()
+	public ArrayList<ItemRequirement> getItemRequirements()
 	{
-		return new ArrayList<>(Arrays.asList("You will need 3 black items for a part of the quest. Potential items would be:",
-			"- Desert shirt/robe dyed with black mushroom ink", "- Black armour", "- Priest gown top/bottom", "- Black wizard hat",
-			"- Dark mystic", "- Ghostly robes", "- Shade robes", "- Black dragonhide", "- Black cape", "- One of the various black holiday event items"));
+		return new ArrayList<>(Arrays.asList(silverlight, darkItems, silverBar));
+	}
+
+	@Override
+	public ArrayList<ItemRequirement> getItemRecommended()
+	{
+		return new ArrayList<>(Arrays.asList(combatGear, coinsForCarpet));
 	}
 
 	@Override
@@ -267,88 +350,5 @@ public class ShadowOfTheStorm extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Defeating Agrith-Naar", new ArrayList<>(Arrays.asList(pickUpSigil, leavePortal, pickUpSigil2, tellDaveToReturn, talkToBaddenAfterRitual, talkToReenAfterRitual, talkToTheGolemAfterRitual, useImplementOnGolem, talkToGolemAfterReprogramming,
 			talkToMatthewToStartFight, standInCircleAgain, incantRitual, killDemon, unequipDarklight)), silverlightDyed, combatGear));
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-
-		steps.put(0, talkToReen);
-		steps.put(10, talkToBadden);
-
-		ConditionalStep infiltrateCult = new ConditionalStep(this, pickMushroom);
-		infiltrateCult.addStep(new Conditions(hasDyedSilverlight, hasImplement, inRuin), talkToEvilDave);
-		infiltrateCult.addStep(new Conditions(hasDyedSilverlight, inRuin), pickUpStrangeImplement);
-		infiltrateCult.addStep(hasDyedSilverlight, goIntoRuin);
-		infiltrateCult.addStep(hasMushroom, dyeSilverlight);
-		steps.put(20, infiltrateCult);
-
-		ConditionalStep goTalkToDenath = new ConditionalStep(this, enterRuinNoDark);
-		goTalkToDenath.addStep(inThroneRoom, talkToDenath);
-		goTalkToDenath.addStep(inRuin, enterPortal);
-		steps.put(30, goTalkToDenath);
-
-		ConditionalStep completeSubTasks = new ConditionalStep(this, enterRuinNoDark);
-		completeSubTasks.addStep(new Conditions(hasBook, hasSigil, inThroneRoom), talkToMatthewAfterBook);
-		completeSubTasks.addStep(new Conditions(hasBook, hasSigil, inRuin), enterPortalAfterBook);
-		completeSubTasks.addStep(new Conditions(hasBook, hasSigil), enterRuinAfterBook);
-		completeSubTasks.addStep(new Conditions(talkedToGolem, hasSigil), searchKiln);
-		completeSubTasks.addStep(new Conditions(talkedToMatthew, hasSigil), talkToGolem);
-		completeSubTasks.addStep(new Conditions(talkedToMatthew, hasSigilMould), smeltSigil);
-		completeSubTasks.addStep(new Conditions(inThroneRoom, hasSigilMould), talkToMatthew);
-		completeSubTasks.addStep(inThroneRoom, talkToJennifer);
-		completeSubTasks.addStep(inRuin, enterPortal);
-		steps.put(40, completeSubTasks);
-		steps.put(50, completeSubTasks);
-		steps.put(60, completeSubTasks);
-
-		ConditionalStep startRitual = new ConditionalStep(this, enterRuinForRitual);
-		startRitual.addStep(inThroneRoom, talkToDenathForRitual);
-		startRitual.addStep(inRuin, enterPortalForRitual);
-		steps.put(70, startRitual);
-
-		ConditionalStep performRitual = new ConditionalStep(this, enterRuinForRitual);
-		performRitual.addStep(inCircleSpot, readIncantation);
-		performRitual.addStep(inThroneRoom, standInCircle);
-		performRitual.addStep(inRuin, enterPortalForRitual);
-		steps.put(80, performRitual);
-
-		ConditionalStep prepareForSecondRitual = new ConditionalStep(this, enterRuinForDave);
-		prepareForSecondRitual.addStep(sigilNearby, pickUpSigil);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemMoved, inThroneRoom), talkToMatthewToStartFight);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemMoved, inRuin), enterPortalAfterRecruiting);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemMoved), enterRuinAfterRecruiting);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemReprogrammed), talkToGolemAfterReprogramming);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved, golemRejected), useImplementOnGolem);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved, reenMoved), talkToTheGolemAfterRitual);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, baddenMoved), talkToReenAfterRitual);
-		prepareForSecondRitual.addStep(new Conditions(hasImplement, evilDaveMoved, inRuin), goUpToBadden);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved, inRuin), pickUpImplementAfterRitual);
-		prepareForSecondRitual.addStep(new Conditions(evilDaveMoved), talkToBaddenAfterRitual);
-		prepareForSecondRitual.addStep(inRuin, tellDaveToReturn);
-		prepareForSecondRitual.addStep(inThroneRoom, leavePortal);
-
-		steps.put(90, prepareForSecondRitual);
-		steps.put(100, prepareForSecondRitual);
-
-		ConditionalStep summonAgrith = new ConditionalStep(this, enterRuinAfterRecruiting);
-		summonAgrith.addStep(inSecondCircleSpot, incantRitual);
-		summonAgrith.addStep(inThroneRoom, standInCircleAgain);
-		summonAgrith.addStep(inRuin, enterPortalAfterRecruiting);
-		steps.put(110, summonAgrith);
-
-		ConditionalStep defeatAgrith = new ConditionalStep(this, enterRuinForFight);
-		defeatAgrith.addStep(inThroneRoom, killDemon);
-		defeatAgrith.addStep(inRuin, enterPortalForFight);
-		steps.put(120, defeatAgrith);
-
-		steps.put(124, unequipDarklight);
-
-		return steps;
 	}
 }

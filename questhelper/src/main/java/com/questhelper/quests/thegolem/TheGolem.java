@@ -1,23 +1,12 @@
 package com.questhelper.quests.thegolem;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
 import com.questhelper.steps.conditional.LogicType;
 import com.questhelper.steps.conditional.Operation;
 import com.questhelper.steps.conditional.VarbitCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +16,17 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.NpcStep;
+import com.questhelper.steps.ObjectStep;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
+import com.questhelper.steps.conditional.ZoneCondition;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.THE_GOLEM
@@ -46,6 +46,83 @@ public class TheGolem extends BasicQuestHelper
 	QuestStep pickUpLetter, readLetter, talkToGolem, useClay, useClay2, useClay3, useClay4, talkToElissa, searchBookcase, readBook, talkToCurator, pickpocketCurator, goUpInMuseum, openCabinet,
 		stealFeather, enterRuin, useStatuette, turnStatue1, turnStatue2, turnStatue3, turnStatue4, enterThroneRoom, leaveThroneRoom, leaveRuin, pickBlackMushroom, grindMushroom,
 		useFeatherOnInk, talkToGolemAfterPortal, useQuillOnPapyrus, useImplementOnGolem, useProgramOnGolem, pickUpImplement, enterRuinWithoutStatuette, enterRuinForFirstTime;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		Map<Integer, QuestStep> steps = new HashMap<>();
+		setupZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+
+		steps.put(0, talkToGolem);
+
+		ConditionalStep repairGolem = new ConditionalStep(this, useClay);
+		repairGolem.addStep(added3Clay, useClay4);
+		repairGolem.addStep(added2Clay, useClay3);
+		repairGolem.addStep(added1Clay, useClay2);
+
+		steps.put(1, repairGolem);
+
+		ConditionalStep goTalkToElissa = new ConditionalStep(this, pickUpLetter);
+		goTalkToElissa.addStep(talkedToCurator, pickpocketCurator);
+		goTalkToElissa.addStep(new Conditions(hasReadNotes, enteredRuins), talkToCurator);
+		goTalkToElissa.addStep(new Conditions(hasVarmenNotes, enteredRuins), readBook);
+		goTalkToElissa.addStep(new Conditions(talkedToElissa, enteredRuins), searchBookcase);
+		goTalkToElissa.addStep(new Conditions(inRuin, hasImplement), talkToElissa);
+		goTalkToElissa.addStep(new Conditions(inRuin), pickUpImplement);
+		goTalkToElissa.addStep(new Conditions(hasReadLetter, enteredRuins), talkToElissa);
+		goTalkToElissa.addStep(hasReadLetter, enterRuinForFirstTime);
+		goTalkToElissa.addStep(hasLetter, readLetter);
+
+		steps.put(2, goTalkToElissa);
+
+		ConditionalStep getStatuette = new ConditionalStep(this, pickpocketCurator);
+		getStatuette.addStep(new Conditions(stolenStatuette, inRuin), useStatuette);
+		getStatuette.addStep(stolenStatuette, enterRuin);
+		getStatuette.addStep(new Conditions(hasKey, inUpstairsMuseum), openCabinet);
+		getStatuette.addStep(hasKey, goUpInMuseum);
+
+		steps.put(3, getStatuette);
+
+		ConditionalStep openPortal = new ConditionalStep(this, enterRuin);
+		openPortal.addStep(new Conditions(turnedStatue4, turnedStatue3, turnedStatue2, inRuin), turnStatue1);
+		openPortal.addStep(new Conditions(turnedStatue4, turnedStatue3, inRuin), turnStatue2);
+		openPortal.addStep(new Conditions(turnedStatue4, inRuin), turnStatue3);
+		openPortal.addStep(new Conditions(inRuin), turnStatue4);
+
+		steps.put(4, openPortal);
+
+		ConditionalStep goEnterPortal = new ConditionalStep(this, enterRuin);
+		goEnterPortal.addStep(new Conditions(inRuin, hasImplement), enterThroneRoom);
+		goEnterPortal.addStep(new Conditions(inRuin), pickUpImplement);
+
+		steps.put(5, goEnterPortal);
+
+		ConditionalStep returnToTheGolem = new ConditionalStep(this, talkToGolemAfterPortal);
+		returnToTheGolem.addStep(new Conditions(inRuin, hasImplement), leaveRuin);
+		returnToTheGolem.addStep(new Conditions(inRuin), pickUpImplement);
+		returnToTheGolem.addStep(inThroneRoom, leaveThroneRoom);
+
+		steps.put(6, returnToTheGolem);
+
+		ConditionalStep reprogramTheGolem = new ConditionalStep(this, enterRuinWithoutStatuette);
+		reprogramTheGolem.addStep(new Conditions(openedHead, hasProgram), useProgramOnGolem);
+		reprogramTheGolem.addStep(new Conditions(hasImplement, hasProgram), useImplementOnGolem);
+		reprogramTheGolem.addStep(new Conditions(hasImplement, hasQuill), useQuillOnPapyrus);
+		reprogramTheGolem.addStep(new Conditions(hasImplement, hasFeather, hasInk), useFeatherOnInk);
+		reprogramTheGolem.addStep(new Conditions(hasImplement, hasInk), stealFeather);
+		reprogramTheGolem.addStep(new Conditions(hasImplement, hasMushroom), grindMushroom);
+		reprogramTheGolem.addStep(new Conditions(inRuin, hasImplement), leaveRuin);
+		reprogramTheGolem.addStep(new Conditions(inRuin), pickUpImplement);
+		reprogramTheGolem.addStep(new Conditions(hasImplement), pickBlackMushroom);
+		reprogramTheGolem.addStep(inThroneRoom, leaveThroneRoom);
+
+		steps.put(7, reprogramTheGolem);
+
+		return steps;
+	}
 
 	private void setupZones()
 	{
@@ -235,82 +312,5 @@ public class TheGolem extends BasicQuestHelper
 			stealFeather, useFeatherOnInk, useQuillOnPapyrus, useProgramOnGolem)), vial, pestleAndMortar, papyrus));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		Map<Integer, QuestStep> steps = new HashMap<>();
-		setupZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-
-		steps.put(0, talkToGolem);
-
-		ConditionalStep repairGolem = new ConditionalStep(this, useClay);
-		repairGolem.addStep(added3Clay, useClay4);
-		repairGolem.addStep(added2Clay, useClay3);
-		repairGolem.addStep(added1Clay, useClay2);
-
-		steps.put(1, repairGolem);
-
-		ConditionalStep goTalkToElissa = new ConditionalStep(this, pickUpLetter);
-		goTalkToElissa.addStep(talkedToCurator, pickpocketCurator);
-		goTalkToElissa.addStep(new Conditions(hasReadNotes, enteredRuins), talkToCurator);
-		goTalkToElissa.addStep(new Conditions(hasVarmenNotes, enteredRuins), readBook);
-		goTalkToElissa.addStep(new Conditions(talkedToElissa, enteredRuins), searchBookcase);
-		goTalkToElissa.addStep(new Conditions(inRuin, hasImplement), talkToElissa);
-		goTalkToElissa.addStep(new Conditions(inRuin), pickUpImplement);
-		goTalkToElissa.addStep(new Conditions(hasReadLetter, enteredRuins), talkToElissa);
-		goTalkToElissa.addStep(hasReadLetter, enterRuinForFirstTime);
-		goTalkToElissa.addStep(hasLetter, readLetter);
-
-		steps.put(2, goTalkToElissa);
-
-		ConditionalStep getStatuette = new ConditionalStep(this, pickpocketCurator);
-		getStatuette.addStep(new Conditions(stolenStatuette, inRuin), useStatuette);
-		getStatuette.addStep(stolenStatuette, enterRuin);
-		getStatuette.addStep(new Conditions(hasKey, inUpstairsMuseum), openCabinet);
-		getStatuette.addStep(hasKey, goUpInMuseum);
-
-		steps.put(3, getStatuette);
-
-		ConditionalStep openPortal = new ConditionalStep(this, enterRuin);
-		openPortal.addStep(new Conditions(turnedStatue4, turnedStatue3, turnedStatue2, inRuin), turnStatue1);
-		openPortal.addStep(new Conditions(turnedStatue4, turnedStatue3, inRuin), turnStatue2);
-		openPortal.addStep(new Conditions(turnedStatue4, inRuin), turnStatue3);
-		openPortal.addStep(new Conditions(inRuin), turnStatue4);
-
-		steps.put(4, openPortal);
-
-		ConditionalStep goEnterPortal = new ConditionalStep(this, enterRuin);
-		goEnterPortal.addStep(new Conditions(inRuin, hasImplement), enterThroneRoom);
-		goEnterPortal.addStep(new Conditions(inRuin), pickUpImplement);
-
-		steps.put(5, goEnterPortal);
-
-		ConditionalStep returnToTheGolem = new ConditionalStep(this, talkToGolemAfterPortal);
-		returnToTheGolem.addStep(new Conditions(inRuin, hasImplement), leaveRuin);
-		returnToTheGolem.addStep(new Conditions(inRuin), pickUpImplement);
-		returnToTheGolem.addStep(inThroneRoom, leaveThroneRoom);
-
-		steps.put(6, returnToTheGolem);
-
-		ConditionalStep reprogramTheGolem = new ConditionalStep(this, enterRuinWithoutStatuette);
-		reprogramTheGolem.addStep(new Conditions(openedHead, hasProgram), useProgramOnGolem);
-		reprogramTheGolem.addStep(new Conditions(hasImplement, hasProgram), useImplementOnGolem);
-		reprogramTheGolem.addStep(new Conditions(hasImplement, hasQuill), useQuillOnPapyrus);
-		reprogramTheGolem.addStep(new Conditions(hasImplement, hasFeather, hasInk), useFeatherOnInk);
-		reprogramTheGolem.addStep(new Conditions(hasImplement, hasInk), stealFeather);
-		reprogramTheGolem.addStep(new Conditions(hasImplement, hasMushroom), grindMushroom);
-		reprogramTheGolem.addStep(new Conditions(inRuin, hasImplement), leaveRuin);
-		reprogramTheGolem.addStep(new Conditions(inRuin), pickUpImplement);
-		reprogramTheGolem.addStep(new Conditions(hasImplement), pickBlackMushroom);
-		reprogramTheGolem.addStep(inThroneRoom, leaveThroneRoom);
-
-		steps.put(7, reprogramTheGolem);
-
-		return steps;
 	}
 }

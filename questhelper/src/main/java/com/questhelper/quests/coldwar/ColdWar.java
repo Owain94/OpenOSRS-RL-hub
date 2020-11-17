@@ -6,32 +6,21 @@ import com.questhelper.Zone;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.BasicQuestHelper;
 import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.NpcStep;
-import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.TileStep;
-import com.questhelper.steps.conditional.ConditionForStep;
-import com.questhelper.steps.conditional.Conditions;
-import com.questhelper.steps.conditional.ItemRequirementCondition;
-import com.questhelper.steps.conditional.LogicType;
-import com.questhelper.steps.conditional.ObjectCondition;
-import com.questhelper.steps.conditional.Operation;
-import com.questhelper.steps.conditional.VarbitCondition;
-import com.questhelper.steps.conditional.ZoneCondition;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import com.questhelper.steps.*;
+import com.questhelper.steps.conditional.*;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 @QuestDescriptor(
-	quest = QuestHelperQuest.COLD_WAR
+        quest = QuestHelperQuest.COLD_WAR
 )
 public class ColdWar extends BasicQuestHelper
 {
@@ -49,7 +38,7 @@ public class ColdWar extends BasicQuestHelper
 	QuestStep talkToLarry, talkToLarryAgain, usePlankOnFirmSnow, useSpadeOnBirdHide, learnPenguinEmotes,
 		talkToLarryAfterEmotes, returnToRelleka, talkToLarryInRelleka, enterPoh, makeClockwork, makePenguin,
 		bringSuitToLarry, talkToLarryOnIcebergWithSuit, tuxedoTime, enterPenguinPen, talkToZooPenguin, emoteAtPenguin,
-		exitSuit, talkToLarryMissionReport, readMissionReport, tuxedoTimeLumbridge, talkToThing, emoteAtPenguinInLumbridge,
+	    exitSuit, talkToLarryMissionReport, readMissionReport, tuxedoTimeLumbridge, talkToThing, emoteAtPenguinInLumbridge,
 		returnToZooPenguin, returnToThing, fredTheFarmer, stealCowbell, askThingAboutOutpost, tellLarryAboutOutpost, kgpAgent,
 		emoteAtPenguinOutpost, noodle1, noodle2, kgpAgent2, enterAvalanche, kgpAgentInAvalanche, enterAgilityCourse, agilityCourse,
 		agilityEnterWater, agilityExitWater, agilityJumpStones, agilityTreadSoftly, agilityCrossIce, agilityDone,
@@ -58,6 +47,112 @@ public class ColdWar extends BasicQuestHelper
 
 	Zone onIceberg, inPenguinPen, inPenguinPen2, atZoo, atLumbridgeSheepFarm, inAgilityStart, inAgilityWater, inAgilityStones,
 		inAgilityTreadSoftly, inAgilityCrossIce, inAgilityDone, inPingPongRoom, preWarRoom, inIcelordPit, inIcelordRoom, inPenguinRooms;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		setupItemRequirements();
+		setupZones();
+		setupConditions();
+		setupSteps();
+
+		Map<Integer, QuestStep> steps = new HashMap<>();
+		steps.put(0, talkToLarry);
+
+		ConditionalStep settingUpTheBirdHide = new ConditionalStep(this, talkToLarryAgain);
+		settingUpTheBirdHide.addStep(birdHideBuilt, useSpadeOnBirdHide);
+		settingUpTheBirdHide.addStep(isOnIceberg, usePlankOnFirmSnow);
+		steps.put(5, settingUpTheBirdHide);
+
+		steps.put(10, learnPenguinEmotes);
+
+		steps.put(15, talkToLarryAfterEmotes);
+
+		ConditionalStep larryInRelleka = new ConditionalStep(this, talkToLarryInRelleka);
+		larryInRelleka.addStep(isOnIceberg, returnToRelleka);
+		steps.put(20, larryInRelleka);
+
+		ConditionalStep clockworkPenguin = new ConditionalStep(this, enterPoh);
+		clockworkPenguin.addStep(hasClockworkSuit, bringSuitToLarry);
+		clockworkPenguin.addStep(new Conditions(tableNearby, hasClockwork), makePenguin);
+		clockworkPenguin.addStep(new Conditions(tableNearby), makeClockwork);
+		steps.put(25, clockworkPenguin);
+
+		steps.put(30, talkToLarryOnIcebergWithSuit);
+
+		ConditionalStep zooPenguinTrust = new ConditionalStep(this, tuxedoTime);
+		zooPenguinTrust.addStep(isEmoting, emoteAtPenguin);
+		zooPenguinTrust.addStep(isInPenguinPen, talkToZooPenguin);
+		zooPenguinTrust.addStep(isPenguin, enterPenguinPen);
+		steps.put(35, zooPenguinTrust);
+
+		steps.put(40, talkToZooPenguin);
+
+		ConditionalStep lumbridgeVisit1 = new ConditionalStep(this, tuxedoTimeLumbridge);
+		lumbridgeVisit1.addStep(new Conditions(isEmoting), emoteAtPenguinInLumbridge);
+		lumbridgeVisit1.addStep(new Conditions(isPenguin, isAtLumbridgeSheepFarm), talkToThing);
+		lumbridgeVisit1.addStep(new Conditions(isPenguin, isAtZoo), exitSuit);
+		steps.put(45, lumbridgeVisit1);
+
+		steps.put(50, returnToZooPenguin);
+
+		steps.put(55, returnToThing);
+
+		steps.put(60, fredTheFarmer);
+
+		ConditionalStep outpostInfo = new ConditionalStep(this, stealCowbell);
+		outpostInfo.addStep(hasCowbell, askThingAboutOutpost);
+		steps.put(65, outpostInfo);
+
+		ConditionalStep enterTheIceberg = new ConditionalStep(this, tellLarryAboutOutpost);
+		enterTheIceberg.addStep(isEmoting, emoteAtPenguinOutpost);
+		enterTheIceberg.addStep(isOnIceberg, kgpAgent);
+		steps.put(70, enterTheIceberg);
+
+		steps.put(75, noodle1);
+
+		steps.put(80, noodle2);
+
+		steps.put(85, kgpAgent2);
+
+		ConditionalStep debriefSteps = new ConditionalStep(this, enterAvalanche);
+		debriefSteps.addStep(isInPenguinRooms, kgpAgentInAvalanche);
+		steps.put(90, debriefSteps);
+		steps.put(95, debriefSteps);
+
+		ConditionalStep agilityCourse = new ConditionalStep(this, enterAgilityCourse);
+		agilityCourse.addStep(isInAgilityStart, agilityEnterWater);
+		agilityCourse.addStep(isInAgilityWater, agilityExitWater);
+		agilityCourse.addStep(isInAgilityStones, agilityJumpStones);
+		agilityCourse.addStep(isInAgilityTreadSoftly, agilityTreadSoftly);
+		agilityCourse.addStep(isInAgilityCrossIce, agilityCrossIce);
+		agilityCourse.addStep(isInAgilityDone, agilityDone);
+		steps.put(100, agilityCourse);
+
+		steps.put(105, tellLarryAboutArmy);
+
+		steps.put(110, pingPong1);
+
+		ConditionalStep gatherInstruments = new ConditionalStep(this, makeBongos);
+		gatherInstruments.addStep(new Conditions(hasBongos, hasCowbell), pingPong2);
+		gatherInstruments.addStep(hasBongos, stealCowbell);
+		gatherInstruments.addStep(isPenguin, removePenguinSuitForBongos);
+		steps.put(115, gatherInstruments);
+
+		ConditionalStep enterControlRoom = new ConditionalStep(this, pingPong3);
+		enterControlRoom.addStep(isPreWarRoom, enterWarRoom);
+		enterControlRoom.addStep(guardMoved, openControlDoor);
+		steps.put(120, enterControlRoom);
+
+		steps.put(125, killIcelords);
+
+		ConditionalStep escape = new ConditionalStep(this, tellLarryPlans);
+		escape.addStep(isInIcelordPit, exitIcelordPen);
+		escape.addStep(isInIcelordRoom, useChasm);
+		steps.put(130, escape);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -180,12 +275,12 @@ public class ColdWar extends BasicQuestHelper
 
 		makeClockwork = new ObjectStep(this, ObjectID.CLOCKMAKERS_BENCH_6798, "Craft a steel bar into a clockwork at a crafting table 3.", steelBar);
 		makeClockwork.addDialogStep("Clockwork mechanism");
-		((ObjectStep) makeClockwork).addAlternateObjects(ObjectID.CLOCKMAKERS_BENCH_6799);
+		((ObjectStep)makeClockwork).addAlternateObjects(ObjectID.CLOCKMAKERS_BENCH_6799);
 
 		makePenguin = new ObjectStep(this, ObjectID.CLOCKMAKERS_BENCH_6798, "Craft a clockwork penguin at a crafting table 3.", clockwork);
 		makePenguin.addDialogStep("Clockwork toy");
 		makePenguin.addDialogStep("Clockwork penguin");
-		((ObjectStep) makePenguin).addAlternateObjects(ObjectID.CLOCKMAKERS_BENCH_6799);
+		((ObjectStep)makePenguin).addAlternateObjects(ObjectID.CLOCKMAKERS_BENCH_6799);
 
 		bringSuitToLarry = new NpcStep(this, NpcID.LARRY, new WorldPoint(2597, 3266, 0), "Talk to Larry back in the Ardougne Zoo.");
 		bringSuitToLarry.addDialogStep("Yes, I have it.");
@@ -247,7 +342,7 @@ public class ColdWar extends BasicQuestHelper
 		enterAvalanche = new ObjectStep(this, ObjectID.AVALANCHE, "Enter the avalanche.");
 
 		kgpAgentInAvalanche = new NpcStep(this, NpcID.KGP_AGENT, new WorldPoint(2647, 10384, 0), "Talk to the KGP Agent in the first room to the west of the entrance.");
-		((NpcStep) kgpAgentInAvalanche).setMaxRoamRange(12);
+		((NpcStep)kgpAgentInAvalanche).setMaxRoamRange(12);
 		enterAgilityCourse = new ObjectStep(this, ObjectID.DOOR_21169, new WorldPoint(2633, 10404, 0), "Enter the door to the west of the KGP Agent to begin the agility course.");
 
 		agilityCourse = new DetailedQuestStep(this, "Complete the agility course.");
@@ -262,7 +357,7 @@ public class ColdWar extends BasicQuestHelper
 		tellLarryAboutArmy = new NpcStep(this, NpcID.LARRY_829, "Return to Larry to tell him about the penguin army. You can quickly return to him by removing the penguin suit.");
 
 		kgpBeforePingPong = new NpcStep(this, NpcID.KGP_AGENT, new WorldPoint(2655, 10408, 0), "Re-enter the outpost and talk to the KGP agent north of the entrance.");
-		((NpcStep) kgpBeforePingPong).setMaxRoamRange(2);
+		((NpcStep)kgpBeforePingPong).setMaxRoamRange(2);
 
 		pingPong1 = new NpcStep(this, NpcID.PING_839, "Talk to Ping or Pong in the room to the east.");
 		((NpcStep) pingPong1).addAlternateNpcs(NpcID.PONG_840);
@@ -284,7 +379,7 @@ public class ColdWar extends BasicQuestHelper
 
 		enterWarRoom = new ObjectStep(this, ObjectID.DOOR_21160, new WorldPoint(2671, 10418, 0), "Enter the war room and walk a few steps in to be captured.");
 
-		killIcelords = new NpcStep(this, NpcID.ICELORD, new WorldPoint(2647, 10425, 0), "Kill icelords until you are able to leave through the door to the west. May take up to 3 kills.", true);
+		killIcelords = new NpcStep(this, NpcID.ICELORD, new WorldPoint(2647, 10425, 0),  "Kill icelords until you are able to leave through the door to the west. May take up to 3 kills.", true);
 		((NpcStep) killIcelords).addAlternateNpcs(NpcID.ICELORD_853, NpcID.ICELORD_854, NpcID.ICELORD_855);
 		exitIcelordPen = new ObjectStep(this, ObjectID.DOOR_21167, new WorldPoint(2639, 10424, 0), "Leave through the door to the west.");
 		killIcelords.addSubSteps(killIcelords);
@@ -333,111 +428,5 @@ public class ColdWar extends BasicQuestHelper
 		allSteps.add(new PanelDetails("The War Room", new ArrayList<>(Arrays.asList(openControlDoor, enterWarRoom, killIcelords, useChasm, tellLarryPlans)), clockworkSuit, combatGear));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		setupItemRequirements();
-		setupZones();
-		setupConditions();
-		setupSteps();
-
-		Map<Integer, QuestStep> steps = new HashMap<>();
-		steps.put(0, talkToLarry);
-
-		ConditionalStep settingUpTheBirdHide = new ConditionalStep(this, talkToLarryAgain);
-		settingUpTheBirdHide.addStep(birdHideBuilt, useSpadeOnBirdHide);
-		settingUpTheBirdHide.addStep(isOnIceberg, usePlankOnFirmSnow);
-		steps.put(5, settingUpTheBirdHide);
-
-		steps.put(10, learnPenguinEmotes);
-
-		steps.put(15, talkToLarryAfterEmotes);
-
-		ConditionalStep larryInRelleka = new ConditionalStep(this, talkToLarryInRelleka);
-		larryInRelleka.addStep(isOnIceberg, returnToRelleka);
-		steps.put(20, larryInRelleka);
-
-		ConditionalStep clockworkPenguin = new ConditionalStep(this, enterPoh);
-		clockworkPenguin.addStep(hasClockworkSuit, bringSuitToLarry);
-		clockworkPenguin.addStep(new Conditions(tableNearby, hasClockwork), makePenguin);
-		clockworkPenguin.addStep(new Conditions(tableNearby), makeClockwork);
-		steps.put(25, clockworkPenguin);
-
-		steps.put(30, talkToLarryOnIcebergWithSuit);
-
-		ConditionalStep zooPenguinTrust = new ConditionalStep(this, tuxedoTime);
-		zooPenguinTrust.addStep(isEmoting, emoteAtPenguin);
-		zooPenguinTrust.addStep(isInPenguinPen, talkToZooPenguin);
-		zooPenguinTrust.addStep(isPenguin, enterPenguinPen);
-		steps.put(35, zooPenguinTrust);
-
-		steps.put(40, talkToZooPenguin);
-
-		ConditionalStep lumbridgeVisit1 = new ConditionalStep(this, tuxedoTimeLumbridge);
-		lumbridgeVisit1.addStep(new Conditions(isEmoting), emoteAtPenguinInLumbridge);
-		lumbridgeVisit1.addStep(new Conditions(isPenguin, isAtLumbridgeSheepFarm), talkToThing);
-		lumbridgeVisit1.addStep(new Conditions(isPenguin, isAtZoo), exitSuit);
-		steps.put(45, lumbridgeVisit1);
-
-		steps.put(50, returnToZooPenguin);
-
-		steps.put(55, returnToThing);
-
-		steps.put(60, fredTheFarmer);
-
-		ConditionalStep outpostInfo = new ConditionalStep(this, stealCowbell);
-		outpostInfo.addStep(hasCowbell, askThingAboutOutpost);
-		steps.put(65, outpostInfo);
-
-		ConditionalStep enterTheIceberg = new ConditionalStep(this, tellLarryAboutOutpost);
-		enterTheIceberg.addStep(isEmoting, emoteAtPenguinOutpost);
-		enterTheIceberg.addStep(isOnIceberg, kgpAgent);
-		steps.put(70, enterTheIceberg);
-
-		steps.put(75, noodle1);
-
-		steps.put(80, noodle2);
-
-		steps.put(85, kgpAgent2);
-
-		ConditionalStep debriefSteps = new ConditionalStep(this, enterAvalanche);
-		debriefSteps.addStep(isInPenguinRooms, kgpAgentInAvalanche);
-		steps.put(90, debriefSteps);
-		steps.put(95, debriefSteps);
-
-		ConditionalStep agilityCourse = new ConditionalStep(this, enterAgilityCourse);
-		agilityCourse.addStep(isInAgilityStart, agilityEnterWater);
-		agilityCourse.addStep(isInAgilityWater, agilityExitWater);
-		agilityCourse.addStep(isInAgilityStones, agilityJumpStones);
-		agilityCourse.addStep(isInAgilityTreadSoftly, agilityTreadSoftly);
-		agilityCourse.addStep(isInAgilityCrossIce, agilityCrossIce);
-		agilityCourse.addStep(isInAgilityDone, agilityDone);
-		steps.put(100, agilityCourse);
-
-		steps.put(105, tellLarryAboutArmy);
-
-		steps.put(110, pingPong1);
-
-		ConditionalStep gatherInstruments = new ConditionalStep(this, makeBongos);
-		gatherInstruments.addStep(new Conditions(hasBongos, hasCowbell), pingPong2);
-		gatherInstruments.addStep(hasBongos, stealCowbell);
-		gatherInstruments.addStep(isPenguin, removePenguinSuitForBongos);
-		steps.put(115, gatherInstruments);
-
-		ConditionalStep enterControlRoom = new ConditionalStep(this, pingPong3);
-		enterControlRoom.addStep(isPreWarRoom, enterWarRoom);
-		enterControlRoom.addStep(guardMoved, openControlDoor);
-		steps.put(120, enterControlRoom);
-
-		steps.put(125, killIcelords);
-
-		ConditionalStep escape = new ConditionalStep(this, tellLarryPlans);
-		escape.addStep(isInIcelordPit, exitIcelordPen);
-		escape.addStep(isInIcelordRoom, useChasm);
-		steps.put(130, escape);
-
-		return steps;
 	}
 }

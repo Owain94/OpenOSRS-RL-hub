@@ -24,19 +24,12 @@
  */
 package com.questhelper.quests.rumdeal;
 
-import com.questhelper.QuestDescriptor;
 import com.questhelper.QuestHelperQuest;
-import com.questhelper.Zone;
-import com.questhelper.panel.PanelDetails;
-import com.questhelper.questhelpers.BasicQuestHelper;
-import com.questhelper.requirements.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
-import com.questhelper.steps.QuestStep;
-import com.questhelper.steps.conditional.ConditionForStep;
 import com.questhelper.steps.conditional.Conditions;
 import com.questhelper.steps.conditional.ItemCondition;
 import com.questhelper.steps.conditional.ItemRequirementCondition;
@@ -53,6 +46,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
+import com.questhelper.requirements.ItemRequirement;
+import com.questhelper.QuestDescriptor;
+import com.questhelper.Zone;
+import com.questhelper.panel.PanelDetails;
+import com.questhelper.questhelpers.BasicQuestHelper;
+import com.questhelper.steps.QuestStep;
+import com.questhelper.steps.conditional.ConditionForStep;
 
 @QuestDescriptor(
 	quest = QuestHelperQuest.RUM_DEAL
@@ -74,6 +74,160 @@ public class RumDeal extends BasicQuestHelper
 	SlugSteps getSlugs;
 
 	Zone island, islandF0, islandF1, islandF2, northIsland, spiderRoom;
+
+	@Override
+	public Map<Integer, QuestStep> loadSteps()
+	{
+		loadZones();
+		setupItemRequirements();
+		setupConditions();
+		setupSteps();
+		Map<Integer, QuestStep> steps = new HashMap<>();
+
+		steps.put(0, talkToPete);
+		steps.put(1, talkToPete);
+
+		ConditionalStep startOff = new ConditionalStep(this, talkToPete);
+		startOff.addStep(onIsland, talkToBraindeath);
+
+		steps.put(2, startOff);
+
+		ConditionalStep growBlindweed = new ConditionalStep(this, talkToPete);
+		growBlindweed.addStep(grownPatch, pickPlant);
+		growBlindweed.addStep(plantedPatch, waitForGrowth);
+		growBlindweed.addStep(inSpiderRoom, goUpFromSpiders);
+		growBlindweed.addStep(new Conditions(onIslandF0, rakedPatch), plantSeed);
+		growBlindweed.addStep(onIslandF2, goDownFromTop);
+		growBlindweed.addStep(onIslandF0, rakePatch);
+		growBlindweed.addStep(onIslandF1, goDownstairs);
+
+		steps.put(3, growBlindweed);
+		steps.put(4, growBlindweed);
+
+		ConditionalStep bringPlant = new ConditionalStep(this, talkToPeteWithPlant);
+		bringPlant.addStep(inSpiderRoom, goUpFromSpiders);
+		bringPlant.addStep(new Conditions(onIslandF1), talkToBraindeathWithPlant);
+		bringPlant.addStep(new Conditions(onIslandF0), goUpStairsWithPlant);
+		bringPlant.addStep(onIslandF2, goDownFromTop);
+
+		steps.put(5, bringPlant);
+
+		ConditionalStep addPlant = new ConditionalStep(this, talkToPeteWithPlant);
+		addPlant.addStep(inSpiderRoom, goUpFromSpiders);
+		addPlant.addStep(onIslandF1, climbUpToDropPlant);
+		addPlant.addStep(onIslandF0, goUpFromBottom);
+		addPlant.addStep(onIslandF2, dropPlant);
+
+		steps.put(6, addPlant);
+
+		ConditionalStep talkAfterPlant = new ConditionalStep(this, talkToPete);
+		talkAfterPlant.addStep(inSpiderRoom, goUpFromSpiders);
+		talkAfterPlant.addStep(onIslandF1, talkToBraindeathAfterPlant);
+		talkAfterPlant.addStep(onIslandF0, goUpFromBottom);
+		talkAfterPlant.addStep(onIslandF2, goDownFromDropPlant);
+
+		steps.put(7, talkAfterPlant);
+
+		ConditionalStep getWater = new ConditionalStep(this, talkToPete);
+		getWater.addStep(inSpiderRoom, goUpFromSpiders);
+		getWater.addStep(new Conditions(onIslandF2, hasStagnantWater), dropWater);
+		getWater.addStep(new Conditions(onIslandF1, hasStagnantWater), goUpToDropWater);
+		getWater.addStep(new Conditions(onIslandF0, hasStagnantWater), goUpWithWater);
+		getWater.addStep(onNorthIsland, useBucketOnWater);
+		getWater.addStep(onIslandF0, openGate);
+		getWater.addStep(onIslandF1, goDownForWater);
+		getWater.addStep(onIslandF2, goDownFromTop);
+
+		steps.put(8, getWater);
+
+		ConditionalStep putWater = new ConditionalStep(this, talkToPete);
+		putWater.addStep(inSpiderRoom, goUpFromSpiders);
+		putWater.addStep(onIslandF2, dropWater);
+		putWater.addStep(onIslandF1, goUpToDropWater);
+		putWater.addStep(onIslandF0, goUpWithWater);
+
+		steps.put(9, putWater);
+
+		ConditionalStep startSlug = new ConditionalStep(this, talkToPete);
+		startSlug.addStep(inSpiderRoom, goUpFromSpiders);
+		startSlug.addStep(onIslandF2, goDownFromTopAfterDropWater);
+		startSlug.addStep(onIslandF1, talkToBraindeathAfterWater);
+		startSlug.addStep(onIslandF0, goUpFromBottom);
+
+		steps.put(10, startSlug);
+
+		ConditionalStep getSlugsSteps = new ConditionalStep(this, getSlugs);
+		getSlugsSteps.addStep(inSpiderRoom, goUpFromSpiders);
+
+		steps.put(11, getSlugsSteps);
+
+		ConditionalStep startSpirit = new ConditionalStep(this, talkToPete);
+		startSpirit.addStep(inSpiderRoom, goUpFromSpiders);
+		startSpirit.addStep(onIslandF1, talkToBraindeathAfterSlugs);
+		startSpirit.addStep(onIslandF2, goDownAfterSlugs);
+		startSpirit.addStep(onIslandF0, goUpFromBottom);
+
+		// 1355 0->1
+		steps.put(12, startSpirit);
+
+		ConditionalStep killSpiritSteps = new ConditionalStep(this, talkToPete);
+		killSpiritSteps.addStep(inSpiderRoom, goUpFromSpiders);
+		killSpiritSteps.addStep(new Conditions(onIslandF1, hasHolyWrench, evilSpiritNearby), killSpirit);
+		killSpiritSteps.addStep(new Conditions(onIslandF1, hasHolyWrench), useWrenchOnControl);
+		killSpiritSteps.addStep(onIslandF1, talkToDavey);
+		killSpiritSteps.addStep(onIslandF2, goDownFromTop);
+		killSpiritSteps.addStep(onIslandF0, goUpFromBottom);
+
+		steps.put(13, killSpiritSteps);
+
+		ConditionalStep spiderStepsStart = new ConditionalStep(this, talkToPete);
+		spiderStepsStart.addStep(inSpiderRoom, goUpFromSpiders);
+		spiderStepsStart.addStep(onIslandF1, talkToBraindeathAfterSpirit);
+		spiderStepsStart.addStep(onIslandF2, goDownFromTop);
+		spiderStepsStart.addStep(onIslandF0, goUpFromBottom);
+
+		steps.put(14, spiderStepsStart);
+
+		ConditionalStep spiderSteps = new ConditionalStep(this, talkToPete);
+		spiderSteps.addStep(new Conditions(onIslandF2, hasSpiderCarcass), dropSpider);
+		spiderSteps.addStep(new Conditions(onIslandF1, hasSpiderCarcass), goUpToDropSpider);
+		spiderSteps.addStep(new Conditions(inSpiderRoom, hasSpiderCarcass), goUpFromSpidersWithCorpse);
+		spiderSteps.addStep(carcassNearby, pickUpCarcass);
+		spiderSteps.addStep(inSpiderRoom, killSpider);
+		spiderSteps.addStep(onIslandF1, goDownToSpiders);
+		spiderSteps.addStep(onIslandF2, goDownFromTop);
+		spiderSteps.addStep(onIslandF0, goUpFromBottom);
+
+		steps.put(15, spiderSteps);
+
+		ConditionalStep makeBrewForDonnieStart = new ConditionalStep(this, talkToPete);
+		makeBrewForDonnieStart.addStep(inSpiderRoom, goUpFromSpiders);
+		makeBrewForDonnieStart.addStep(onIslandF1, talkToBraindeathAfterSpider);
+		makeBrewForDonnieStart.addStep(onIslandF2, goDownFromTop);
+		makeBrewForDonnieStart.addStep(onIslandF0, goUpFromBottom);
+
+		steps.put(16, makeBrewForDonnieStart);
+
+		ConditionalStep giveBrewToDonnie = new ConditionalStep(this, talkToPete);
+		giveBrewToDonnie.addStep(new Conditions(onIslandF0, hasSwill), talkToDonnie);
+		giveBrewToDonnie.addStep(new Conditions(onIslandF1, hasSwill), goDownToDonnie);
+		giveBrewToDonnie.addStep(inSpiderRoom, goUpFromSpiders);
+		giveBrewToDonnie.addStep(onIslandF1, useBucketOnTap);
+		giveBrewToDonnie.addStep(onIslandF2, goDownAfterSpider);
+		giveBrewToDonnie.addStep(onIslandF0, goUpFromBottom);
+
+		steps.put(17, giveBrewToDonnie);
+
+		ConditionalStep finishQuest = new ConditionalStep(this, talkToPete);
+		finishQuest.addStep(inSpiderRoom, goUpFromSpiders);
+		finishQuest.addStep(onIslandF1, talkToBraindeathToFinish);
+		finishQuest.addStep(onIslandF2, goDownFromTop);
+		finishQuest.addStep(onIslandF0, goUpToBraindeathToFinish);
+
+		steps.put(18, finishQuest);
+
+		return steps;
+	}
 
 	public void setupItemRequirements()
 	{
@@ -240,7 +394,7 @@ public class RumDeal extends BasicQuestHelper
 		killSpider = new NpcStep(this, NpcID.FEVER_SPIDER, "Go into the brewery's basement and kill a fever spider. If you're not wearing slayer gloves they'll afflcit you with disease.", slayerGloves);
 		pickUpCarcass = new ItemStep(this, "Pick up the fever spider body.", spiderCarcass);
 		goUpFromSpidersWithCorpse = new ObjectStep(this, ObjectID.LADDER_10167, new WorldPoint(2139, 5105, 0), "Add the spider body to the hopper on the top floor.", spiderCarcass);
-		goUpToDropSpider = new ObjectStep(this, ObjectID.LADDER_10167, new WorldPoint(2163, 5092, 1), "Add the spider body to the hopper on the top floor.", spiderCarcass);
+		goUpToDropSpider =  new ObjectStep(this, ObjectID.LADDER_10167, new WorldPoint(2163, 5092, 1), "Add the spider body to the hopper on the top floor.", spiderCarcass);
 		dropSpider = new ObjectStep(this, ObjectID.HOPPER_10170, new WorldPoint(2142, 5102, 2), "Add the spider body to the hopper on the top floor.", spiderCarcassHighlight);
 		dropSpider.addIcon(ItemID.FEVER_SPIDER_BODY);
 		dropSpider.addSubSteps(goUpFromSpidersWithCorpse, goUpToDropSpider);
@@ -268,6 +422,7 @@ public class RumDeal extends BasicQuestHelper
 		return new ArrayList<>(Arrays.asList(combatGear, dibber, rake, slayerGloves));
 	}
 
+
 	@Override
 	public ArrayList<String> getCombatRequirements()
 	{
@@ -291,160 +446,6 @@ public class RumDeal extends BasicQuestHelper
 		allSteps.add(new PanelDetails("Giving swill to Donnie", new ArrayList<>(Arrays.asList(talkToBraindeathAfterSpider, useBucketOnTap, talkToDonnie, talkToBraindeathToFinish))));
 
 		return allSteps;
-	}
-
-	@Override
-	public Map<Integer, QuestStep> loadSteps()
-	{
-		loadZones();
-		setupItemRequirements();
-		setupConditions();
-		setupSteps();
-		Map<Integer, QuestStep> steps = new HashMap<>();
-
-		steps.put(0, talkToPete);
-		steps.put(1, talkToPete);
-
-		ConditionalStep startOff = new ConditionalStep(this, talkToPete);
-		startOff.addStep(onIsland, talkToBraindeath);
-
-		steps.put(2, startOff);
-
-		ConditionalStep growBlindweed = new ConditionalStep(this, talkToPete);
-		growBlindweed.addStep(grownPatch, pickPlant);
-		growBlindweed.addStep(plantedPatch, waitForGrowth);
-		growBlindweed.addStep(inSpiderRoom, goUpFromSpiders);
-		growBlindweed.addStep(new Conditions(onIslandF0, rakedPatch), plantSeed);
-		growBlindweed.addStep(onIslandF2, goDownFromTop);
-		growBlindweed.addStep(onIslandF0, rakePatch);
-		growBlindweed.addStep(onIslandF1, goDownstairs);
-
-		steps.put(3, growBlindweed);
-		steps.put(4, growBlindweed);
-
-		ConditionalStep bringPlant = new ConditionalStep(this, talkToPeteWithPlant);
-		bringPlant.addStep(inSpiderRoom, goUpFromSpiders);
-		bringPlant.addStep(new Conditions(onIslandF1), talkToBraindeathWithPlant);
-		bringPlant.addStep(new Conditions(onIslandF0), goUpStairsWithPlant);
-		bringPlant.addStep(onIslandF2, goDownFromTop);
-
-		steps.put(5, bringPlant);
-
-		ConditionalStep addPlant = new ConditionalStep(this, talkToPeteWithPlant);
-		addPlant.addStep(inSpiderRoom, goUpFromSpiders);
-		addPlant.addStep(onIslandF1, climbUpToDropPlant);
-		addPlant.addStep(onIslandF0, goUpFromBottom);
-		addPlant.addStep(onIslandF2, dropPlant);
-
-		steps.put(6, addPlant);
-
-		ConditionalStep talkAfterPlant = new ConditionalStep(this, talkToPete);
-		talkAfterPlant.addStep(inSpiderRoom, goUpFromSpiders);
-		talkAfterPlant.addStep(onIslandF1, talkToBraindeathAfterPlant);
-		talkAfterPlant.addStep(onIslandF0, goUpFromBottom);
-		talkAfterPlant.addStep(onIslandF2, goDownFromDropPlant);
-
-		steps.put(7, talkAfterPlant);
-
-		ConditionalStep getWater = new ConditionalStep(this, talkToPete);
-		getWater.addStep(inSpiderRoom, goUpFromSpiders);
-		getWater.addStep(new Conditions(onIslandF2, hasStagnantWater), dropWater);
-		getWater.addStep(new Conditions(onIslandF1, hasStagnantWater), goUpToDropWater);
-		getWater.addStep(new Conditions(onIslandF0, hasStagnantWater), goUpWithWater);
-		getWater.addStep(onNorthIsland, useBucketOnWater);
-		getWater.addStep(onIslandF0, openGate);
-		getWater.addStep(onIslandF1, goDownForWater);
-		getWater.addStep(onIslandF2, goDownFromTop);
-
-		steps.put(8, getWater);
-
-		ConditionalStep putWater = new ConditionalStep(this, talkToPete);
-		putWater.addStep(inSpiderRoom, goUpFromSpiders);
-		putWater.addStep(onIslandF2, dropWater);
-		putWater.addStep(onIslandF1, goUpToDropWater);
-		putWater.addStep(onIslandF0, goUpWithWater);
-
-		steps.put(9, putWater);
-
-		ConditionalStep startSlug = new ConditionalStep(this, talkToPete);
-		startSlug.addStep(inSpiderRoom, goUpFromSpiders);
-		startSlug.addStep(onIslandF2, goDownFromTopAfterDropWater);
-		startSlug.addStep(onIslandF1, talkToBraindeathAfterWater);
-		startSlug.addStep(onIslandF0, goUpFromBottom);
-
-		steps.put(10, startSlug);
-
-		ConditionalStep getSlugsSteps = new ConditionalStep(this, getSlugs);
-		getSlugsSteps.addStep(inSpiderRoom, goUpFromSpiders);
-
-		steps.put(11, getSlugsSteps);
-
-		ConditionalStep startSpirit = new ConditionalStep(this, talkToPete);
-		startSpirit.addStep(inSpiderRoom, goUpFromSpiders);
-		startSpirit.addStep(onIslandF1, talkToBraindeathAfterSlugs);
-		startSpirit.addStep(onIslandF2, goDownAfterSlugs);
-		startSpirit.addStep(onIslandF0, goUpFromBottom);
-
-		// 1355 0->1
-		steps.put(12, startSpirit);
-
-		ConditionalStep killSpiritSteps = new ConditionalStep(this, talkToPete);
-		killSpiritSteps.addStep(inSpiderRoom, goUpFromSpiders);
-		killSpiritSteps.addStep(new Conditions(onIslandF1, hasHolyWrench, evilSpiritNearby), killSpirit);
-		killSpiritSteps.addStep(new Conditions(onIslandF1, hasHolyWrench), useWrenchOnControl);
-		killSpiritSteps.addStep(onIslandF1, talkToDavey);
-		killSpiritSteps.addStep(onIslandF2, goDownFromTop);
-		killSpiritSteps.addStep(onIslandF0, goUpFromBottom);
-
-		steps.put(13, killSpiritSteps);
-
-		ConditionalStep spiderStepsStart = new ConditionalStep(this, talkToPete);
-		spiderStepsStart.addStep(inSpiderRoom, goUpFromSpiders);
-		spiderStepsStart.addStep(onIslandF1, talkToBraindeathAfterSpirit);
-		spiderStepsStart.addStep(onIslandF2, goDownFromTop);
-		spiderStepsStart.addStep(onIslandF0, goUpFromBottom);
-
-		steps.put(14, spiderStepsStart);
-
-		ConditionalStep spiderSteps = new ConditionalStep(this, talkToPete);
-		spiderSteps.addStep(new Conditions(onIslandF2, hasSpiderCarcass), dropSpider);
-		spiderSteps.addStep(new Conditions(onIslandF1, hasSpiderCarcass), goUpToDropSpider);
-		spiderSteps.addStep(new Conditions(inSpiderRoom, hasSpiderCarcass), goUpFromSpidersWithCorpse);
-		spiderSteps.addStep(carcassNearby, pickUpCarcass);
-		spiderSteps.addStep(inSpiderRoom, killSpider);
-		spiderSteps.addStep(onIslandF1, goDownToSpiders);
-		spiderSteps.addStep(onIslandF2, goDownFromTop);
-		spiderSteps.addStep(onIslandF0, goUpFromBottom);
-
-		steps.put(15, spiderSteps);
-
-		ConditionalStep makeBrewForDonnieStart = new ConditionalStep(this, talkToPete);
-		makeBrewForDonnieStart.addStep(inSpiderRoom, goUpFromSpiders);
-		makeBrewForDonnieStart.addStep(onIslandF1, talkToBraindeathAfterSpider);
-		makeBrewForDonnieStart.addStep(onIslandF2, goDownFromTop);
-		makeBrewForDonnieStart.addStep(onIslandF0, goUpFromBottom);
-
-		steps.put(16, makeBrewForDonnieStart);
-
-		ConditionalStep giveBrewToDonnie = new ConditionalStep(this, talkToPete);
-		giveBrewToDonnie.addStep(new Conditions(onIslandF0, hasSwill), talkToDonnie);
-		giveBrewToDonnie.addStep(new Conditions(onIslandF1, hasSwill), goDownToDonnie);
-		giveBrewToDonnie.addStep(inSpiderRoom, goUpFromSpiders);
-		giveBrewToDonnie.addStep(onIslandF1, useBucketOnTap);
-		giveBrewToDonnie.addStep(onIslandF2, goDownAfterSpider);
-		giveBrewToDonnie.addStep(onIslandF0, goUpFromBottom);
-
-		steps.put(17, giveBrewToDonnie);
-
-		ConditionalStep finishQuest = new ConditionalStep(this, talkToPete);
-		finishQuest.addStep(inSpiderRoom, goUpFromSpiders);
-		finishQuest.addStep(onIslandF1, talkToBraindeathToFinish);
-		finishQuest.addStep(onIslandF2, goDownFromTop);
-		finishQuest.addStep(onIslandF0, goUpToBraindeathToFinish);
-
-		steps.put(18, finishQuest);
-
-		return steps;
 	}
 }
 

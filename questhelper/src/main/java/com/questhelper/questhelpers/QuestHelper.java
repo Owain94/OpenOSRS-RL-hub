@@ -31,8 +31,6 @@ import com.google.inject.Module;
 import com.questhelper.QuestHelperQuest;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.requirements.ItemRequirement;
-import com.questhelper.steps.OwnerStep;
-import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.inject.Inject;
@@ -41,6 +39,8 @@ import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.QuestState;
 import net.runelite.client.eventbus.EventBus;
+import com.questhelper.steps.OwnerStep;
+import com.questhelper.steps.QuestStep;
 
 public abstract class QuestHelper implements Module
 {
@@ -77,6 +77,7 @@ public abstract class QuestHelper implements Module
 		{
 			currentStep = step;
 			currentStep.startUp();
+			//eventBus.register(currentStep);
 		}
 		else
 		{
