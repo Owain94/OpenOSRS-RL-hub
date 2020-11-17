@@ -31,7 +31,7 @@ project.extra["PluginDescription"] = "Sends a detailed notification via Discord 
 dependencies {
     compileOnly("com.openosrs.externals:loottracker:0.0.+")
 
-    implementation(group = "org.json", name = "json", version = "20200518")
+    implementation(group = "org.json", name = "json", version = "20201115")
     implementation(group = "org.jsoup", name = "jsoup", version = "1.13.1")
 }
 
