@@ -104,7 +104,7 @@ public class TradePersister
 		Map<String, AccountData> accountData = gson.fromJson(tradesJson, type);
 
 		//they have no data to partition
-		if (!accountData.containsKey(FlippingPlugin.ACCOUNT_WIDE))
+		if (accountData == null || !accountData.containsKey(FlippingPlugin.ACCOUNT_WIDE))
 		{
 			return;
 		}
