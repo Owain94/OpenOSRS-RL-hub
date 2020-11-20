@@ -24,61 +24,52 @@
  */
 package renderer.loader;
 
+import renderer.util.Colors;
 import renderer.model.TextureDefinition;
 import renderer.util.CacheBuffer;
-import renderer.util.Colors;
 
-public class TextureLoader
-{
-	public static TextureDefinition load(int id, byte[] b)
-	{
-		TextureDefinition def = new TextureDefinition();
-		CacheBuffer is = new CacheBuffer(b);
+public class TextureLoader {
+    public static TextureDefinition load(int id, byte[] b) {
+        TextureDefinition def = new TextureDefinition();
+        CacheBuffer is = new CacheBuffer(b);
 
-		def.averageColor = Colors.hsl(is.getShort() & 0xFFFF);
-		def.unknown6 = is.get() != 0;
-		def.id = id;
+        def.averageColor = Colors.hsl(is.getShort() & 0xFFFF);
+        def.unknown6 = is.get() != 0;
+        def.id = id;
 
-		int count = is.get() & 0xFF;
-		int[] files = new int[count];
+        int count = is.get() & 0xFF;
+        int[] files = new int[count];
 
-		for (int i = 0; i < count; ++i)
-		{
-			files[i] = is.getShort() & 0xFFFF;
-		}
+        for (int i = 0; i < count; ++i)
+            files[i] = is.getShort() & 0xFFFF;
 
-		def.fileIds = files;
+        def.fileIds = files;
 
-		if (count > 1)
-		{
-			def.unknown1 = new int[count - 1];
+        if (count > 1) {
+            def.unknown1 = new int[count - 1];
 
-			for (int var3 = 0; var3 < count - 1; ++var3)
-			{
-				def.unknown1[var3] = is.get() & 0xFF;
-			}
-		}
+            for (int var3 = 0; var3 < count - 1; ++var3) {
+                def.unknown1[var3] = is.get() & 0xFF;
+            }
+        }
 
-		if (count > 1)
-		{
-			def.unknown2 = new int[count - 1];
+        if (count > 1) {
+            def.unknown2 = new int[count - 1];
 
-			for (int var3 = 0; var3 < count - 1; ++var3)
-			{
-				def.unknown2[var3] = is.get() & 0xFF;
-			}
-		}
+            for (int var3 = 0; var3 < count - 1; ++var3) {
+                def.unknown2[var3] = is.get() & 0xFF;
+            }
+        }
 
-		def.unknown3 = new int[count];
+        def.unknown3 = new int[count];
 
-		for (int var3 = 0; var3 < count; ++var3)
-		{
-			def.unknown3[var3] = is.getInt();
-		}
+        for (int var3 = 0; var3 < count; ++var3) {
+            def.unknown3[var3] = is.getInt();
+        }
 
-		def.unknown5 = is.get() & 0xFF;
-		def.unknown4 = is.get() & 0xFF;
+        def.unknown5 = is.get() & 0xFF;
+        def.unknown4 = is.get() & 0xFF;
 
-		return def;
-	}
+        return def;
+    }
 }

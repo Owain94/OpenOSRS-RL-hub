@@ -28,153 +28,127 @@ import renderer.cache.CacheSystem;
 import renderer.model.TransformDefinition;
 import renderer.util.CacheBuffer;
 
-public class TransformLoader
-{
-	public static TransformDefinition loadTransform(int id, byte[] b)
-	{
-		TransformDefinition transform = new TransformDefinition();
-		transform.id = id;
+public class TransformLoader {
+    public static TransformDefinition loadTransform(int id, byte[] b) {
+        TransformDefinition transform = new TransformDefinition();
+        transform.id = id;
 
-		CacheBuffer in = new CacheBuffer(b);
-		CacheBuffer data = new CacheBuffer(b);
+        CacheBuffer in = new CacheBuffer(b);
+        CacheBuffer data = new CacheBuffer(b);
 
-		int framemapArchiveIndex = in.getShort() & 0xFFFF;
-		SkeletonDefinition skeleton = CacheSystem.getSkeletonDefinition(framemapArchiveIndex);
+        int framemapArchiveIndex = in.getShort() & 0xFFFF;
+        SkeletonDefinition skeleton = CacheSystem.getSkeletonDefinition(framemapArchiveIndex);
 
-		int length = in.get() & 0xFF;
+        int length = in.get() & 0xFF;
 
-		data.position(data.position() + 3 + length);
+        data.position(data.position() + 3 + length);
 
-		int[] indexFrameIds = new int[500];
-		int[] dx = new int[500];
-		int[] dy = new int[500];
-		int[] dz = new int[500];
+        int[] indexFrameIds = new int[500];
+        int[] dx = new int[500];
+        int[] dy = new int[500];
+        int[] dz = new int[500];
 
-		int lastI = -1;
-		int index = 0;
-		for (int i = 0; i < length; ++i)
-		{
-			int var9 = in.get() & 0xFF;
+        int lastI = -1;
+        int index = 0;
+        for (int i = 0; i < length; ++i) {
+            int var9 = in.get() & 0xFF;
 
-			if (var9 <= 0)
-			{
-				continue;
-			}
+            if (var9 <= 0) {
+                continue;
+            }
 
-			if (skeleton.types[i] != 0)
-			{
-				for (int var10 = i - 1; var10 > lastI; --var10)
-				{
-					if (skeleton.types[var10] == 0)
-					{
-						indexFrameIds[index] = var10;
-						dx[index] = 0;
-						dy[index] = 0;
-						dz[index] = 0;
-						++index;
-						break;
-					}
-				}
-			}
+            if (skeleton.types[i] != 0) {
+                for (int var10 = i - 1; var10 > lastI; --var10) {
+                    if (skeleton.types[var10] == 0) {
+                        indexFrameIds[index] = var10;
+                        dx[index] = 0;
+                        dy[index] = 0;
+                        dz[index] = 0;
+                        ++index;
+                        break;
+                    }
+                }
+            }
 
-			indexFrameIds[index] = i;
-			short var11 = 0;
-			if (skeleton.types[i] == 3)
-			{
-				var11 = 128;
-			}
+            indexFrameIds[index] = i;
+            short var11 = 0;
+            if (skeleton.types[i] == 3) {
+                var11 = 128;
+            }
 
-			if ((var9 & 1) != 0)
-			{
-				dx[index] = data.getSpecial1();
-			}
-			else
-			{
-				dx[index] = var11;
-			}
+            if ((var9 & 1) != 0) {
+                dx[index] = data.getSpecial1();
+            } else {
+                dx[index] = var11;
+            }
 
-			if ((var9 & 2) != 0)
-			{
-				dy[index] = data.getSpecial1();
-			}
-			else
-			{
-				dy[index] = var11;
-			}
+            if ((var9 & 2) != 0) {
+                dy[index] = data.getSpecial1();
+            } else {
+                dy[index] = var11;
+            }
 
-			if ((var9 & 4) != 0)
-			{
-				dz[index] = data.getSpecial1();
-			}
-			else
-			{
-				dz[index] = var11;
-			}
+            if ((var9 & 4) != 0) {
+                dz[index] = data.getSpecial1();
+            } else {
+                dz[index] = var11;
+            }
 
-			lastI = i;
-			++index;
-			if (skeleton.types[i] == 5)
-			{
-				transform.showing = true;
-			}
-		}
+            lastI = i;
+            ++index;
+            if (skeleton.types[i] == 5) {
+                transform.showing = true;
+            }
+        }
 
-		if (data.position() != b.length)
-		{
-			throw new RuntimeException();
-		}
+        if (data.position() != b.length) {
+            throw new RuntimeException();
+        }
 
-		for (int i = 0; i < index; ++i)
-		{
-			transform.transforms.add(new TransformDefinition.Transform(
-				skeleton.types[indexFrameIds[i]],
-				skeleton.labels[i],
-				dx[i],
-				dy[i],
-				dz[i]
-			));
-		}
+        for (int i = 0; i < index; ++i) {
+            transform.transforms.add(new TransformDefinition.Transform(
+                    skeleton.types[indexFrameIds[i]],
+                    skeleton.labels[i],
+                    dx[i],
+                    dy[i],
+                    dz[i]
+            ));
+        }
 
-		return transform;
-	}
+        return transform;
+    }
 
-	public static SkeletonDefinition loadSkeleton(int id, byte[] b)
-	{
-		SkeletonDefinition def = new SkeletonDefinition();
-		CacheBuffer in = new CacheBuffer(b);
+    public static SkeletonDefinition loadSkeleton(int id, byte[] b) {
+        SkeletonDefinition def = new SkeletonDefinition();
+        CacheBuffer in = new CacheBuffer(b);
 
-		def.id = id;
+        def.id = id;
 
-		def.length = in.get() & 0xFF;
-		def.types = new int[def.length];
-		def.labels = new int[def.length][];
+        def.length = in.get() & 0xFF;
+        def.types = new int[def.length];
+        def.labels = new int[def.length][];
 
-		for (int i = 0; i < def.length; ++i)
-		{
-			def.types[i] = in.get() & 0xFF;
-		}
+        for (int i = 0; i < def.length; ++i) {
+            def.types[i] = in.get() & 0xFF;
+        }
 
-		for (int i = 0; i < def.length; ++i)
-		{
-			def.labels[i] = new int[in.get() & 0xFF];
-		}
+        for (int i = 0; i < def.length; ++i) {
+            def.labels[i] = new int[in.get() & 0xFF];
+        }
 
-		for (int i = 0; i < def.length; ++i)
-		{
-			for (int j = 0; j < def.labels[i].length; ++j)
-			{
-				def.labels[i][j] = in.get() & 0xFF;
-			}
-		}
+        for (int i = 0; i < def.length; ++i) {
+            for (int j = 0; j < def.labels[i].length; ++j) {
+                def.labels[i][j] = in.get() & 0xFF;
+            }
+        }
 
-		return def;
-	}
+        return def;
+    }
 
-	public static class SkeletonDefinition
-	{
-		public int id;
-		public int[] types;
-		public int[][] labels;
-		public int length;
-	}
+    public static class SkeletonDefinition {
+        public int id;
+        public int[] types;
+        public int[][] labels;
+        public int length;
+    }
 }

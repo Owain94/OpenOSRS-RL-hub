@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.17"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "dillydill123"
 project.extra["PluginName"] = "Inventory Setups"
 project.extra["PluginDescription"] = "Save inventory setups"
 

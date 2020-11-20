@@ -23,7 +23,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import java.util.*;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Bank Diff",
@@ -67,7 +66,6 @@ public class BankDiffPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Bank Diff started!");
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			grabSnapshot();
@@ -80,7 +78,6 @@ public class BankDiffPlugin extends Plugin
 	{
 		snapshot.clear();
 		overlayManager.remove(negativeOneItemOverlay);
-		log.info("Bank Diff stopped!");
 	}
 
 	@Subscribe
@@ -118,7 +115,7 @@ public class BankDiffPlugin extends Plugin
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
 		if (event.getOpcode() != MenuOpcode.CC_OP.getId() || !event.getOption().equals("Show menu")
-				|| (event.getParam1() >> 16) != WidgetID.BANK_GROUP_ID)
+			|| (event.getParam1() >> 16) != WidgetID.BANK_GROUP_ID)
 		{
 			return;
 		}
@@ -159,8 +156,8 @@ public class BankDiffPlugin extends Plugin
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		if ((event.getMenuOpcode() != MenuOpcode.RUNELITE)
-				|| (event.getParam1() >> 16) != WidgetID.BANK_GROUP_ID
-				|| !(event.getOption().equals(CREATE_SNAPSHOT) || event.getOption().equals(TOGGLE_VIEW)))
+			|| (event.getParam1() >> 16) != WidgetID.BANK_GROUP_ID
+			|| !(event.getOption().equals(CREATE_SNAPSHOT) || event.getOption().equals(TOGGLE_VIEW)))
 		{
 			return;
 		}

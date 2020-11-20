@@ -24,7 +24,6 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Analogue Timestamps",
@@ -33,6 +32,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class AnalogueTimestampsPlugin extends Plugin
 {
 	@Inject

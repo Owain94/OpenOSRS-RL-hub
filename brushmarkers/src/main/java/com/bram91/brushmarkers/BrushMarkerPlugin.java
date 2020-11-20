@@ -58,7 +58,6 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Brush Markers",
@@ -67,6 +66,7 @@ import org.pf4j.Extension;
 	type = PluginType.UTILITY,
 	enabledByDefault = false
 )
+@Slf4j
 public class BrushMarkerPlugin extends Plugin implements KeyListener
 {
 	private static final String CONFIG_GROUP = "brushMarkers";

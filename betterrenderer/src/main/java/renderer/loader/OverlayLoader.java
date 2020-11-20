@@ -24,44 +24,39 @@
  */
 package renderer.loader;
 
-import renderer.cache.CacheSystem;
 import renderer.util.CacheBuffer;
 import renderer.world.OverlayDefinition;
+import renderer.cache.CacheSystem;
 
-public class OverlayLoader
-{
-	public static OverlayDefinition load(int id, byte[] b)
-	{
-		OverlayDefinition def = new OverlayDefinition();
-		def.id = id;
-		CacheBuffer is = new CacheBuffer(b);
+public class OverlayLoader {
+    public static OverlayDefinition load(int id, byte[] b) {
+        OverlayDefinition def = new OverlayDefinition();
+        def.id = id;
+        CacheBuffer is = new CacheBuffer(b);
 
-		while (true)
-		{
-			int opcode = is.get() & 0xFF;
+        while (true) {
+            int opcode = is.get() & 0xFF;
 
-			if (opcode == 0)
-			{
-				break;
-			}
+            if (opcode == 0) {
+                break;
+            }
 
-			switch (opcode)
-			{
-				case 1:
-					def.color = is.getMedium();
-					break;
-				case 2:
-					def.texture = CacheSystem.getTextureDefinition(is.get() & 0xFF);
-					break;
-				case 5:
-					def.hideUnderlay = false;
-					break;
-				case 7:
-					def.mapColor = is.getMedium();
-					break;
-			}
-		}
+            switch (opcode) {
+                case 1:
+                    def.color = is.getMedium();
+                    break;
+                case 2:
+                    def.texture = CacheSystem.getTextureDefinition(is.get() & 0xFF);
+                    break;
+                case 5:
+                    def.hideUnderlay = false;
+                    break;
+                case 7:
+                    def.mapColor = is.getMedium();
+                    break;
+            }
+        }
 
-		return def;
-	}
+        return def;
+    }
 }

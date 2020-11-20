@@ -16,7 +16,6 @@ import net.runelite.api.events.PlayerSpawned;
 
 import net.runelite.api.util.Text;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.util.LinkBrowser;
 import net.runelite.http.api.RuneLiteAPI;
 import okhttp3.HttpUrl;
@@ -41,7 +40,7 @@ public class StreamerHandler {
     private static final String TWITCH_CLIENT_ID = "ifhhbwyqdp5p9fmhn33wvlsufsemp8";
     private static final String TWITCH_API_URL = "https://api.twitch.tv/helix/streams";
     private static final String TWITCH_USER_QUERY_FIELD = "user_login";
-    private static final int MAX_UNSEEN_DURATION_BEFORE_REMOVAL = 3;
+    private static final int MAX_UNSEEN_DURATION_BEFORE_REMOVAL = 1;
     private static final Long TWITCH_API_USER_SEARCH_LIMIT = 100L;
 
     private Map<String, NearbyPlayer> nearbyPlayers;
@@ -52,18 +51,24 @@ public class StreamerHandler {
 
     private Gson gson = new Gson();
 
-    private VerifiedStreamers verifiedStreamers;
+    public VerifiedStreamers verifiedStreamers;
 
     public StreamerHandler(Client client, OsrsStreamersConfig config, EventBus eventBus) {
+		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
+		eventBus.subscribe(PlayerMenuOptionClicked.class, this, this::onPlayerMenuOptionClicked);
+		eventBus.subscribe(PlayerSpawned.class, this, this::onPlayerSpawned);
+		eventBus.subscribe(PlayerDespawned.class, this, this::onPlayerDespawned);
+
         this.client = client;
         this.config = config;
         this.verifiedStreamers = new VerifiedStreamers();
         this.nearbyPlayers = new HashMap<>();
         this.addAllNearbyPlayers();
+    }
 
-        eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
-        eventBus.subscribe(PlayerMenuOptionClicked.class, this, this::onPlayerMenuOptionClicked);
-        eventBus.subscribe(PlayerSpawned.class, this, this::onPlayerSpawned);
+    public void addStreamerFromConsole(String rsn, String twitchName) {
+        this.verifiedStreamers.rsnToTwitchLoginMap.put(rsn, twitchName);
+        this.addNewNearbyPlayer(rsn);
     }
 
     private void addAllNearbyPlayers() {
@@ -73,6 +78,7 @@ public class StreamerHandler {
     }
 
     private void addNewNearbyPlayer(String rsn) {
+        nearbyPlayers.remove(rsn);
         if (verifiedStreamers.isVerifiedStreamer(rsn)) {
             nearbyPlayers.put(rsn, new NearbyPlayer(verifiedStreamers.getTwitchName(rsn)));
         } else {
@@ -85,7 +91,10 @@ public class StreamerHandler {
         MenuEntry[] menuEntries = client.getMenuEntries();
         if (PLAYER_INDICATOR.equals(event.getOption())) {
             NearbyPlayer nearbyPlayer = this.nearbyPlayers.get(Text.removeTags(event.getTarget()).split("[(]")[0].trim());
-            if (Objects.nonNull(nearbyPlayer) && StreamStatus.LIVE.equals(nearbyPlayer.getStatus())) {
+            if (Objects.nonNull(nearbyPlayer) && !StreamStatus.NOT_STREAMER.equals(nearbyPlayer.getStatus())) {
+                if (config.onlyShowStreamersWhoAreLive() && (nearbyPlayer.status.equals(StreamStatus.NOT_LIVE) || nearbyPlayer.status.equals(StreamStatus.STREAMER))) {
+                    return;
+                }
                 menuEntries = Arrays.copyOf(menuEntries, menuEntries.length + 1);
                 MenuEntry menuEntry = menuEntries[menuEntries.length - 1] = new MenuEntry();
                 menuEntry.setOption(WATCH_STREAM_ACTION);
@@ -121,7 +130,6 @@ public class StreamerHandler {
 
     }
 
-    @Subscribe
     public void onPlayerDespawned(PlayerDespawned playerDespawned) {
 
         final String name = playerDespawned.getPlayer().getName();
@@ -182,7 +190,7 @@ public class StreamerHandler {
     public void fetchStreamStatusOfUndeterminedStreamers() {
         List<NearbyPlayer> undeterminedStreamers = nearbyPlayers.entrySet().stream()
                 .filter(stringNearbyPlayerEntry -> stringNearbyPlayerEntry.getValue().getStatus().equals(StreamStatus.STREAMER))
-                .map(stringNearbyPlayerEntry -> stringNearbyPlayerEntry.getValue())
+                .map(Map.Entry::getValue)
                 .limit(TWITCH_API_USER_SEARCH_LIMIT)
                 .collect(Collectors.toList());
 

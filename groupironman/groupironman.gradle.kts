@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Spedwards"
 project.extra["PluginName"] = "Group Iron Man"
 project.extra["PluginDescription"] = "Adds the capability to play Group Iron Man"
 

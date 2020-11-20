@@ -2,105 +2,93 @@ package renderer.cache;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.nio.ByteBuffer;
 import renderer.util.NetworkBuffer;
 import renderer.util.Util;
 
-public class Group
-{
-	public int id;
-	public int crc;
-	public int version;
-	public ByteBuffer data;
-	public Int2ObjectMap<ByteBuffer> files;
-	public int fileCount;
-	public int[] fileIds;
-	public int[] fileNameHashes;
+import java.nio.ByteBuffer;
 
-	public void buildFiles(int[] key)
-	{
-		byte[] data = Util.toBytes(this.data);
+public class Group {
+    public int id;
+    public int crc;
+    public int version;
+    public ByteBuffer data;
+    public Int2ObjectMap<ByteBuffer> files;
+    public int fileCount;
+    public int[] fileIds;
+    public int[] fileNameHashes;
 
-		if (key != null && (key[0] != 0 || key[1] != 0 || key[2] != 0 || key[3] != 0))
-		{
-			data = data.clone();
-			Util.unxtea(data, 5, data.length, key);
-		}
+    public void buildFiles(int[] key) {
+        byte[] data = Util.toBytes(this.data);
 
-		byte[] decompressedBytes = Archive.decompress(data);
+        if (key != null && (key[0] != 0 || key[1] != 0 || key[2] != 0 || key[3] != 0)) {
+            data = data.clone();
+            Util.unxtea(data, 5, data.length, key);
+        }
 
-		files = new Int2ObjectOpenHashMap<>();
+        byte[] decompressedBytes = Archive.decompress(data);
 
-		if (fileCount == 1)
-		{
-			files.put(fileIds[0], Util.toBuffer(decompressedBytes));
-			return;
-		}
+        files =  new Int2ObjectOpenHashMap<>();
 
-		int length = decompressedBytes.length;
-		--length;
-		int var10 = decompressedBytes[length] & 255;
-		length -= var10 * fileCount * 4;
-		NetworkBuffer buffer = new NetworkBuffer(decompressedBytes);
-		int[] var12 = new int[fileCount];
-		buffer.offset = length;
+        if (fileCount == 1) {
+            files.put(fileIds[0], Util.toBuffer(decompressedBytes));
+            return;
+        }
 
-		int var14;
-		for (int var13 = 0; var13 < var10; ++var13)
-		{
-			var14 = 0;
+        int length = decompressedBytes.length;
+        --length;
+        int var10 = decompressedBytes[length] & 255;
+        length -= var10 * fileCount * 4;
+        NetworkBuffer buffer = new NetworkBuffer(decompressedBytes);
+        int[] var12 = new int[fileCount];
+        buffer.offset = length;
 
-			for (int i = 0; i < fileCount; ++i)
-			{
-				var14 += buffer.readInt();
-				var12[i] += var14;
-			}
-		}
+        int var14;
+        for (int var13 = 0; var13 < var10; ++var13) {
+            var14 = 0;
 
-		byte[][] var19 = new byte[fileCount][];
+            for (int i = 0; i < fileCount; ++i) {
+                var14 += buffer.readInt();
+                var12[i] += var14;
+            }
+        }
 
-		for (var14 = 0; var14 < fileCount; ++var14)
-		{
-			var19[var14] = new byte[var12[var14]];
-			var12[var14] = 0;
-		}
+        byte[][] var19 = new byte[fileCount][];
 
-		buffer.offset = length;
-		var14 = 0;
+        for (var14 = 0; var14 < fileCount; ++var14) {
+            var19[var14] = new byte[var12[var14]];
+            var12[var14] = 0;
+        }
 
-		for (int i = 0; i < var10; ++i)
-		{
-			int var16 = 0;
+        buffer.offset = length;
+        var14 = 0;
 
-			for (int var17 = 0; var17 < fileCount; ++var17)
-			{
-				var16 += buffer.readInt();
-				System.arraycopy(decompressedBytes, var14, var19[var17], var12[var17], var16);
-				var12[var17] += var16;
-				var14 += var16;
-			}
-		}
+        for (int i = 0; i < var10; ++i) {
+            int var16 = 0;
 
-		for (int i = 0; i < fileCount; ++i)
-		{
-			files.put(fileIds[i], Util.toBuffer(var19[i]));
-		}
-	}
+            for (int var17 = 0; var17 < fileCount; ++var17) {
+                var16 += buffer.readInt();
+                System.arraycopy(decompressedBytes, var14, var19[var17], var12[var17], var16);
+                var12[var17] += var16;
+                var14 += var16;
+            }
+        }
 
-	public byte[] file(int id)
-	{
-		if (files == null)
-		{
-			buildFiles(null);
-		}
+        for (int i = 0; i < fileCount; ++i) {
+            files.put(fileIds[i], Util.toBuffer(var19[i]));
+        }
+    }
 
-		byte[] file = Util.toBytes(files.get(id));
+    public byte[] file(int id) {
+        if (files == null) {
+            buildFiles(null);
+        }
 
-		if (file == null)
-		{
-			throw new IllegalArgumentException("file " + id + " doesn't exist");
-		}
+        byte[] file = Util.toBytes(files.get(id));
 
-		return file;
-	}
+        if (file == null) {
+            throw new IllegalArgumentException("file " + id + " doesn't exist");
+        }
+
+        return file;
+    }
 }

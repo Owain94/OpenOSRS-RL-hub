@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "vonpawn"
 project.extra["PluginName"] = "NPC Idle Timer"
 project.extra["PluginDescription"] = "A utility to add overhead timers to select npcs to keep track of how long they have been standing on the same tile"
 

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.10"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Equinox-"
 project.extra["PluginName"] = "InfluxDB"
 project.extra["PluginDescription"] = "Saves statistics to InfluxDB"
 

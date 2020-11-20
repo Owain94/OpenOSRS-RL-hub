@@ -47,7 +47,6 @@ import thestonedturtle.partypanel.data.PartyPlayer;
 import thestonedturtle.partypanel.data.Prayers;
 import thestonedturtle.partypanel.ui.prayer.PrayerSprites;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Party Panel",

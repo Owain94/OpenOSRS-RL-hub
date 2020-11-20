@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "hippipi"
 project.extra["PluginName"] = "Volcanic Mine"
 project.extra["PluginDescription"] = "Useful timers for when to start moving in Volcanic Mine"
 

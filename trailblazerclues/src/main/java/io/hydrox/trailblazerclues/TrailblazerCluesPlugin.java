@@ -27,12 +27,6 @@ package io.hydrox.trailblazerclues;
 import com.google.common.collect.ImmutableSet;
 import io.hydrox.trailblazerclues.requirements.ANDGroupedRequirements;
 import io.hydrox.trailblazerclues.requirements.RegionRequirement;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.ItemDefinition;
@@ -51,6 +45,12 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 import org.pf4j.Extension;
 
 @Extension
@@ -114,11 +114,8 @@ public class TrailblazerCluesPlugin extends Plugin
 		for (int varb : CHOSEN_REGION_VARBITS)
 		{
 			int regionID = client.getVarbitValue(varb);
-			if (regionID == 0)
-			{
-				continue;
-			}
-			unlockedRegions.add(Region.fromID(regionID));
+			if (regionID == 0) continue;
+			unlockedRegions.add(Region.fromData(regionID));
 		}
 	}
 
@@ -185,11 +182,11 @@ public class TrailblazerCluesPlugin extends Plugin
 	{
 		if (event.getOption() != null && event.getOption().equals("Read"))
 		{
-			final ItemDefinition ItemDefinition = itemManager.getItemDefinition(event.getIdentifier());
+			final ItemDefinition itemComposition = itemManager.getItemDefinition(event.getIdentifier());
 
-			if (ItemDefinition != null && ItemDefinition.getName().startsWith("Clue scroll"))
+			if (itemComposition != null && itemComposition.getName().startsWith("Clue scroll"))
 			{
-				currentClueHash = ItemDefinition.getId();
+				currentClueHash = itemComposition.getId();
 				currentReqs = Clue.fromMap(currentClueHash);
 			}
 		}

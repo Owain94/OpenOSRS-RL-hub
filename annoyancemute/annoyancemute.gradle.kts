@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Broooklyn"
 project.extra["PluginName"] = "Annoyance Mute"
 project.extra["PluginDescription"] = "Mute annoying sounds without muting all area sounds"
 

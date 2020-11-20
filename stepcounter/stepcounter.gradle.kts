@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "cweeks12"
 project.extra["PluginName"] = "Step Counter"
 project.extra["PluginDescription"] = "Counts the steps you take and if you meet your goal"
 

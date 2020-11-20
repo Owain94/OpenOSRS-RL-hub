@@ -23,11 +23,12 @@ import java.util.*;
 import static net.runelite.api.ItemID.*;
 import org.pf4j.Extension;
 
+
 @Extension
 @PluginDescriptor(
-		name = "Herb Sack Price Check",
-		description = "Price checks the herbs in herb sack",
-		tags = {"herbs", "prices"},
+	name = "Herb Sack Price Check",
+	description = "Price checks the herbs in herb sack",
+	tags = {"herbs", "prices"},
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )

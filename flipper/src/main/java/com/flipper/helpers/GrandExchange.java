@@ -31,7 +31,7 @@ public class GrandExchange {
 
     /**
      * Potentially creates a transaction based on the GrandExchange event
-     * @param newOfferEvent
+     * @param
      * @return null or newly created transaction
      */
     public static Transaction createTransactionFromOffer(GrandExchangeOffer offer, ItemManager itemManager) {

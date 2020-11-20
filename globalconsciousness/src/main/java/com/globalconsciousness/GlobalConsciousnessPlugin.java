@@ -16,11 +16,10 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-		name = "Global Consciousness",
-		description = "Channel your inner Rendi to unlock the power of global consciousness and... just get the drop lul.",
+	name = "Global Consciousness",
+	description = "Channel your inner Rendi to unlock the power of global consciousness and... just get the drop lul.",
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )

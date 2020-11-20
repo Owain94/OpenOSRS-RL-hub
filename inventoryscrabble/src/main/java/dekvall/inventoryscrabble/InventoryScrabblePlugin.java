@@ -39,7 +39,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Inventory Scrabble",
@@ -73,7 +72,6 @@ public class InventoryScrabblePlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Inventory Scrabble started!");
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			clientThread.invokeLater(() -> {
@@ -87,7 +85,6 @@ public class InventoryScrabblePlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		counts.clear();
-		log.info("Inventory Scrabble stopped!");
 	}
 
 	@Subscribe

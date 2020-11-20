@@ -40,8 +40,8 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import java.util.Random;
+import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
 /*

@@ -21,7 +21,6 @@ import java.sql.Time;
 import java.util.ArrayList;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "XP Grapher",
@@ -29,8 +28,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
-public class XpGrapherPlugin extends Plugin
-{
+public class XpGrapherPlugin extends Plugin {
 
 	@Inject
 	private Client client;
@@ -68,6 +66,7 @@ public class XpGrapherPlugin extends Plugin
 	}
 
 
+
 	@com.google.inject.Inject
 	private XpGrapherOverlay overlay;
 
@@ -95,34 +94,23 @@ public class XpGrapherPlugin extends Plugin
 		overlayManager.remove(overlay);
 	}
 
-	private boolean isSkillCurrentlyGraphed(Skill theSkill)
-	{
-		for (int i = 0; i < currentlyGraphedSkills.size(); i++)
-		{
+	private boolean isSkillCurrentlyGraphed(Skill theSkill) {
+		for (int i = 0; i < currentlyGraphedSkills.size(); i++) {
 			if (currentlyGraphedSkills.get(i).getName() == theSkill.getName())
-			{
 				return true;
-			}
 		}
 		return false;
 	}
 
-	public void graphSkill(Skill skillToAdd)
-	{
+	public void graphSkill(Skill skillToAdd) {
 		mostRecentSkillGained = skillToAdd;
-		if (!isSkillCurrentlyGraphed(skillToAdd))
-		{
-			if (currentlyGraphedSkills.size() < config.maxSkillsToGraph())
-			{
+		if (!isSkillCurrentlyGraphed(skillToAdd)) {
+			if (currentlyGraphedSkills.size() < config.maxSkillsToGraph()) {
 				currentlyGraphedSkills.add(skillToAdd);
 				xpGraphPointManager.isSkillShownMap.put(skillToAdd, true);
-			}
-			else
-			{
-				while (currentlyGraphedSkills.size() > config.maxSkillsToGraph())
-				{
+			} else {
+				while(currentlyGraphedSkills.size() > config.maxSkillsToGraph())
 					removeSkill();
-				}
 				currentlyGraphedSkills.add(skillToAdd);
 				xpGraphPointManager.isSkillShownMap.put(skillToAdd, true);
 			}
@@ -130,8 +118,7 @@ public class XpGrapherPlugin extends Plugin
 
 	}
 
-	public void removeSkill()
-	{
+	public void removeSkill() {
 		xpGraphPointManager.isSkillShownMap.put(currentlyGraphedSkills.get(0), false);
 		currentlyGraphedSkills.remove(0);
 	}
@@ -146,11 +133,9 @@ public class XpGrapherPlugin extends Plugin
 		xpDataManager.update();
 		xpGraphPointManager.update();
 
-		if (currentlyGraphedSkills.size() > config.maxSkillsToGraph())
-		{
+		if (currentlyGraphedSkills.size() > config.maxSkillsToGraph()) {
 			int excessAmount = currentlyGraphedSkills.size() - config.maxSkillsToGraph();
-			for (int i = 0; i < excessAmount; i++)
-			{
+			for (int i = 0; i <  excessAmount; i++) {
 				removeSkill();
 			}
 		}
@@ -162,8 +147,7 @@ public class XpGrapherPlugin extends Plugin
 		tickCount++;
 
 		thisTickResetGraphSwitch = config.resetGraph();
-		if (thisTickResetGraphSwitch && !lastTickResetGraphSwitch)
-		{
+		if (thisTickResetGraphSwitch && !lastTickResetGraphSwitch) {
 			resetAll();
 		}
 
@@ -171,8 +155,7 @@ public class XpGrapherPlugin extends Plugin
 
 	}
 
-	private void resetAll()
-	{
+	private void resetAll() {
 		xpDataManager = new XpDataManager(this);
 		xpGraphPointManager = new XpGraphPointManager(this);
 		startTime = System.currentTimeMillis();
@@ -180,13 +163,11 @@ public class XpGrapherPlugin extends Plugin
 		tickCount = 0;
 	}
 
-	public Client getClient()
-	{
+	public Client getClient() {
 		return client;
 	}
 
-	public boolean isSkillShown(Skill skill)
-	{
+	public boolean isSkillShown(Skill skill) {
 
 		return xpGraphPointManager.isSkillShown(skill);
 	}

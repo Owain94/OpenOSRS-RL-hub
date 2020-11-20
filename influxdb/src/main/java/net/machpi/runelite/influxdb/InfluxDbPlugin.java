@@ -34,8 +34,6 @@ import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -46,7 +44,7 @@ import org.pf4j.Extension;
 @PluginDescriptor(
         name = "InfluxDB",
         description = "Saves statistics to InfluxDB",
-        tags = {"experience", "levels", "stats", "activity", "tracker"},
+	tags = {"experience", "levels", "stats", "activity", "tracker"},
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
@@ -86,6 +84,8 @@ public class InfluxDbPlugin extends Plugin {
 
     @Subscribe
     public void onStatChanged(StatChanged statChanged) {
+        if (measurer.isInLastManStanding())
+            return;
         if (statChanged.getXp() == 0 || client.getGameState() != GameState.LOGGED_IN)
             return;
         final Integer previous = previousStatXp.put(statChanged.getSkill(), statChanged.getXp());
@@ -132,7 +132,7 @@ public class InfluxDbPlugin extends Plugin {
     }
 
     private void measureInitialState() {
-        if (config.writeXp()) {
+        if (config.writeXp() && !measurer.isInLastManStanding()) {
             for (Skill s : Skill.values()) {
                 measurer.createXpMeasurement(s).ifPresent(writer::submit);
             }
@@ -153,9 +153,6 @@ public class InfluxDbPlugin extends Plugin {
         if (container == null)
             return;
         Item[] items = container.getItems();
-        if (items == null)
-            return;
-
         InventoryID id = null;
         for (InventoryID val : InventoryID.values()) {
             if (val.getId() == event.getContainerId()) {

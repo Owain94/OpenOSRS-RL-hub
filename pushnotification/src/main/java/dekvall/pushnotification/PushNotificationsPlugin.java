@@ -22,7 +22,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Push Notifications",
@@ -30,6 +29,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class PushNotificationsPlugin extends Plugin
 {
 	@Inject
@@ -37,18 +37,6 @@ public class PushNotificationsPlugin extends Plugin
 
 	@Inject
 	private PushNotificationsConfig config;
-
-	@Override
-	protected void startUp() throws Exception
-	{
-		log.info("Push Notifications started!");
-	}
-
-	@Override
-	protected void shutDown() throws Exception
-	{
-		log.info("Push Notifications stopped!");
-	}
 
 	@Provides
 	PushNotificationsConfig provideConfig(ConfigManager configManager)
@@ -58,6 +46,12 @@ public class PushNotificationsPlugin extends Plugin
 
 	@Subscribe
 	public void onNotificationFired(NotificationFired event)
+	{
+		handlePushbullet(event);
+		handlePushover(event);
+	}
+
+	private void handlePushbullet(NotificationFired event)
 	{
 		if(Strings.isNullOrEmpty(config.pushbullet()))
 		{
@@ -87,6 +81,37 @@ public class PushNotificationsPlugin extends Plugin
 			.build();
 
 		sendRequest("Pushbullet", request);
+	}
+
+	private void handlePushover(NotificationFired event)
+	{
+		if(Strings.isNullOrEmpty(config.pushover_api()) || Strings.isNullOrEmpty(config.pushover_user()))
+		{
+			return;
+		}
+
+		HttpUrl url = new HttpUrl.Builder()
+			.scheme("https")
+			.host("api.pushover.net")
+			.addPathSegment("1")
+			.addPathSegment("messages.json")
+			.build();
+
+		RequestBody push = new FormBody.Builder()
+			.add("token", config.pushover_api())
+			.add("user", config.pushover_user())
+			.add("message", event.getMessage())
+			.build();
+
+		Request request = new Request.Builder()
+			.header("User-Agent", "RuneLite")
+			.header("Content-Type", "application/json")
+			.header("User-Agent", "RuneLite")
+			.post(push)
+			.url(url)
+			.build();
+
+		sendRequest("Pushover", request);
 	}
 
 	private static void sendRequest(String platform, Request request)

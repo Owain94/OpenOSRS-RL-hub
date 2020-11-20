@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "TheStonedTurtle"
 project.extra["PluginName"] = "Crab Solver"
 project.extra["PluginDescription"] = "Shows the correct color for each crab crystal"
 

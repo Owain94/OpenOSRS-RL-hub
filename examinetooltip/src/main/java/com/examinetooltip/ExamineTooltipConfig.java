@@ -184,10 +184,22 @@ public interface ExamineTooltipConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "showPatchInspects",
+		name = "Show farming patch inspects",
+		description = "Show text from inspecting farming patches",
+		position = 19,
+		titleSection = "examineTypesSettings"
+	)
+	default boolean showPatchInspects()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "tooltipTimeout",
 		name = "Tooltip timeout",
 		description = "How long to show the examine tooltip",
-		position = 19,
+		position = 20,
 		titleSection = "displaySettings"
 	)
 	@Units(Units.SECONDS)
@@ -201,7 +213,7 @@ public interface ExamineTooltipConfig extends Config
 		keyName = "tooltipFadeout",
 		name = "Tooltip fadeout",
 		description = "Start fading out the tooltip X milliseconds before it disappears, 0 means no fadeout",
-		position = 20,
+		position = 21,
 		titleSection = "displaySettings"
 	)
 	@Units(Units.MILLISECONDS)
@@ -212,10 +224,24 @@ public interface ExamineTooltipConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "patchInspectExtraTime",
+		name = "Patch extra time",
+		description = "Add extra time to show the tooltip when inspecting farming patches (the text is typically quite long)",
+		position = 22,
+		titleSection = "displaySettings"
+	)
+	@Units(Units.SECONDS)
+	@Range(max = 10)
+	default int patchInspectExtraTime()
+	{
+		return 2;
+	}
+
+	@ConfigItem(
 		keyName = "wrapTooltip",
 		name = "Wrap tooltip",
 		description = "Wrap the text in the tooltip if it gets too long",
-		position = 21,
+		position = 23,
 		titleSection = "displaySettings"
 	)
 	default boolean wrapTooltip()
@@ -227,7 +253,7 @@ public interface ExamineTooltipConfig extends Config
 		keyName = "wrapTooltipColumns",
 		name = "Wrap columns",
 		description = "How many text columns (or characters) before wrapping the text",
-		position = 22,
+		position = 24,
 		titleSection = "displaySettings"
 	)
 	@Range(
@@ -243,7 +269,7 @@ public interface ExamineTooltipConfig extends Config
 		keyName = "customBackgroundColor",
 		name = "Custom background color",
 		description = "Use a custom background color instead of the globally configured overlay background default",
-		position = 23,
+		position = 25,
 		titleSection = "displaySettings"
 	)
 	Color customBackgroundColor();

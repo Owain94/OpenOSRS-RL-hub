@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "AaronPoon"
 project.extra["PluginName"] = "Essence Running"
 project.extra["PluginDescription"] = "QoL for essence runners"
 

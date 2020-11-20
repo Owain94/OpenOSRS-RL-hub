@@ -34,7 +34,11 @@ import net.runelite.client.config.ConfigItem;
 @ConfigGroup("discordraredropnotificater")
 public interface DiscordRareDropNotificaterConfig extends Config
 {
-	@ConfigItem(keyName = "webhookurl", name = "Discord webhook URL", description = "The Discord Webhook URL to use")
+	@ConfigItem(
+			keyName = "webhookurl",
+			name = "Discord webhook URL(s)",
+			description = "The Discord Webhook URL(s) to use, separated by newline"
+	)
 	default String webhookUrl()
 	{
 		return "";
@@ -58,5 +62,21 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	default int minValue()
 	{
 		return 50000;
+	}
+
+	@ConfigItem(keyName = "sendscreenshot", name = "Send Screenshot", description = "Whether to send a screenshot")
+	default boolean sendScreenshot()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "ignoredkeywords",
+			name = "Ignored Keywords",
+			description = "(NPC drops only) comma-separated list of keywords in item name for items to ignore"
+	)
+	default String ignoredKeywords()
+	{
+		return "grimy,seed";
 	}
 }

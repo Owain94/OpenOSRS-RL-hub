@@ -2,237 +2,191 @@ package renderer.cache;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import renderer.util.FastIntMap;
 import renderer.util.NetworkBuffer;
 import renderer.util.Util;
 
-public class Archive
-{
-	public int id;
-	public int hash;
-	public int crc;
-	public int version;
-	private final Int2ObjectMap<Group> groups = new FastIntMap<>();
-	private final Int2ObjectMap<Group> namedGroups = new Int2ObjectOpenHashMap<>();
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.zip.GZIPInputStream;
 
-	public Archive(int id)
-	{
-		this.id = id;
-	}
+public class Archive {
+    public int id;
+    public int hash;
+    public int crc;
+    public int version;
+    private final Int2ObjectMap<Group> groups = new FastIntMap<>();
+    private final Int2ObjectMap<Group> namedGroups = new Int2ObjectOpenHashMap<>();
 
-	public void load(int indexCrc, int indexVersion)
-	{
-		crc = indexCrc;
-		version = indexVersion;
+    public Archive(int id) {
+        this.id = id;
+    }
 
-		byte[] data = CacheFiles.read(255, id);
+    public void load(int indexCrc, int indexVersion) {
+        crc = indexCrc;
+        version = indexVersion;
 
-		if (data == null || Util.crc(data) != indexCrc && indexCrc != 0)
-		{
-			requestMaster();
-			return;
-		}
+        byte[] data = CacheFiles.read(255, id);
 
-		NetworkBuffer decompressed = new NetworkBuffer(decompress(data));
-		int type = decompressed.readUnsignedByte();
+        if (data == null || Util.crc(data) != indexCrc && indexCrc != 0) {
+            requestMaster();
+            return;
+        }
 
-		if (type != 5 && type != 6)
-		{
-			throw new IllegalStateException();
-		}
+        NetworkBuffer decompressed = new NetworkBuffer(decompress(data));
+        int type = decompressed.readUnsignedByte();
 
-		if (type == 6)
-		{
-			decompressed.readInt();
-		}
+        if (type != 5 && type != 6) {
+            throw new IllegalStateException();
+        }
 
-		loadIndex(data);
-	}
+        if (type == 6) {
+            decompressed.readInt();
+        }
 
-	public void requestMaster()
-	{
-		Js5.request(255, id, true, data -> {
-			if (Util.crc(data) != crc)
-			{
-				throw new AssertionError("crc");
-			}
+        loadIndex(data);
+    }
 
-			CacheFiles.write(255, id, data);
-			loadIndex(data);
-		});
-	}
+    public void requestMaster() {
+        Js5.request(255, id, true, data -> {
+            if (Util.crc(data) != crc) {
+                throw new AssertionError("crc");
+            }
 
-	private void loadIndex(byte[] data)
-	{
-		hash = Util.crc(data);
-		NetworkBuffer buffer = new NetworkBuffer(decompress(data));
-		int type = buffer.readUnsignedByte();
+            CacheFiles.write(255, id, data);
+            loadIndex(data);
+        });
+    }
 
-		if (type != 5 && type != 6)
-		{
-			throw new RuntimeException();
-		}
+    private void loadIndex(byte[] data) {
+        hash = Util.crc(data);
+        NetworkBuffer buffer = new NetworkBuffer(decompress(data));
+        int type = buffer.readUnsignedByte();
 
-		if (type == 6)
-		{
-			buffer.readInt();
-		}
+        if (type != 5 && type != 6) {
+            throw new RuntimeException();
+        }
 
-		boolean hasNames = buffer.readUnsignedByte() != 0;
-		int gc = type >= 7 ? buffer.readShortOrInt() : buffer.readUnsignedShort();
+        if (type == 6) {
+            buffer.readInt();
+        }
 
-		Group[] groups = new Group[gc];
+        boolean hasNames = buffer.readUnsignedByte() != 0;
+        int gc = type >= 7 ? buffer.readShortOrInt() : buffer.readUnsignedShort();
 
-		for (int i = 0; i < groups.length; i++)
-		{
-			groups[i] = new Group();
-		}
+        Group[] groups = new Group[gc];
 
-		int id = 0;
+        for (int i = 0; i < groups.length; i++) {
+            groups[i] = new Group();
+        }
 
-		for (Group group : groups)
-		{
-			id += buffer.readUnsignedShort();
-			group.id = id;
-			this.groups.put(id, group);
-		}
+        int id = 0;
 
-		if (hasNames)
-		{
-			for (Group group : groups)
-			{
-				namedGroups.put(buffer.readInt(), group);
-			}
-		}
+        for (Group group : groups) {
+            id += buffer.readUnsignedShort();
+            group.id = id;
+            this.groups.put(id, group);
+        }
 
-		for (Group group : groups)
-		{
-			group.crc = buffer.readInt();
-		}
-		for (Group group : groups)
-		{
-			group.version = buffer.readInt();
-		}
-		for (Group group : groups)
-		{
-			group.fileCount = buffer.readUnsignedShort();
-		}
+        if (hasNames) {
+            for (Group group : groups) {
+                namedGroups.put(buffer.readInt(), group);
+            }
+        }
 
-		for (Group group : groups)
-		{
-			group.fileIds = new int[group.fileCount];
-			int fileId = 0;
+        for (Group group : groups) group.crc = buffer.readInt();
+        for (Group group : groups) group.version = buffer.readInt();
+        for (Group group : groups) group.fileCount = buffer.readUnsignedShort();
 
-			for (int i = 0; i < group.fileCount; ++i)
-			{
-				fileId += buffer.readUnsignedShort();
-				group.fileIds[i] = fileId;
-			}
-		}
+        for (Group group : groups) {
+            group.fileIds = new int[group.fileCount];
+            int fileId = 0;
 
-		if (hasNames)
-		{
-			for (Group group : groups)
-			{
-				group.fileNameHashes = new int[group.fileCount];
+            for (int i = 0; i < group.fileCount; ++i) {
+                fileId += buffer.readUnsignedShort();
+                group.fileIds[i] = fileId;
+            }
+        }
 
-				for (int i = 0; i < group.fileCount; ++i)
-				{
-					group.fileNameHashes[group.fileNameHashes[i]] = buffer.readInt();
-				}
-			}
-		}
+        if (hasNames) {
+            for (Group group : groups) {
+                group.fileNameHashes = new int[group.fileCount];
 
-		for (Group group : this.groups.values())
-		{
-			byte[] groupData = CacheFiles.read(this.id, group.id);
+                for (int i = 0; i < group.fileCount; ++i) {
+                    group.fileNameHashes[group.fileNameHashes[i]] = buffer.readInt();
+                }
+            }
+        }
 
-			if (groupData == null || Util.crc(groupData) != group(group.id).crc)
-			{
-				Js5.request(this.id, group.id, false, d -> {
-					if (Util.crc(d) != group(group.id).crc)
-					{
-						throw new IllegalStateException("received crc doesn't match");
-					}
+        for (Group group : this.groups.values()) {
+            byte[] groupData = CacheFiles.read(this.id, group.id);
 
-					CacheFiles.write(this.id, group.id, d);
-					group(group.id).data = Util.toBuffer(d);
-				});
-			}
-			else
-			{
-				group(group.id).data = Util.toBuffer(groupData);
-			}
-		}
-	}
+            if (groupData == null || Util.crc(groupData) != group(group.id).crc) {
+                Js5.request(this.id, group.id, false, d -> {
+                    if (Util.crc(d) != group(group.id).crc) {
+                        throw new IllegalStateException("received crc doesn't match");
+                    }
 
-	public Group group(int group)
-	{
-		return groups.get(group);
-	}
+                    CacheFiles.write(this.id, group.id, d);
+                    group(group.id).data = Util.toBuffer(d);
+                });
+            } else {
+                group(group.id).data = Util.toBuffer(groupData);
+            }
+        }
+    }
 
-	public Group group(String name)
-	{
-		return namedGroups.get(hash(name.toLowerCase()));
-	}
+    public Group group(int group) {
+        return groups.get(group);
+    }
 
-	public static int hash(String s)
-	{
-		int length = s.length();
-		int hash = 0;
+    public Group group(String name) {
+        return namedGroups.get(hash(name.toLowerCase()));
+    }
 
-		for (int i = 0; i < length; ++i)
-		{
-			hash = (hash << 5) - hash + Util.toCp1252(s.charAt(i));
-		}
+    public static int hash(String s) {
+        int length = s.length();
+        int hash = 0;
 
-		return hash;
-	}
+        for (int i = 0; i < length; ++i) {
+            hash = (hash << 5) - hash + Util.toCp1252(s.charAt(i));
+        }
 
-	public static byte[] decompress(byte[] bytes)
-	{
-		try
-		{
-			NetworkBuffer buffer = new NetworkBuffer(bytes);
-			int compressionType = buffer.readUnsignedByte();
-			int size = buffer.readInt();
+        return hash;
+    }
 
-			switch (compressionType)
-			{
-				case 0:
-				{
-					return buffer.read(size);
-				}
-				case 1:
-				{
-					int uncompressedSize = buffer.readInt();
-					byte[] data = new byte[4 + buffer.array.length - buffer.offset];
-					data[0] = 'B';
-					data[1] = 'Z';
-					data[2] = 'h';
-					data[3] = '1';
-					System.arraycopy(buffer.array, buffer.offset, data, 4, buffer.array.length - buffer.offset);
-					return Util.readNBytes(new BZip2CompressorInputStream(new ByteArrayInputStream(data)), uncompressedSize);
-				}
-				case 2:
-				{
-					int uncompressedSize = buffer.readInt();
-					return Util.readNBytes(new GZIPInputStream(buffer.stream()), uncompressedSize);
-				}
-				default:
-				{
-					throw new AssertionError("unknown compression type " + compressionType);
-				}
-			}
-		}
-		catch (IOException e)
-		{
-			throw new UncheckedIOException(e);
-		}
-	}
+    public static byte[] decompress(byte[] bytes) {
+        try {
+            NetworkBuffer buffer = new NetworkBuffer(bytes);
+            int compressionType = buffer.readUnsignedByte();
+            int size = buffer.readInt();
+
+            switch (compressionType) {
+                case 0: {
+                    return buffer.read(size);
+                }
+                case 1: {
+                    int uncompressedSize = buffer.readInt();
+                    byte[] data = new byte[4 + buffer.array.length - buffer.offset];
+                    data[0] = 'B';
+                    data[1] = 'Z';
+                    data[2] = 'h';
+                    data[3] = '1';
+                    System.arraycopy(buffer.array, buffer.offset, data, 4, buffer.array.length - buffer.offset);
+                    return Util.readNBytes(new BZip2CompressorInputStream(new ByteArrayInputStream(data)), uncompressedSize);
+                }
+                case 2: {
+                    int uncompressedSize = buffer.readInt();
+                    return Util.readNBytes(new GZIPInputStream(buffer.stream()), uncompressedSize);
+                }
+                default: {
+                    throw new AssertionError("unknown compression type " + compressionType);
+                }
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }

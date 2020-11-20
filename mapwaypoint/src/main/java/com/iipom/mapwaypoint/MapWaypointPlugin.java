@@ -30,12 +30,11 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "Map Waypoints",
-        description = "Adds waypoint functionality to the world map (via double-click) with a direction overlay",
-        tags = {"map", "waypoint", "distance"},
+	name = "Map Waypoints",
+	description = "Adds waypoint functionality to the world map (via double-click) with a direction overlay",
+	tags = {"map", "waypoint", "distance"},
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Tjieco"
 project.extra["PluginName"] = "Zalcano"
 project.extra["PluginDescription"] = "Zalcano Utility Plugin"
 

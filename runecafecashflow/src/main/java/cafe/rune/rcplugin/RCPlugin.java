@@ -27,9 +27,9 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-		name = "RuneCafe Cash Flow",
-		description = "Plugin providing RuneLite integration for rune.cafe.",
-		tags = {"external", "integration", "prices", "trade"},
+	name = "RuneCafe Cash Flow",
+	description = "Plugin providing RuneLite integration for rune.cafe.",
+	tags = {"external", "integration", "prices", "trade"},
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )

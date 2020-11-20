@@ -15,6 +15,7 @@ import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
@@ -35,9 +36,11 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import org.pf4j.Extension;
 
 @Extension
-@Slf4j
 @PluginDescriptor(
-	name = "OsLeague"
+	name = "OsLeague",
+	description = "who needs one anyways, right?",
+	enabledByDefault = false,
+	type = PluginType.MISCELLANEOUS
 )
 public class OsLeaguePlugin extends Plugin
 {

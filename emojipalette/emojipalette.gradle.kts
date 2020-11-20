@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "hjdarnel"
 project.extra["PluginName"] = "Emoji palette"
 project.extra["PluginDescription"] = "Shows a panel with all the emoji"
 

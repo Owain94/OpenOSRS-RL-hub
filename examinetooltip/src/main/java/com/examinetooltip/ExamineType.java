@@ -32,5 +32,6 @@ public enum ExamineType
 	ITEM_INTERFACE,
 	OBJECT,
 	NPC,
-	PRICE_CHECK
+	PRICE_CHECK,
+	PATCH_INSPECT
 }

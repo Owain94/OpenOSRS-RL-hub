@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "ffalor"
 project.extra["PluginName"] = "Wellness Notifications"
 project.extra["PluginDescription"] = "A plugin to add reminders that promote wellness and healthy gaming."
 

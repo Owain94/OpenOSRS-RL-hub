@@ -41,21 +41,20 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import java.time.Duration;
 import java.time.Instant;
+import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
 
 @Extension
 @PluginDescriptor(
-        name = "Volcanic Mine",
-        description = "Useful timers for when to start moving in Volcanic Mine",
-        tags = {"volcanic", "mine", "vm", "mining", "timer", "warning"},
+	name = "Volcanic Mine",
+	description = "Useful timers for when to start moving in Volcanic Mine",
+	tags = {"volcanic", "mine", "vm", "mining", "timer", "warning"},
 	enabledByDefault = false,
 	type = PluginType.SKILLING
 )
-@Slf4j
 public class VMPlugin extends Plugin
 {
     // Chat messages

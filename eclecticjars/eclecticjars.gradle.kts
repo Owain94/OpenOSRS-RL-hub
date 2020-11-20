@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "zenpj"
 project.extra["PluginName"] = "Eclectic Jar Tracker"
 project.extra["PluginDescription"] = "Tracks profits of opening eclectic impling jars"
 

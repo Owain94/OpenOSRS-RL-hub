@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "evansloan"
 project.extra["PluginName"] = "Collection Log"
 project.extra["PluginDescription"] = "Add items obtained/total items to the top of the collection log"
 

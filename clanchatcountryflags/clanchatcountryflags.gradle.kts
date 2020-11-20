@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.8"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "melkypie"
 project.extra["PluginName"] = "Clan Chat Country Flags"
 project.extra["PluginDescription"] = "Shows the flag of the world next to the world number"
 

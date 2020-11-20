@@ -35,14 +35,17 @@ import com.masterkenth.discord.Field;
 import com.masterkenth.discord.Image;
 import com.masterkenth.discord.Webhook;
 
+import net.runelite.api.Item;
 import net.runelite.api.ItemDefinition;
 import net.runelite.client.plugins.PluginType;
 import org.json.JSONObject;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
 import java.awt.image.BufferedImage;
@@ -58,23 +61,23 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.loottracker.LootReceived;
 import net.runelite.client.ui.DrawManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStack;
-import net.runelite.client.plugins.loottracker.LootReceived;
 import net.runelite.http.api.loottracker.LootRecordType;
 import okhttp3.HttpUrl;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 		name = "Discord Rare Drop Notificater",
 		description = "Sends a detailed notification via Discord webhooks whenever you get a rare/unique drop.",
-		tags = { "discord", "loot", "unique", "boss", "notification" },
+	tags = { "discord", "loot", "unique", "boss", "notification" },
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class DiscordRareDropNotificaterPlugin extends Plugin
 {
 	private static final String PET_MESSAGE_DUPLICATE = "You have a funny feeling like you would have been followed";
@@ -113,11 +116,27 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 		List<CompletableFuture<Boolean>> futures = new ArrayList<CompletableFuture<Boolean>>();
 		for (ItemStack item : items)
 		{
-			futures.add(processItemRarityNPC(npc, item.getId(), item.getQuantity()));
+			ItemDefinition comp = itemManager.getItemDefinition(item.getId());
+			if (!shouldBeIgnored(comp.getName()))
+			{
+				futures.add(processItemRarityNPC(npc, item.getId(), item.getQuantity()));
+			}
+		}
+
+		if (futures.size() > 0)
+		{
+			CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+					.thenAccept(_v -> sendScreenshotIfSupposedTo());
 		}
 
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
-				.thenAccept(_v -> sendScreenshotIfSupposedTo());
+				.thenAccept(_v -> sendScreenshotIfSupposedTo()).exceptionally(e ->
+				{
+					log.error(String.format("onNpcLootReceived error: %s", e.getMessage()), e);
+					log.error(String.format("npc %d items %s", npcLootReceived.getNpc().getId(),
+							npcLootReceived.getItems().stream().map(i -> "" + i.getId()).reduce("", (p, c) -> p + ", " + c)));
+					return null;
+				});
 	}
 
 	@Subscribe
@@ -134,11 +153,26 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 		List<CompletableFuture<Boolean>> futures = new ArrayList<CompletableFuture<Boolean>>();
 		for (ItemStack item : items)
 		{
-			futures.add(processItemRarityEvent(lootReceived.getName(), item.getId(), item.getQuantity()));
+			ItemDefinition comp = itemManager.getItemDefinition(item.getId());
+			if (!shouldBeIgnored(comp.getName()))
+			{
+				futures.add(processItemRarityEvent(lootReceived.getName(), item.getId(), item.getQuantity()));
+			}
 		}
 
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
-				.thenAccept(_v -> sendScreenshotIfSupposedTo());
+				.thenAccept(_v -> sendScreenshotIfSupposedTo()).exceptionally(e ->
+				{
+					log.error(String.format("onLootReceived error: %s", e.getMessage()), e);
+					log.error(String.format("event %s items %s", lootReceived.getName(),
+							lootReceived.getItems().stream().map(i -> "" + i.getId()).reduce("", (p, c) -> p + ", " + c)));
+					return null;
+				});
+		if (futures.size() > 0)
+		{
+			CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+					.thenAccept(_v -> sendScreenshotIfSupposedTo());
+		}
 	}
 
 	@Subscribe
@@ -146,21 +180,38 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 	{
 		String chatMessage = event.getMessage();
 
+		// TODO: filter by sender (e.g. game not player) but for now allow all for
+		// testing
 		if (PET_MESSAGES.stream().anyMatch(chatMessage::contains))
 		{
 			boolean isDuplicate = chatMessage.contains(PET_MESSAGE_DUPLICATE);
 			log.info(String.format("Possible pet: duplicate=%b (%s, %s) %s", isDuplicate, event.getSender(), event.getName(),
 					event.getMessage()));
-			getScreenshot().thenAccept(screenshot ->
-			{
-				// Waiting for screenshot before checking pet allows us to wait one frame, in
-				// case pet data is not available yet
 
-				// TODO: Figure out how to get pet info
-				queuePetNotification(getPlayerName(), getPlayerIconUrl(), null, -1, isDuplicate)
-						.thenCompose(_v -> sendScreenshot(config.webhookUrl(), screenshot));
-			});
+			CompletableFuture<java.awt.Image> screenshotFuture = config.sendScreenshot() ? getScreenshot()
+					: CompletableFuture.completedFuture(null);
+
+			screenshotFuture
+					// Waiting for screenshot before checking pet allows us to wait one frame, in
+					// case pet data is not available yet
+					// TODO: Figure out how to get pet info
+					.thenApply(screenshot -> queuePetNotification(getPlayerName(), getPlayerIconUrl(), null, -1, isDuplicate)
+							.thenCompose(_v -> screenshot != null ? sendScreenshot(getWebhookUrls(), screenshot)
+									: CompletableFuture.completedFuture(null)))
+					.exceptionally(e ->
+					{
+						log.error(String.format("onChatMessage (pet) error: %s", e.getMessage()), e);
+						log.error(event.toString());
+						return null;
+					});
 		}
+	}
+
+	private boolean shouldBeIgnored(String itemName)
+	{
+		String lowerName = itemName.toLowerCase();
+		List<String> keywords = Arrays.asList(config.ignoredKeywords().split(","));
+		return keywords.stream().anyMatch(key -> key.length() > 0 && lowerName.contains(key.toLowerCase()));
 	}
 
 	private CompletableFuture<Boolean> processItemRarityEvent(String eventName, int itemId, int quantity)
@@ -170,7 +221,7 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 		if (rarity >= 0)
 		{
 			queueScreenshot();
-			return QueueLootNotification(getPlayerName(), getPlayerIconUrl(), itemId, quantity, rarity, -1, -1, null,
+			return queueLootNotification(getPlayerName(), getPlayerIconUrl(), itemId, quantity, rarity, -1, -1, null,
 					eventName, config.webhookUrl()).thenApply(_v -> true);
 		}
 		return CompletableFuture.completedFuture(false);
@@ -190,7 +241,7 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 			{
 				CompletableFuture<Boolean> f = new CompletableFuture<>();
 				queueScreenshot();
-				QueueLootNotification(getPlayerName(), getPlayerIconUrl(), itemId, quantity, rarity, npcId, npcCombatLevel,
+				queueLootNotification(getPlayerName(), getPlayerIconUrl(), itemId, quantity, rarity, npcId, npcCombatLevel,
 						npcName, null, config.webhookUrl()).handle((_v, e) ->
 						{
 							if (e != null)
@@ -214,7 +265,7 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 
 	private void queueScreenshot()
 	{
-		if (queuedScreenshot == null)
+		if (queuedScreenshot == null && config.sendScreenshot())
 		{
 			queuedScreenshot = getScreenshot();
 		}
@@ -222,19 +273,23 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 
 	private void sendScreenshotIfSupposedTo()
 	{
-		if (queuedScreenshot != null)
+		if (queuedScreenshot != null && config.sendScreenshot())
 		{
 			CompletableFuture<java.awt.Image> copy = queuedScreenshot;
 			queuedScreenshot = null;
-			copy.thenAccept(screenshot ->
+			copy.thenAccept(screenshot -> sendScreenshot(getWebhookUrls(), screenshot)).handle((v, e) ->
 			{
-				sendScreenshot(config.webhookUrl(), screenshot);
+				if (e != null)
+				{
+					log.error(String.format("sendScreenshotIfSupposedTo error: %s", e.getMessage()), e);
+				}
 				queuedScreenshot = null;
+				return null;
 			});
 		}
 	}
 
-	private CompletableFuture<Void> QueueLootNotification(String playerName, String playerIconUrl, int itemId,
+	private CompletableFuture<Void> queueLootNotification(String playerName, String playerIconUrl, int itemId,
 			int quantity, float rarity, int npcId, int npcCombatLevel, String npcName, String eventName, String webhookUrl)
 	{
 		Author author = new Author();
@@ -266,10 +321,15 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 
 		Image thumbnail = new Image();
 		CompletableFuture<Void> iconFuture = ApiTool.getInstance()
-				.getIconUrl("item", itemId, itemManager.getItemDefinition(itemId).getName()).thenAccept(iconUrl ->
+				.getIconUrl("item", itemId, itemManager.getItemDefinition(itemId).getName()).handle((iconUrl, e) ->
 				{
+					if (e != null)
+					{
+						log.error(String.format("queueLootNotification (icon %d) error: %s", itemId, e.getMessage()), e);
+					}
 					thumbnail.setUrl(iconUrl);
 					embed.setThumbnail(thumbnail);
+					return null;
 				});
 
 		CompletableFuture<Void> descFuture = getLootNotificationDescription(itemId, quantity, npcId, npcCombatLevel,
@@ -277,7 +337,7 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 				{
 					if (e != null)
 					{
-						log.error("unable to get item desc for " + itemId + " (" + e.getMessage() + ")");
+						log.error(String.format("queueLootNotification (desc %d) error: %s", itemId, e.getMessage()), e);
 					}
 					embed.setDescription(notifDesc);
 					return null;
@@ -287,7 +347,7 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 		{
 			Webhook webhookData = new Webhook();
 			webhookData.setEmbeds(new Embed[] { embed });
-			return sendWebhookData(config.webhookUrl(), webhookData);
+			return sendWebhookData(getWebhookUrls(), webhookData);
 		});
 	}
 
@@ -322,7 +382,7 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 		{
 			Webhook webhookData = new Webhook();
 			webhookData.setEmbeds(new Embed[] { embed });
-			return sendWebhookData(config.webhookUrl(), webhookData);
+			return sendWebhookData(getWebhookUrls(), webhookData);
 		});
 	}
 
@@ -336,23 +396,71 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 		return f;
 	}
 
-	private CompletableFuture<Void> sendWebhookData(String webhookUrl, Webhook webhookData)
+	private CompletableFuture<Void> sendWebhookData(List<String> webhookUrls, Webhook webhookData)
 	{
 		JSONObject json = new JSONObject(webhookData);
 		String jsonStr = json.toString();
-		return ApiTool.getInstance().postRaw(webhookUrl, jsonStr, "application/json").thenAccept(res ->
+
+		List<Throwable> exceptions = new ArrayList<>();
+		List<CompletableFuture<Void>> sends = webhookUrls.stream()
+				.map(url -> ApiTool.getInstance().postRaw(url, jsonStr, "application/json").handle((_v, e) ->
+				{
+					if (e != null)
+					{
+						exceptions.add(e);
+					}
+					return null;
+				}).thenAccept(_v ->
+				{
+				})).collect(Collectors.toList());
+
+		return CompletableFuture.allOf(sends.toArray(new CompletableFuture[sends.size()])).thenCompose(_v ->
 		{
+			if (exceptions.size() > 0)
+			{
+				log.error(String.format("sendWebhookData got %d error(s)", exceptions.size()));
+				exceptions.forEach(t -> log.error(t.getMessage()));
+				CompletableFuture<Void> f = new CompletableFuture<>();
+				f.completeExceptionally(exceptions.get(0));
+				return f;
+			}
+			return CompletableFuture.completedFuture(null);
 		});
 	}
 
-	private CompletableFuture<Void> sendScreenshot(String webhookUrl, java.awt.Image screenshot)
+	private CompletableFuture<Void> sendScreenshot(List<String> webhookUrls, java.awt.Image screenshot)
 	{
 		try
 		{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ImageIO.write((BufferedImage) screenshot, "png", baos);
 			byte[] imageBytes = baos.toByteArray();
-			return ApiTool.getInstance().postFormImage(webhookUrl, imageBytes, "image/png");
+
+			List<Throwable> exceptions = new ArrayList<>();
+			List<CompletableFuture<Void>> sends = webhookUrls.stream()
+					.map(url -> ApiTool.getInstance().postFormImage(url, imageBytes, "image/png").handle((_v, e) ->
+					{
+						if (e != null)
+						{
+							exceptions.add(e);
+						}
+						return null;
+					}).thenAccept(_v ->
+					{
+					})).collect(Collectors.toList());
+
+			return CompletableFuture.allOf(sends.toArray(new CompletableFuture[sends.size()])).thenCompose(_v ->
+			{
+				if (exceptions.size() > 0)
+				{
+					log.error(String.format("sendScreenshot got %d error(s)", exceptions.size()));
+					exceptions.forEach(t -> log.error(t.getMessage()));
+					CompletableFuture<Void> f = new CompletableFuture<>();
+					f.completeExceptionally(exceptions.get(0));
+					return f;
+				}
+				return CompletableFuture.completedFuture(null);
+			});
 		}
 		catch (Exception e)
 		{
@@ -441,5 +549,11 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 	private String getPlayerName()
 	{
 		return client.getLocalPlayer().getName();
+	}
+
+	private List<String> getWebhookUrls()
+	{
+		return Arrays.asList(config.webhookUrl().split("\n")).stream().filter(u -> u.length() > 0)
+				.collect(Collectors.toList());
 	}
 }

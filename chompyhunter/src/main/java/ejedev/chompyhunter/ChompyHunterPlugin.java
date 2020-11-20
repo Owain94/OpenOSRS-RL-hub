@@ -24,13 +24,12 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-        name = "Chompy Hunter",
-        description = "A plugin to overlay chompy birds with a timer and colour based on remaining time till despawn.",
-        tags = {"chompy", "bird", "hunt", "hunting", "chompies"},
-        enabledByDefault = false,
+	name = "Chompy Hunter",
+	description = "A plugin to overlay chompy birds with a timer and colour based on remaining time till despawn.",
+	tags = {"chompy", "bird", "hunt", "hunting", "chompies"},
+	enabledByDefault = false,
 	type = PluginType.MINIGAME
 )
-
 public class ChompyHunterPlugin extends Plugin{
 
     @Inject

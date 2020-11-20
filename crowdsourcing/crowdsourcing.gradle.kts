@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "leejt"
 project.extra["PluginName"] = "OSRS Wiki Crowdsourcing"
 project.extra["PluginDescription"] = "Help figure out skilling success rates, burn rates, more. See osrs.wiki/RS:CROWD"
 

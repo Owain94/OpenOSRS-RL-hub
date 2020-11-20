@@ -52,7 +52,6 @@ import org.pf4j.Extension;
 	type = PluginType.MISCELLANEOUS,
 	enabledByDefault = false
 )
-@Slf4j
 public class CrateLimiterPlugin extends Plugin
 {
 	private static final Set<MenuOpcode> VALID_MENU_ACTIONS = ImmutableSet.of(

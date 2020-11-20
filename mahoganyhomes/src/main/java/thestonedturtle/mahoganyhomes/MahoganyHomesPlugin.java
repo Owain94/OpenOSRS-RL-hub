@@ -43,7 +43,6 @@ import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Mahogany Homes",
@@ -51,6 +50,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.SKILLING
 )
+@Slf4j
 public class MahoganyHomesPlugin extends Plugin
 {
 	@VisibleForTesting

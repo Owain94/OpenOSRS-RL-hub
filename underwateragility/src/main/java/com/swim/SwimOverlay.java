@@ -7,6 +7,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.NPCDefinition;
 import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.events.NpcDefinitionChanged;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -64,7 +65,7 @@ public class SwimOverlay extends Overlay
 
                 for (NPC npc : npcs)
                 {
-                    NPCDefinition npcComposition = npc.getDefinition();
+                    NPCDefinition npcComposition = npc.getTransformedDefinition();
                     int size = npcComposition.getSize();
                     LocalPoint lp = npc.getLocalLocation();
 

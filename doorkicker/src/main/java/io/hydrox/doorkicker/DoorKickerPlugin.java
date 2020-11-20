@@ -46,7 +46,6 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
-@Slf4j
 public class DoorKickerPlugin extends Plugin
 {
 	@Inject

@@ -16,10 +16,9 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "Profit Tracker",
+	name = "Profit Tracker",
 	description = "Track profit while money making.",
 	enabledByDefault = false,
 	type = PluginType.UTILITY
@@ -184,7 +183,6 @@ public class ProfitTrackerPlugin extends Plugin
         else
         {
             /* first time calculation / banking / equipping */
-            log.info("Skipping profit calculation!");
 
             skipTickForProfitCalculation = false;
 
@@ -205,7 +203,6 @@ public class ProfitTrackerPlugin extends Plugin
         this event tells us when inventory has changed
         and when banking/equipment event occured this tick
          */
-        log.info("onItemContainerChanged container id: " + event.getContainerId());
 
         int containerId = event.getContainerId();
 
@@ -229,7 +226,6 @@ public class ProfitTrackerPlugin extends Plugin
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
         /* for ignoring deposit in deposit box */
-
         if (event.getIdentifier() == ObjectID.BANK_DEPOSIT_BOX) {
             // we've interacted with a deposit box. Don't take this tick into account for profit calculation
             skipTickForProfitCalculation = true;

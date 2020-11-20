@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "while-loop"
 project.extra["PluginName"] = "Time to Level"
 project.extra["PluginDescription"] = "Panel to show how long until you get dopamine fireworks. /s"
 

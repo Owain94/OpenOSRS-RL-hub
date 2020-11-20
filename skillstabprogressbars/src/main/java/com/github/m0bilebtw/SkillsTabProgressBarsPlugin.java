@@ -27,14 +27,12 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-		name = "Skills Progress Bars",
-		description = "Adds progress bars to the skills tab to show how close the next level ups are",
-		tags = {"skills", "stats", "levels", "progress", "bars"},
+	name = "Skills Progress Bars",
+	description = "Adds progress bars to the skills tab to show how close the next level ups are",
+	tags = {"skills", "stats", "levels", "progress", "bars"},
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
-
-@Slf4j
 public class SkillsTabProgressBarsPlugin extends Plugin {
 
 	static final int MINIMUM_BAR_HEIGHT = 1;
@@ -59,7 +57,6 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 		// If user already logged in, we must manually get the first xp state
 		// Otherwise, it would only show bars for skills being trained, or need a world hop/relog to show all
 		if (client.getGameState() == GameState.LOGGED_IN) {
-			log.info("Plugin startup while logged in - manually finding skill progress and attaching hover listeners");
 			calculateAndStoreProgressForAllSkillsToLevel();
 			attachHoverListeners();
 		}
@@ -140,7 +137,6 @@ public class SkillsTabProgressBarsPlugin extends Plugin {
 	private void attachHoverListeners() {
 		Widget skillsContainer = client.getWidget(WidgetInfo.SKILLS_CONTAINER);
 		if (skillsContainer == null) {
-			log.info("skills container widget not found - not attaching hovered skill listeners");
 			return;
 		}
 

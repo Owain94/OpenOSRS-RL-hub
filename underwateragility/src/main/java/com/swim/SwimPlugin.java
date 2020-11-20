@@ -28,13 +28,12 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-        name = "Underwater Agility",
-        description = "Highlight active chest, show timer, highlight obstacles ",
-        tags = {"agility", "thieving", "skilling", "overlay"},
+	name = "Underwater Agility",
+	description = "Highlight active chest, show timer, highlight obstacles ",
+	tags = {"agility", "thieving", "skilling", "overlay"},
 	enabledByDefault = false,
 	type = PluginType.SKILLING
 )
-@Slf4j
 @Getter
 public class SwimPlugin extends Plugin
 {

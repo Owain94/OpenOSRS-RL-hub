@@ -15,12 +15,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-		name = "Wiki Search Shortcuts",
-		description = "Shortcut keys to open osrs wiki search",
-		tags = {"wiki", "search", "shortcut", "hotkey"},
+	name = "Wiki Search Shortcuts",
+	description = "Shortcut keys to open osrs wiki search",
+	tags = {"wiki", "search", "shortcut", "hotkey"},
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )

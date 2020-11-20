@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "DMAD777"
 project.extra["PluginName"] = "Tray Indicators"
 project.extra["PluginDescription"] = "Displays your hitpoints, prayer or absorption in the system tray."
 

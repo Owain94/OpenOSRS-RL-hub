@@ -24,7 +24,7 @@ import org.pf4j.Extension;
         name = "cballxprate",
         description = "Calculates Slayer and Ranged XP gained per cannonball used",
         tags = {"experience", "levels", "cannon", "cannonballs", "slayer","overlay"},
-        enabledByDefault = false,
+	enabledByDefault = false,
 	type = PluginType.SKILLING
 )
 

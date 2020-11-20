@@ -18,11 +18,10 @@ import net.runelite.client.util.ImageUtil;
 import java.awt.image.BufferedImage;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-		name = "Teleport Logger",
-		description = "Utility for tracking a list of all ingame teleportation methods.",
+	name = "Teleport Logger",
+	description = "Utility for tracking a list of all ingame teleportation methods.",
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )

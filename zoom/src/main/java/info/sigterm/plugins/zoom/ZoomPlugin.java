@@ -23,7 +23,7 @@ public class ZoomPlugin extends Plugin
 	@Inject
 	private Client client;
 
-	@Subscribe // after camera plugin
+	@Subscribe
 	public void onScriptCallbackEvent(ScriptCallbackEvent event)
 	{
 		if (event.getEventName().equals("innerZoomLimit"))

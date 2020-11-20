@@ -47,15 +47,15 @@ import java.util.Map;
 import java.util.Set;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "NMZ Optimal Points",
-        description = "Highlight NMZ bosses and displays their point value",
-        tags = {"highlight", "npcs", "nmz"},
+	name = "NMZ Optimal Points",
+	description = "Highlight NMZ bosses and displays their point value",
+	tags = {"highlight", "npcs", "nmz"},
 	enabledByDefault = false,
 	type = PluginType.MINIGAME
 )
+@Slf4j
 public class OptimalPointsPlugin extends Plugin {
     private static final int[] NMZ_MAP_REGION = {9033};
     private static final int MAX_ACTOR_VIEW_RANGE = 15;

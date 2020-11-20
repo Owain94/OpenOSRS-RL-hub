@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Unholypanda"
 project.extra["PluginName"] = "Global Consciousness"
 project.extra["PluginDescription"] = "Channel your inner Rendi to unlock the power of global consciousness and... just get the drop lul."
 

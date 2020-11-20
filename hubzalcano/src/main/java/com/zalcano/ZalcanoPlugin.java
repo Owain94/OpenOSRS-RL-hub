@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Objects;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Zalcano",
@@ -106,7 +105,6 @@ public class ZalcanoPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Zalcano plugin started");
 		overlayManager.add(zalcanoOverlay);
 
 		addExcludedWorldPoints();
@@ -126,7 +124,6 @@ public class ZalcanoPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		overlayManager.remove(zalcanoOverlay);
-		log.info("Zalcano plugin stopped");
 	}
 
 	@Subscribe

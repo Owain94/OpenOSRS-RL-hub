@@ -23,10 +23,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.1.0"
 
-project.extra["PluginName"] = "InfernoSplitTimer"
-project.extra["PluginDescription"] = "Inferno Split Timers"
+project.extra["PluginProvider"] = "usa-usa-usa-usa"
+project.extra["PluginName"] = "Inferno Split Timer"
+project.extra["PluginDescription"] = "Displays Wave splits in  chatbox"
 
 tasks {
     jar {

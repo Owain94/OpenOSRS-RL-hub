@@ -24,12 +24,11 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-        name = "Raid Shamer",
-        description = "Takes a screenshot of deaths during Theater of Blood. Also supports discord webhook integration.",
-        tags = {"death", "raid", "raids", "shame", "tob", "theater", "discord", "discord", "webhook"},
-        enabledByDefault = false,
+	name = "Raid Shamer",
+	description = "Takes a screenshot of deaths during Theater of Blood. Also supports discord webhook integration.",
+	tags = {"death", "raid", "raids", "shame", "tob", "theater", "discord", "discord", "webhook"},
+	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
-
 )
 public class RaidShamerPlugin extends Plugin{
 
