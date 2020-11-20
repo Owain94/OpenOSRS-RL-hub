@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Diabolickal"
 project.extra["PluginName"] = "Pickpocket Info"
 project.extra["PluginDescription"] = "Shows helpful pickpocketing info."
 

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "simbleau"
 project.extra["PluginName"] = "Clan Roster Helper"
 project.extra["PluginDescription"] = "Informs the user of actions to match a truthful copy of the clan roster"
 

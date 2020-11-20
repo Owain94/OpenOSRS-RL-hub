@@ -27,34 +27,28 @@ package renderer.loader;
 import renderer.util.CacheBuffer;
 import renderer.world.UnderlayDefinition;
 
-public class UnderlayLoader
-{
-	public static UnderlayDefinition load(int id, byte[] b)
-	{
-		if (b == null)
-		{
-			return null;
-		}
+public class UnderlayLoader {
+    public static UnderlayDefinition load(int id, byte[] b) {
+        if (b == null) {
+            return null;
+        }
 
-		UnderlayDefinition underlay = new UnderlayDefinition();
-		CacheBuffer is = new CacheBuffer(b);
+        UnderlayDefinition underlay = new UnderlayDefinition();
+        CacheBuffer is = new CacheBuffer(b);
 
-		underlay.id = id;
+        underlay.id = id;
 
-		while (true)
-		{
-			int opcode = is.get() & 0xFF;
-			if (opcode == 0)
-			{
-				break;
-			}
+        while (true) {
+            int opcode = is.get() & 0xFF;
+            if (opcode == 0) {
+                break;
+            }
 
-			if (opcode == 1)
-			{
-				underlay.color = is.getMedium();
-			}
-		}
+            if (opcode == 1) {
+                underlay.color = is.getMedium();
+            }
+        }
 
-		return underlay;
-	}
+        return underlay;
+    }
 }

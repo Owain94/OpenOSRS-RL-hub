@@ -25,6 +25,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.game.ItemManager;
+import org.apache.commons.text.StringEscapeUtils;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -36,7 +37,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.lang.Integer.parseInt;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Raid Data Tracker",

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "HSJ-OSRS"
 project.extra["PluginName"] = "Theatre of Blood Stats"
 project.extra["PluginDescription"] = "Detailed time splits and damage tracker for tob"
 

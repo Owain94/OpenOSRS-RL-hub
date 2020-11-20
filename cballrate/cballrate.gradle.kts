@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "ZERORANGERS"
 project.extra["PluginName"] = "cballxprate"
 project.extra["PluginDescription"] = "Calculates Slayer and Ranged XP gained per cannonball used"
 

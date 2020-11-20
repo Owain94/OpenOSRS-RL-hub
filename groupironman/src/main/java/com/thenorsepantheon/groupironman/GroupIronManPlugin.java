@@ -42,7 +42,6 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Group Iron Man",
@@ -70,8 +69,6 @@ public class GroupIronManPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Group Ironman started!");
-
 		populateGroupMembers();
 
 		if (client.getModIcons() == null)
@@ -89,8 +86,6 @@ public class GroupIronManPlugin extends Plugin
 		iconMap.clear();
 
 		clientThread.invoke(() -> client.runScript(ScriptID.CHAT_PROMPT_INIT));
-
-		log.info("Group Ironman stopped!");
 	}
 
 	@Subscribe

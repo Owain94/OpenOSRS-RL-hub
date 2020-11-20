@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Cyborger1"
 project.extra["PluginName"] = "Examine Tooltip"
 project.extra["PluginDescription"] = "Shows tooltips or RS3 style hover boxes on examine"
 

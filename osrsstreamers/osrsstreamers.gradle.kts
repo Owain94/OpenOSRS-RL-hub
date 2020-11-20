@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "rhoiyds"
 project.extra["PluginName"] = "OSRS Streamers"
 project.extra["PluginDescription"] = "See which players in-game are usually/currently streamed on Twitch from a list of verified streamers."
 

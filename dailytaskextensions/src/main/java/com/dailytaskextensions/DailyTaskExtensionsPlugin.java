@@ -52,7 +52,6 @@ import javax.inject.Inject;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Daily Task Extensions",

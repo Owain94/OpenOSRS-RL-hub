@@ -25,7 +25,7 @@
 plugins{
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
-version = "0.0.2"
+version = "0.1.0"
 
 project.extra["PluginProvider"] = "RuneMoro"
 project.extra["PluginName"] = "Better Renderer"
@@ -38,18 +38,36 @@ dependencies {
     compileOnly("com.openosrs.externals:gpu:0.0.+")
 
     implementation("org.joml:joml:1.9.25")
+
     implementation("org.lwjgl:lwjgl:3.2.3")
+    runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-windows")
+    runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-windows-x86")
+    runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-linux")
+    runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-linux-arm32")
+    runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-linux-arm64")
+    runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-macos")
+
     implementation("org.lwjgl:lwjgl-opengl:3.2.3")
+    runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-windows")
+    runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-windows-x86")
+    runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-linux")
+    runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-linux-arm32")
+    runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-linux-arm64")
+    runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-macos")
+
     implementation("org.lwjgl:lwjgl-glfw:3.2.3")
-    implementation("org.lwjgl:lwjgl-stb:3.2.3")
+    runtimeOnly("org.lwjgl:lwjgl-glfw:3.2.3:natives-windows")
+    runtimeOnly("org.lwjgl:lwjgl-glfw:3.2.3:natives-windows-x86")
+    runtimeOnly("org.lwjgl:lwjgl-glfw:3.2.3:natives-linux")
+    runtimeOnly("org.lwjgl:lwjgl-glfw:3.2.3:natives-linux-arm32")
+    runtimeOnly("org.lwjgl:lwjgl-glfw:3.2.3:natives-linux-arm64")
+    runtimeOnly("org.lwjgl:lwjgl-glfw:3.2.3:natives-macos")
+
     implementation("org.lwjgl:lwjgl-jawt:3.2.3")
+    implementation(files("lib/lwjgl3-awt-0.1.8-SNAPSHOT.jar"))
+
     implementation("it.unimi.dsi:fastutil:8.4.3")
     implementation("org.apache.commons:commons-compress:1.20")
-
-    runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-windows")
-    runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-windows")
-    runtimeOnly("org.lwjgl:lwjgl-glfw:3.2.3:natives-windows")
-    runtimeOnly("org.lwjgl:lwjgl-stb:3.2.3:natives-windows")
 
     annotationProcessor("org.projectlombok:lombok:1.18.4")
 }

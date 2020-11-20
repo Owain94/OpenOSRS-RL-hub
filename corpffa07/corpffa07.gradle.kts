@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Box-Of-Hats"
 project.extra["PluginName"] = "Corp FFA"
 project.extra["PluginDescription"] = "Count specs and check gear for the Corp Ffa07 CC."
 

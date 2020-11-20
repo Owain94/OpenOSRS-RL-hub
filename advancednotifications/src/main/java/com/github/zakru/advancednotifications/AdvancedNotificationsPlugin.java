@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Advanced Notifications",

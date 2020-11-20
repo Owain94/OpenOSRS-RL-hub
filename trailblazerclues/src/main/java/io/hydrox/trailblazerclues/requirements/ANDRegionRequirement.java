@@ -25,9 +25,9 @@
 package io.hydrox.trailblazerclues.requirements;
 
 import io.hydrox.trailblazerclues.Region;
-import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor

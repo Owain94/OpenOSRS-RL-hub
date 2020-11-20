@@ -5,12 +5,10 @@ uniform mat4 projection;
 uniform float view_distance;
 uniform vec3 camera_position;
 in vec3 position;
-in vec3 normal;
 in int color;
 in float priority;
 
 out vec4 f_color;
-out vec3 f_normal;
 out vec3 f_position;
 out float f_fog;
 
@@ -29,7 +27,6 @@ void main(void) {
     gl_Position = pos;
 
     f_position = position;
-    f_normal = normal;
     f_color = vec4((color >> 16) & 0xff, (color >> 8) & 0xff, (color >> 0) & 0xff, (color >> 24) & 0xff) / 0xff;
 
     float fog_start = 0.9 * view_distance;

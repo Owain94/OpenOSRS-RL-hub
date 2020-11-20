@@ -25,15 +25,15 @@ import java.util.List;
 import static net.runelite.api.Skill.*;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "Time to Level",
-        description = "Panel to show how long until you get dopamine fireworks. /s",
-        tags = {"xp", "track", "ttl", "skill", "level"},
+	name = "Time to Level",
+	description = "Panel to show how long until you get dopamine fireworks. /s",
+	tags = {"xp", "track", "ttl", "skill", "level"},
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class TimeToLevelPlugin extends Plugin {
     @Inject
     private Client client;

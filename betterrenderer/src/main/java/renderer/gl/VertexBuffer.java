@@ -1,48 +1,45 @@
 package renderer.gl;
 
 import java.nio.ByteBuffer;
-import static org.lwjgl.opengl.GL15C.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15C.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15C.glBindBuffer;
-import static org.lwjgl.opengl.GL15C.glBufferData;
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glGenBuffers;
 
-public class VertexBuffer implements AutoCloseable
-{
-	public final int id;
-	private int vertexCount;
-	private boolean closed = false;
+import static org.lwjgl.opengl.GL32C.*;
 
-	public VertexBuffer()
-	{
-		id = glGenBuffers();
-	}
+public class VertexBuffer implements AutoCloseable {
+    public final int buffer;
+    public final int vertexArray;
+    private int vertexCount;
+    private boolean closed = false;
 
-	public void set(int vertexCount, ByteBuffer buffer)
-	{
-		if (closed)
-		{
-			throw new IllegalStateException("closed");
-		}
+    public VertexBuffer() {
+        buffer = glGenBuffers();
+        vertexArray = glGenVertexArrays();
+    }
 
-		this.vertexCount = vertexCount;
-		glBindBuffer(GL_ARRAY_BUFFER, id);
-		glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
-	}
+    public void set(int vertexCount, ByteBuffer data) {
+        if (closed) {
+            throw new IllegalStateException("closed");
+        }
 
-	@Override
-	public void close()
-	{
-		if (!closed)
-		{
-			closed = true;
-			glDeleteBuffers(id);
-		}
-	}
+        this.vertexCount = vertexCount;
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+    }
 
-	public int getVertexCount()
-	{
-		return vertexCount;
-	}
+    public void bind() {
+        glBindVertexArray(vertexArray);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    }
+
+    @Override
+    public void close() {
+        if (!closed) {
+            closed = true;
+            glDeleteBuffers(buffer);
+            glDeleteVertexArrays(vertexArray);
+        }
+    }
+
+    public void draw() {
+        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+    }
 }

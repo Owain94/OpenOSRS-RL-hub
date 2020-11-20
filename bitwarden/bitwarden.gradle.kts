@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "raiyni"
 project.extra["PluginName"] = "Bitwarden"
 project.extra["PluginDescription"] = "Plugin that interfaces with the Bitwarden CLI to retrieve RuneScape passwords."
 

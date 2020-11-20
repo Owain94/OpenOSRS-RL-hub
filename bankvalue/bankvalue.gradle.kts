@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "spudjb"
 project.extra["PluginName"] = "Bank Value"
 project.extra["PluginDescription"] = "Shows the value of your bank in the sidebar"
 

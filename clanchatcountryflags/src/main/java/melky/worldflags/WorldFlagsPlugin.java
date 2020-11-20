@@ -52,7 +52,6 @@ import net.runelite.http.api.worlds.WorldResult;
 import org.apache.commons.lang3.ArrayUtils;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "World country flags",
@@ -60,6 +59,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class WorldFlagsPlugin extends Plugin
 {
 	private int modIconsStart = -1;

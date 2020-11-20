@@ -9,9 +9,9 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-		name = "Magic Secateurs",
-		description = "Highlight when magic secateurs aren't equipped on a farming run",
-		tags = {"overlay", "skilling"},
+	name = "Magic Secateurs",
+	description = "Highlight when magic secateurs aren't equipped on a farming run",
+	tags = {"overlay", "skilling"},
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )

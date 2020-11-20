@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "devLotto"
 project.extra["PluginName"] = "Monkey Metrics"
 project.extra["PluginDescription"] = "Shows helpful information when chinning"
 

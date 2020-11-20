@@ -30,12 +30,11 @@ import java.util.Set;
 import org.pf4j.Extension;
 
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-		name = "Slayer Wiki",
-		description = "Adds Wiki option to slayer equipment to lookup current task.",
-		tags = {"slayer", "wiki", "slayer wiki"},
+	name = "Slayer Wiki",
+	description = "Adds Wiki option to slayer equipment to lookup current task.",
+	tags = {"slayer", "wiki", "slayer wiki"},
 	enabledByDefault = false,
 	type = PluginType.SKILLING
 )

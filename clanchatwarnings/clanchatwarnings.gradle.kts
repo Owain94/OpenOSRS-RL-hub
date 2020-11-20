@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.12"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "MarbleTurtle"
 project.extra["PluginName"] = "Clan Chat Warnings"
 project.extra["PluginDescription"] = "Notifies you when players join clan chat. Supports adding notes to signal why you put them on the watchlist"
 

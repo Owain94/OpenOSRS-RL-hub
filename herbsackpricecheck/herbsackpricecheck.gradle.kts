@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "OliverBroadbent"
 project.extra["PluginName"] = "Herb Sack Price Check"
 project.extra["PluginDescription"] = "Tells you the price of the herbs in your herb sack"
 

@@ -32,10 +32,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "Clan Chat Warnings",
+	name = "Clan Chat Warnings",
 	description = "Notifies you when players join clan chat. Supports adding notes to signal why you put them on the watchlist",
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
@@ -84,7 +83,7 @@ public class ClanChatWarningsPlugin extends Plugin {
     public void onMenuEntryAdded(MenuEntryAdded event) {
         //If you or someone you love is able to figure out how to only have this enabled for clan and private chat, hit a Turtle up.
         if (this.config.track()) {
-            int groupId = WidgetInfo.TO_GROUP(event.getParam1());
+			int groupId = WidgetInfo.TO_GROUP(event.getParam1());
             String option = event.getOption();
             if (groupId == WidgetInfo.CHATBOX.getGroupId() && !"Kick".equals(option) || groupId == WidgetInfo.PRIVATE_CHAT_MESSAGE.getGroupId()) {
                 if (!AFTER_OPTIONS.contains(option)) {
@@ -93,9 +92,9 @@ public class ClanChatWarningsPlugin extends Plugin {
                 MenuEntry track = new MenuEntry();
                 track.setOption("Track Player");
                 track.setTarget(event.getTarget());
-                track.setOpcode(MenuOpcode.RUNELITE.getId());
-                track.setParam0(event.getParam0());
-                track.setParam1(event.getParam0());
+				track.setOpcode(MenuOpcode.RUNELITE.getId());
+				track.setParam0(event.getParam0());
+				track.setParam1(event.getParam0());
                 track.setIdentifier(event.getIdentifier());
                 this.insertMenuEntry(track, this.client.getMenuEntries());
             }

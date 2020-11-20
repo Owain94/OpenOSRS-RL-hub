@@ -2,9 +2,7 @@ package com.osrsstreamers.handler;
 
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.io.InputStreamReader;
 
 import com.google.gson.Gson;
@@ -17,6 +15,7 @@ public class VerifiedStreamers {
     private static final String VERIFIED_STREAMERS_LIST = "https://raw.githubusercontent.com/rhoiyds/osrs-streamers/master/resources/streamers.json";
 
     public Map<String, String> rsnToTwitchLoginMap;
+    public List<Streamer> streamers;
 
     public VerifiedStreamers() {
         rsnToTwitchLoginMap = new HashMap<>();
@@ -27,6 +26,7 @@ public class VerifiedStreamers {
             InputStreamReader reader = new InputStreamReader(url.openStream());
             Type collectionType = new TypeToken<Collection<Streamer>>(){}.getType();
             Collection<Streamer> streamers = new Gson().fromJson(reader, collectionType);
+            this.streamers = new ArrayList<>(streamers);
             streamers.forEach(streamer -> {
                 streamer.characterNames.forEach(characterName -> rsnToTwitchLoginMap.put(characterName, streamer.twitchName));
             });

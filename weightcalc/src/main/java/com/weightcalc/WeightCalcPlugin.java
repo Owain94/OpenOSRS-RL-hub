@@ -28,7 +28,6 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )
-
 @Slf4j
 public class WeightCalcPlugin extends Plugin
 {

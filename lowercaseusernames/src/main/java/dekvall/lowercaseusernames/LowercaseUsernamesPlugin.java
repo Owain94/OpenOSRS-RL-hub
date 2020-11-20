@@ -17,7 +17,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Lowercase Usernames",
@@ -33,19 +32,7 @@ public class LowercaseUsernamesPlugin extends Plugin
 	@Inject
 	private LowercaseUsernamesConfig config;
 
-	@Override
-	protected void startUp() throws Exception
-	{
-		log.info("Lowercase Usernames started!");
-	}
-
-	@Override
-	protected void shutDown() throws Exception
-	{
-		log.info("Lowercase Usernames stopped!");
-	}
-
-	@Subscribe //if we go first we only have to care about col tags
+	@Subscribe
 	public void onClientTick(ClientTick event)
 	{
 		if (client.isMenuOpen())

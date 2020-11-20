@@ -18,10 +18,9 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "Step Counter",
+	name = "Step Counter",
 	description = "Counts the steps you take and if you meet your goal",
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS

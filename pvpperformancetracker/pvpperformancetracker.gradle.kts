@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.16"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Matsyir"
 project.extra["PluginName"] = "PvP Performance Tracker"
 project.extra["PluginDescription"] = "Estimate performance in PvP by tracking various stats."
 

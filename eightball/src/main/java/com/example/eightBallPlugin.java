@@ -23,7 +23,6 @@ import java.util.Random;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "8ball",

@@ -12,16 +12,15 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Not Empty",
@@ -35,18 +34,6 @@ public class NotEmptyPlugin extends Plugin
 
 	@Inject
 	private Client client;
-
-	@Override
-	protected void startUp() throws Exception
-	{
-		log.info("Not Empty started!");
-	}
-
-	@Override
-	protected void shutDown() throws Exception
-	{
-		log.info("Not Empty stopped!");
-	}
 
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)

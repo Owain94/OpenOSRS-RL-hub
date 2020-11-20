@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "tylerthardy"
 project.extra["PluginName"] = "OsLeague"
 project.extra["PluginDescription"] = "who needs one anyways, right?"
 

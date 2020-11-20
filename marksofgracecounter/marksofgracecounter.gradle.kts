@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Cyborger1"
 project.extra["PluginName"] = "Marks of Grace Counter"
 project.extra["PluginDescription"] = "Counts Marks of Grace spawns"
 

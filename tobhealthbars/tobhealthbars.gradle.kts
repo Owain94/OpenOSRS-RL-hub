@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Trevor159"
 project.extra["PluginName"] = "Tob Health Bars"
 project.extra["PluginDescription"] = "Replaces the tob orbs with health bars"
 

@@ -57,7 +57,6 @@ import java.io.IOException;
 import org.pf4j.Extension;
 
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Bank Tag Generation",
@@ -66,6 +65,7 @@ import org.pf4j.Extension;
 	type = PluginType.UTILITY
 )
 @PluginDependency(value = BankTagsPlugin.class) // Required for bank tags TagManager
+@Slf4j
 public class WikiBankTagIntegrationPlugin extends Plugin
 {
 	@Inject
@@ -118,8 +118,6 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	 */
 	private void addTagsFromDrops(String monster)
 	{
-		log.info("attempting to add tags to items dropped by " + monster);
-
 		List<Integer> items = getDropIDs(monster);
 
 		tagItems(items, monster + " drops");
@@ -145,8 +143,6 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	 */
 	private void addTagsFromCategory(String category)
 	{
-		log.info("attempting to add tags to items from " + category);
-
 		List<Integer> items = getCategoryIDs(category);
 
 		tagItems(items, category);
@@ -262,7 +258,7 @@ public class WikiBankTagIntegrationPlugin extends Plugin
 	/**
 	 * Makes and returns results for an ask Query the OSRS wiki for all item IDs in the provided category
 	 *
-	 * @param category The name of the OSRS wiki category that will be Item Ids will be generated from
+	 * @param query The name of the OSRS wiki category that will be Item Ids will be generated from
 	 * @return A okhttp3 HTTP response containing the results of a ask query in JSON format
 	 */
 	private Response getWikiResponse(String query) throws IOException

@@ -1,11 +1,16 @@
 package com.osrsstreamers.handler;
 
+import com.osrsstreamers.OsrsStreamersConfig;
 import net.runelite.api.Client;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.api.Point;
+import net.runelite.api.util.Text;
+import net.runelite.client.ui.overlay.*;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Dimension;
+import java.awt.Polygon;
 import java.util.Objects;
 
 public class StreamingPlayerOverlay extends Overlay {
@@ -15,21 +20,44 @@ public class StreamingPlayerOverlay extends Overlay {
 
     public StreamerHandler streamerHandler;
 
-    private static final Color TWITCH_COLOR = new Color(95, 58, 162);
+    private final OsrsStreamersConfig config;
+
+    private static final Color TWITCH_COLOR = new Color(133, 76, 231);
     private static final Color OFFLINE_COLOR = new Color(169, 169, 169);
+    private static final int PLAYER_OVERHEAD_TEXT_MARGIN =  40;
+
+    @Inject
+    private StreamingPlayerOverlay(OsrsStreamersConfig config)
+    {
+        this.config = config;
+        setLayer(OverlayLayer.ABOVE_SCENE);
+        setPosition(OverlayPosition.DYNAMIC);
+        setPriority(OverlayPriority.MED);
+    }
+
 
     @Override
     public Dimension render(Graphics2D graphics) {
 
-        client.getPlayers().forEach(player -> {
+        client.getPlayers().stream().filter(player -> !player.equals(client.getLocalPlayer())).forEach(player -> {
             NearbyPlayer nearbyPlayer = streamerHandler.getNearbyPlayer(player.getName());
-            if (Objects.nonNull(nearbyPlayer) ) {
+            if (Objects.nonNull(nearbyPlayer) && !StreamStatus.NOT_STREAMER.equals(nearbyPlayer.status)) {
+                Color color = OFFLINE_COLOR;
                 if (StreamStatus.LIVE.equals(nearbyPlayer.getStatus())) {
-                    OverlayUtil.renderActorOverlay(graphics, player, "t.tv/" + nearbyPlayer.getTwitchName(), TWITCH_COLOR);
+                    color = TWITCH_COLOR;
                 }
-                if (StreamStatus.STREAMER.equals(nearbyPlayer.getStatus()) || StreamStatus.NOT_LIVE.equals(nearbyPlayer.getStatus())) {
-                    OverlayUtil.renderActorOverlay(graphics, player, "t.tv/" + nearbyPlayer.getTwitchName(), OFFLINE_COLOR);
+                if (config.onlyShowStreamersWhoAreLive() && (nearbyPlayer.status.equals(StreamStatus.NOT_LIVE) || nearbyPlayer.status.equals(StreamStatus.STREAMER))) {
+                    return;
                 }
+                final Polygon poly = player.getCanvasTilePoly();
+                if (poly != null)
+                {
+                    OverlayUtil.renderPolygon(graphics, poly, color);
+                }
+                String twitchHandle = "t.tv/" + nearbyPlayer.getTwitchName();
+                int zOffset = player.getLogicalHeight() + PLAYER_OVERHEAD_TEXT_MARGIN;
+                Point textLocation = player.getCanvasTextLocation(graphics, Text.sanitize(Objects.requireNonNull(player.getName())), zOffset);
+                OverlayUtil.renderTextLocation(graphics, textLocation, twitchHandle, color);
             }
         });
 

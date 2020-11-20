@@ -69,7 +69,6 @@ import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Runite Rocks",
@@ -77,6 +76,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )
+@Slf4j
 public class RuniteRocksPlugin extends Plugin
 {
 	private static final int DISPLAY_SWITCHER_MAX_ATTEMPTS = 3;

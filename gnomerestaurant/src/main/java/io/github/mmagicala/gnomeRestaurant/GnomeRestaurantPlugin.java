@@ -75,7 +75,6 @@ import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.infobox.Timer;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Gnome Restaurant",
@@ -989,56 +988,6 @@ public class GnomeRestaurantPlugin extends Plugin
 	{
 		overlayManager.remove(overlay);
 		overlay = null;
-	}
-
-	// Plugin testing
-
-	@Subscribe
-	public void onCommandExecuted(CommandExecuted commandExecuted)
-	{
-		// Must be in developer mode to send command
-
-		if (!commandExecuted.getCommand().equals("gnome") || commandExecuted.getArguments().length < 1)
-		{
-			return;
-		}
-
-		if (commandExecuted.getArguments()[0].equals("reset"))
-		{
-			resetPluginAndTest("Reset command called.");
-			return;
-		}
-		else if (isTrackingDelivery && !isDeliveryForTesting)
-		{
-			printTestMessage("Cannot run test when a real order is in progress");
-			return;
-		}
-
-		String orderName = commandExecuted.getArguments()[0].replace("_", " ");
-		String recipientName;
-
-		// Default recipient
-
-		if (commandExecuted.getArguments().length < 2)
-		{
-			recipientName = "His Royal Highness King Narnode";
-		}
-		else
-		{
-			recipientName = commandExecuted.getArguments()[1].replace("_", " ");
-		}
-
-		printTestMessage("Test started with arguments: " + orderName + ", " + recipientName);
-
-		try
-		{
-			isDeliveryForTesting = true;
-			startTrackingDelivery(recipientName, orderName);
-		}
-		catch (InvalidParameterException e)
-		{
-			resetPluginAndTest(e.getMessage());
-		}
 	}
 
 	/**

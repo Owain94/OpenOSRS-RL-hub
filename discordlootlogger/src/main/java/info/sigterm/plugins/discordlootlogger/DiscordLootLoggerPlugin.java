@@ -28,6 +28,7 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.loottracker.LootReceived;
 import net.runelite.client.ui.DrawManager;
 import net.runelite.client.util.ImageCapture;
+import net.runelite.client.util.QuantityFormatter;
 import net.runelite.client.util.WildcardMatcher;
 import static net.runelite.http.api.RuneLiteAPI.GSON;
 import net.runelite.http.api.loottracker.LootRecordType;
@@ -42,7 +43,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Discord Loot Logger",
@@ -50,6 +50,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class DiscordLootLoggerPlugin extends Plugin
 {
 	@Inject
@@ -134,7 +135,7 @@ public class DiscordLootLoggerPlugin extends Plugin
 	@Subscribe
 	public void onLootReceived(LootReceived lootReceived)
 	{
-		if (lootReceived.getType() != LootRecordType.EVENT)
+		if (lootReceived.getType() != LootRecordType.EVENT && lootReceived.getType() != LootRecordType.PICKPOCKET)
 		{
 			return;
 		}
@@ -163,7 +164,12 @@ public class DiscordLootLoggerPlugin extends Plugin
 			if (config.includeLowValueItems() || total >= targetValue)
 			{
 				ItemDefinition itemComposition = itemManager.getItemDefinition(itemId);
-				stringBuilder.append(qty).append(" x ").append(itemComposition.getName()).append("\n");
+				stringBuilder.append(qty).append(" x ").append(itemComposition.getName());
+				if (config.stackValue())
+				{
+					stringBuilder.append(" (").append(QuantityFormatter.quantityToStackSize(total)).append(")").append("\n");
+				}
+				stringBuilder.append("\n");
 				webhookBody.getEmbeds().add(new WebhookBody.Embed(new WebhookBody.UrlEmbed(itemImageUrl(itemId))));
 			}
 		}

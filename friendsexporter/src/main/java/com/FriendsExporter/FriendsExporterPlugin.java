@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Friends Exporter",
@@ -40,8 +39,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )
-public class FriendsExporterPlugin extends Plugin
-{
+public class FriendsExporterPlugin extends Plugin {
 	private static final WidgetMenuOption FIXED_Friends_List;
 	private static final WidgetMenuOption Resizable_Friends_List;
 	private static final WidgetMenuOption Bottom_Friends_List;
@@ -53,8 +51,8 @@ public class FriendsExporterPlugin extends Plugin
 	private static final WidgetMenuOption Fixed_Clan_List_List;
 	private static final WidgetMenuOption Resizable_Clan_List_List;
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-	private boolean clan = false;
-	private boolean wid = false;
+	private boolean clan=false;
+	private boolean wid=false;
 	@Inject
 	private Client client;
 	@Inject
@@ -63,73 +61,46 @@ public class FriendsExporterPlugin extends Plugin
 	private FriendsExporterConfig config;
 
 	@Override
-	protected void startUp() throws Exception
-	{
+	protected void startUp() throws Exception {
 		refreshShiftClickCustomizationMenus();
 	}
 
 	@Override
-	protected void shutDown() throws Exception
-	{
+	protected void shutDown() throws Exception {
 		removeShiftClickCustomizationMenus();
 	}
 
-	static String format(Date date)
-	{
-		synchronized (TIME_FORMAT)
-		{
+	static String format(Date date) {
+		synchronized(TIME_FORMAT) {
 			return TIME_FORMAT.format(date);
 		}
 	}
 
 	@Subscribe
-	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event)
-	{
-		if (event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_CHAT_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_CHAT_TAB)
-		{
-			try
-			{
-				if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Friends List"))
-				{
-					exportFriendsList();
+	public void onWidgetMenuOptionClicked(WidgetMenuOptionClicked event) throws Exception {
+		if (event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB || event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB||event.getWidget() == WidgetInfo.FIXED_VIEWPORT_FRIENDS_CHAT_TAB||event.getWidget() == WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_CHAT_TAB) {
+			if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Friends List")) {
+				exportFriendsList();
+			} else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Ignore List")) {
+				exportIgnoreList();
+			} else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Rank List")) {
+				if(clan) {
+					exportRankList();
+				}else{
+					this.client.addChatMessage(ChatMessageType.GAMEMESSAGE,"","Please open Clan Setup found in Friends Chat tab to export this list.","");
 				}
-				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Ignore List"))
-				{
-					exportIgnoreList();
+			} else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Current Members")) {
+				if(this.client.getFriendsChatManager()!=null) {
+					exportClanList();
+				}else{
+					this.client.addChatMessage(ChatMessageType.GAMEMESSAGE,"","Please join a Friends Chat to export this list.","");
 				}
-				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Rank List"))
-				{
-					if (clan)
-					{
-						exportRankList();
-					}
-					else
-					{
-						this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please open Clan Setup found in Friends Chat tab to export this list.", "");
-					}
-				}
-				else if (event.getMenuOption().equals("Export") && Text.removeTags(event.getMenuTarget()).equals("Current Members"))
-				{
-					if (this.client.getFriendsChatManager() != null)
-					{
-						exportClanList();
-					}
-					else
-					{
-						this.client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Please join a Friends Chat to export this list.", "");
-					}
-				}
-				refreshShiftClickCustomizationMenus();
-
 			}
-			catch (Exception ignored)
-			{
-			}
+			refreshShiftClickCustomizationMenus();
 		}
 	}
 
-	private void refreshShiftClickCustomizationMenus()
-	{
+	private void refreshShiftClickCustomizationMenus() {
 		this.removeShiftClickCustomizationMenus();
 		this.menuManager.addManagedCustomMenu(FIXED_Friends_List);
 		this.menuManager.addManagedCustomMenu(Resizable_Friends_List);
@@ -143,8 +114,7 @@ public class FriendsExporterPlugin extends Plugin
 		this.menuManager.addManagedCustomMenu(Resizable_Clan_List_List);
 	}
 
-	private void removeShiftClickCustomizationMenus()
-	{
+	private void removeShiftClickCustomizationMenus() {
 		this.menuManager.removeManagedCustomMenu(FIXED_Friends_List);
 		this.menuManager.removeManagedCustomMenu(Resizable_Friends_List);
 		this.menuManager.removeManagedCustomMenu(Bottom_Friends_List);
@@ -157,76 +127,58 @@ public class FriendsExporterPlugin extends Plugin
 		this.menuManager.removeManagedCustomMenu(Resizable_Clan_List_List);
 	}
 
-	private void exportFriendsList() throws Exception
-	{
+	private void exportFriendsList() throws Exception {
 		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Friends " + format(new Date()) + ".txt";
 		purgeList(fileName);
 		Friend array[] = this.client.getFriendContainer().getMembers();
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x != this.client.getFriendContainer().getMembers().length; x++)
-		{
+		for (int x = 0; x != this.client.getFriendContainer().getMembers().length; x++) {
 			String friendName = array[x].getName();
 			String prevName = "";
-			if (!StringUtils.isEmpty(array[x].getPrevName()) && this.config.prevName())
-			{
+			if (!StringUtils.isEmpty(array[x].getPrevName())&&this.config.prevName()) {
 				prevName = array[x].getPrevName();
 			}
-			String Writing = toWrite(x + 1, friendName, prevName, "");
-			try
-			{
+			String Writing = toWrite(x + 1, friendName, prevName,"");
+			try {
 				writer.write(Writing + "\r\n");
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		writer.close();
 	}
 
-	private void exportRankList() throws Exception
-	{
+	private void exportRankList() throws Exception {
 		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Ranks " + format(new Date()) + ".txt";
 		purgeList(fileName);
 		Friend array[] = this.client.getFriendContainer().getMembers();
-		Widget temp = null;
-		Widget[] temp2 = null;
+		Widget temp=null;
+		Widget[] temp2=null;
 		temp = this.client.getWidget(94, 28);
-		temp2 = temp.getChildren();
+		temp2=temp.getChildren();
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x < temp2.length / 4; x++)
-		{
-			String rank = temp2[(x * 4) + 1].getText();
-			if (!rank.equals("Not in clan") || this.config.showUnranked())
-			{
+		for(int x=0;x<temp2.length/4;x++) {
+			String rank=temp2[(x * 4) + 1].getText();
+			if(!rank.equals("Not in clan")||this.config.showUnranked()) {
 				String prevName = "";
-				for (int y = 0; y != this.client.getFriendContainer().getMembers().length; y++)
-				{
+				for (int y = 0; y != this.client.getFriendContainer().getMembers().length; y++) {
 					String friendName = array[y].getName();
-					if (friendName.equals(temp2[(x * 4) + 2].getText()))
-					{
-						if (!StringUtils.isEmpty(array[y].getPrevName()) && this.config.prevName())
-						{
+					if (friendName.equals(temp2[(x * 4) + 2].getText())) {
+						if (!StringUtils.isEmpty(array[y].getPrevName())&&this.config.prevName()) {
 							prevName = array[y].getPrevName();
 						}
 						break;
 					}
 				}
-				String Writing = "";
-				if (!rank.equals("Not in clan"))
-				{
+				String Writing="";
+				if(!rank.equals("Not in clan")) {
 					Writing = toWrite(x, temp2[(x * 4) + 2].getText(), prevName, rank);
-				}
-				else
-				{
+				}else{
 					Writing = toWrite(x, temp2[(x * 4) + 2].getText(), prevName, "No Rank");
 				}
-				try
-				{
+				try {
 					writer.write(Writing + "\r\n");
-				}
-				catch (IOException e)
-				{
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -234,135 +186,98 @@ public class FriendsExporterPlugin extends Plugin
 		writer.close();
 	}
 
-	private void exportIgnoreList() throws Exception
-	{
+	private void exportIgnoreList() throws Exception {
 		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Ignore " + format(new Date()) + ".txt";
 		purgeList(fileName);
 		Ignore array[] = this.client.getIgnoreContainer().getMembers();
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x != this.client.getIgnoreContainer().getMembers().length; x++)
-		{
+		for (int x = 0; x != this.client.getIgnoreContainer().getMembers().length; x++) {
 			String friendName = array[x].getName();
 			String prevName = "";
-			if (!StringUtils.isEmpty(array[x].getPrevName()) && this.config.prevName())
-			{
+			if (!StringUtils.isEmpty(array[x].getPrevName())&&this.config.prevName()) {
 				prevName = array[x].getPrevName();
 			}
-			String Writing = toWrite(x + 1, friendName, prevName, "");
-			try
-			{
+			String Writing = toWrite(x + 1, friendName, prevName,"");
+			try {
 				writer.write(Writing + "\r\n");
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		writer.close();
 	}
 
-	private void exportClanList() throws Exception
-	{
+	private void exportClanList() throws Exception {
 		String fileName = RuneLite.RUNELITE_DIR + "\\" + this.client.getLocalPlayer().getName() + " Members " + format(new Date()) + ".txt";
 		purgeList(fileName);
 		FriendsChatMember array[] = this.client.getFriendsChatManager().getMembers();
 		System.out.println(array.length);
 		FileWriter writer = new FileWriter(fileName, true);
-		for (int x = 0; x != this.client.getFriendsChatManager().getMembers().length; x++)
-		{
+		for (int x = 0; x != this.client.getFriendsChatManager().getMembers().length; x++) {
 			String friendName = array[x].getName();
 			System.out.println(friendName);
-			String Writing = toWrite(x + 1, friendName, "", "");
-			try
-			{
+			String Writing = toWrite(x + 1, friendName, "","");
+			try {
 				writer.write(Writing + "\r\n");
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		writer.close();
 	}
 
-	private void purgeList(String fileName)
-	{
+	private void purgeList(String fileName) {
 		File purge = new File(fileName);
 		purge.delete();
 	}
 
-	private String toWrite(Integer Num, String firstName, String lastName, String rank)
-	{
-		firstName = firstName.replace('\u00A0', ' ');
-		lastName = lastName.replace('\u00A0', ' ');
+	private String toWrite(Integer Num, String firstName, String lastName, String rank) {
+	    firstName=firstName.replace('\u00A0', ' ');
+	    lastName=lastName.replace('\u00A0', ' ');
 		String export = "";
-		String Role = "";
+		String Role="";
 		String Separator = this.config.Separator();
-		if (this.config.newLine() && this.config.prevName())
-		{
-			Separator = "\n" + Separator;
+		if(this.config.newLine()&&this.config.prevName()){
+			Separator="\n"+Separator;
 		}
-		if (!rank.isEmpty())
-		{
-			Role = rank + Separator;
+		if(!rank.isEmpty()){
+			Role=rank+Separator;
 		}
-		switch (this.config.Lineleads())
-		{
+		switch (this.config.Lineleads()) {
 			case None:
 				if (!StringUtils.isEmpty(lastName))
-				{
-					export = Role + firstName + Separator + lastName;
-				}
+					export = Role+firstName + Separator + lastName;
 				else
-				{
-					export = Role + firstName;
-				}
+					export = Role+firstName;
 				break;
 			case Number:
 				if (!StringUtils.isEmpty(lastName))
-				{
-					export = Num.toString() + " " + Role + firstName + Separator + lastName;
-				}
+					export = Num.toString() + " " + Role+firstName + Separator + lastName;
 				else
-				{
-					export = Num.toString() + " " + Role + firstName;
-				}
+					export = Num.toString() + " " + Role+firstName;
 				break;
 			case Number1:
 				if (!StringUtils.isEmpty(lastName))
-				{
-					export = Num.toString() + ". " + Role + firstName + Separator + lastName;
-				}
+					export = Num.toString() + ". " + Role+firstName + Separator + lastName;
 				else
-				{
-					export = Num.toString() + ". " + Role + firstName;
-				}
+					export = Num.toString() + ". " + Role+firstName;
 				break;
 			case Number2:
 				if (!StringUtils.isEmpty(lastName))
-				{
-					export = Num.toString() + ") " + Role + firstName + Separator + lastName;
-				}
+					export = Num.toString() + ") " + Role+firstName + Separator + lastName;
 				else
-				{
-					export = Num.toString() + ") " + Role + firstName;
-				}
+					export = Num.toString() + ") " + Role+firstName;
 				break;
 			case Number3:
 				if (!StringUtils.isEmpty(lastName))
-				{
-					export = Num.toString() + ".) " + Role + firstName + Separator + lastName;
-				}
+					export = Num.toString() + ".) " + Role+firstName + Separator + lastName;
 				else
-				{
-					export = Num.toString() + ".) " + Role + firstName;
-				}
+					export = Num.toString() + ".) " + Role+firstName;
 		}
 		return (export);
 	}
 
-	static
-	{
+	static {
 		FIXED_Friends_List = new WidgetMenuOption("Export", "Friends List", WidgetInfo.FIXED_VIEWPORT_FRIENDS_TAB);
 		Resizable_Friends_List = new WidgetMenuOption("Export", "Friends List", WidgetInfo.RESIZABLE_VIEWPORT_FRIENDS_TAB);
 		Bottom_Friends_List = new WidgetMenuOption("Export", "Friends List", WidgetInfo.RESIZABLE_VIEWPORT_BOTTOM_LINE_FRIEND_ICON);
@@ -376,35 +291,28 @@ public class FriendsExporterPlugin extends Plugin
 	}
 
 	@Provides
-	FriendsExporterConfig provideConfig(ConfigManager configManager)
-	{
+	FriendsExporterConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(FriendsExporterConfig.class);
 	}
 
 	@Subscribe
-	public void onWidgetLoaded(WidgetLoaded widget)
-	{
-		if (widget.getGroupId() == 94)
-		{
-			wid = true;
-			clan = true;
+	public void onWidgetLoaded(WidgetLoaded widget) {
+		if(widget.getGroupId()==94){
+			wid=true;
+			clan=true;
 		}
-		Widget temp = this.client.getWidget(widget.getGroupId(), 0);
+		Widget temp=this.client.getWidget(widget.getGroupId(),0);
 	}
-
 	@Subscribe
-	public void onGameTick(GameTick event)
-	{
-		if (this.client.getWidget(94, 28) == null)
-		{
-			clan = false;
+	public void onGameTick(GameTick event) {
+		if(this.client.getWidget(94,28)==null){
+			clan=false;
 			refreshShiftClickCustomizationMenus();
 		}
 
-		if (wid)
-		{
+		if(wid){
 			refreshShiftClickCustomizationMenus();
-			wid = false;
+			wid=false;
 		}
 	}
 }

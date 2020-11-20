@@ -168,17 +168,11 @@ public class BankHistoryPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onWidgetLoaded(final WidgetLoaded event) {
+	public void onWidgetLoaded(final WidgetLoaded event) throws InvocationTargetException, InterruptedException {
 		if (event.getGroupId() == WidgetID.BANK_GROUP_ID)
 		{
 			log.trace("Player opened the bank");
-			try
-			{
-				SwingUtilities.invokeAndWait(() -> this.setActivePanel(client.getUsername()));
-			}
-			catch (InterruptedException | InvocationTargetException ignored)
-			{
-			}
+			SwingUtilities.invokeAndWait(() -> this.setActivePanel(client.getUsername()));
 			if (isHistoryPanelActive()) {
 				bankHistoryPanel.setDatasetButton(true);
 			}

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Adam-"
 project.extra["PluginName"] = "HTTP API"
 project.extra["PluginDescription"] = "Exposes an HTTP API on localhost:8080 for querying stats"
 

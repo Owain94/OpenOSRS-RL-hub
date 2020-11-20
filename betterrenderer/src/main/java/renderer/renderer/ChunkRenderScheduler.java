@@ -3,136 +3,115 @@ package renderer.renderer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.Weigher;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.joml.Vector2i;
+import org.joml.Vector3i;
+import org.joml.Vector4i;
 import renderer.cache.CacheSystem;
 import renderer.world.Position;
 import renderer.world.World;
 
-public class ChunkRenderScheduler
-{
-	private final List<WorldRenderer> renderersToClose = new ArrayList<>();
-	private final ExecutorService buildExecutor;
-	private final Cache<Integer, WorldRenderer> chunks = CacheBuilder
-		.newBuilder()
-		.expireAfterAccess(300, TimeUnit.SECONDS)
-		.weigher((Weigher<Integer, WorldRenderer>) (key, value) -> value.opaqueBuffer.memoryUsage() + value.translucentBuffer.memoryUsage())
-		.maximumWeight(32 * 1024 * 1024L * 1024L) // todo: set this based on max graphics memory
-		.removalListener(n -> renderersToClose.add(n.getValue()))
-		.concurrencyLevel(Runtime.getRuntime().availableProcessors() + 2)
-		.build();
-	private final Set<Integer> scheduled = ConcurrentHashMap.newKeySet();
-	private final World world;
-	private HashSet<Position> roofsRemoved = new HashSet<>();
-	private int roofRemovalPlane;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-	public ChunkRenderScheduler(World world)
-	{
-		this.world = world;
-		buildExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-	}
+public class ChunkRenderScheduler {
+    private final List<WorldRenderer> renderersToClose = new ArrayList<>();
+    private final ExecutorService buildExecutor;
+    private final Cache<Integer, WorldRenderer> chunks = CacheBuilder
+            .newBuilder()
+            .expireAfterAccess(300, TimeUnit.SECONDS)
+            .weigher((Weigher<Integer, WorldRenderer>) (key, value) -> value.opaqueBuffer.memoryUsage() + value.translucentBuffer.memoryUsage())
+            .maximumWeight(32 * 1024 * 1024L * 1024L) // todo: set this based on max graphics memory
+            .removalListener(n -> renderersToClose.add(n.getValue()))
+            .concurrencyLevel(Runtime.getRuntime().availableProcessors() + 2)
+            .build();
+    private final Set<Integer> scheduled = ConcurrentHashMap.newKeySet();
+    private final World world;
+    private HashSet<Position> roofsRemoved = new HashSet<>();
+    private int roofRemovalPlane;
 
-	public WorldRenderer get(int x, int y)
-	{
-		closedUncachedRenderers();
+    public ChunkRenderScheduler(World world) {
+        this.world = world;
+        buildExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    }
 
-		int key = (x << 16) + y;
-		WorldRenderer chunk = chunks.getIfPresent(key);
+    public WorldRenderer get(int x, int y) {
+        closedUncachedRenderers();
 
-		if (chunk != null)
-		{
-			return chunk;
-		}
+        int key = (x << 16) + y;
+        WorldRenderer chunk = chunks.getIfPresent(key);
 
-		if (scheduled.add(key))
-		{
-			buildExecutor.submit(() -> render(x, y));
-		}
+        if (chunk != null) {
+            return chunk;
+        }
 
-		return null;
-	}
+        if (scheduled.add(key)) {
+            buildExecutor.submit(() -> render(x, y));
+        }
 
-	private void closedUncachedRenderers()
-	{
-		for (WorldRenderer renderer : new ArrayList<>(renderersToClose))
-		{
-			if (renderer != null)
-			{
-				renderer.opaqueBuffer.close();
-				renderer.translucentBuffer.close();
-			}
-		}
+        return null;
+    }
 
-		renderersToClose.clear();
-	}
+    private void closedUncachedRenderers() {
+        for (WorldRenderer renderer : new ArrayList<>(renderersToClose)) {
+            if (renderer != null) {
+                renderer.opaqueBuffer.close();
+                renderer.translucentBuffer.close();
+            }
+        }
 
-	public void render(int x, int y)
-	{
-		try
-		{
-			if (CacheSystem.region(x * Renderer.CHUNK_SIZE / 64, y * Renderer.CHUNK_SIZE / 64) == null)
-			{
-				return;
-			}
+        renderersToClose.clear();
+    }
 
-			WorldRenderer renderer = new WorldRenderer(world);
-			renderer.chunk(x, y);
+    public void render(int x, int y) {
+        try {
+            if (CacheSystem.region(x * Renderer.CHUNK_SIZE / 64, y * Renderer.CHUNK_SIZE / 64) == null) {
+                return;
+            }
 
-			int key = (x << 16) + y;
-			chunks.put(key, renderer);
-			scheduled.remove(key);
-		}
-		catch (Throwable t)
-		{
-			t.printStackTrace();
-			System.exit(0);
-		}
-	}
+            WorldRenderer renderer = new WorldRenderer(world);
+            renderer.chunk(x, y);
 
-	public void setRoofsRemoved(HashSet<Position> newRoofsRemoved, int roofRemovalPlane)
-	{
-		Set<Vector2i> toUpdate = new HashSet<>();
+            int key = (x << 16) + y;
+            chunks.put(key, renderer);
+            scheduled.remove(key);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.exit(0);
+        }
+    }
 
-		for (Position p : roofsRemoved)
-		{
-			if (!newRoofsRemoved.contains(p))
-			{
-				toUpdate.add(new Vector2i(p.x / 8, p.y / 8));
-			}
-		}
+    public void setRoofsRemoved(HashSet<Position> newRoofsRemoved, int roofRemovalPlane) {
+        Set<Vector2i> toUpdate = new HashSet<>();
 
-		for (Position p : newRoofsRemoved)
-		{
-			if (roofRemovalPlane != this.roofRemovalPlane || !roofsRemoved.contains(p))
-			{
-				toUpdate.add(new Vector2i(p.x / 8, p.y / 8));
-			}
-		}
+        for (Position p : roofsRemoved) {
+            if (!newRoofsRemoved.contains(p)) {
+                toUpdate.add(new Vector2i(p.x / 8, p.y / 8));
+            }
+        }
 
-		for (Vector2i chunkPos : toUpdate)
-		{
-			render(chunkPos.x, chunkPos.y);
-		}
+        for (Position p : newRoofsRemoved) {
+            if (roofRemovalPlane != this.roofRemovalPlane || !roofsRemoved.contains(p)) {
+                toUpdate.add(new Vector2i(p.x / 8, p.y / 8));
+            }
+        }
 
-		roofsRemoved = new HashSet<>(newRoofsRemoved);
-		this.roofRemovalPlane = roofRemovalPlane;
-	}
+        for (Vector2i chunkPos : toUpdate) {
+            render(chunkPos.x, chunkPos.y);
+        }
 
-	public void clear()
-	{
-		chunks.invalidateAll();
-		scheduled.clear();
-	}
+        roofsRemoved = new HashSet<>(newRoofsRemoved);
+        this.roofRemovalPlane = roofRemovalPlane;
+    }
 
-	public void stopAllThreads()
-	{
-		buildExecutor.shutdown();
-	}
+    public void clear() {
+        chunks.invalidateAll();
+        scheduled.clear();
+    }
+
+    public void stopAllThreads() {
+        buildExecutor.shutdown();
+    }
 }

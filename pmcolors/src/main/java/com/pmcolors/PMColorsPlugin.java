@@ -67,7 +67,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "PM Colors",
@@ -172,7 +171,7 @@ public class PMColorsPlugin extends Plugin
 		}
 	}
 
-	@Subscribe // run before chat message manager
+	@Subscribe
 	public void onChatMessage(ChatMessage chatMessage)
 	{
 		ChatMessageType messageType = chatMessage.getType();
@@ -220,7 +219,7 @@ public class PMColorsPlugin extends Plugin
 		}
 	}
 
-	@Subscribe // run before chat message manager
+	@Subscribe
 	public void onScriptCallbackEvent(ScriptCallbackEvent scriptCallbackEvent)
 	{
 		final String eventName = scriptCallbackEvent.getEventName();

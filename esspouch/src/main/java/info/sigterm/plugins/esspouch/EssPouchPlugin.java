@@ -277,11 +277,11 @@ public class EssPouchPlugin extends Plugin
 				break;
 			case CC_OP:
 			case CC_OP_LOW_PRIORITY:
-				int widgetId = event.getParam0();
+				int widgetId = event.getParam1();
 				Widget widget = client.getWidget(TO_GROUP(widgetId), TO_CHILD(widgetId));
 				if (widget != null)
 				{
-					int child = event.getParam1();
+					int child = event.getParam0();
 					if (child == -1)
 					{
 						return;
@@ -310,7 +310,7 @@ public class EssPouchPlugin extends Plugin
 		}
 
 		final int tick = client.getTickCount() + 3;
-		switch (event.getTarget())
+		switch (event.getOption())
 		{
 			case "Fill":
 				clickedItems.add(new ClickOperation(pouch, tick, 1));
