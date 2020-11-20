@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "bloogeyz"
 project.extra["PluginName"] = "NMZ Optimal Points"
 project.extra["PluginDescription"] = "Highlight NMZ bosses and displays their point value"
 

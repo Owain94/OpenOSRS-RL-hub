@@ -1,7 +1,6 @@
 package renderer.world;
 
-public class UnderlayDefinition
-{
-	public int id;
-	public int color;
+public class UnderlayDefinition {
+    public int id;
+    public int color;
 }

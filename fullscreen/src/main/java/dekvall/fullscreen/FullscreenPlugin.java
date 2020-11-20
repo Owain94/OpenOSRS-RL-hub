@@ -39,7 +39,6 @@ import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.ContainableFrame;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Fullscreen",
@@ -60,13 +59,11 @@ public class FullscreenPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Fullscreen started!");
 		gd = clientUI.getGraphicsConfiguration().getDevice();
 		Frame tempParent = Frame.getFrames()[0];
 
 		if (configManager.getConfig(RuneLiteConfig.class).enableCustomChrome())
 		{
-			log.info("You must disable custom chrome to enable fullscreen");
 			SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(tempParent,
 				"You must disable custom chrome to enable fullscreen",
 				"Could not enter fullscreen mode",
@@ -76,7 +73,6 @@ public class FullscreenPlugin extends Plugin
 
 		if (!gd.isFullScreenSupported())
 		{
-			log.info("Fullscreen is not supported on your device, sorry :(");
 			SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(tempParent,
 				"Fullscreen is not supported on your device, sorry :(",
 				"Could not enter fullscreen mode",
@@ -100,6 +96,5 @@ public class FullscreenPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		gd.setFullScreenWindow(null);
-		log.info("Fullscreen stopped!");
 	}
 }

@@ -28,9 +28,9 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-		name = "Raid Player Names",
-		description = "This plugin will log all player names when a CoX raid is starting",
-		tags = {"combat", "raid", "pve", "pvm", "bosses", "cox", "names", "log"},
+	name = "Raid Player Names",
+	description = "This plugin will log all player names when a CoX raid is starting",
+	tags = {"combat", "raid", "pve", "pvm", "bosses", "cox", "names", "log"},
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )

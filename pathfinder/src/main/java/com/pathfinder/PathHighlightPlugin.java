@@ -17,13 +17,12 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 		name = "Pathfinder",
 		description = "Highlight the path your character will take to the hovered tile",
 		tags = {"highlight", "overlay", "path", "tile", "tiles", "gauntlet", "zalcano"},
-		enabledByDefault = false,
+	enabledByDefault = false,
 	type = PluginType.UTILITY
 )
 public class PathHighlightPlugin extends Plugin

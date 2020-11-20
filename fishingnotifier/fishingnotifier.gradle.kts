@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Bram91"
 project.extra["PluginName"] = "Fishing Notifier"
 project.extra["PluginDescription"] = "Notifies the moment you go idle while fishing"
 

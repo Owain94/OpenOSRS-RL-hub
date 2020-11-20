@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "ConradicalMel"
 project.extra["PluginName"] = "Master Farmer Helper"
 project.extra["PluginDescription"] = "Utilities that help when thieving master farmers"
 

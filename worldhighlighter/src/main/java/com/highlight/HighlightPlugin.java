@@ -28,7 +28,6 @@ import java.awt.*;
 import java.awt.geom.Area;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "World Highlighter",
@@ -72,14 +71,11 @@ public class HighlightPlugin extends Plugin
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event) {
 		//If you or someone you love is able to figure out how to only have this enabled for clan and private chat, hit a Turtle up.
-		if (true)
-		{
+		if (true) {
 			int groupId = WidgetInfo.TO_GROUP(event.getParam1());
 			String option = event.getOption();
-			if (groupId == WidgetInfo.CHATBOX.getGroupId() && !"Kick".equals(option) || groupId == WidgetInfo.PRIVATE_CHAT_MESSAGE.getGroupId())
-			{
-				if (!AFTER_OPTIONS.contains(option))
-				{
+			if (groupId == WidgetInfo.CHATBOX.getGroupId() && !"Kick".equals(option) || groupId == WidgetInfo.PRIVATE_CHAT_MESSAGE.getGroupId()) {
+				if (!AFTER_OPTIONS.contains(option)) {
 					return;
 				}
 				MenuEntry high = new MenuEntry();

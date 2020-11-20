@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.List;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Eclectic Jar Tracker",
@@ -36,8 +35,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false
 )
 
-public class EclecticPlugin extends Plugin
-{
+public class EclecticPlugin extends Plugin {
 	private int jarsOpened;
 	private double moneySpent;
 	private double moneyGained;
@@ -64,22 +62,19 @@ public class EclecticPlugin extends Plugin
 	private ItemManager itemManager;
 
 	@Override
-	public void startUp() throws IOException
-	{
+	public void startUp() throws IOException {
 		overlayManager.add(overlay);
 		looting = false;
 		firstRun = false;
 		setUp();
-		if (!firstRun)
-		{
+		if(!firstRun) {
 			data = loadJson();
 			jarsOpened = data.get(0).intValue();
 			moneySpent = data.get(1);
 			moneyGained = data.get(2);
 			nextMedium = data.get(3).intValue();
 		}
-		else
-		{
+		else{
 			data.add(0, 0.0);
 			data.add(1, 0.0);
 			data.add(2, 0.0);
@@ -88,8 +83,7 @@ public class EclecticPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
-	{
+	protected void shutDown() throws Exception {
 		//System.out.println("Saving");
 		overlayManager.remove(overlay);
 		data.set(0, (double) jarsOpened);
@@ -100,71 +94,54 @@ public class EclecticPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged)
-	{
-		try
-		{
-			if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
-			{
-				looting = false;
-				firstRun = false;
-				setUp();
-				if (!firstRun)
-				{
-					data = loadJson();
-					jarsOpened = data.get(0).intValue();
-					moneySpent = data.get(1);
-					moneyGained = data.get(2);
-					nextMedium = data.get(3).intValue();
-				}
-				else
-				{
-					data.add(0, 0.0);
-					data.add(1, 0.0);
-					data.add(2, 0.0);
-					data.add(3, 0.0);
-				}
-				//invPrev = Arrays.asList(client.getItemContainer(InventoryID.INVENTORY).getItems());
+	public void onGameStateChanged(GameStateChanged gameStateChanged) throws IOException {
+		if(gameStateChanged.getGameState() == GameState.LOGGED_IN) {
+			looting = false;
+			firstRun = false;
+			setUp();
+			if(!firstRun) {
+				data = loadJson();
+				jarsOpened = data.get(0).intValue();
+				moneySpent = data.get(1);
+				moneyGained = data.get(2);
+				nextMedium = data.get(3).intValue();
 			}
-			else if (gameStateChanged.getGameState() == GameState.CONNECTION_LOST)
-			{
-				//System.out.println("Shut Down");
-				data.set(0, (double) jarsOpened);
-				data.set(1, moneySpent);
-				data.set(2, moneyGained);
-				data.set(3, (double) nextMedium);
-				saveJson(data);
+			else{
+				data.add(0, 0.0);
+				data.add(1, 0.0);
+				data.add(2, 0.0);
+				data.add(3, 0.0);
 			}
+			//invPrev = Arrays.asList(client.getItemContainer(InventoryID.INVENTORY).getItems());
 		}
-		catch (IOException ignored)
-		{
+		else if(gameStateChanged.getGameState() == GameState.CONNECTION_LOST) {
+			//System.out.println("Shut Down");
+			data.set(0, (double) jarsOpened);
+			data.set(1, moneySpent);
+			data.set(2, moneyGained);
+			data.set(3, (double) nextMedium);
+			saveJson(data);
 		}
 	}
 
-	public static void setUp() throws IOException
-	{
+	public static void setUp() throws IOException {
 		directory = PARENT_DIRECTORY;
 		createDirectory(PARENT_DIRECTORY);
 		createRequiredFiles();
 	}
 
 	@Subscribe
-	public void onMenuOptionClicked(MenuOptionClicked event)
-	{
-		if (event.getIdentifier() == 11248 && event.getOption().equals("Loot"))
-		{
-			if (!looting)
-			{
+	public void onMenuOptionClicked(MenuOptionClicked event){
+		if(event.getIdentifier() == 11248 && event.getOption().equals("Loot")){
+			if(!looting){
 				looting = true;
 			}
 			jarsOpened++;
 			moneySpent += itemManager.getItemPrice(11248);
 			System.out.println(jarsOpened + " jars opened");
 		}
-		else if (event.getIdentifier() == 20545 && nextMedium == 1 && event.getOption().equals("Open"))
-		{
-			if (!looting)
-			{
+		else if(event.getIdentifier() == 20545 && nextMedium == 1 && event.getOption().equals("Open")){
+			if(!looting){
 				looting = true;
 			}
 			nextMedium = 0;
@@ -172,102 +149,79 @@ public class EclecticPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onItemContainerChanged(ItemContainerChanged event)
-	{
-		if (event.getContainerId() == 93 && looting)
-		{
+	public void onItemContainerChanged(ItemContainerChanged event) throws IOException {
+		if(event.getContainerId() == 93 && looting) {
 			invPrev.clear();
 			invPrev.addAll(inv);
 			inv = Arrays.asList(event.getItemContainer().getItems());
 			newItems.clear();
 			newItems.addAll(inv);
-			for (var item : invPrev)
-			{
+			for(var item : invPrev) {
 				newItems.remove(item);
 			}
-			for (var item : newItems)
-			{
-				if (item.getQuantity() > 0 && looting)
-				{
+			for (var item : newItems) {
+				if(item.getQuantity() > 0 && looting) {
 					looting = false;
 				}
-				if (item.getQuantity() > 1 && invPrev.size() > inv.indexOf(item) && invPrev.get(inv.indexOf(item)).getId() == item.getId())
-				{
+				if(item.getQuantity() > 1 && invPrev.size() > inv.indexOf(item) && invPrev.get(inv.indexOf(item)).getId() == item.getId()) {
 					System.out.println(item.getQuantity() - invPrev.get(inv.indexOf(item)).getQuantity() +
-						" " + itemManager.getItemDefinition(item.getId()).getName() + ": " +
-						itemManager.getItemPrice(item.getId()) * (item.getQuantity() -
-							invPrev.get(inv.indexOf(item)).getQuantity()) + " gp");
+							" " + itemManager.getItemDefinition(item.getId()).getName() + ": " +
+							itemManager.getItemPrice(item.getId()) * (item.getQuantity() -
+									invPrev.get(inv.indexOf(item)).getQuantity()) + " gp");
 					moneyGained += itemManager.getItemPrice(item.getId()) * (item.getQuantity() -
-						invPrev.get(inv.indexOf(item)).getQuantity());
+							invPrev.get(inv.indexOf(item)).getQuantity());
 				}
-				else
-				{
+				else{
 					System.out.println(item.getQuantity() +
-						" " + itemManager.getItemDefinition(item.getId()).getName() + ": " +
-						itemManager.getItemPrice(item.getId()) * item.getQuantity() + " gp");
+							" " + itemManager.getItemDefinition(item.getId()).getName() + ": " +
+							itemManager.getItemPrice(item.getId()) * item.getQuantity() + " gp");
 					moneyGained += itemManager.getItemPrice(item.getId()) * item.getQuantity();
 				}
 
-				if (itemManager.getItemDefinition(item.getId()).getName().equals("Clue scroll (medium)"))
-				{
+				if(itemManager.getItemDefinition(item.getId()).getName().equals("Clue scroll (medium)")){
 					nextMedium = 1;
 				}
 			}
 			System.out.println("Money Spent: " + moneySpent + " gp | Money Gained: " + moneyGained +
-				" gp | Profit: " + (moneyGained - moneySpent));
+					" gp | Profit: " + (moneyGained - moneySpent));
 			//System.out.println("Shut Down");
 			data.set(0, (double) jarsOpened);
 			data.set(1, moneySpent);
 			data.set(2, moneyGained);
 			data.set(3, (double) nextMedium);
-			try
-			{
-				saveJson(data);
-			}
-			catch (IOException ignored)
-			{
-			}
+			saveJson(data);
 		}
-		else if (event.getContainerId() == 93)
-		{
+		else if(event.getContainerId() == 93){
 			inv = Arrays.asList(event.getItemContainer().getItems());
 		}
 	}
 
-	private static void createRequiredFiles() throws IOException
-	{
+	private static void createRequiredFiles() throws IOException {
 		File file = new File(directory, "eclectic-data.json");
-		if (!file.exists())
-		{
-			if (!file.createNewFile())
-			{
+		if (!file.exists()) {
+			if (!file.createNewFile()) {
 				System.out.println("Failed to generate file " + file.getPath());
 			}
 		}
 	}
 
-	private static void createDirectory(File directory) throws IOException
-	{
-		if (!directory.exists())
-		{
+	private static void createDirectory(File directory) throws IOException {
+		if (!directory.exists()) {
 			firstRun = true;
 			System.out.println("Creating eclectic directory");
-			if (!directory.mkdir())
-			{
+			if (!directory.mkdir()) {
 				throw new IOException("unable to create parent directory!");
 			}
 		}
 	}
 
-	private static String getFileContent(String filename) throws IOException
-	{
+	private static String getFileContent(String filename) throws IOException {
 		Path filePath = Paths.get(directory + "\\" + filename);
 		byte[] fileBytes = Files.readAllBytes(filePath);
 		return new String(fileBytes);
 	}
 
-	public static void saveJson(List<?> list) throws IOException
-	{
+	public static void saveJson(List<?> list) throws IOException {
 		System.out.println("Saving JSON file");
 		final Gson gson = new Gson();
 		File file = new File(directory, "eclectic-data.json");
@@ -275,50 +229,38 @@ public class EclecticPlugin extends Plugin
 		Files.write(file.toPath(), json.getBytes());
 	}
 
-	public static List<Double> loadJson() throws IOException
-	{
+	public static List<Double> loadJson() throws IOException{
 		Gson gson = new Gson();
 		String jsonString = getFileContent("eclectic-data.json");
-		Type type = new TypeToken<List<Double>>()
-		{
+		Type type = new TypeToken<List<Double>>() {
 		}.getType();
 		List<Double> dat = gson.fromJson(jsonString, type);
-		if (dat == null)
-		{
+		if (dat == null) {
 			return new ArrayList<Double>();
 		}
 		return dat;
 	}
 
-	public int getJarsOpened()
-	{
+	public int getJarsOpened(){
 		return jarsOpened;
 	}
 
-	public double getMoneySpent()
-	{
+	public double getMoneySpent(){
 		return moneySpent;
 	}
 
-	public double getMoneyGained()
-	{
+	public double getMoneyGained(){
 		return moneyGained;
 	}
 
-	public double getProfit()
-	{
+	public double getProfit(){
 		return moneyGained - moneySpent;
 	}
 
-	public Color getProfitColor()
-	{
-		if (getProfit() > 0)
-		{
+	public Color getProfitColor(){
+		if(getProfit() > 0)
 			return Color.green;
-		}
 		else
-		{
 			return Color.red;
-		}
 	}
 }

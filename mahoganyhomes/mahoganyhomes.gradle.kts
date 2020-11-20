@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.2"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "TheStonedTurtle"
 project.extra["PluginName"] = "Mahogany Homes"
 project.extra["PluginDescription"] = "Mahogany Homes helper plugin"
 

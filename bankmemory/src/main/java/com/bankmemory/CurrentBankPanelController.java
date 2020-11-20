@@ -1,0 +1,104 @@
+package com.bankmemory;
+
+import com.bankmemory.data.BankItem;
+import com.bankmemory.data.BankSave;
+import com.bankmemory.data.BankWorldType;
+import com.bankmemory.data.PluginDataStore;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.swing.SwingUtilities;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.ItemDefinition;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.util.AsyncBufferedImage;
+
+public class CurrentBankPanelController {
+    @Inject private Client client;
+    @Inject private ItemManager itemManager;
+    @Inject private PluginDataStore dataStore;
+
+    private BankViewPanel panel;
+
+    @Nullable private BankSave latestDisplayedData = null;
+
+    public void startUp(BankViewPanel panel) {
+        assert client.isClientThread();
+
+        this.panel = panel;
+
+        if (client.getGameState() == GameState.LOGGED_IN) {
+            updateDisplayForCurrentAccount();
+        } else {
+            SwingUtilities.invokeLater(panel::displayNoDataMessage);
+        }
+    }
+
+    public void onGameStateChanged(GameStateChanged gameStateChanged) {
+        assert client.isClientThread();
+
+        if (gameStateChanged.getGameState() != GameState.LOGGED_IN) {
+            return;
+        }
+        updateDisplayForCurrentAccount();
+    }
+
+    private void updateDisplayForCurrentAccount() {
+        BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
+        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getUsername());
+        if (existingSave.isPresent()) {
+            handleBankSave(existingSave.get());
+        } else {
+            latestDisplayedData = null;
+            SwingUtilities.invokeLater(panel::displayNoDataMessage);
+        }
+    }
+
+    public void handleBankSave(BankSave newSave) {
+        assert client.isClientThread();
+
+        dataStore.saveAsCurrentBank(newSave);
+
+        boolean shouldReset = isBankIdentityDifferentToLastDisplayed(newSave);
+        boolean shouldUpdateItemsDisplay = shouldReset || isItemDataNew(newSave);
+        List<ItemListEntry> items = new ArrayList<>();
+        if (shouldUpdateItemsDisplay) {
+            // Get all the data we need for the UI on this thread (the game thread)
+            // Doing it on the EDT seems to cause random crashes & NPEs
+            for (BankItem i : newSave.getItemData()) {
+                ItemDefinition ic = itemManager.getItemDefinition(i.getItemId());
+                AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
+                int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
+                int haValue = ic.getHaPrice() * i.getQuantity();
+                items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
+            }
+        }
+        SwingUtilities.invokeLater(() -> {
+            if (shouldReset) {
+                panel.reset();
+            }
+            panel.updateTimeDisplay(newSave.getDateTimeString());
+            if (shouldUpdateItemsDisplay) {
+                panel.displayItemListings(items, true);
+            }
+        });
+        latestDisplayedData = newSave;
+    }
+
+    private boolean isBankIdentityDifferentToLastDisplayed(BankSave newSave) {
+        if (latestDisplayedData == null) {
+            return true;
+        }
+        boolean userNamesSame = latestDisplayedData.getUserName().equalsIgnoreCase(newSave.getUserName());
+        boolean worldTypesSame = latestDisplayedData.getWorldType() == newSave.getWorldType();
+        return !userNamesSame || !worldTypesSame;
+    }
+
+    private boolean isItemDataNew(BankSave newSave) {
+        return latestDisplayedData == null || !latestDisplayedData.getItemData().equals(newSave.getItemData());
+    }
+}

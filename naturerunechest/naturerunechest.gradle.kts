@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "travisfe"
 project.extra["PluginName"] = "Nature Rune Chest"
 project.extra["PluginDescription"] = "A plugin that adds a timer and readiness indicator for thieving nature rune chests"
 

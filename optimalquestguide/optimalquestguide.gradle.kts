@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "cesoun"
 project.extra["PluginName"] = "Optimal Quest Guide"
 project.extra["PluginDescription"] = "I wanted this so now you get this as well. OSRS Wiki Optimal Quest Guide."
 

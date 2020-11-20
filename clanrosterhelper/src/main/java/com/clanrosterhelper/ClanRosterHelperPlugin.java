@@ -55,7 +55,7 @@ import org.pf4j.Extension;
 @PluginDescriptor(
         name = "Clan Roster Helper",
         description = "Informs the user of actions to match a truthful copy of the clan roster",
-        tags = {"clan", "roster", "helper"},
+	tags = {"clan", "roster", "helper"},
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )

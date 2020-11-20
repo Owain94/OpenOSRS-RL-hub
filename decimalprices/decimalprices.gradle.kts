@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "rmaes4"
 project.extra["PluginName"] = "Decimal Prices"
 project.extra["PluginDescription"] = "Allows the use of decimals when entering a custom price"
 

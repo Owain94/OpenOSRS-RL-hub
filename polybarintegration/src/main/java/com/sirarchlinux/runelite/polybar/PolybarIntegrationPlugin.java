@@ -26,7 +26,7 @@ import org.pf4j.Extension;
 @Slf4j
 @Extension
 @PluginDescriptor(
-        name = "Polybar Integration",
+	name = "Polybar Integration",
 	description = "Shows OpenOSRS status inside a polybar statusbar",
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS

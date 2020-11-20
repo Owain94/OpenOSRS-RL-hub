@@ -47,9 +47,9 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-		name = "Nature Rune Chest",
-		description = "Show when nature rune chest is ready to be looted again",
-		tags = {"overlay", "skilling", "timers"},
+	name = "Nature Rune Chest",
+	description = "Show when nature rune chest is ready to be looted again",
+	tags = {"overlay", "skilling", "timers"},
 	enabledByDefault = false,
 	type = PluginType.SKILLING
 )

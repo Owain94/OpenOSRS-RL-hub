@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "hex-agon"
 project.extra["PluginName"] = "Volcanic Mine Stability Tracker"
 project.extra["PluginDescription"] = "Tracks mine stability changes and draws them on the hud"
 

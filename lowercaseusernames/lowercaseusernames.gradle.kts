@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "dekvall"
 project.extra["PluginName"] = "Lowercase Usernames"
 project.extra["PluginDescription"] = "Lowercases right-click menu entries to prevent lookalike usernames"
 

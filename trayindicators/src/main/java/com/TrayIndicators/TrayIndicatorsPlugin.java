@@ -20,12 +20,11 @@ import java.util.List;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-		name = "Tray Indicators",
-		description = "Displays your hitpoints, prayer or absorption in the system tray.",
-		tags = {"notifications"},
+	name = "Tray Indicators",
+	description = "Displays your hitpoints, prayer or absorption in the system tray.",
+	tags = {"notifications"},
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
@@ -178,7 +177,6 @@ public class TrayIndicatorsPlugin extends Plugin
 		}
 		catch (AWTException ex)
 		{
-			log.debug("Unable to add system tray icon", ex);
 			return trayIcon;
 		}
 
@@ -251,7 +249,6 @@ public class TrayIndicatorsPlugin extends Plugin
 	public void removeTrayIcon(int i){
 		if(!indexExists(trayIcons, i))
 		{
-			log.info("Index: '" + i + "' does not exist for trayIcons ;(");
 			return;
 		}
 

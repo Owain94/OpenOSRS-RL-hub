@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "microtavor5"
 project.extra["PluginName"] = "Pet Info"
 project.extra["PluginDescription"] = "Highlights other players pets,shows the pets name and gives info about the pets."
 

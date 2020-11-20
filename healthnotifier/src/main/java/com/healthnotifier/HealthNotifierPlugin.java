@@ -17,11 +17,10 @@ import javax.inject.Inject;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-		name = "Health Notifier",
-		description = "Notifies you when the mob you are attacking is below certain health.",
+	name = "Health Notifier",
+	description = "Notifies you when the mob you are attacking is below certain health.",
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "MMagicala"
 project.extra["PluginName"] = "Gnome Restaurant"
 project.extra["PluginDescription"] = "Add quality-of-life features to the Gnome Restaurant minigame"
 

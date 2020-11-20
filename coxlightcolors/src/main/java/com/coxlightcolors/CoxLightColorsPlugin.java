@@ -34,19 +34,19 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
 		name = "CoX Light Colors",
 		description = "Set the colors of the light above the loot chest in Chambers of Xeric",
-		tags = {"bosses", "combat", "pve", "raid"},
+	tags = {"bosses", "combat", "pve", "raid"},
 	type = PluginType.MINIGAME,
 	enabledByDefault = false
 )

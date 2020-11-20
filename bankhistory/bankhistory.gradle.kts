@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.12"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "AdrianLeeElder"
 project.extra["PluginName"] = "Bank Value Tracking"
 project.extra["PluginDescription"] = "Track the value of your bank over time"
 

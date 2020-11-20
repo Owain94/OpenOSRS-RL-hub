@@ -43,7 +43,6 @@ import net.runelite.client.plugins.PluginType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Collection Log",
@@ -52,6 +51,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.UTILITY
 )
+@Slf4j
 public class CollectionLogPlugin extends Plugin
 {
 	private static final String CONFIG_GROUP = "collectionlog";

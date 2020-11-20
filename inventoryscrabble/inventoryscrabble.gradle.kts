@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.4"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "dekvall"
 project.extra["PluginName"] = "Inventory Scrabble"
 project.extra["PluginDescription"] = "Only allow interactions with entities which name you can spell with the items in your inventory"
 

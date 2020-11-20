@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "AnkouOSRS"
 project.extra["PluginName"] = "Cox Light Colors"
 project.extra["PluginDescription"] = "change the cox loot light color"
 

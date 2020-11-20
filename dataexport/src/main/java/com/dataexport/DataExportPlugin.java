@@ -35,7 +35,6 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Data Export",
@@ -43,6 +42,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )
+@Slf4j
 public class DataExportPlugin extends Plugin
 {
 	private static final Set<Integer> CONTAINERS = ImmutableSet.of(InventoryID.BANK.getId(), InventoryID.SEED_VAULT.getId(), InventoryID.INVENTORY.getId(), InventoryID.EQUIPMENT.getId());

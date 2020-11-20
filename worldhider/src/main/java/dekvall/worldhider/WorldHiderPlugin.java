@@ -48,7 +48,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "World Hider",
@@ -73,18 +72,6 @@ public class WorldHiderPlugin extends Plugin
 	private ClientThread clientThread;
 
 	private int randomWorld = getRandomWorld();
-
-	@Override
-	protected void startUp() throws Exception
-    {
-		log.info("World Hider started!");
-    }
-
-	@Override
-	protected void shutDown() throws Exception
-	{
-		log.info("World Hider stopped!");
-	}
 
 	@Provides
 	WorldHiderConfig provideConfig(ConfigManager configManager)

@@ -24,106 +24,89 @@
  */
 package renderer.loader;
 
+import renderer.cache.CacheSystem;
+import renderer.world.*;
+import renderer.util.CacheBuffer;
+
 import java.util.ArrayList;
 import java.util.List;
-import renderer.cache.CacheSystem;
-import renderer.util.CacheBuffer;
-import renderer.world.Location;
-import renderer.world.LocationType;
-import renderer.world.MapDefinition;
-import renderer.world.OverlayShape;
-import renderer.world.Position;
 
-public class RegionLoader
-{
-	public static MapDefinition.Tile[][][] readTerrain(byte[] buf)
-	{
-		CacheBuffer in = new CacheBuffer(buf);
+public class RegionLoader {
+    public static MapDefinition.Tile[][][] readTerrain(byte[] buf) {
+        CacheBuffer in = new CacheBuffer(buf);
 
-		MapDefinition.Tile[][][] tiles = new MapDefinition.Tile[4][64][64];
+        MapDefinition.Tile[][][] tiles = new MapDefinition.Tile[4][64][64];
 
-		for (int z = 0; z < 4; z++)
-		{
-			for (int x = 0; x < 64; x++)
-			{
-				for (int y = 0; y < 64; y++)
-				{
-					tiles[z][x][y] = readTile(in);
-				}
-			}
-		}
+        for (int z = 0; z < 4; z++) {
+            for (int x = 0; x < 64; x++) {
+                for (int y = 0; y < 64; y++) {
+                    tiles[z][x][y] = readTile(in);
+                }
+            }
+        }
 
-		return tiles;
-	}
+        return tiles;
+    }
 
-	private static MapDefinition.Tile readTile(CacheBuffer in)
-	{
-		MapDefinition.Tile tile = new MapDefinition.Tile();
+    private static MapDefinition.Tile readTile(CacheBuffer in) {
+        MapDefinition.Tile tile = new MapDefinition.Tile();
 
-		while (true)
-		{
-			int attribute = in.get() & 0xFF;
-			if (attribute == 0)
-			{
-				return tile;
-			}
+        while (true) {
+            int attribute = in.get() & 0xFF;
+            if (attribute == 0) {
+                return tile;
+            }
 
-			if (attribute == 1)
-			{
-				tile.height = in.get() & 0xFF;
-				return tile;
-			}
+            if (attribute == 1) {
+                tile.height = in.get() & 0xFF;
+                return tile;
+            }
 
-			if (attribute <= 49)
-			{
-				tile.overlay = CacheSystem.getOverlayDefinition((in.get() & 0xff) - 1);
-				int overlayShape = attribute - 2;
-				tile.overlayShape = OverlayShape.values()[(overlayShape >> 2) + 1];
-				tile.overlayRotation = (byte) (overlayShape & 0b11);
-				continue;
-			}
+            if (attribute <= 49) {
+                tile.overlay = CacheSystem.getOverlayDefinition((in.get() & 0xff) - 1);
+                int overlayShape = attribute - 2;
+                tile.overlayShape = OverlayShape.values()[(overlayShape >> 2) + 1];
+                tile.overlayRotation = (byte) (overlayShape & 0b11);
+                continue;
+            }
 
-			if (attribute <= 81)
-			{
-				tile.settings = (byte) (attribute - 49);
-				continue;
-			}
+            if (attribute <= 81) {
+                tile.settings = (byte) (attribute - 49);
+                continue;
+            }
 
-			tile.underlay = CacheSystem.getUnderlayDefinition((attribute - 81) - 1);
-		}
-	}
+            tile.underlay = CacheSystem.getUnderlayDefinition((attribute - 81) - 1);
+        }
+    }
 
-	public static List<Location> loadLocations(byte[] b)
-	{
-		List<Location> loc = new ArrayList<>();
-		CacheBuffer buf = new CacheBuffer(b);
+    public static List<Location> loadLocations(byte[] b) {
+        List<Location> loc = new ArrayList<>();
+        CacheBuffer buf = new CacheBuffer(b);
 
-		int id = -1;
-		int idOffset;
+        int id = -1;
+        int idOffset;
 
-		while ((idOffset = buf.getSpecial3()) != 0)
-		{
-			id += idOffset;
+        while ((idOffset = buf.getSpecial3()) != 0) {
+            id += idOffset;
 
-			int position = 0;
-			int positionOffset;
+            int position = 0;
+            int positionOffset;
 
-			while ((positionOffset = buf.getSpecial2()) != 0)
-			{
-				position += positionOffset - 1;
+            while ((positionOffset = buf.getSpecial2()) != 0) {
+                position += positionOffset - 1;
 
-				int localY = position & 0x3F;
-				int localX = position >> 6 & 0x3F;
-				int height = position >> 12 & 0b11;
+                int localY = position & 0x3F;
+                int localX = position >> 6 & 0x3F;
+                int height = position >> 12 & 0b11;
 
-				int attributes = buf.get() & 0xFF;
-				LocationType type = LocationType.values()[attributes >> 2];
-				int orientation = attributes & 0x3;
+                int attributes = buf.get() & 0xFF;
+                LocationType type = LocationType.values()[attributes >> 2];
+                int orientation = attributes & 0x3;
 
-				loc.add(new Location(CacheSystem.getObjectDefinition(id), type, orientation, new Position(localX, localY, height)));
-			}
-		}
+                loc.add(new Location(CacheSystem.getObjectDefinition(id), type, orientation, new Position(localX, localY, height)));
+            }
+        }
 
-		return loc;
-	}
+        return loc;
+    }
 }

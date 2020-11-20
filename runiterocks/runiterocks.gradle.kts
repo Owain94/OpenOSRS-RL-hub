@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.5"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "TheStonedTurtle"
 project.extra["PluginName"] = "Runite Rocks"
 project.extra["PluginDescription"] = "Tracks when runite rocks will respawn"
 

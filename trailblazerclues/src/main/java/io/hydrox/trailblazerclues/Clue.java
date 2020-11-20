@@ -26,24 +26,70 @@ package io.hydrox.trailblazerclues;
 
 import io.hydrox.trailblazerclues.requirements.ANDGroupedRequirements;
 import io.hydrox.trailblazerclues.requirements.ANDRegionRequirement;
+import io.hydrox.trailblazerclues.requirements.NeverShowRequirements;
 import io.hydrox.trailblazerclues.requirements.ORGroupedRequirements;
 import io.hydrox.trailblazerclues.requirements.ORRegionRequirement;
 import io.hydrox.trailblazerclues.requirements.RegionRequirement;
 import io.hydrox.trailblazerclues.requirements.SingleRegionRequirement;
-import java.util.HashMap;
-import java.util.Map;
 import net.runelite.api.ItemID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.WidgetID;
+import java.util.HashMap;
+import java.util.Map;
 
 class Clue
 {
+	private static RegionRequirement and(Region... regions)
+	{
+		return new ANDRegionRequirement(regions);
+	}
+
+	private static RegionRequirement or(Region... regions)
+	{
+		return new ORRegionRequirement(regions);
+	}
+
+	private static RegionRequirement a(Region region)
+	{
+		return new SingleRegionRequirement(region);
+	}
+
+	private static RegionRequirement or(RegionRequirement... requirements)
+	{
+		return new ORGroupedRequirements(requirements);
+	}
+
+	private static RegionRequirement and(RegionRequirement... requirements)
+	{
+		return new ANDGroupedRequirements(requirements);
+	}
+
+	static RegionRequirement fromText(String text)
+	{
+		return CLUES.get(text);
+	}
+
+	static RegionRequirement fromWorldPoint(WorldPoint point)
+	{
+		return COORD_CLUES.get(point);
+	}
+
+	static RegionRequirement fromMap(int itemID)
+	{
+		return MAP_CLUES.get(itemID);
+	}
+
+	static RegionRequirement fromBeginnerMap(int widgetID)
+	{
+		return BEGINNER_MAP_CLUES.get(widgetID);
+	}
+
 	// I'm so, so very sorry.
 	private static final Map<String, RegionRequirement> CLUES = new HashMap<>();
 	private static final Map<WorldPoint, RegionRequirement> COORD_CLUES = new HashMap<>();
 	private static final Map<Integer, RegionRequirement> MAP_CLUES = new HashMap<>();
 	private static final Map<Integer, RegionRequirement> BEGINNER_MAP_CLUES = new HashMap<>();
-
+	
 	static
 	{
 		// Anagrams
@@ -282,7 +328,7 @@ class Clue
 		CLUES.put("search the bush at the digsite centre.", a(Region.MISTHALIN));
 		CLUES.put("someone watching the fights in the duel arena is your next destination.", a(Region.DESERT));
 		CLUES.put("it seems to have reached the end of the line, and it's still empty.", a(Region.ASGARNIA));
-		CLUES.put("you'll have to plug your nose if you use this source of herbs.", or(Region.MORYTANIA, Region.KANDARIN)); // Not entirely sure, since they removed a task that required you to kill spectres in Kandarin
+		CLUES.put("you'll have to plug your nose if you use this source of herbs.", a(Region.MORYTANIA));
 		CLUES.put("when you get tired of fighting, go deep, deep down until you need an antidote.", a(Region.KANDARIN));
 		CLUES.put("search the bookcase in the monastery.", a(Region.ASGARNIA));
 		CLUES.put("surprising? i bet he is...", a(Region.ASGARNIA));
@@ -461,7 +507,7 @@ class Clue
 		CLUES.put("clap in seers court house. spin before you talk to me. equip an adamant halberd, blue mystic robe bottom and a diamond ring.", and(Region.KANDARIN, Region.TIRANNWN));
 		CLUES.put("clap in the magic axe hut. beware of double agents! equip only some flared trousers.", and(Region.WILDERNESS, Region.MISTHALIN));
 		CLUES.put("cry in the catherby ranging shop. bow before you talk to me. equip blue gnome boots, a hard leather body and an unblessed silver sickle.", a(Region.KANDARIN));
-		CLUES.put("cry on the shore of catherby beach. laugh before you talk to me, equip an adamant sq shield, a bone dagger and mithril platebody.", and(Region.KANDARIN, Region.MISTHALIN));
+		CLUES.put("cry on the shore of catherby beach. laugh before you talk to me, equip an adamant sq shield, a bone dagger and mithril platebody.", and(Region.KANDARIN, Region.MISTHALIN, Region.ASGARNIA));
 		CLUES.put("cry on top of the western tree in the gnome agility arena. indicate 'no' before you talk to me. equip a steel kiteshield, ring of forging and green dragonhide chaps.", a(Region.KANDARIN));
 		CLUES.put("cry in the tzhaar gem store. beware of double agents! equip a fire cape and toktz-xil-ul.", a(Region.KARAMJA));
 		CLUES.put("cry in the draynor village jail. jump for joy before you talk to me. equip an adamant sword, a sapphire amulet and an adamant plateskirt.", a(Region.MISTHALIN));
@@ -475,7 +521,7 @@ class Clue
 		CLUES.put("dance at the entrance to the grand exchange. equip a pink skirt, pink robe top and a body tiara.", and(Region.MISTHALIN, Region.ASGARNIA));
 		CLUES.put("goblin salute in the goblin village. beware of double agents! equip a bandos godsword, a bandos cloak and a bandos platebody.", a(Region.ASGARNIA));
 		CLUES.put("headbang in the mine north of al kharid. equip a desert shirt, leather gloves and leather boots.", and(Region.MISTHALIN, Region.DESERT));
-		CLUES.put("headbang at the exam centre. beware of double agents! equip a mystic fire staff, a diamond bracelet and rune boots.", and(and(Region.MISTHALIN, Region.MORYTANIA), or(Region.WILDERNESS, Region.KANDARIN, Region.MISTHALIN)));
+		CLUES.put("headbang at the exam centre. beware of double agents! equip a mystic fire staff, a diamond bracelet and rune boots.", and(and(Region.MISTHALIN), or(Region.KANDARIN, Region.WILDERNESS, RareRegion.MISTHALIN), or(Region.TIRANNWN, Region.MORYTANIA)));
 		CLUES.put("headbang at the top of slayer tower. equip a seercull, a combat bracelet and helm of neitiznot.", and(Region.FREMENNIK, Region.MORYTANIA));
 		CLUES.put("dance a jig by the entrance to the fishing guild. equip an emerald ring, a sapphire amulet, and a bronze chain body.", a(Region.KANDARIN));
 		CLUES.put("dance a jig under shantay's awning. bow before you talk to me. equip a pointed blue snail helmet, an air staff and a bronze square shield.", and(Region.MORYTANIA, Region.DESERT));
@@ -484,9 +530,9 @@ class Clue
 		CLUES.put("jump for joy in yanille bank. dance a jig before you talk to me. equip a brown apron, adamantite medium helmet and snakeskin chaps.", and(a(Region.KANDARIN), or(Region.KARAMJA, Region.MORYTANIA, Region.MISTHALIN, Region.TIRANNWN)));
 		CLUES.put("jump for joy in the tzhaar sword shop. shrug before you talk to me. equip a steel longsword, blue d'hide body and blue mystic gloves.", and(a(Region.KARAMJA), or(Region.KANDARIN, Region.FREMENNIK)));
 		CLUES.put("jump for joy in the ancient cavern. equip a granite shield, splitbark body and any rune heraldic helm.", and(a(Region.KANDARIN), or(Region.FREMENNIK, Region.ASGARNIA), or(Region.MORYTANIA, Region.WILDERNESS)));
-		CLUES.put("jump for joy in the centre of zul-andra. beware of double agents! equip a dragon 2h sword, bandos boots and an obsidian cape.", and(a(Region.TIRANNWN), or(Region.WILDERNESS, Region.DESERT), a(Region.ASGARNIA), a(Region.KARAMJA)));
+		CLUES.put("jump for joy in the centre of zul-andra. beware of double agents! equip a dragon 2h sword, bandos boots and an obsidian cape.", and(and(Region.TIRANNWN, Region.KARAMJA, Region.ASGARNIA), or(Region.WILDERNESS, Region.DESERT)));
 		CLUES.put("laugh by the fountain of heroes. equip splitbark legs, dragon boots and a rune longsword.", and(a(Region.ASGARNIA), or(Region.WILDERNESS, Region.MORYTANIA)));
-		CLUES.put("laugh in jokul's tent in the mountain camp. beware of double agents! equip a rune full helmet, blue dragonhide chaps and a fire battlestaff.", and(a(Region.FREMENNIK), or(Region.KANDARIN, Region.KARAMJA)));
+		CLUES.put("laugh in jokul's tent in the mountain camp. beware of double agents! equip a rune full helmet, blue dragonhide chaps and a fire battlestaff.", and(a(Region.FREMENNIK), or(Region.TIRANNWN, Region.MORYTANIA, Region.WILDERNESS, Region.MISTHALIN, Region.KANDARIN, Region.KARAMJA)));
 		CLUES.put("laugh at the crossroads south of the sinclair mansion. equip a cowl, a blue wizard robe top and an iron scimitar.", a(Region.KANDARIN));
 		CLUES.put("laugh in front of the gem store in ardougne market. equip a castlewars bracelet, a dragonstone amulet and a ring of forging.", a(Region.KANDARIN));
 		CLUES.put("panic in the limestone mine. equip bronze platelegs, a steel pickaxe and a steel medium helmet.", a(Region.MISTHALIN));
@@ -508,7 +554,7 @@ class Clue
 		CLUES.put("spin at the crossroads north of rimmington. equip a green gnome hat, cream gnome top and leather chaps.", and(Region.ASGARNIA, Region.KANDARIN));
 		CLUES.put("spin in draynor manor by the fountain. equip an iron platebody, studded leather chaps and a bronze full helmet.", a(Region.MISTHALIN));
 		CLUES.put("spin in the varrock castle courtyard. equip a black axe, a coif and a ruby ring.", a(Region.MISTHALIN));
-		CLUES.put("spin in west ardougne church. equip a dragon spear and red dragonhide chaps.", and(a(Region.KANDARIN), or(Region.KARAMJA, Region.FREMENNIK, Region.WILDERNESS)));
+		CLUES.put("spin in west ardougne church. equip a dragon spear and red dragonhide chaps.", and(a(Region.KANDARIN), or(Region.KARAMJA, Region.FREMENNIK, Region.WILDERNESS, RareRegion.KANDARIN)));
 		CLUES.put("spin on the bridge by the barbarian village. salute before you talk to me. equip purple gloves, a steel kiteshield and a mithril full helmet.", and(Region.MISTHALIN, Region.MORYTANIA));
 		CLUES.put("stamp in the enchanted valley west of the waterfall. beware of double agents! equip a dragon axe.", and(Region.MISTHALIN, Region.FREMENNIK));
 		CLUES.put("think in middle of the wheat field by the lumbridge mill. equip a blue gnome robetop, a turquoise gnome robe bottom and an oak shortbow.", and(Region.MISTHALIN, Region.KANDARIN));
@@ -521,9 +567,9 @@ class Clue
 		CLUES.put("yawn in the varrock library. equip a green gnome robe top, ham robe bottom and an iron warhammer.", and(Region.MISTHALIN, Region.KANDARIN));
 		CLUES.put("yawn in draynor marketplace. equip studded leather chaps, an iron kiteshield and a steel longsword.", a(Region.MISTHALIN));
 		CLUES.put("yawn in the castle wars lobby. shrug before you talk to me. equip a ruby amulet, a mithril scimitar and a wilderness cape.", and(Region.KANDARIN, Region.WILDERNESS));
-		CLUES.put("yawn in the rogues' general store. beware of double agents! equip an adamant square shield, blue dragon vambraces and a rune pickaxe.", and(a(Region.WILDERNESS), or(Region.KANDARIN, Region.TIRANNWN)));
-		CLUES.put("yawn at the top of trollheim. equip a lava battlestaff, black dragonhide vambraces and a mind shield.", and(Region.ASGARNIA, Region.KANDARIN));
-		CLUES.put("swing a bullroarer at the top of the watchtower. beware of double agents! equip a dragon plateskirt, climbing boots and a dragon chainbody.", and(Region.KANDARIN, Region.ASGARNIA, Region.KARAMJA));
+		CLUES.put("yawn in the rogues' general store. beware of double agents! equip an adamant square shield, blue dragon vambraces and a rune pickaxe.", and(a(Region.WILDERNESS), or(Region.KANDARIN, Region.TIRANNWN, Region.FREMENNIK, Region.ASGARNIA)));
+		CLUES.put("yawn at the top of trollheim. equip a lava battlestaff, black dragonhide vambraces and a mind shield.", and(and(Region.ASGARNIA, Region.KANDARIN), or(Region.MORYTANIA, Region.WILDERNESS, Region.DESERT, RareRegion.KANDARIN, RareRegion.ASGARNIA)));
+		CLUES.put("swing a bullroarer at the top of the watchtower. beware of double agents! equip a dragon plateskirt, climbing boots and a dragon chainbody.", and(and(Region.ASGARNIA, Region.KARAMJA, Region.FREMENNIK), or(Region.KANDARIN, Region.DESERT)));
 		CLUES.put("blow a raspberry at gypsy aris in her tent. equip a gold ring and a gold necklace.", a(Region.MISTHALIN));
 		CLUES.put("bow to brugsen bursen at the grand exchange.", a(Region.MISTHALIN));
 		CLUES.put("cheer at iffie nitter. equip a chef hat and a red cape.", a(Region.MISTHALIN));
@@ -609,7 +655,10 @@ class Clue
 		CLUES.put("they come from some time ago, from a land unto the east. fossilised they have become, this small and gentle beast.", a(Region.MISTHALIN));
 		CLUES.put("to slay a dragon you must first do, before this chest piece can be put on you.", a(Region.MISTHALIN));
 		CLUES.put("vampyres are agile opponents, damaged best with a weapon of many components.", a(Region.MORYTANIA));
-
+		// Special
+		CLUES.put("buried beneath the ground, who knows where it's found. lucky for you, a man called reldo may have a clue.", or(Region.MISTHALIN, Region.ASGARNIA));
+		CLUES.put("buried beneath the ground, who knows where it's found. lucky for you, a man called jorral may have a clue.", new NeverShowRequirements());
+		
 		// Coord Clues
 		COORD_CLUES.put(new WorldPoint(2479, 3158, 0), a(Region.KANDARIN));
 		COORD_CLUES.put(new WorldPoint(2887, 3154, 0), a(Region.KARAMJA));
@@ -798,50 +847,5 @@ class Clue
 		BEGINNER_MAP_CLUES.put(WidgetID.BEGINNER_CLUE_MAP_DRAYNOR, a(Region.MISTHALIN));
 		BEGINNER_MAP_CLUES.put(WidgetID.BEGINNER_CLUE_MAP_NORTH_OF_FALADOR, a(Region.ASGARNIA));
 		BEGINNER_MAP_CLUES.put(WidgetID.BEGINNER_CLUE_MAP_WIZARDS_TOWER, a(Region.MISTHALIN));
-	}
-
-	private static RegionRequirement and(Region... regions)
-	{
-		return new ANDRegionRequirement(regions);
-	}
-
-	private static RegionRequirement or(Region... regions)
-	{
-		return new ORRegionRequirement(regions);
-	}
-
-	private static RegionRequirement a(Region region)
-	{
-		return new SingleRegionRequirement(region);
-	}
-
-	private static RegionRequirement or(RegionRequirement... requirements)
-	{
-		return new ORGroupedRequirements(requirements);
-	}
-
-	private static RegionRequirement and(RegionRequirement... requirements)
-	{
-		return new ANDGroupedRequirements(requirements);
-	}
-
-	static RegionRequirement fromText(String text)
-	{
-		return CLUES.get(text);
-	}
-
-	static RegionRequirement fromWorldPoint(WorldPoint point)
-	{
-		return COORD_CLUES.get(point);
-	}
-
-	static RegionRequirement fromMap(int itemID)
-	{
-		return MAP_CLUES.get(itemID);
-	}
-
-	static RegionRequirement fromBeginnerMap(int widgetID)
-	{
-		return BEGINNER_MAP_CLUES.get(widgetID);
 	}
 }

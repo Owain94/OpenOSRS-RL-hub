@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import static net.runelite.api.ItemID.INFERNAL_CAPE;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Inferno Split Timer",
@@ -36,6 +35,7 @@ import org.pf4j.Extension;
 	enabledByDefault = false,
 	type = PluginType.MINIGAME
 )
+@Slf4j
 public class InfernoSplitTimerPlugin extends Plugin
 {
 	private static final Pattern WAVE_MESSAGE = Pattern.compile("Wave: (\\d+)");

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "andham97"
 project.extra["PluginName"] = "Play Time"
 project.extra["PluginDescription"] = "Tracking in-game play time days and hours"
 

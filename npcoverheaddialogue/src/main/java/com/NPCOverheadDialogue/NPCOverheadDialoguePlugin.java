@@ -32,10 +32,9 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "NPC Overhead Dialog",
+	name = "NPC Overhead Dialog",
 	description = "Displays NPC dialog over their head, includes custom ambient, walking, damage, and death dialog as well.",
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
@@ -307,7 +306,6 @@ public class NPCOverheadDialoguePlugin extends Plugin
             {
                 setOverheadText(dialogue, npc, state);
                 state.setTicksWithoutMoving(0);
-                log.info("set " + npc + " overhead text");
             }
         }
         else
@@ -330,7 +328,6 @@ public class NPCOverheadDialoguePlugin extends Plugin
         {
             return;
         }
-        log.info("NPC being checked is: " + dialogNpc.getNpcName() + " with an npcID of: " + dialogNpc.getNpcID());
 
         final String[] dialogues = dialogNpc.getAmbientDialogs();
         if (dialogues == null)
@@ -343,7 +340,6 @@ public class NPCOverheadDialoguePlugin extends Plugin
         {
             final String dialogue = dialogues[RANDOM.nextInt(dialogues.length)];
             setOverheadText(dialogue, npc, state);
-            log.info(npc.getName() + " said: " + dialogue);
         }
     }
 

@@ -20,10 +20,9 @@ import java.awt.image.BufferedImage;
 import java.util.function.Consumer;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-    name = "Probability Calculator",
+	name = "Probability Calculator",
 	description = "Calculates the statistical probability of various mechanics such as drops",
 	enabledByDefault = false,
 	type = PluginType.UTILITY
@@ -50,7 +49,6 @@ public class ProbabilityCalculatorPlugin extends Plugin
     @Override
     protected void startUp()
     {
-        log.info("prob-calc: Plugin started!");
         input = new ProbabilityCalculatorInputArea();
         output = new ProbabilityCalculatorOutputArea(dropRate, killCount, dropsReceived, config);
         panel = new ProbabilityCalculatorPanel(input, output);
@@ -112,8 +110,6 @@ public class ProbabilityCalculatorPlugin extends Plugin
         output.setKillCount(killCount);
         output.setDropsReceived(dropsReceived);
         output.updateTextArea();
-
-        log.info("prob-calc: Input fields updated!");
     }
 
     private FocusAdapter buildFocusAdapter(Consumer<FocusEvent> focusLostConsumer)
@@ -132,7 +128,6 @@ public class ProbabilityCalculatorPlugin extends Plugin
     protected void shutDown()
     {
         clientToolbar.removeNavigation(navButton);
-        log.info("prob-calc: Plugin stopped!");
     }
 
     @Provides

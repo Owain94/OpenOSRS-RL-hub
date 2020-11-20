@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "ejedev"
 project.extra["PluginName"] = "Raid Shamer"
 project.extra["PluginDescription"] = "Takes a screenshot of deaths during Theater of Blood. Also supports discord webhook integration."
 

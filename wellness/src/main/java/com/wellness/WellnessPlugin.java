@@ -19,12 +19,11 @@ import net.runelite.client.Notifier;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-		name = "Wellness Notifications",
-		description = "A plugin to add reminders that promote wellness and healthy gaming.",
-		tags = {"wellness", "health", "eye", "reminder", "hydration"},
+	name = "Wellness Notifications",
+	description = "A plugin to add reminders that promote wellness and healthy gaming.",
+	tags = {"wellness", "health", "eye", "reminder", "hydration"},
 	enabledByDefault = false,
 	type = PluginType.MISCELLANEOUS
 )

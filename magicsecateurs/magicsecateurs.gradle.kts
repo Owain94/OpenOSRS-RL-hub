@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.3"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Ryanbarker0"
 project.extra["PluginName"] = "Magic Secateurs"
 project.extra["PluginDescription"] = "Highlight when magic secateurs aren't equipped on a farming run"
 

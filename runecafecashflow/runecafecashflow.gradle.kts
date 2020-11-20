@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.6"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "jmhertlein"
 project.extra["PluginName"] = "RuneCafe Cash Flow"
 project.extra["PluginDescription"] = "Plugin providing RuneLite integration for rune.cafe."
 

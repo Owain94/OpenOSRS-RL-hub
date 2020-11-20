@@ -9,7 +9,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Decimal Prices",
@@ -32,14 +31,12 @@ public class DecimalPrices extends Plugin
 	protected void startUp() throws Exception
 	{
 		keyManager.registerKeyListener(inputListener);
-		log.info("Decimal prices started!");
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
 		keyManager.unregisterKeyListener(inputListener);
-		log.info("Decimal prices stopped!");
 	}
 
 }

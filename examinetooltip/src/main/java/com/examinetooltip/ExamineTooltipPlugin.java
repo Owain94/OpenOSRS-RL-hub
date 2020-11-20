@@ -30,6 +30,7 @@ import com.google.inject.Provides;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
@@ -45,7 +46,6 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Examine Tooltip",
@@ -56,6 +56,8 @@ import org.pf4j.Extension;
 )
 public class ExamineTooltipPlugin extends Plugin
 {
+	private static Pattern PATCH_INSPECT_PATTERN = Pattern.compile("^This is an? .+\\. The (?:soil|patch) has");
+
 	@Inject
 	private OverlayManager overlayManager;
 
@@ -70,6 +72,8 @@ public class ExamineTooltipPlugin extends Plugin
 
 	private final Queue<ExamineTextTime> pendingExamines = new ArrayDeque<>();
 
+	private ExamineTextTime pendingPatchInspect;
+
 	@Provides
 	ExamineTooltipConfig provideConfig(ConfigManager configManager)
 	{
@@ -80,6 +84,7 @@ public class ExamineTooltipPlugin extends Plugin
 	{
 		examines.clear();
 		pendingExamines.clear();
+		pendingPatchInspect = null;
 	}
 
 	@Override
@@ -105,62 +110,92 @@ public class ExamineTooltipPlugin extends Plugin
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		if (!Text.removeTags(event.getOption()).equals("Examine"))
+		String option = Text.removeTags(event.getOption());
+
+		ExamineType type;
+		if (option.equals("Examine"))
+		{
+			switch (event.getMenuOpcode())
+			{
+				case EXAMINE_ITEM:
+					if (!config.showItemExamines())
+					{
+						return;
+					}
+					type = ExamineType.ITEM;
+					break;
+				case EXAMINE_ITEM_GROUND:
+					if (!config.showGroundItemExamines())
+					{
+						return;
+					}
+					type = ExamineType.ITEM_GROUND;
+					break;
+				case CC_OP_LOW_PRIORITY:
+					if (!config.showItemExamines())
+					{
+						return;
+					}
+					type = ExamineType.ITEM_INTERFACE;
+					break;
+				case EXAMINE_OBJECT:
+					if (!config.showObjectExamines())
+					{
+						return;
+					}
+					type = ExamineType.OBJECT;
+					break;
+				case EXAMINE_NPC:
+					if (!config.showNPCExamines())
+					{
+						return;
+					}
+					type = ExamineType.NPC;
+					break;
+				default:
+					return;
+			}
+		}
+		else if (option.equals("Inspect"))
+		{
+			switch (event.getMenuOpcode())
+			{
+				case GAME_OBJECT_FIRST_OPTION:
+				case GAME_OBJECT_SECOND_OPTION:
+				case GAME_OBJECT_THIRD_OPTION:
+				case GAME_OBJECT_FOURTH_OPTION:
+				case GAME_OBJECT_FIFTH_OPTION:
+					type = ExamineType.PATCH_INSPECT;
+					break;
+				default:
+					return;
+			}
+		}
+		else
 		{
 			return;
 		}
 
-		ExamineType type;
 		int id = event.getIdentifier();
 		int actionParam = event.getParam1();
 		int wId = event.getParam0();
-		switch (event.getMenuOpcode())
-		{
-			case EXAMINE_ITEM:
-				if (!config.showItemExamines())
-				{
-					return;
-				}
-				type = ExamineType.ITEM;
-				break;
-			case EXAMINE_ITEM_GROUND:
-				if (!config.showGroundItemExamines())
-				{
-					return;
-				}
-				type = ExamineType.ITEM_GROUND;
-				break;
-			case CC_OP_LOW_PRIORITY:
-				if (!config.showItemExamines())
-				{
-					return;
-				}
-				type = ExamineType.ITEM_INTERFACE;
-				break;
-			case EXAMINE_OBJECT:
-				if (!config.showObjectExamines())
-				{
-					return;
-				}
-				type = ExamineType.OBJECT;
-				break;
-			case EXAMINE_NPC:
-				if (!config.showNPCExamines())
-				{
-					return;
-				}
-				type = ExamineType.NPC;
-				break;
-			default:
-				return;
-		}
 
 		ExamineTextTime examine = new ExamineTextTime();
 		examine.setType(type);
 		examine.setId(id);
 		examine.setWidgetId(wId);
 		examine.setActionParam(actionParam);
-		pendingExamines.offer(examine);
+
+		if (type == ExamineType.PATCH_INSPECT)
+		{
+			// Patch inspects require the player to move up to the patch.
+			// They have to be treated separately and cannot be queued.
+			pendingPatchInspect = examine;
+		}
+		else
+		{
+			pendingExamines.offer(examine);
+		}
 	}
 
 	@Subscribe
@@ -186,7 +221,14 @@ public class ExamineTooltipPlugin extends Plugin
 				type = ExamineType.NPC;
 				break;
 			case GAMEMESSAGE:
-				type = ExamineType.ITEM_INTERFACE;
+				if (PATCH_INSPECT_PATTERN.matcher(event.getMessage()).lookingAt())
+				{
+					type = ExamineType.PATCH_INSPECT;
+				}
+				else
+				{
+					type = ExamineType.ITEM_INTERFACE;
+				}
 				break;
 			default:
 				return;
@@ -208,12 +250,28 @@ public class ExamineTooltipPlugin extends Plugin
 			return;
 		}
 
-		if (pendingExamines.isEmpty())
+		ExamineTextTime pending;
+
+		if (type == ExamineType.PATCH_INSPECT)
+		{
+			if (pendingPatchInspect != null && config.showPatchInspects())
+			{
+				pending = pendingPatchInspect;
+				pendingPatchInspect = null;
+			}
+			else
+			{
+				return;
+			}
+		}
+		else if (!pendingExamines.isEmpty())
+		{
+			pending = pendingExamines.poll();
+		}
+		else
 		{
 			return;
 		}
-
-		ExamineTextTime pending = pendingExamines.poll();
 
 		if (pending.getType() == type || (type == ExamineType.ITEM && pending.getType() == ExamineType.ITEM_GROUND))
 		{

@@ -49,13 +49,12 @@ import java.util.Iterator;
 import java.util.List;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 		name = "Crab Stun Timers",
 		description = "Show crab stun timers",
 		tags = {"overlay", "raid", "pvm", "timers"},
-		enabledByDefault = false,
+	enabledByDefault = false,
 	type = PluginType.MINIGAME
 )
 public class CrabStunPlugin extends Plugin {

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.8"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "m0bilebtw"
 project.extra["PluginName"] = "Skills Progress Bars"
 project.extra["PluginDescription"] = "Adds progress bars to the skills tab to show how close the next level ups are"
 

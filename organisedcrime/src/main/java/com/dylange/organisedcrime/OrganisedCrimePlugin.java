@@ -47,12 +47,11 @@ import static com.dylange.organisedcrime.tools.WidgetConstants.GROUP_ID_INFORMAT
 import static com.dylange.organisedcrime.tools.WidgetConstants.GROUP_ID_NO_INFORMATION_ATM;
 import org.pf4j.Extension;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
-        name = "Organised crime",
-        description = "Keeps track of organised crime locations across worlds",
-        enabledByDefault = false,
+	name = "Organised crime",
+	description = "Keeps track of organised crime locations across worlds",
+	enabledByDefault = false,
 	type = PluginType.MINIGAME
 )
 public class OrganisedCrimePlugin extends Plugin {

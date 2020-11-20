@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "stevenkaan"
 project.extra["PluginName"] = "Raid Player Names Logger"
 project.extra["PluginDescription"] = "This plugin will log all player names when a CoX raid is starting"
 

@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Trevor159"
 project.extra["PluginName"] = "Chatbox Opacity"
 project.extra["PluginDescription"] = "Change the opacity on your transparent chatboxes"
 

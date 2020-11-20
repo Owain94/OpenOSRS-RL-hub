@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Milo-Piazza"
 project.extra["PluginName"] = "Pathfinder"
 project.extra["PluginDescription"] = "Highlights your character's path to the hovered tile"
 

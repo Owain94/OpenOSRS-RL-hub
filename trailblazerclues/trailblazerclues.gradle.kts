@@ -23,8 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.1.0"
 
+project.extra["PluginProvider"] = "Hydrox6"
 project.extra["PluginName"] = "Trailblazer Clues"
 project.extra["PluginDescription"] = "Know what Trailblazer regions each clue requires"
 

@@ -32,7 +32,6 @@ import thestonedturtle.bankedexperience.data.Activity;
 import thestonedturtle.bankedexperience.data.ExperienceItem;
 import thestonedturtle.bankedexperience.data.WidgetInventoryInfo;
 
-@Slf4j
 @Extension
 @PluginDescriptor(
 	name = "Banked Experience",
