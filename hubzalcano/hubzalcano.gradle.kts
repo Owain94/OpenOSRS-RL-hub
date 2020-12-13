@@ -26,7 +26,7 @@
 version = "0.1.0"
 
 project.extra["PluginProvider"] = "Tjieco"
-project.extra["PluginName"] = "Zalcano"
+project.extra["PluginName"] = "Hub Zalcano"
 project.extra["PluginDescription"] = "Zalcano Utility Plugin"
 
 tasks {
