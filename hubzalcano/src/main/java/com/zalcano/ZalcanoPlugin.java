@@ -48,7 +48,7 @@ import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-	name = "Zalcano",
+	name = "Hub Zalcano",
 	description = "Zalcano Utility Plugin",
 	enabledByDefault = false,
 	type = PluginType.MINIGAME
