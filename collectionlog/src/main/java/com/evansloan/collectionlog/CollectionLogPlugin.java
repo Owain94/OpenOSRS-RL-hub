@@ -466,7 +466,17 @@ public class CollectionLogPlugin extends Plugin
 		String jsonString = configManager.getConfiguration(group, configKey);
 		if (jsonString == null)
 		{
-			return "{}";
+			if (configKey.equals("completed_categories"))
+			{
+				return "[]";  // List<x>
+			}
+			return "{}"; // Map<x,y>
+		}
+		if (configKey.equals("completed_categories") && jsonString.equals("{}"))
+		{
+			log.debug("Detected incorrect value in - completed_categories - overrote it with []");
+			configManager.setConfiguration(group, configKey, "[]");
+			return "[]";  // List<x>
 		}
 		return jsonString;
 	}
