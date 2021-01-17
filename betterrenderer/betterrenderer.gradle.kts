@@ -37,7 +37,7 @@ dependencies {
 
     compileOnly("com.openosrs.externals:gpu:0.0.+")
 
-    implementation("org.joml:joml:1.9.25")
+    implementation("org.joml:joml:1.10.0")
 
     implementation("org.lwjgl:lwjgl:3.2.3")
     runtimeOnly("org.lwjgl:lwjgl:3.2.3:natives-windows")
@@ -66,7 +66,7 @@ dependencies {
     implementation("org.lwjgl:lwjgl-jawt:3.2.3")
     implementation(files("lib/lwjgl3-awt-0.1.8-SNAPSHOT.jar"))
 
-    implementation("it.unimi.dsi:fastutil:8.4.3")
+    implementation("it.unimi.dsi:fastutil:8.4.4")
     implementation("org.apache.commons:commons-compress:1.20")
 
     annotationProcessor("org.projectlombok:lombok:1.18.4")

@@ -30,7 +30,7 @@ project.extra["PluginName"] = "InfluxDB"
 project.extra["PluginDescription"] = "Saves statistics to InfluxDB"
 
 dependencies {
-    implementation(group = "org.influxdb", name = "influxdb-java", version = "2.20")
+    implementation(group = "org.influxdb", name = "influxdb-java", version = "2.21")
 
     compileOnly("com.openosrs.externals:loottracker:0.0.+")
 }
